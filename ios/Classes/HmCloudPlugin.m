@@ -12,9 +12,22 @@
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
   if ([@"getPlatformVersion" isEqualToString:call.method]) {
     result([@"iOS " stringByAppendingString:[[UIDevice currentDevice] systemVersion]]);
+  }else if ([@"getBatteryLevel" isEqualToString:call.method]) {
+      CGFloat batteryLevel = [self getBatteryLevel];
+      result([NSString stringWithFormat:@"%.0f%%",batteryLevel]);
   } else {
     result(FlutterMethodNotImplemented);
   }
+}
+
+- (CGFloat)getBatteryLevel{
+
+    [UIDevice currentDevice].batteryMonitoringEnabled = YES;
+    
+    if ([UIDevice currentDevice].batteryState == UIDeviceBatteryStateUnknown) {
+        return -1;
+    }
+    return (CGFloat)[UIDevice currentDevice].batteryLevel*100;
 }
 
 @end

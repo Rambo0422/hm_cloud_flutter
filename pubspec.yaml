@@ -1,7 +1,7 @@
 name: hm_cloud
 description: A new Flutter plugin project.
 version: 0.0.1
-homepage:
+homepage: https://github.com/Rambo0422/hm_cloud_flutter
 
 environment:
   sdk: '>=2.18.6 <3.0.0'

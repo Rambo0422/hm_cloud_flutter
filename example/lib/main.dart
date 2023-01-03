@@ -17,12 +17,14 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
+  String _platformBatteryLevel = 'Unknown';
   final _hmCloudPlugin = HmCloud();
 
   @override
   void initState() {
     super.initState();
     initPlatformState();
+    initBatteryLevel();
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
@@ -31,8 +33,8 @@ class _MyAppState extends State<MyApp> {
     // Platform messages may fail, so we use a try/catch PlatformException.
     // We also handle the message potentially returning null.
     try {
-      platformVersion =
-          await _hmCloudPlugin.getPlatformVersion() ?? 'Unknown platform version';
+      platformVersion = await _hmCloudPlugin.getPlatformVersion() ??
+          'Unknown platform version';
     } on PlatformException {
       platformVersion = 'Failed to get platform version.';
     }
@@ -47,6 +49,23 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+  Future<void> initBatteryLevel() async {
+    String batteryLevel;
+    try {
+      batteryLevel = await _hmCloudPlugin.getBatteryLevel() ??
+          'Unknown platform batteryLevel';
+    } on PlatformException {
+      batteryLevel = 'Failed to get platform batteryLevel.';
+    }
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _platformBatteryLevel = batteryLevel;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -55,7 +74,15 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
         ),
         body: Center(
-          child: Text('Running on: $_platformVersion\n'),
+          child: Column(
+            children: [
+              Text('Running on: $_platformVersion\n'),
+              const SizedBox(
+                height: 20,
+              ),
+              Text('Running on: $_platformBatteryLevel\n'),
+            ],
+          ),
         ),
       ),
     );

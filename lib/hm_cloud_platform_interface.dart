@@ -26,4 +26,8 @@ abstract class HmCloudPlatform extends PlatformInterface {
   Future<String?> getPlatformVersion() {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
+
+  Future<String?> getBatteryLevel() {
+    throw UnimplementedError('batteryLevel() has not been implemented.');
+  }
 }
