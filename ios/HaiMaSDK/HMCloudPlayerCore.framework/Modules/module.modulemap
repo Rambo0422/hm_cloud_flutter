@@ -1,0 +1,6 @@
+framework module HMCloudPlayerCore {
+  umbrella header "HMCloudPlayerCore.h"
+
+  export *
+  module * { export * }
+}

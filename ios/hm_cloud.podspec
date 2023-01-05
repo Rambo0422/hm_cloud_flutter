@@ -15,6 +15,8 @@ A new Flutter plugin project.
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.public_header_files = 'Classes/**/*.h'
+  s.resource              = 'HaiMaSDK/HaiMaSDK_Bundle_iOS.bundle'
+  s.vendored_frameworks   = 'HaiMaSDK/HMCloudPlayerCore.framework', 'HaiMaSDK/HMWebRTC.framework'
   s.dependency 'Flutter'
   s.platform = :ios, '9.0'
 

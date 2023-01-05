@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:hm_cloud/hm_cloud.dart';
+import 'package:hm_cloud/hm_cloud_view.dart';
 
 void main() {
   runApp(const MyApp());
@@ -76,11 +77,23 @@ class _MyAppState extends State<MyApp> {
         body: Center(
           child: Column(
             children: [
-              Text('Running on: $_platformVersion\n'),
+              InkWell(
+                  onTap: () {
+                    HmCloud().startCloudGame();
+                  },
+                  child: Text('Running on: $_platformVersion\n')),
               const SizedBox(
                 height: 20,
               ),
               Text('Running on: $_platformBatteryLevel\n'),
+              const Expanded(
+                  child: HmCloudView(
+                accessKey: 'e8c086496c7dc017e2c98e5facc83b11',
+                accessKeyId: '86c5b660eea',
+                channelId: 'luehu',
+                userId: 'test123',
+                gameId: 'com.tencent.tmgp.sgame',
+              )),
             ],
           ),
         ),

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Launguages</key>
+	<dict>
+		<key>en_US</key>
+		<dict>
+            <key>heartBeatTimeout</key>
+            <string>Reconnect for heartbeat timeout</string>
+            <key>OK</key>
+            <string>OK</string>
+            <key>wrongParameter</key>
+            <string>Incomplete request parameter</string>
+		</dict>
+		<key>zh_CN</key>
+		<dict>
+            <key>heartBeatTimeout</key>
+            <string>心跳超时重连</string>
+            <key>OK</key>
+            <string>好的</string>
+            <key>wrongParameter</key>
+            <string>请求参数不完整</string>
+		</dict>
+	</dict>
+</dict>
+</plist>
