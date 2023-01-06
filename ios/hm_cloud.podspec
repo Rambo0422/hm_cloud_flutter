@@ -16,8 +16,12 @@ A new Flutter plugin project.
   s.source_files = 'Classes/**/*'
   s.public_header_files = 'Classes/**/*.h'
   s.resource              = 'HaiMaSDK/HaiMaSDK_Bundle_iOS.bundle'
+  s.resource_bundles = {
+      'DaShen' => ['Classes/**/*.{xib,png,xcassets,json,plist}']
+    }
   s.vendored_frameworks   = 'HaiMaSDK/HMCloudPlayerCore.framework', 'HaiMaSDK/HMWebRTC.framework'
   s.dependency 'Flutter'
+  s.dependency 'Masonry', '~> 1.1.0'
   s.platform = :ios, '9.0'
 
   # Flutter.framework does not contain a i386 slice.

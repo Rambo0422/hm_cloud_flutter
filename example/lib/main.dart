@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -19,11 +21,17 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
   String _platformBatteryLevel = 'Unknown';
+  bool isFull = false;
   final _hmCloudPlugin = HmCloud();
 
   @override
   void initState() {
     super.initState();
+
+    HmCloudController.instance.setCallback((actionName) {
+      print('来自iOS的回调$actionName');
+    });
+
     initPlatformState();
     initBatteryLevel();
   }
@@ -79,17 +87,27 @@ class _MyAppState extends State<MyApp> {
             children: [
               InkWell(
                   onTap: () {
-                    HmCloud().startCloudGame();
+                    HmCloudController.instance.startCloudGame();
                   },
                   child: Text('Running on: $_platformVersion\n')),
               const SizedBox(
                 height: 20,
               ),
-              Text('Running on: $_platformBatteryLevel\n'),
+              InkWell(
+                  onTap: () {
+                    if (isFull) {
+                      HmCloudController.instance.fullCloudGame(isFull);
+                      isFull = false;
+                    } else {
+                      HmCloudController.instance.fullCloudGame(isFull);
+                      isFull = true;
+                    }
+                  },
+                  child: Text('Running on: $_platformBatteryLevel\n')),
               const Expanded(
                   child: HmCloudView(
-                accessKey: 'e8c086496c7dc017e2c98e5facc83b11',
-                accessKeyId: '86c5b660eea',
+                accessKey: '8a7a7a623d25ee7a3c87f688287bd4ba',
+                accessKeyId: 'b14605e9d68',
                 channelId: 'luehu',
                 userId: 'test123',
                 gameId: 'com.tencent.tmgp.sgame',

@@ -1,7 +1,15 @@
 import 'package:flutter/services.dart';
 import 'hm_cloud_platform_interface.dart';
 
+typedef OnRecvChannelCallback = void Function(
+  String actionName,
+);
+
 class HmCloud {
+  static final HmCloud _instance = HmCloud();
+
+  static HmCloud get instance => _instance;
+
   Future<String?> getPlatformVersion() {
     return HmCloudPlatform.instance.getPlatformVersion();
   }
@@ -9,20 +17,43 @@ class HmCloud {
   Future<String?> getBatteryLevel() {
     return HmCloudPlatform.instance.getBatteryLevel();
   }
-
-  Future<void> startCloudGame() {
-    return HmCloudController.instance.startCloudGame();
-  }
 }
 
 class HmCloudController {
-  final _methodChannel = const MethodChannel('hm_cloud_controller');
+  MethodChannel? methodChannel;
+
+  HmCloudController() {
+    methodChannel = const MethodChannel('hm_cloud_controller');
+    methodChannel!.setMethodCallHandler(platformCallHandler);
+  }
 
   static final HmCloudController _instance = HmCloudController();
 
   static HmCloudController get instance => _instance;
 
+  OnRecvChannelCallback? callbak;
+
+  setCallback(OnRecvChannelCallback callback) {
+    callbak = callback;
+  }
+
   Future<void> startCloudGame() {
-    return _methodChannel.invokeMethod('startCloudGame');
+    return methodChannel!.invokeMethod('startCloudGame');
+  }
+
+  Future<void> fullCloudGame(bool isFull) {
+    return methodChannel!.invokeMethod('fullCloudGame', {'isFull': isFull});
+  }
+
+  ///实现监听原生方法回调
+  Future<dynamic> platformCallHandler(MethodCall call) async {
+    switch (call.method) {
+      case "changeSound":
+        if (callbak != null) {
+          callbak!(call.method);
+        }
+
+        return;
+    }
   }
 }

@@ -45,7 +45,7 @@ class _HmCloudViewState extends State<HmCloudView> {
 
         /// 用来编码 creationParams 的形式，可选 [StandardMessageCodec], [JSONMessageCodec], [StringCodec], or [BinaryCodec]
         /// 如果存在 creationParams，则该值不能为null
-        creationParamsCodec: StandardMessageCodec(),
+        creationParamsCodec: const StandardMessageCodec(),
       );
     } else if (Platform.isAndroid) {
       return const AndroidView(viewType: 'testView');

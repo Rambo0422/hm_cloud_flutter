@@ -10,7 +10,7 @@
 #import "CloudPlayerWarpper.h"
 #import <CommonCrypto/CommonDigest.h>
 #import <CommonCrypto/CommonCryptor.h>
-
+#import "CloudPreViewController.h"
 @interface HmCloudPlatformView ()<CloudPlayerWarpperDelegate>
 
 
@@ -37,7 +37,6 @@
         _frame = frame;
         _viewId = viewId;
         _args = args;
-        
         
         if ([args isKindOfClass:[NSDictionary class]]) {
             
@@ -88,6 +87,7 @@
         return _v;
     } else {
         _v = [[HmCloudView alloc] initWithFrame:_frame];
+        _v.multipleTouchEnabled = YES;
         _v.backgroundColor = [UIColor redColor];
     }
     return _v;
@@ -125,13 +125,68 @@
         }
         
         self.gameVC.view.frame = _v.bounds;
-        [_v addSubview:self.gameVC.view];
+        [_v insertSubview:self.gameVC.view atIndex:0];
         
         
         [[CloudPlayerWarpper sharedWrapper] startNetMonitor];
         
     }
     
+    
+    if ([[call method] isEqualToString:@"fullCloudGame"]) {
+        
+        if ([call.arguments isKindOfClass:[NSDictionary class]]) {
+         
+            NSDictionary * arguments = (NSDictionary *)call.arguments;
+            NSNumber * isFull = arguments[@"isFull"];
+            if (isFull) {
+                [_v.subviews.firstObject removeFromSuperview];
+                
+                CloudPreViewController * vc = [[CloudPreViewController alloc] initWithNibName:@"CloudPreViewController" bundle:[NSBundle bundleWithPath:[[NSBundle bundleForClass:self.class] pathForResource:@"DaShen" ofType:@"bundle"]]];
+                
+                vc.modalPresentationStyle = UIModalPresentationFullScreen;
+                vc.gameVC = self.gameVC;
+                vc.channelAction = ^(NSString * _Nonnull methodName, bool value) {
+                    [self sendToFlutter:methodName params:@{@"switch" : @(value)}];
+                };
+                
+                vc.didDismiss = ^{
+                    
+                    
+                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    
+                        self.gameVC.view.frame = self->_v.bounds;
+                        [self->_v insertSubview:self.gameVC.view atIndex:0];
+                                                                    
+                    });
+                    
+                };
+                
+                [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:vc animated:YES completion:nil];
+                
+            } else {
+                
+                __weak __typeof__(self) weakSelf = self;
+                
+                [self.gameVC dismissViewControllerAnimated:YES completion:^{
+                   
+                    __strong __typeof__(weakSelf) strongSelf = weakSelf;
+                    
+                    weakSelf.gameVC.view.frame = strongSelf->_v.bounds;
+                    [strongSelf->_v insertSubview:weakSelf.gameVC.view atIndex:0];
+                    
+                }];
+            }
+            
+        }
+        
+    }
+    
+}
+
+// 传值到flutter
+- (void)sendToFlutter:(NSString *)actionName params:(NSDictionary *)params {
+    [self.channel invokeMethod:actionName arguments:params];
 }
 
 #pragma mark - Demo Depended Function
@@ -196,11 +251,6 @@
 
     return output;
 }
-
-//调用Flutter
-//- (void)flutterMethod{
-//    [self.channel invokeMethod:@"clickAciton" arguments:@"我是参数"];
-//}
 
 #pragma mark - CloudPlayerWrapper Delegate
 - (void) cloudPlayerReigsted:(BOOL)success {
