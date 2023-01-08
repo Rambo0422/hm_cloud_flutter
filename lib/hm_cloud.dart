@@ -41,6 +41,10 @@ class HmCloudController {
     return methodChannel!.invokeMethod('startCloudGame');
   }
 
+  Future<void> stopGame() {
+    return methodChannel!.invokeMethod('stopGame');
+  }
+
   Future<void> fullCloudGame(bool isFull) {
     return methodChannel!.invokeMethod('fullCloudGame', {'isFull': isFull});
   }

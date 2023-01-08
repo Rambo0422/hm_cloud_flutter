@@ -6,7 +6,7 @@
 //
 
 #import "CloudPreViewController.h"
-
+#import <AVFAudio/AVFAudio.h>
 @interface CloudPreViewController ()
 @property (weak, nonatomic) IBOutlet UIButton *disMissBtn;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *rightCos;
@@ -63,6 +63,19 @@
 }
 
 - (IBAction)didChangeSoundSwitch:(UISwitch *)sender {
+    
+//    NSError *error2;
+//    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord
+//                                            mode:AVAudioSessionModeVoiceChat
+//                                         options:(AVAudioSessionCategoryOptionMixWithOthers |
+//                                                  AVAudioSessionCategoryOptionAllowBluetoothA2DP |
+//                                                  AVAudioSessionCategoryOptionAllowAirPlay |
+//                                                  AVAudioSessionCategoryOptionDefaultToSpeaker |
+//                                                  AVAudioSessionCategoryOptionAllowBluetooth)
+//                                           error:&error2];
+//    if (error2) {
+//        NSLog(@"error2 = %@",error2);
+//    }
     
     // 改变声音
     if (self.channelAction) {

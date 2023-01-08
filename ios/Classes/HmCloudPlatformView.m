@@ -11,6 +11,9 @@
 #import <CommonCrypto/CommonDigest.h>
 #import <CommonCrypto/CommonCryptor.h>
 #import "CloudPreViewController.h"
+
+#define DaShenBundle [NSBundle bundleWithPath:[[NSBundle bundleForClass:self.class] pathForResource:@"DaShen" ofType:@"bundle"]]
+
 @interface HmCloudPlatformView ()<CloudPlayerWarpperDelegate>
 
 
@@ -88,7 +91,6 @@
     } else {
         _v = [[HmCloudView alloc] initWithFrame:_frame];
         _v.multipleTouchEnabled = YES;
-        _v.backgroundColor = [UIColor redColor];
     }
     return _v;
     
@@ -124,8 +126,29 @@
             return;
         }
         
-        self.gameVC.view.frame = _v.bounds;
-        [_v insertSubview:self.gameVC.view atIndex:0];
+        CloudPreViewController * vc = [[CloudPreViewController alloc] initWithNibName:@"CloudPreViewController" bundle:DaShenBundle];
+        
+        vc.modalPresentationStyle = UIModalPresentationFullScreen;
+        vc.gameVC = self.gameVC;
+        vc.channelAction = ^(NSString * _Nonnull methodName, bool value) {
+            [self sendToFlutter:methodName params:@{@"switch" : @(value)}];
+        };
+        
+        vc.didDismiss = ^{
+            
+            
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            
+                self.gameVC.view.frame = self->_v.bounds;
+                [self->_v insertSubview:self.gameVC.view atIndex:0];
+                                                            
+            });
+            
+        };
+        
+        [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:vc animated:YES completion:^{
+            [self sendToFlutter:@"startSuccess" params:@{}];
+        }];
         
         
         [[CloudPlayerWarpper sharedWrapper] startNetMonitor];
@@ -142,7 +165,7 @@
             if (isFull) {
                 [_v.subviews.firstObject removeFromSuperview];
                 
-                CloudPreViewController * vc = [[CloudPreViewController alloc] initWithNibName:@"CloudPreViewController" bundle:[NSBundle bundleWithPath:[[NSBundle bundleForClass:self.class] pathForResource:@"DaShen" ofType:@"bundle"]]];
+                CloudPreViewController * vc = [[CloudPreViewController alloc] initWithNibName:@"CloudPreViewController" bundle:DaShenBundle];
                 
                 vc.modalPresentationStyle = UIModalPresentationFullScreen;
                 vc.gameVC = self.gameVC;
@@ -152,35 +175,29 @@
                 
                 vc.didDismiss = ^{
                     
-                    
                     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                     
                         self.gameVC.view.frame = self->_v.bounds;
                         [self->_v insertSubview:self.gameVC.view atIndex:0];
                                                                     
                     });
-                    
                 };
                 
-                [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:vc animated:YES completion:nil];
-                
-            } else {
-                
-                __weak __typeof__(self) weakSelf = self;
-                
-                [self.gameVC dismissViewControllerAnimated:YES completion:^{
-                   
-                    __strong __typeof__(weakSelf) strongSelf = weakSelf;
-                    
-                    weakSelf.gameVC.view.frame = strongSelf->_v.bounds;
-                    [strongSelf->_v insertSubview:weakSelf.gameVC.view atIndex:0];
-                    
+                [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:vc animated:YES completion:^{
+                    [self sendToFlutter:@"startSuccess" params:@{}];
                 }];
             }
-            
         }
+    }
+    
+    
+    if ([call.method isEqualToString:@"stopGame"]) {
+     
+        [[CloudPlayerWarpper sharedWrapper] stop];
+        [[CloudPlayerWarpper sharedWrapper] stopNetMonitor];
         
     }
+    
     
 }
 
@@ -254,19 +271,15 @@
 
 #pragma mark - CloudPlayerWrapper Delegate
 - (void) cloudPlayerReigsted:(BOOL)success {
-    NSLog(@"%s : %@", __FUNCTION__, success?@"YES":@"NO");
 }
 
 - (void) cloudPlayerResolutionList:(NSArray<HMCloudPlayerResolution*> *)resolutions {
-    NSLog(@"%s : %@", __FUNCTION__, resolutions);
 }
 
 - (void) cloudPlayerRecvMessage:(NSString *)msg {
-    NSLog(@"%s : %@", __FUNCTION__, msg);
 }
 
 - (void) cloudPlayerPrepared:(BOOL)success {
-    NSLog(@"%s : %@", __FUNCTION__, success?@"YES":@"NO");
 
     if (success) {
         [[CloudPlayerWarpper sharedWrapper] play];
