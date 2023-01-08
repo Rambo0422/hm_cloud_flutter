@@ -49,10 +49,16 @@ android {
         implementation('io.socket:socket.io-client:1.0.0') {
             exclude group: 'org.json', module: 'json'
         }
-        implementation project(path: ':hmcCloud')
+        implementation(name: 'saas-sdk-master-5.1.85.1-1dee6161', ext: 'aar')
     }
 }
-//
-//dependencies {
-//    implementation project(path: ':hmcCloud')
-//}
+
+rootProject.allprojects {
+    repositories {
+        google()
+        jcenter()
+        flatDir {
+            dirs project(':hm_cloud').file('libs')
+        }
+    }
+}
