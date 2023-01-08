@@ -19,59 +19,22 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
-  String _platformBatteryLevel = 'Unknown';
   bool isFull = false;
-  final _hmCloudPlugin = HmCloud();
 
   @override
   void initState() {
     super.initState();
 
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft, //全屏时旋转方向，左边
+    ]);
+
+    // SystemChrome.setEnabledSystemUIOverlays([]);
+    WidgetsFlutterBinding.ensureInitialized(); // add this line
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
+
     HmCloudController.instance.setCallback((actionName) {
       print('来自iOS的回调$actionName');
-    });
-
-    initPlatformState();
-    initBatteryLevel();
-  }
-
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    // We also handle the message potentially returning null.
-    try {
-      platformVersion = await _hmCloudPlugin.getPlatformVersion() ??
-          'Unknown platform version';
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
-    }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      _platformVersion = platformVersion;
-    });
-  }
-
-  Future<void> initBatteryLevel() async {
-    String batteryLevel;
-    try {
-      batteryLevel = await _hmCloudPlugin.getBatteryLevel() ??
-          'Unknown platform batteryLevel';
-    } on PlatformException {
-      batteryLevel = 'Failed to get platform batteryLevel.';
-    }
-    if (!mounted) {
-      return;
-    }
-
-    setState(() {
-      _platformBatteryLevel = batteryLevel;
     });
   }
 
@@ -79,38 +42,18 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
         body: Center(
           child: Column(
-            children: [
-              InkWell(
-                  onTap: () {
-                    HmCloudController.instance.startCloudGame();
-                  },
-                  child: Text('Running on: $_platformVersion\n')),
-              const SizedBox(
-                height: 20,
-              ),
-              InkWell(
-                  onTap: () {
-                    if (isFull) {
-                      HmCloudController.instance.fullCloudGame(isFull);
-                      isFull = false;
-                    } else {
-                      HmCloudController.instance.fullCloudGame(isFull);
-                      isFull = true;
-                    }
-                  },
-                  child: Text('Running on: $_platformBatteryLevel\n')),
-              const Expanded(
+            children: const [
+              Expanded(
                   child: HmCloudView(
                 accessKey: '8a7a7a623d25ee7a3c87f688287bd4ba',
                 accessKeyId: 'b14605e9d68',
                 channelId: 'luehu',
                 userId: 'test123',
                 gameId: 'com.tencent.tmgp.sgame',
+                isPortrait: false,
+                playTime: 1000000,
               )),
             ],
           ),
