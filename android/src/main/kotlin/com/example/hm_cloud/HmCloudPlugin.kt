@@ -7,7 +7,6 @@ import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.embedding.engine.plugins.lifecycle.FlutterLifecycleAdapter
 
-
 /** HmCloudPlugin */
 class HmCloudPlugin : FlutterPlugin, ActivityAware {
 
@@ -19,16 +18,18 @@ class HmCloudPlugin : FlutterPlugin, ActivityAware {
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         this.flutterPluginBinding = flutterPluginBinding
         this.context = flutterPluginBinding.applicationContext
+
+        val hMcpVideoFactory = HMcpVideoFactory(
+            flutterPluginBinding.binaryMessenger,
+            object : LifecycleProvider {
+                override fun getLifecycle(): Lifecycle? {
+                    return lifecycle
+                }
+            })
+
         flutterPluginBinding
             .platformViewRegistry
-            .registerViewFactory(
-                VIEW_TYPE,
-                HMcpVideoFactory(flutterPluginBinding.binaryMessenger, object : LifecycleProvider {
-                    override fun getLifecycle(): Lifecycle? {
-                        return lifecycle
-                    }
-                })
-            )
+            .registerViewFactory(VIEW_TYPE, hMcpVideoFactory)
     }
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {

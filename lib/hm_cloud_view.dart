@@ -7,13 +7,22 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 
 class HmCloudView extends StatefulWidget {
-  const HmCloudView(
-      {super.key,
-      required this.accessKey,
-      required this.accessKeyId,
-      required this.gameId,
-      required this.channelId,
-      required this.userId});
+  // View 是否横屏或者竖屏
+  final bool isPortrait;
+  final String extraInfo;
+  final int playTime;
+
+  const HmCloudView({
+    super.key,
+    required this.accessKey,
+    required this.accessKeyId,
+    required this.gameId,
+    required this.channelId,
+    required this.userId,
+    this.isPortrait = false,
+    this.extraInfo = "",
+    this.playTime = 1000,
+  });
 
   final String accessKey;
   final String accessKeyId;
@@ -41,6 +50,9 @@ class _HmCloudViewState extends State<HmCloudView> {
       'gameId': widget.gameId,
       'channelId': widget.channelId,
       'userId': widget.userId,
+      'isPortrait': widget.isPortrait,
+      'extraInfo': widget.extraInfo,
+      'playTime': widget.playTime,
     };
 
     if (Platform.isIOS) {
@@ -61,7 +73,6 @@ class _HmCloudViewState extends State<HmCloudView> {
 
   Widget _getAndroidView(Map<String, dynamic> creationParams) {
     const String viewType = 'plugins.flutter.io/hm_cloud_view';
-    // const Map<String, dynamic> creationParams = <String, dynamic>{};
     return PlatformViewLink(
       surfaceFactory:
           (BuildContext context, PlatformViewController controller) {
@@ -72,7 +83,7 @@ class _HmCloudViewState extends State<HmCloudView> {
         );
       },
       onCreatePlatformView: (PlatformViewCreationParams params) {
-        return PlatformViewsService.initAndroidView(
+        return PlatformViewsService.initSurfaceAndroidView(
           id: params.id,
           viewType: viewType,
           layoutDirection: TextDirection.ltr,
