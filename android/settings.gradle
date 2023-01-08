@@ -1,1 +1,2 @@
 rootProject.name = 'hm_cloud'
+include ':hmcCloud'

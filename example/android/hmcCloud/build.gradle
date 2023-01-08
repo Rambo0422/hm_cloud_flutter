@@ -1,0 +1,2 @@
+configurations.maybeCreate("default")
+artifacts.add("default", file('saas-sdk-master-5.1.85.1-1dee6161.aar'))
