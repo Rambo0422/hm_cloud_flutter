@@ -2,8 +2,9 @@ import 'package:flutter/services.dart';
 import 'hm_cloud_platform_interface.dart';
 
 typedef OnRecvChannelCallback = void Function(
-  String actionName,
-);
+  String actionName, {
+  dynamic params,
+});
 
 class HmCloud {
   static final HmCloud _instance = HmCloud();
@@ -51,13 +52,8 @@ class HmCloudController {
 
   ///实现监听原生方法回调
   Future<dynamic> platformCallHandler(MethodCall call) async {
-    switch (call.method) {
-      case "changeSound":
-        if (callbak != null) {
-          callbak!(call.method);
-        }
-
-        return;
+    if (callbak != null) {
+      callbak!(call.method, params: call.arguments);
     }
   }
 }

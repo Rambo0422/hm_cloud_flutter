@@ -9,6 +9,10 @@
 #import <Flutter/Flutter.h>
 NS_ASSUME_NONNULL_BEGIN
 
+#define k_changeSound       @"changeSound"
+#define k_startSuccess      @"startSuccess"
+#define k_startFailed       @"startFailed"
+
 @interface CloudPreViewController : UIViewController
 
 @property (nonatomic, strong) UIViewController *gameVC;

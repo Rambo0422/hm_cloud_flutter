@@ -73,7 +73,7 @@
             
         }
         
-        _channel = [FlutterMethodChannel methodChannelWithName:@"hm_cloud_controller" binaryMessenger:messenger];
+        _channel = [FlutterMethodChannel methodChannelWithName:@"hm_cloud_controller" binaryMessenger:messenger codec:[FlutterStandardMethodCodec sharedInstance]];
         
     }
     __weak __typeof__(self) weakSelf = self;
@@ -122,7 +122,8 @@
         
         self.gameVC = [[CloudPlayerWarpper sharedWrapper] prepare:gameOptions];
         if (!self.gameVC) {
-            NSLog(@"startSDK Failed .");
+            
+            [self sendToFlutter:k_startFailed params:nil];
             return;
         }
         
@@ -147,7 +148,7 @@
         };
         
         [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:vc animated:YES completion:^{
-            [self sendToFlutter:@"startSuccess" params:@{}];
+            [self sendToFlutter:k_startSuccess params:nil];
         }];
         
         
@@ -184,7 +185,7 @@
                 };
                 
                 [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:vc animated:YES completion:^{
-                    [self sendToFlutter:@"startSuccess" params:@{}];
+                    [self sendToFlutter:k_startSuccess params:nil];
                 }];
             }
         }
@@ -202,7 +203,7 @@
 }
 
 // 传值到flutter
-- (void)sendToFlutter:(NSString *)actionName params:(NSDictionary *)params {
+- (void)sendToFlutter:(NSString *)actionName params:(id _Nullable)params {
     [self.channel invokeMethod:actionName arguments:params];
 }
 

@@ -79,7 +79,7 @@
     
     // 改变声音
     if (self.channelAction) {
-        self.channelAction(@"changeSound", sender.on);
+        self.channelAction(k_changeSound, sender.on);
     }
 }
 
