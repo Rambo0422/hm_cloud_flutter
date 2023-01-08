@@ -33,7 +33,10 @@ class _MyAppState extends State<MyApp> {
     WidgetsFlutterBinding.ensureInitialized(); // add this line
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
 
-    HmCloudController.instance.setCallback((actionName) {
+    // HmCloudController.instance.setCallback((actionName, {pragma}) {
+    //   print('来自iOS的回调$actionName');
+    // });
+    HmCloudController.instance.setCallback((actionName, {params}) {
       print('来自iOS的回调$actionName');
     });
   }
@@ -44,8 +47,14 @@ class _MyAppState extends State<MyApp> {
       home: Scaffold(
         body: Center(
           child: Column(
-            children: const [
-              Expanded(
+            children: [
+              MaterialButton(
+                onPressed: (() {
+                  HmCloudController.instance.startCloudGame();
+                }),
+                child: const Text('开始游戏'),
+              ),
+              const Expanded(
                   child: HmCloudView(
                 accessKey: '8a7a7a623d25ee7a3c87f688287bd4ba',
                 accessKeyId: 'b14605e9d68',

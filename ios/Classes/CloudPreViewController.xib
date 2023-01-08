@@ -22,25 +22,10 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="YqR-3r-nuB">
-                    <rect key="frame" x="652" y="0.0" width="200" height="393"/>
+                    <rect key="frame" x="852" y="0.0" width="160" height="393"/>
                     <subviews>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7BO-xf-sAl">
-                            <rect key="frame" x="0.0" y="174.66666666666666" width="40" height="44"/>
-                            <constraints>
-                                <constraint firstAttribute="width" constant="40" id="Kwm-De-YNR"/>
-                                <constraint firstAttribute="height" constant="44" id="YQt-FJ-1a1"/>
-                            </constraints>
-                            <fontDescription key="fontDescription" type="system" pointSize="13"/>
-                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                            <state key="normal" title="展开">
-                                <color key="titleColor" systemColor="systemRedColor"/>
-                            </state>
-                            <connections>
-                                <action selector="didShowAction:" destination="-1" eventType="touchUpInside" id="hKl-fv-2Jb"/>
-                            </connections>
-                        </button>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="20a-PY-coX">
-                            <rect key="frame" x="40" y="0.0" width="160" height="393"/>
+                            <rect key="frame" x="0.0" y="0.0" width="160" height="393"/>
                             <subviews>
                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aQI-QG-LTn">
                                     <rect key="frame" x="15" y="309" width="130" height="44"/>
@@ -94,11 +79,9 @@
                     <constraints>
                         <constraint firstItem="20a-PY-coX" firstAttribute="top" secondItem="YqR-3r-nuB" secondAttribute="top" id="Aa4-gC-9ft"/>
                         <constraint firstAttribute="bottom" secondItem="20a-PY-coX" secondAttribute="bottom" id="BcN-Kg-Ewo"/>
+                        <constraint firstItem="20a-PY-coX" firstAttribute="leading" secondItem="YqR-3r-nuB" secondAttribute="leading" id="LZS-wR-wsd"/>
                         <constraint firstAttribute="trailing" secondItem="20a-PY-coX" secondAttribute="trailing" id="X3S-6d-Wgs"/>
-                        <constraint firstItem="7BO-xf-sAl" firstAttribute="leading" secondItem="YqR-3r-nuB" secondAttribute="leading" id="afh-fz-fBq"/>
-                        <constraint firstItem="7BO-xf-sAl" firstAttribute="centerY" secondItem="YqR-3r-nuB" secondAttribute="centerY" id="cbg-p1-LlU"/>
-                        <constraint firstItem="20a-PY-coX" firstAttribute="leading" secondItem="7BO-xf-sAl" secondAttribute="trailing" id="dP1-UN-CQ4"/>
-                        <constraint firstAttribute="width" constant="200" id="uZm-Dd-40v"/>
+                        <constraint firstAttribute="width" constant="160" id="uZm-Dd-40v"/>
                     </constraints>
                 </view>
             </subviews>
@@ -106,7 +89,7 @@
             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
             <constraints>
                 <constraint firstAttribute="bottom" secondItem="YqR-3r-nuB" secondAttribute="bottom" id="0cG-dy-kSP"/>
-                <constraint firstAttribute="trailing" secondItem="YqR-3r-nuB" secondAttribute="trailing" id="4zN-31-DcD"/>
+                <constraint firstAttribute="trailing" secondItem="YqR-3r-nuB" secondAttribute="trailing" constant="-160" id="4zN-31-DcD"/>
                 <constraint firstItem="YqR-3r-nuB" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="vul-up-HVd"/>
             </constraints>
             <point key="canvasLocation" x="139.43661971830986" y="19.083969465648853"/>
@@ -115,9 +98,6 @@
     <resources>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
-        <systemColor name="systemRedColor">
-            <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

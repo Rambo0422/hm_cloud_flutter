@@ -13,6 +13,10 @@ NS_ASSUME_NONNULL_BEGIN
 #define k_startSuccess      @"startSuccess"
 #define k_startFailed       @"startFailed"
 
+
+#define k_DaShenBundle [NSBundle bundleWithPath:[[NSBundle bundleForClass:self.class] pathForResource:@"DaShen" ofType:@"bundle"]]
+#define k_BundleImage(name) [UIImage imageWithContentsOfFile:[k_DaShenBundle pathForResource:name ofType:@"png"]]
+
 @interface CloudPreViewController : UIViewController
 
 @property (nonatomic, strong) UIViewController *gameVC;

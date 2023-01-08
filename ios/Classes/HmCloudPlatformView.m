@@ -12,7 +12,6 @@
 #import <CommonCrypto/CommonCryptor.h>
 #import "CloudPreViewController.h"
 
-#define DaShenBundle [NSBundle bundleWithPath:[[NSBundle bundleForClass:self.class] pathForResource:@"DaShen" ofType:@"bundle"]]
 
 @interface HmCloudPlatformView ()<CloudPlayerWarpperDelegate>
 
@@ -127,7 +126,7 @@
             return;
         }
         
-        CloudPreViewController * vc = [[CloudPreViewController alloc] initWithNibName:@"CloudPreViewController" bundle:DaShenBundle];
+        CloudPreViewController * vc = [[CloudPreViewController alloc] initWithNibName:@"CloudPreViewController" bundle:k_DaShenBundle];
         
         vc.modalPresentationStyle = UIModalPresentationFullScreen;
         vc.gameVC = self.gameVC;
@@ -166,7 +165,7 @@
             if (isFull) {
                 [_v.subviews.firstObject removeFromSuperview];
                 
-                CloudPreViewController * vc = [[CloudPreViewController alloc] initWithNibName:@"CloudPreViewController" bundle:DaShenBundle];
+                CloudPreViewController * vc = [[CloudPreViewController alloc] initWithNibName:@"CloudPreViewController" bundle:k_DaShenBundle];
                 
                 vc.modalPresentationStyle = UIModalPresentationFullScreen;
                 vc.gameVC = self.gameVC;

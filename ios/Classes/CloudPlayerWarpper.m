@@ -171,7 +171,9 @@
 }
 
 - (void) cloudPlayerTouchBegan {
-    NSLog(@"%s", __FUNCTION__);
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"touchBegan" object:nil];
+    
 }
 
 #pragma mark - CloudPlayer Delegate Function
