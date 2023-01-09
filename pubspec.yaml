@@ -1,6 +1,6 @@
 name: hm_cloud
 description: HaiMa cloud plugin.
-version: 0.0.19
+version: 0.0.24
 homepage: https://github.com/Rambo0422/hm_cloud_flutter
 
 environment:
