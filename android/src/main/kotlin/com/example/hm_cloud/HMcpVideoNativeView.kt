@@ -35,6 +35,7 @@ class HMcpVideoNativeView(
 
     val TAG = this.javaClass.simpleName
 
+    private var frameLayout: InterceptTouchFrameLayout? = null
     private var hmcpVideoView: HmcpVideoView? = null
     private var disposed = false
     private var mHmCloudPluginListener: HmCloudPluginListener? = null
@@ -42,19 +43,21 @@ class HMcpVideoNativeView(
     init {
         lifecycleProvider.getLifecycle()?.addObserver(this)
         initHmcp(context, creationParams)
+
+        frameLayout = InterceptTouchFrameLayout(context)
         hmcpVideoView = createHmcpVideoView(context)
+        frameLayout?.addView(hmcpVideoView)
     }
 
     private fun createHmcpVideoView(context: Context): HmcpVideoView {
-        Log.e(TAG, "createHmcpVideoView")
         val hmcpVideoView = HmcpVideoView(context)
         hmcpVideoView.hmcpPlayerListener = this@HMcpVideoNativeView
         return hmcpVideoView
     }
 
     override fun getView(): View? {
-        Log.e(TAG, "getView hmcpVideoView: ${hmcpVideoView}")
-        return hmcpVideoView
+        Log.e(TAG, "getView hmcpVideoView: $hmcpVideoView")
+        return frameLayout
     }
 
     override fun dispose() {
@@ -238,6 +241,7 @@ class HMcpVideoNativeView(
     private fun initHmcp(context: Context, creationParams: Map<String, Any>) {
         HmcpManagerIml.init(context, creationParams, object : OnInitCallBackListener {
             override fun success() {
+                startPlay()
             }
 
             override fun fail(message: String) = Unit
