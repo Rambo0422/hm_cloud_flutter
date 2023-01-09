@@ -13,8 +13,6 @@ object HmcpManagerIml {
 
     fun init(context: Context, creationParams: Map<String, Any>, onInitCallBackListener: OnInitCallBackListener) {
         if (!isInit) {
-            Log.e(TAG,"creationParams: $creationParams")
-
             val accessKeyId = creationParams["accessKeyId"].toString()
             val channelId = creationParams["channelId"].toString()
 
@@ -24,9 +22,9 @@ object HmcpManagerIml {
             bundle.putString(HmcpManager.CHANNEL_ID, channelId)
             manager.init(bundle, context, object : OnInitCallBackListener {
                 override fun success() {
+                    Log.e(TAG, "-------- init success --------")
                     isInit = true
                     onInitCallBackListener.success()
-                    Log.e(TAG, "-------- init success --------")
                 }
 
                 override fun fail(msg: String) {
