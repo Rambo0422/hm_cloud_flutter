@@ -241,7 +241,7 @@ class HMcpVideoNativeView(
     private fun initHmcp(context: Context, creationParams: Map<String, Any>) {
         HmcpManagerIml.init(context, creationParams, object : OnInitCallBackListener {
             override fun success() {
-                startPlay()
+//                startPlay()
             }
 
             override fun fail(message: String) = Unit
