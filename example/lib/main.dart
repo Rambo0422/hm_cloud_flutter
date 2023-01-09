@@ -45,26 +45,16 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        body: Center(
-          child: Column(
-            children: [
-              MaterialButton(
-                onPressed: (() {
-                  HmCloudController.instance.startCloudGame();
-                }),
-                child: const Text('开始游戏'),
-              ),
-              const Expanded(
-                  child: HmCloudView(
-                accessKey: '8a7a7a623d25ee7a3c87f688287bd4ba',
-                accessKeyId: 'b14605e9d68',
-                channelId: 'luehu',
-                userId: 'test123',
-                gameId: 'com.tencent.tmgp.sgame',
-                isPortrait: false,
-                playTime: 1000000,
-              )),
-            ],
+        body: Container(
+          child: HmCloudView(
+            accessKey: '8a7a7a623d25ee7a3c87f688287bd4ba',
+            accessKeyId: 'b14605e9d68',
+            channelId: 'luehu',
+            userId: 'test123',
+            gameId: 'com.tencent.tmgp.sgame',
+            isPortrait: false,
+            playTime: 1000000,
+            videoViewType: 1,
           ),
         ),
       ),

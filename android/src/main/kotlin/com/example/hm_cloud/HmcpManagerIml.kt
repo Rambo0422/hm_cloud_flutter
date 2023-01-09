@@ -13,20 +13,23 @@ object HmcpManagerIml {
 
     fun init(context: Context, creationParams: Map<String, Any>, onInitCallBackListener: OnInitCallBackListener) {
         if (!isInit) {
-            Log.e(TAG,"creationParams: $creationParams")
-
             val accessKeyId = creationParams["accessKeyId"].toString()
             val channelId = creationParams["channelId"].toString()
+            val videoViewType = kotlin.runCatching {
+                creationParams["videoViewType"] as Int
+            }.getOrElse { HmcpManager.RENDER_TEXTURE_VIEW }
 
             val manager = HmcpManager.getInstance()
             val bundle = Bundle()
             bundle.putString(HmcpManager.ACCESS_KEY_ID, accessKeyId)
             bundle.putString(HmcpManager.CHANNEL_ID, channelId)
+
+            manager.videoViewType = videoViewType
             manager.init(bundle, context, object : OnInitCallBackListener {
                 override fun success() {
+                    Log.e(TAG, "-------- init success --------")
                     isInit = true
                     onInitCallBackListener.success()
-                    Log.e(TAG, "-------- init success --------")
                 }
 
                 override fun fail(msg: String) {

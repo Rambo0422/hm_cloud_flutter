@@ -11,6 +11,7 @@ class HmCloudView extends StatefulWidget {
   final bool isPortrait;
   final String extraInfo;
   final int playTime;
+  final int videoViewType;
 
   const HmCloudView({
     super.key,
@@ -22,6 +23,7 @@ class HmCloudView extends StatefulWidget {
     this.isPortrait = false,
     this.extraInfo = "",
     this.playTime = 1000,
+    this.videoViewType = 2,
   });
 
   final String accessKey;
@@ -53,6 +55,7 @@ class _HmCloudViewState extends State<HmCloudView> {
       'isPortrait': widget.isPortrait,
       'extraInfo': widget.extraInfo,
       'playTime': widget.playTime,
+      'videoViewType': widget.videoViewType,
     };
 
     if (Platform.isIOS) {
