@@ -48,6 +48,7 @@ class HMcpVideoNativeView(
     init {
         lifecycleProvider.getLifecycle()?.addObserver(this)
         setMethodChannel()
+        initHmcp(context, creationParams)
         hmcpVideoView = createHmcpVideoView(context)
     }
 
@@ -55,20 +56,12 @@ class HMcpVideoNativeView(
         Log.e(TAG, "createHmcpVideoView")
         val hmcpVideoView = HmcpVideoView(context)
         hmcpVideoView.hmcpPlayerListener = this@HMcpVideoNativeView
-        hmcpVideoView.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                hmcpVideoView.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                initHmcp(context, creationParams)
-            }
-        })
-
         return hmcpVideoView
     }
 
     override fun getView(): View? {
         Log.e(TAG, "getView hmcpVideoView: ${hmcpVideoView}")
         return hmcpVideoView
-//        return textView
     }
 
     private fun setMethodChannel() {
@@ -119,6 +112,7 @@ class HMcpVideoNativeView(
         val bundle = Bundle()
         val cToken = CryptoUtils.generateCToken(curGamePackageName, userId, userId, accessKeyId, channelId, accessKey)
 
+        Log.e(TAG, "isPortrait: ${isPortrait}")
         bundle.putSerializable(HmcpVideoView.ORIENTATION, if (isPortrait) ScreenOrientation.PORTRAIT else ScreenOrientation.LANDSCAPE)
         bundle.putInt(HmcpVideoView.PLAY_TIME, playTime * 1000)
 
@@ -137,7 +131,10 @@ class HMcpVideoNativeView(
         Log.e(TAG, "onMethodCall: ${call.method}")
         when (call.method) {
             "startCloudGame" -> {
-//                startPlay()
+                startPlay()
+            }
+            "stopGame" -> {
+//              hmcpVideoView?.stop()
             }
             "fullCloudGame" -> {
 //                startPlay()
@@ -193,6 +190,7 @@ class HMcpVideoNativeView(
 
     override fun onSuccess() {
         Log.e(TAG, "onSuccess")
+        methodChannel.invokeMethod("startSuccess", null)
     }
 
     override fun onExitQueue() {
@@ -267,7 +265,6 @@ class HMcpVideoNativeView(
     private fun initHmcp(context: Context, creationParams: Map<String, Any>) {
         HmcpManagerIml.init(context, creationParams, object : OnInitCallBackListener {
             override fun success() {
-                startPlay()
             }
 
             override fun fail(message: String) = Unit
