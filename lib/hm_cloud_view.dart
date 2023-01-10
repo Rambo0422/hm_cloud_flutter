@@ -8,29 +8,10 @@ import 'package:flutter/services.dart';
 
 class HmCloudView extends StatefulWidget {
   // View 是否横屏或者竖屏
-  final bool isPortrait;
-  final String extraInfo;
-  final int playTime;
-  final int videoViewType;
-
-  const HmCloudView({
-    super.key,
-    required this.accessKey,
-    required this.accessKeyId,
-    required this.gameId,
-    required this.channelId,
-    required this.userId,
-    this.isPortrait = false,
-    this.extraInfo = "",
-    this.playTime = 1000,
-    this.videoViewType = 2,
-  });
-
-  final String accessKey;
-  final String accessKeyId;
-  final String gameId;
-  final String channelId;
-  final String userId;
+  // final bool isPortrait;
+  // final String extraInfo;
+  // final int playTime;
+  // final int videoViewType;
 
   @override
   State<HmCloudView> createState() => _HmCloudViewState();
@@ -45,36 +26,18 @@ class _HmCloudViewState extends State<HmCloudView> {
   }
 
   Widget _buildView() {
-    var createParams = <String, dynamic>{
-      ///给原生传递初始化参数 就是上面定义的初始化参数
-      'accessKey': widget.accessKey,
-      'accessKeyId': widget.accessKeyId,
-      'gameId': widget.gameId,
-      'channelId': widget.channelId,
-      'userId': widget.userId,
-      'isPortrait': widget.isPortrait,
-      'extraInfo': widget.extraInfo,
-      'playTime': widget.playTime,
-      'videoViewType': widget.videoViewType,
-    };
-
     if (Platform.isIOS) {
-      return UiKitView(
+      return const UiKitView(
         viewType: 'hmCloudView',
-        creationParams: createParams,
-
-        /// 用来编码 creationParams 的形式，可选 [StandardMessageCodec], [JSONMessageCodec], [StringCodec], or [BinaryCodec]
-        /// 如果存在 creationParams，则该值不能为null
-        creationParamsCodec: const StandardMessageCodec(),
       );
     } else if (Platform.isAndroid) {
-      return _getAndroidView(createParams);
+      return _getAndroidView();
     } else {
       return const Text('因为这里只介绍。iOS 、Android，其平台不支持');
     }
   }
 
-  Widget _getAndroidView(Map<String, dynamic> creationParams) {
+  Widget _getAndroidView() {
     const String viewType = 'plugins.flutter.io/hm_cloud_view';
     return PlatformViewLink(
       surfaceFactory:
@@ -90,7 +53,6 @@ class _HmCloudViewState extends State<HmCloudView> {
           id: params.id,
           viewType: viewType,
           layoutDirection: TextDirection.ltr,
-          creationParams: creationParams,
           creationParamsCodec: const StandardMessageCodec(),
           onFocus: () {
             params.onFocusChanged(true);

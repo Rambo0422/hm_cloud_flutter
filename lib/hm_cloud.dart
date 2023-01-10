@@ -38,8 +38,10 @@ class HmCloudController {
     callbak = callback;
   }
 
-  Future<void> startCloudGame() {
-    return methodChannel!.invokeMethod('startCloudGame');
+  Future<void> startCloudGame(
+    Map<String, dynamic> params,
+  ) {
+    return methodChannel!.invokeMethod('startCloudGame', params);
   }
 
   Future<void> stopGame() {

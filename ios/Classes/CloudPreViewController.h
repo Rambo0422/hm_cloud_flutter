@@ -12,6 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 #define k_changeSound       @"changeSound"
 #define k_startSuccess      @"startSuccess"
 #define k_startFailed       @"startFailed"
+#define k_cloudInitBegan    @"cloudInitBegan"
+#define k_cloudQueueInfo    @"cloudQueueInfo"
 
 
 #define k_DaShenBundle [NSBundle bundleWithPath:[[NSBundle bundleForClass:self.class] pathForResource:@"DaShen" ofType:@"bundle"]]

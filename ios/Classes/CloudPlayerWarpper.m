@@ -37,7 +37,7 @@
 
 
 - (void) regist {
-    if (isInitialized) return;
+//    if (isInitialized) return;
 
     NSLog(@" =============== SDK_VERSION : %@", CLOUDGAME_SDK_VERSION);
 

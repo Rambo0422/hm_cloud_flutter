@@ -23,11 +23,14 @@
 
 @property (nonatomic, assign) id<CloudPlayerWarpperDelegate> delegate;
 
-@property (nonatomic, copy)   NSString *accessKeyId;
-@property (nonatomic, copy)   NSString *accessKey;
-@property (nonatomic, copy)   NSString *userId;
-@property (nonatomic, copy)   NSString *channelId;
-@property (nonatomic, copy)   NSString *gameId;
+@property (nonatomic, strong)   NSString *accessKeyId;
+@property (nonatomic, strong)   NSString *cToken;
+@property (nonatomic, strong)   NSString *userId;
+@property (nonatomic, strong)   NSString *userToken;
+@property (nonatomic, strong)   NSString *channelId;
+@property (nonatomic, strong)   NSString *gameId;
+@property (nonatomic, assign)   NSNumber *expireTime;
+
 
 - (void) regist;
 - (UIViewController *) prepare:(NSDictionary *)options;
