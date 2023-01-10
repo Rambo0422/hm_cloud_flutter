@@ -1,11 +1,15 @@
-package com.example.hm_cloud
+package com.example.hm_cloud.ui.activity
 
 import android.content.Context
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
+import android.view.Window
+import android.view.WindowManager
+import androidx.appcompat.app.AppCompatActivity
+import com.example.hm_cloud.R
 import com.haima.hmcp.Constants
 import com.haima.hmcp.beans.Message
 import com.haima.hmcp.beans.UserInfo
@@ -14,61 +18,70 @@ import com.haima.hmcp.enums.ErrorType
 import com.haima.hmcp.enums.NetWorkState
 import com.haima.hmcp.enums.ScreenOrientation
 import com.haima.hmcp.listeners.HmcpPlayerListener
-import com.haima.hmcp.listeners.OnInitCallBackListener
 import com.haima.hmcp.utils.CryptoUtils
 import com.haima.hmcp.utils.StatusCallbackUtil
 import com.haima.hmcp.widgets.HmcpVideoView
-import io.flutter.plugin.platform.PlatformView
 import org.json.JSONObject
 
-/**
- * 海马云原生 View
- */
-class HMcpVideoNativeView(
-    context: Context,
-    private val creationParams: Map<String, Any>,
-    private val lifecycleProvider: LifecycleProvider,
-) : PlatformView,
-    HmcpPlayerListener,
-    DefaultLifecycleObserver,
-    HMcpVideoNativeListener {
+class HMcpVideoActivity : AppCompatActivity(), View.OnSystemUiVisibilityChangeListener, HmcpPlayerListener {
 
-    val TAG = this.javaClass.simpleName
-
-    private var hmcpVideoView: HmcpVideoView? = null
-    private var disposed = false
-    private var mHmCloudPluginListener: HmCloudPluginListener? = null
-
-    init {
-        lifecycleProvider.getLifecycle()?.addObserver(this)
-        initHmcp(context, creationParams)
-        hmcpVideoView = createHmcpVideoView(context)
-    }
-
-    private fun createHmcpVideoView(context: Context): HmcpVideoView {
-        Log.e(TAG, "createHmcpVideoView")
-        val hmcpVideoView = HmcpVideoView(context)
-        hmcpVideoView.hmcpPlayerListener = this@HMcpVideoNativeView
-        return hmcpVideoView
-    }
-
-    override fun getView(): View? {
-        Log.e(TAG, "getView hmcpVideoView: ${hmcpVideoView}")
-        return hmcpVideoView
-    }
-
-    override fun dispose() {
-        Log.e(TAG, "dispose")
-        if (disposed) {
-            return
+    companion object {
+        private val TAG: String = HMcpVideoActivity::class.java.getSimpleName()
+        private const val EXTRA_CONFIG = "config"
+        fun start(context: Context, config: String) {
+            Log.e(TAG, "HMcpVideoActivity start: $config")
+            val intent = Intent(context, HMcpVideoActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            intent.putExtra(EXTRA_CONFIG, config)
+            context.startActivity(intent)
         }
-        disposed = true
-        destroyViewIfNecessary()
-        val lifecycle = lifecycleProvider.getLifecycle()
-        lifecycle?.removeObserver(this)
+    }
+
+    private lateinit var hmcpVideoView: HmcpVideoView
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        requestWindowFeature(Window.FEATURE_NO_TITLE)
+        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+        window.decorView.setOnSystemUiVisibilityChangeListener(this)
+        setContentView(R.layout.activity_hmcp_video)
+
+        hmcpVideoView = findViewById(R.id.hmcp_video_view)
+//        hmcpVideoView.hmcpPlayerListener = this
+
+        val creationParams = hashMapOf<String, Any>()
+        creationParams["accessKey"] = "8a7a7a623d25ee7a3c87f688287bd4ba"
+        creationParams["accessKeyId"] = "b14605e9d68"
+        creationParams["channelId"] = "luehu"
+        creationParams["userId"] = "test123"
+        creationParams["gameId"] = "com.tencent.tmgp.sgame"
+        creationParams["isPortrait"] = false
+        creationParams["playTime"] = 1000000
+        creationParams["videoViewType"] = 2
+
+//        initHmcp(this, creationParams)
+        startPlay()
+    }
+
+    private fun initHmcp(context: Context, creationParams: Map<String, Any>) {
+//        HmcpManagerIml.init(context, creationParams, object : OnInitCallBackListener {
+//            override fun success() {
+//                startPlay(creationParams)
+//            }
+//
+//            override fun fail(message: String) = Unit
+//        })
     }
 
     private fun startPlay() {
+        val extraConfig = intent.getStringExtra(EXTRA_CONFIG) ?: ""
+
+        Log.e(TAG, "startPlay extraConfig: $extraConfig")
+
+        val creationParams = JSONObject(extraConfig)
+        Log.e(TAG, "startPlay creationParams: $extraConfig")
+
         val accessKey = creationParams["accessKey"].toString()
         val accessKeyId = creationParams["accessKeyId"].toString()
         val curGamePackageName = creationParams["gameId"].toString()
@@ -92,8 +105,8 @@ class HMcpVideoNativeView(
         userInfo.userId = userId
         userInfo.userToken = userId
 
-        hmcpVideoView?.setUserInfo(userInfo)
-        hmcpVideoView?.setConfigInfo(config)
+        hmcpVideoView.setUserInfo(userInfo)
+        hmcpVideoView.setConfigInfo(config)
 
         // 游戏包名
         val bundle = Bundle()
@@ -111,49 +124,27 @@ class HMcpVideoNativeView(
         bundle.putString(HmcpVideoView.EXTRA_ID, extraInfo)
         //STREAM_TYPE 0 rtmp, 1 webrtc, 不设置默认是rtmp
         bundle.putInt(HmcpVideoView.STREAM_TYPE, 1)
-        hmcpVideoView?.play(bundle)
+        hmcpVideoView.play(bundle)
     }
 
-    override fun onCreate(owner: LifecycleOwner) {
-        Log.e(TAG, "onCreate")
+    @Deprecated("Deprecated in Java")
+    override fun onSystemUiVisibilityChange(visibility: Int) {
+        setHideVirtualKey()
     }
 
-    override fun onStart(owner: LifecycleOwner) {
-        Log.e(TAG, "onStart")
-        hmcpVideoView?.onStart()
-    }
-
-    override fun onResume(owner: LifecycleOwner) {
-        hmcpVideoView?.onResume()
-        Log.e(TAG, "onResume")
-    }
-
-    override fun onPause(owner: LifecycleOwner) {
-        Log.e(TAG, "onPause")
-        hmcpVideoView?.onPause()
-    }
-
-    override fun onStop(owner: LifecycleOwner) {
-        Log.e(TAG, "onStop")
-        hmcpVideoView?.onStop()
-    }
-
-    override fun onDestroy(owner: LifecycleOwner) {
-        Log.e(TAG, "onDestroy")
-        owner.lifecycle.removeObserver(this)
-        // mHmCloudPluginListener = null
-        if (disposed) {
-            return
+    private fun setHideVirtualKey() {
+        //保持布局状态
+        var uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or  //布局位于状态栏下方
+                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or  //全屏
+                View.SYSTEM_UI_FLAG_FULLSCREEN or  //隐藏导航栏
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+        uiOptions = if (Build.VERSION.SDK_INT >= 19) {
+            uiOptions or 0x00001000
+        } else {
+            uiOptions or View.SYSTEM_UI_FLAG_LOW_PROFILE
         }
-        destroyViewIfNecessary()
-    }
-
-    private fun destroyViewIfNecessary() {
-        if (hmcpVideoView == null) {
-            return
-        }
-        hmcpVideoView?.onDestroy()
-        hmcpVideoView = null
+        window.decorView.systemUiVisibility = uiOptions
     }
 
     override fun onError(errorType: ErrorType, errorMEssage: String) {
@@ -161,8 +152,6 @@ class HMcpVideoNativeView(
     }
 
     override fun onSuccess() {
-        Log.e(TAG, "onSuccess")
-        mHmCloudPluginListener?.onSuccess()
     }
 
     override fun onExitQueue() {
@@ -187,17 +176,19 @@ class HMcpVideoNativeView(
 
     override fun HmcpPlayerStatusCallback(json: String) {
         Log.e(TAG, "HmcpPlayerStatusCallback json: $json")
-        mHmCloudPluginListener?.setHmcpPlayerStatusCallback(json)
         try {
             val jsonObject = JSONObject(json)
             val statusCode = jsonObject.getInt(StatusCallbackUtil.STATUS)
             when (statusCode) {
                 Constants.STATUS_PLAY_INTERNAL -> {
                     Log.e(TAG, "HmcpPlayerStatusCallback: STATUS_PLAY_INTERNAL")
-                    hmcpVideoView?.play()
+                    hmcpVideoView.play()
                 }
                 Constants.STATUS_OPERATION_HMCP_ERROR -> {
                     Log.e(TAG, "HmcpPlayerStatusCallback: STATUS_OPERATION_HMCP_ERROR")
+                }
+                Constants.STATUS_PAUSE_PLAY -> {
+                    // 停止游戏成功，跳转到横屏页面
                 }
                 else -> {}
             }
@@ -235,30 +226,33 @@ class HMcpVideoNativeView(
         Log.e(TAG, "onCloudPlayerKeyboardStatusChanged")
     }
 
-    private fun initHmcp(context: Context, creationParams: Map<String, Any>) {
-        HmcpManagerIml.init(context, creationParams, object : OnInitCallBackListener {
-            override fun success() {
-            }
-
-            override fun fail(message: String) = Unit
-        })
+    override fun onStart() {
+        hmcpVideoView.onStart()
+        super.onStart()
     }
 
-    override fun onEvent(method: String) {
-        Log.e(TAG, "onEvent: $method")
-        when (method) {
-            "startCloudGame" -> {
-                startPlay()
-            }
-            "stopGame" -> {
-            }
-            "fullCloudGame" -> {
-            }
-            else -> {}
-        }
+    override fun onRestart() {
+        hmcpVideoView.onRestart(1000)
+        super.onRestart()
     }
 
-    override fun setHmCloudPluginListener(mHmCloudPluginListener: HmCloudPluginListener) {
-        this.mHmCloudPluginListener = mHmCloudPluginListener
+    override fun onResume() {
+        hmcpVideoView.onResume()
+        super.onResume()
+    }
+
+    override fun onPause() {
+        hmcpVideoView.onPause()
+        super.onPause()
+    }
+
+    override fun onStop() {
+        hmcpVideoView.onStop()
+        super.onStop()
+    }
+
+    override fun onDestroy() {
+        hmcpVideoView.onDestroy()
+        super.onDestroy()
     }
 }

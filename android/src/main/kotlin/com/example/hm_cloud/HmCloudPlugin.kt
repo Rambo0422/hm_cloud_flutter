@@ -1,7 +1,6 @@
 package com.example.hm_cloud
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.Lifecycle
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
@@ -72,7 +71,6 @@ class HmCloudPlugin : FlutterPlugin, ActivityAware, MethodChannel.MethodCallHand
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
-        Log.e(TAG, "onMethodCall: ${call.method} eventListener: $mHMcpVideoNativeListener")
         mHMcpVideoNativeListener?.onEvent(call.method)
         when (call.method) {
             "startCloudGame" -> {
