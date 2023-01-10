@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.FrameLayout
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.example.hm_cloud.*
@@ -37,14 +38,18 @@ class HMcpVideoNativeView(
 
     val TAG = "HMcpVideoNativeView"
 
+    private var frameLayout: FrameLayout? = null
     private var hmcpVideoView: HmcpVideoView? = null
     private var disposed = false
     private var mHmCloudPluginListener: HmCloudPluginListener? = null
 
     init {
         lifecycleProvider.getLifecycle()?.addObserver(this)
+
+        frameLayout = FrameLayout(context)
         initHmcp(context, creationParams)
         hmcpVideoView = createHmcpVideoView(context)
+        frameLayout?.addView(hmcpVideoView)
     }
 
     private fun createHmcpVideoView(context: Context): HmcpVideoView {
@@ -55,13 +60,8 @@ class HMcpVideoNativeView(
     }
 
     override fun getView(): View? {
-<<<<<<< Updated upstream:android/src/main/kotlin/com/example/hm_cloud/HMcpVideoNativeView.kt
-        Log.e(TAG, "getView hmcpVideoView: ${hmcpVideoView}")
-        return hmcpVideoView
-=======
         // Log.e(TAG, "getView hmcpVideoView: $hmcpVideoView")
         return frameLayout
->>>>>>> Stashed changes:android/src/main/kotlin/com/example/hm_cloud/ui/view/HMcpVideoNativeView.kt
     }
 
     override fun dispose() {
@@ -214,7 +214,7 @@ class HMcpVideoNativeView(
 //                        HMcpVideoActivity.start(context = context,JSONObject(creationParams).toString())
 //                    }
                 }
-                Constants.RESPONESE_STATE_CHANGE_REASON -> {
+                Constants.STATUS_STOP_PLAY -> {
                     frameLayout?.context?.let { context ->
                         Log.e(TAG, "to HMcpVideoActivity")
                         HMcpVideoActivity.start(context = context, JSONObject(creationParams).toString())

@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.example.hm_cloud.ui.activity
 
 import android.content.Context
@@ -62,16 +64,6 @@ class HMcpVideoActivity : AppCompatActivity(), View.OnSystemUiVisibilityChangeLi
 
 //        initHmcp(this, creationParams)
         startPlay()
-    }
-
-    private fun initHmcp(context: Context, creationParams: Map<String, Any>) {
-//        HmcpManagerIml.init(context, creationParams, object : OnInitCallBackListener {
-//            override fun success() {
-//                startPlay(creationParams)
-//            }
-//
-//            override fun fail(message: String) = Unit
-//        })
     }
 
     private fun startPlay() {

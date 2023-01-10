@@ -11,22 +11,6 @@ object HmcpManagerIml {
     val TAG = "HmcpManagerIml"
 
     fun init(context: Context, creationParams: Map<String, Any>, onInitCallBackListener: OnInitCallBackListener) {
-<<<<<<< Updated upstream
-        if (!isInit) {
-            val accessKeyId = creationParams["accessKeyId"].toString()
-            val channelId = creationParams["channelId"].toString()
-
-            val manager = HmcpManager.getInstance()
-            val bundle = Bundle()
-            bundle.putString(HmcpManager.ACCESS_KEY_ID, accessKeyId)
-            bundle.putString(HmcpManager.CHANNEL_ID, channelId)
-            manager.init(bundle, context, object : OnInitCallBackListener {
-                override fun success() {
-                    Log.e(TAG, "-------- init success --------")
-                    isInit = true
-                    onInitCallBackListener.success()
-                }
-=======
         val accessKeyId = creationParams["accessKeyId"].toString()
         val channelId = creationParams["channelId"].toString()
         val videoViewType = kotlin.runCatching {
@@ -44,7 +28,6 @@ object HmcpManagerIml {
                 Log.e(TAG, "$TAG -------- init success --------")
                 onInitCallBackListener.success()
             }
->>>>>>> Stashed changes
 
             override fun fail(msg: String) {
                 Log.e(TAG, "$TAG -------- init fail--------$msg")
