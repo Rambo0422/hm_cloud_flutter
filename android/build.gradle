@@ -25,7 +25,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 30
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -42,6 +42,7 @@ android {
 
     defaultConfig {
         minSdkVersion 16
+        consumerProguardFiles 'proguard.txt'
     }
 
     dependencies {
@@ -51,6 +52,12 @@ android {
         }
         implementation(name: 'saas-sdk-master-5.1.85.1-1dee6161', ext: 'aar')
     }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.5.1'
+    implementation 'com.google.android.material:material:1.7.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 }
 
 rootProject.allprojects {
