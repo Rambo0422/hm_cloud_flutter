@@ -40,6 +40,7 @@
         _viewId = viewId;
         _args = args;
         
+        /*
         if ([args isKindOfClass:[NSDictionary class]]) {
             
             NSDictionary * params = (NSDictionary *)args;
@@ -71,7 +72,8 @@
             [[CloudPlayerWarpper sharedWrapper] regist];
             
         }
-        
+        */
+         
         _channel = [FlutterMethodChannel methodChannelWithName:@"hm_cloud_controller" binaryMessenger:messenger codec:[FlutterStandardMethodCodec sharedInstance]];
         
     }
@@ -102,56 +104,57 @@
     if ([[call method] isEqualToString:@"startCloudGame"]) {
         
         
-        NSDictionary *gameOptions = @{CloudGameOptionKeyId:[CloudPlayerWarpper sharedWrapper].gameId,
-                                      CloudGameOptionKeyOrientation:@(0),
-                                      CloudGameOptionKeyUserId:[CloudPlayerWarpper sharedWrapper].userId,
-                                      CloudGameOptionKeyUserToken:[CloudPlayerWarpper sharedWrapper].userId,
-                                      CloudGameOptionKeyConfigInfo:@"config",
-                                      CloudGameOptionKeyCToken:[self generateCToken:[CloudPlayerWarpper sharedWrapper].gameId],
-                                      CloudGameOptionKeyPriority:@(0),
-                                      CloudGameOptionKeyPlayingTime:@(DEMO_GAME_TIME*1000),
-                                      CloudGameOptionKeyExtraId:@"",
-                                      CloudGameOptionKeyArchive:@(0),
-                                      CloudGameOptionKeyProtoData:@"",
-                                      CloudGameOptionKeyAppChannel:[CloudPlayerWarpper sharedWrapper].channelId,
-                                      CloudGameOptionKeyStreamType:@(CloudCoreStreamingTypeRTC),
-        };
+        [self sendToFlutter:k_cloudInitBegan params:nil];
         
-        NSLog(@"startSDK params : %@", gameOptions);
-        
-        self.gameVC = [[CloudPlayerWarpper sharedWrapper] prepare:gameOptions];
-        if (!self.gameVC) {
+        if ([call.arguments isKindOfClass:[NSDictionary class]]) {
             
-            [self sendToFlutter:k_startFailed params:nil];
-            return;
+            NSDictionary * params = (NSDictionary *)call.arguments;
+            
+            // accessKey
+            if (params[@"token"]) {
+                [CloudPlayerWarpper sharedWrapper].cToken = params[@"token"];
+            }
+            
+            // accessKeyId
+            if (params[@"accessKeyId"]) {
+                [CloudPlayerWarpper sharedWrapper].accessKeyId = params[@"accessKeyId"];
+            }
+            
+            // expireTime
+            if (params[@"expireTime"]) {
+                [CloudPlayerWarpper sharedWrapper].expireTime = params[@"expireTime"];
+            }
+            
+            // userId
+            if (params[@"userId"]) {
+                [CloudPlayerWarpper sharedWrapper].userId = params[@"userId"];
+            }
+            
+            // gameId
+            if (params[@"gameId"]) {
+                [CloudPlayerWarpper sharedWrapper].gameId = params[@"gameId"];
+            }
+            
+            // channelId
+            if (params[@"channelId"]) {
+                [CloudPlayerWarpper sharedWrapper].channelId = params[@"channelId"];
+            }
+            
+            // userToken
+            if (params[@"userToken"]) {
+                [CloudPlayerWarpper sharedWrapper].userToken = params[@"userToken"];
+            }
+            
+            // pushUrl
+            if (params[@"pushUrl"]) {
+                [CloudPlayerWarpper sharedWrapper].pushUrl = params[@"pushUrl"];
+            }
+            
+            [CloudPlayerWarpper sharedWrapper].delegate = self;
+            [[CloudPlayerWarpper sharedWrapper] regist];
+            
         }
         
-        CloudPreViewController * vc = [[CloudPreViewController alloc] initWithNibName:@"CloudPreViewController" bundle:k_DaShenBundle];
-        
-        vc.modalPresentationStyle = UIModalPresentationFullScreen;
-        vc.gameVC = self.gameVC;
-        vc.channelAction = ^(NSString * _Nonnull methodName, bool value) {
-            [self sendToFlutter:methodName params:@{@"switch" : @(value)}];
-        };
-        
-        vc.didDismiss = ^{
-            
-            
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            
-                self.gameVC.view.frame = self->_v.bounds;
-                [self->_v insertSubview:self.gameVC.view atIndex:0];
-                                                            
-            });
-            
-        };
-        
-        [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:vc animated:YES completion:^{
-            [self sendToFlutter:k_startSuccess params:nil];
-        }];
-        
-        
-        [[CloudPlayerWarpper sharedWrapper] startNetMonitor];
         
     }
     
@@ -196,6 +199,8 @@
         [[CloudPlayerWarpper sharedWrapper] stop];
         [[CloudPlayerWarpper sharedWrapper] stopNetMonitor];
         
+        [_v.subviews.firstObject removeFromSuperview];
+        self.gameVC = nil;
     }
     
     
@@ -206,71 +211,40 @@
     [self.channel invokeMethod:actionName arguments:params];
 }
 
-#pragma mark - Demo Depended Function
-- (NSString *) generateCToken:(NSString *)pkgName {
-    NSData *keyData = [self hexToBytes:[CloudPlayerWarpper sharedWrapper].accessKey];
-    Byte *keyArr = (Byte*)[keyData bytes];
-
-    NSString *str = [NSString stringWithFormat:@"%@%@%@%@%@", [CloudPlayerWarpper sharedWrapper].userId, [CloudPlayerWarpper sharedWrapper].userId, pkgName, [CloudPlayerWarpper sharedWrapper].accessKeyId, [CloudPlayerWarpper sharedWrapper].channelId];
-    NSData *strData = [str dataUsingEncoding:kCFStringEncodingUTF8];
-
-    NSData *aesData = [self AES256EncryptWithKey:(void *)keyArr forData:strData ];//加密后的串
-    return [self stringByHashingWithSHA1:aesData];
-}
-
-- (NSData *) hexToBytes:(NSString *)val {
-    NSMutableData* data = [NSMutableData data];
-    int idx;
-    for (idx = 0; idx+2 <= val.length; idx+=2) {
-        NSRange range = NSMakeRange(idx, 2);
-        NSString * hexStr = [val substringWithRange:range];
-        NSScanner * scanner = [NSScanner scannerWithString:hexStr];
-        unsigned int intValue;
-        [scanner scanHexInt:&intValue];
-        [data appendBytes:&intValue length:1];
-    }
-    return data;
-}
-
-- (NSData *) AES256EncryptWithKey:(const void *)key forData:(NSData *)data {
-    char keyPtr[kCCKeySizeAES256+1];
-    bzero(keyPtr, sizeof(keyPtr));
-
-    NSUInteger dataLength = [data length];
-    size_t bufferSize = dataLength + kCCBlockSizeAES128;
-    void *buffer = malloc(bufferSize);
-    size_t numBytesEncrypted = 0;
-    CCCryptorStatus cryptStatus = CCCrypt(kCCEncrypt, kCCAlgorithmAES128,
-                                          kCCOptionPKCS7Padding|kCCOptionECBMode,
-                                          key, kCCBlockSizeAES128,
-                                          NULL,
-                                          [data bytes], dataLength,
-                                          buffer, bufferSize,
-                                          &numBytesEncrypted);
-    if (cryptStatus == kCCSuccess) {
-        return [NSData dataWithBytesNoCopy:buffer length:numBytesEncrypted];
-    }
-    free(buffer);
-
-    return nil;
-}
-
-- (NSString *) stringByHashingWithSHA1:(NSData *)data {
-    uint8_t digest[CC_SHA1_DIGEST_LENGTH];
-
-    CC_SHA1(data.bytes, (unsigned int)data.length, digest);
-
-    NSMutableString *output = [NSMutableString stringWithCapacity:CC_SHA1_DIGEST_LENGTH * 2];
-
-    for(int i=0; i<CC_SHA1_DIGEST_LENGTH; i++) {
-        [output appendFormat:@"%02x", digest[i]];
-    }
-
-    return output;
-}
-
 #pragma mark - CloudPlayerWrapper Delegate
 - (void) cloudPlayerReigsted:(BOOL)success {
+    
+    if (success) {
+     
+        dispatch_async(dispatch_get_main_queue(), ^{
+            
+            NSDictionary *gameOptions = @{CloudGameOptionKeyId:[CloudPlayerWarpper sharedWrapper].gameId,
+                                          CloudGameOptionKeyOrientation:@(0),
+                                          CloudGameOptionKeyUserId:[CloudPlayerWarpper sharedWrapper].userId,
+                                          CloudGameOptionKeyUserToken:[CloudPlayerWarpper sharedWrapper].userToken,
+                                          CloudGameOptionKeyConfigInfo:@"config",
+                                          CloudGameOptionKeyCToken:[CloudPlayerWarpper sharedWrapper].cToken,
+                                          CloudGameOptionKeyPriority:@(0),
+                                          CloudGameOptionKeyPlayingTime:[CloudPlayerWarpper sharedWrapper].expireTime,
+                                          CloudGameOptionKeyExtraId:@"",
+                                          CloudGameOptionKeyArchive:@(0),
+                                          CloudGameOptionKeyProtoData:@"",
+                                          CloudGameOptionKeyAppChannel:[CloudPlayerWarpper sharedWrapper].channelId,
+                                          CloudGameOptionKeyStreamType:@(CloudCoreStreamingTypeRTC),
+            };
+            
+            
+//            NSLog(@"ccctoken = %@, %@",[CloudPlayerWarpper sharedWrapper].cToken,[self generateCToken:[CloudPlayerWarpper sharedWrapper].gameId]);
+            
+            
+            self.gameVC = [[CloudPlayerWarpper sharedWrapper] prepare:gameOptions];
+            
+        });
+        
+        
+        
+    }
+    
 }
 
 - (void) cloudPlayerResolutionList:(NSArray<HMCloudPlayerResolution*> *)resolutions {
@@ -282,7 +256,9 @@
 - (void) cloudPlayerPrepared:(BOOL)success {
 
     if (success) {
+        
         [[CloudPlayerWarpper sharedWrapper] play];
+        
     }
 }
 
@@ -295,6 +271,53 @@
 
         case PlayerStateVideoVisible: { //视频第一帧到达
             NSLog(@"%s Remove Loading", __FUNCTION__);
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                
+                if (!self.gameVC) {
+                    
+                    [self sendToFlutter:k_startFailed params:nil];
+                    return;
+                }
+                
+                CloudPreViewController * vc = [[CloudPreViewController alloc] initWithNibName:@"CloudPreViewController" bundle:k_DaShenBundle];
+                
+                vc.modalPresentationStyle = UIModalPresentationFullScreen;
+                vc.gameVC = self.gameVC;
+                vc.channelAction = ^(NSString * _Nonnull methodName, bool value) {
+                    [self sendToFlutter:methodName params:@{@"switch" : @(value)}];
+                };
+                
+                vc.didDismiss = ^{
+                    
+                    
+                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    
+                        self.gameVC.view.frame = self->_v.bounds;
+                        [self->_v insertSubview:self.gameVC.view atIndex:0];
+                                                                    
+                    });
+                    
+                };
+                
+                [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:vc animated:YES completion:^{
+                    [self sendToFlutter:k_startSuccess params:nil];
+                }];
+                
+                
+                [[CloudPlayerWarpper sharedWrapper] startNetMonitor];
+                
+
+            });
+            
+            // 开启直播
+            [[HMCloudPlayer sharedCloudPlayer] startLivingWithLivingId:[CloudPlayerWarpper sharedWrapper].userId pushStreamUrl:[CloudPlayerWarpper sharedWrapper].pushUrl Success:^(BOOL success) {
+
+                [self sendToFlutter:k_videoVisble params:nil];
+
+            } Fail:^(NSString *errorCode, NSString *errorMsg) {
+            }];
+            
 //            [self addRotateButton];
 //            [self addPlayStatusButton];
         }
@@ -342,11 +365,14 @@
 
         case PlayerQueueStateUpdate: { //排队进度更新
             NSLog(@"%s Show FullScreen QueueStatus View", __FUNCTION__);
+
+            [self sendToFlutter:k_cloudQueueInfo params:nil];
         }
             break;
 
         case PlayerQueueStateEntering: { //即将进入游戏
             NSLog(@"%s Show FullScreen Entering View", __FUNCTION__);
+            
         }
             break;
 
