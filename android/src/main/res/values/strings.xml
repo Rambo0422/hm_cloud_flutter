@@ -1,1 +1,6 @@
-<resources></resources>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="setting">设置</string>
+  <string name="sound">声音</string>
+  <string name="exit_full">退出全屏</string>
+</resources>

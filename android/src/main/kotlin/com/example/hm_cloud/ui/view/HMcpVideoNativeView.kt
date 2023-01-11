@@ -217,7 +217,7 @@ class HMcpVideoNativeView(
                 Constants.STATUS_STOP_PLAY -> {
                     frameLayout?.context?.let { context ->
                         Log.e(TAG, "to HMcpVideoActivity")
-                        HMcpVideoActivity.start(context = context, JSONObject(creationParams).toString())
+                        HMcpVideoActivity.start(context = context)
                     }
                 }
                 else -> {}

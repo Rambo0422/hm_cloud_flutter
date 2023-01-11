@@ -1,7 +1,12 @@
 package com.example.hm_cloud
 
+import android.app.Activity
 import android.content.Context
 import androidx.lifecycle.Lifecycle
+import com.example.hm_cloud.manage.HmcpVideoManage
+import com.example.hm_cloud.ui.activity.HMcpVideoActivity
+import com.example.hmcpdemo.listener.FirstFrameArrivalListener
+import com.haima.hmcp.listeners.OnInitCallBackListener
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -11,11 +16,14 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 
 /** HmCloudPlugin */
+@Suppress("UNCHECKED_CAST")
 class HmCloudPlugin : FlutterPlugin, ActivityAware, MethodChannel.MethodCallHandler, HmCloudPluginListener {
 
-    val TAG = this.javaClass.simpleName
+    val TAG = "HmCloudPlugin"
 
     private lateinit var context: Context
+    private lateinit var activity: Activity
+
     private val VIEW_TYPE = "plugins.flutter.io/hm_cloud_view"
     private lateinit var flutterPluginBinding: FlutterPlugin.FlutterPluginBinding
     private var lifecycle: Lifecycle? = null
@@ -48,6 +56,7 @@ class HmCloudPlugin : FlutterPlugin, ActivityAware, MethodChannel.MethodCallHand
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+        activity = binding.activity
         lifecycle = FlutterLifecycleAdapter.getActivityLifecycle(binding)
     }
 
@@ -74,6 +83,11 @@ class HmCloudPlugin : FlutterPlugin, ActivityAware, MethodChannel.MethodCallHand
         mHMcpVideoNativeListener?.onEvent(call.method)
         when (call.method) {
             "startCloudGame" -> {
+                if (this::activity.isInitialized) {
+                    val creationParams = call.arguments as Map<String, Any>
+                    hmcInit(creationParams)
+                }
+                // HMcpVideoActivity.start(context, call.arguments.toString())
             }
             "stopGame" -> {
             }
@@ -93,5 +107,25 @@ class HmCloudPlugin : FlutterPlugin, ActivityAware, MethodChannel.MethodCallHand
 
     override fun onSuccess() {
         methodChannel.invokeMethod("startSuccess", null)
+    }
+
+    private fun hmcInit(creationParams: Map<String, Any>) {
+        HmcpManagerIml.init(activity, creationParams, object : OnInitCallBackListener {
+            override fun success() {
+                HmcpVideoManage.getInstance().apply {
+                    initHMcpVideoView(activity)
+                    playVideo(creationParams)
+                    setFirstFrameArrivalListener(object : FirstFrameArrivalListener {
+                        override fun onFirstFrameArrival() {
+                            removeFirstFrameArrivalListener()
+                            HMcpVideoActivity.start(activity)
+                        }
+                    })
+                }
+            }
+
+            override fun fail(msg: String) {
+            }
+        })
     }
 }
