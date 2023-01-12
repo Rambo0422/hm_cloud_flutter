@@ -2,42 +2,33 @@
 
 package com.example.hm_cloud.ui.activity
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
+import android.view.KeyEvent
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
-import androidx.appcompat.app.AppCompatActivity
-import com.example.hm_cloud.R
 import com.example.hm_cloud.databinding.ActivityHmcpVideoBinding
 import com.example.hm_cloud.manage.HmcpVideoManage
-import com.haima.hmcp.Constants
-import com.haima.hmcp.beans.Message
-import com.haima.hmcp.beans.UserInfo
-import com.haima.hmcp.enums.CloudPlayerKeyboardStatus
-import com.haima.hmcp.enums.ErrorType
-import com.haima.hmcp.enums.NetWorkState
-import com.haima.hmcp.enums.ScreenOrientation
-import com.haima.hmcp.listeners.HmcpPlayerListener
-import com.haima.hmcp.utils.CryptoUtils
-import com.haima.hmcp.utils.StatusCallbackUtil
-import com.haima.hmcp.widgets.HmcpVideoView
-import org.json.JSONObject
+import com.example.hm_cloud.manage.MethodChannelManage
+
+import androidx.appcompat.app.AppCompatActivity
+import com.example.hm_cloud.pluginconstant.ChannelConstant
 
 class HMcpVideoActivity : AppCompatActivity(), View.OnSystemUiVisibilityChangeListener {
 
-    private lateinit var hmcpVideoView: HmcpVideoView
     private lateinit var binding: ActivityHmcpVideoBinding
 
     companion object {
-        private val TAG: String = HMcpVideoActivity::class.java.getSimpleName()
-        fun start(context: Context) {
-            val intent = Intent(context, HMcpVideoActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            context.startActivity(intent)
+        const val REQUEST_CODE = 100
+        const val FULL_RESULT_CODE = 956545
+
+        fun startActivityForResult(activity: Activity) {
+            val intent = Intent(activity, HMcpVideoActivity::class.java)
+            activity.startActivityForResult(intent, REQUEST_CODE)
         }
     }
 
@@ -50,6 +41,8 @@ class HMcpVideoActivity : AppCompatActivity(), View.OnSystemUiVisibilityChangeLi
         binding = ActivityHmcpVideoBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        MethodChannelManage.getInstance().invokeMethod(ChannelConstant.METHOD_START_SUCCESS)
+
         initView()
         initHmc()
     }
@@ -60,16 +53,18 @@ class HMcpVideoActivity : AppCompatActivity(), View.OnSystemUiVisibilityChangeLi
         }
 
         binding.buttonExitFull.setOnClickListener {
-
+            exitFullScreen()
         }
 
-        binding.switchSound.setOnCheckedChangeListener { _, isChecked ->
-            Log.e(TAG, "switchSound: $isChecked")
+        binding.switchSound.setOnCheckedChangeListener { _, _ ->
+            MethodChannelManage.getInstance().invokeMethod(ChannelConstant.METHOD_CHANGE_SOUND)
         }
     }
 
     private fun initHmc() {
-        HmcpVideoManage.getInstance().addView(this, binding.layoutHmcContainer)
+        HmcpVideoManage.getInstance().apply {
+            addView(binding.layoutHmcContainer)
+        }
     }
 
     @Deprecated("Deprecated in Java")
@@ -82,13 +77,27 @@ class HMcpVideoActivity : AppCompatActivity(), View.OnSystemUiVisibilityChangeLi
         var uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or  //布局位于状态栏下方
                 View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or  //全屏
                 View.SYSTEM_UI_FLAG_FULLSCREEN or  //隐藏导航栏
-                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
-                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
         uiOptions = if (Build.VERSION.SDK_INT >= 19) {
             uiOptions or 0x00001000
         } else {
             uiOptions or View.SYSTEM_UI_FLAG_LOW_PROFILE
         }
         window.decorView.systemUiVisibility = uiOptions
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            // 屏蔽返回按钮
+            return false
+        }
+        return super.onKeyDown(keyCode, event)
+    }
+
+    private fun exitFullScreen() {
+        // 移除 hmcpView
+        HmcpVideoManage.getInstance().removeView()
+        setResult(FULL_RESULT_CODE)
+        finish()
     }
 }
