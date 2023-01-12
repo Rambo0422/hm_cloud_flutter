@@ -4,11 +4,11 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.Lifecycle
-import com.example.hm_cloud.pluginconstant.EventConstant
 import com.example.hm_cloud.manage.HmcpVideoManage
 import com.example.hm_cloud.manage.MethodCallListener
 import com.example.hm_cloud.manage.MethodChannelManage
 import com.example.hm_cloud.pluginconstant.ChannelConstant
+import com.example.hm_cloud.pluginconstant.EventConstant
 import com.example.hm_cloud.ui.activity.HMcpVideoActivity
 import com.example.hm_cloud.utils.LoggerUtils
 import com.example.hmcpdemo.listener.FirstFrameArrivalListener
@@ -100,14 +100,11 @@ class HmCloudPlugin : FlutterPlugin,
         hmcpVideoNativeListener?.onEvent(call.method)
         when (call.method) {
             "startCloudGame" -> {
-//                MethodChannelManage.getInstance().invokeMethod(ChannelConstant.METHOD_CLOUD_INIT_BEGAN)
-//                if (activity != null) {
-//                    val creationParams = call.arguments as Map<String, Any>
-//                    hmcInit(creationParams)
-//                }
-
-                startHmcpActivity()
-
+                MethodChannelManage.getInstance().invokeMethod(ChannelConstant.METHOD_CLOUD_INIT_BEGAN)
+                if (activity != null) {
+                    val creationParams = call.arguments as Map<String, Any>
+                    hmcInit(creationParams)
+                }
             }
             "stopGame" -> {
                 HmcpVideoManage.getInstance().onDestroy()
