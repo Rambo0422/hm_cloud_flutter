@@ -17,6 +17,7 @@ import com.haima.hmcp.enums.CloudPlayerKeyboardStatus
 import com.haima.hmcp.enums.ErrorType
 import com.haima.hmcp.enums.NetWorkState
 import com.haima.hmcp.utils.StatusCallbackUtil
+import com.orhanobut.logger.Logger
 import io.flutter.plugin.platform.PlatformView
 import org.json.JSONObject
 
@@ -27,8 +28,6 @@ class HMcpVideoNativeView(
     context: Context,
     private val lifecycleProvider: LifecycleProvider,
 ) : PlatformView, DefaultLifecycleObserver, HMcpVideoNativeListener {
-
-    val TAG = "guozewen"
 
     private var frameLayout: InterceptTouchFrameLayout? = null
     private var disposed = false
@@ -44,7 +43,7 @@ class HMcpVideoNativeView(
     }
 
     override fun dispose() {
-        Log.e(TAG, "dispose")
+        Logger.e("HMcpVideoNativeView dispose")
         if (disposed) {
             return
         }
@@ -56,23 +55,23 @@ class HMcpVideoNativeView(
     }
 
     override fun onStart(owner: LifecycleOwner) {
-        Log.e(TAG, "onStart")
+        Logger.e("HMcpVideoNativeView onStart")
     }
 
     override fun onResume(owner: LifecycleOwner) {
-        Log.e(TAG, "onResume")
+        Logger.e("HMcpVideoNativeView onResume")
     }
 
     override fun onPause(owner: LifecycleOwner) {
-        Log.e(TAG, "onPause")
+        Logger.e("HMcpVideoNativeView onPause")
     }
 
     override fun onStop(owner: LifecycleOwner) {
-        Log.e(TAG, "onStop")
+        Logger.e("HMcpVideoNativeView onStop")
     }
 
     override fun onDestroy(owner: LifecycleOwner) {
-        Log.e(TAG, "onDestroy")
+        Logger.e("HMcpVideoNativeView onDestroy")
         if (disposed) {
             return
         }
@@ -87,10 +86,10 @@ class HMcpVideoNativeView(
     }
 
     override fun onEvent(method: String) {
-        Log.e(TAG, "onEvent: $method")
+        Logger.e("HMcpVideoNativeView onEvent: $method")
         when (method) {
             EventConstant.EVENT_EXIT_FULL -> {
-                Log.e(TAG, "EVENT_EXIT_FULL")
+                Logger.e("EVENT_EXIT_FULL")
                 // 添加 海马云的View
                 frameLayout?.apply {
                     HmcpVideoManage.getInstance().addView(this)

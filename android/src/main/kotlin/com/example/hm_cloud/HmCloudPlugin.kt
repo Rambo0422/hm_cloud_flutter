@@ -3,7 +3,6 @@ package com.example.hm_cloud
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import androidx.lifecycle.Lifecycle
 import com.example.hm_cloud.pluginconstant.EventConstant
 import com.example.hm_cloud.manage.HmcpVideoManage
@@ -11,6 +10,7 @@ import com.example.hm_cloud.manage.MethodCallListener
 import com.example.hm_cloud.manage.MethodChannelManage
 import com.example.hm_cloud.pluginconstant.ChannelConstant
 import com.example.hm_cloud.ui.activity.HMcpVideoActivity
+import com.example.hm_cloud.utils.LoggerUtils
 import com.example.hmcpdemo.listener.FirstFrameArrivalListener
 import com.haima.hmcp.listeners.OnInitCallBackListener
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -30,12 +30,11 @@ class HmCloudPlugin : FlutterPlugin,
     PluginRegistry.ActivityResultListener {
 
     companion object {
-        val TAG = "guozewen"
+        private const val VIEW_TYPE = "plugins.flutter.io/hm_cloud_view"
     }
 
     private lateinit var context: Context
     private var activity: Activity? = null
-    private val VIEW_TYPE = "plugins.flutter.io/hm_cloud_view"
     private lateinit var flutterPluginBinding: FlutterPlugin.FlutterPluginBinding
     private var lifecycle: Lifecycle? = null
     private var hmcpVideoNativeListener: HMcpVideoNativeListener? = null
@@ -43,6 +42,8 @@ class HmCloudPlugin : FlutterPlugin,
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         this.flutterPluginBinding = flutterPluginBinding
         this.context = flutterPluginBinding.applicationContext
+
+        LoggerUtils.init()
 
         setMethodChannel(flutterPluginBinding.binaryMessenger)
 
@@ -99,11 +100,14 @@ class HmCloudPlugin : FlutterPlugin,
         hmcpVideoNativeListener?.onEvent(call.method)
         when (call.method) {
             "startCloudGame" -> {
-                MethodChannelManage.getInstance().invokeMethod(ChannelConstant.METHOD_CLOUD_INIT_BEGAN)
-                if (activity != null) {
-                    val creationParams = call.arguments as Map<String, Any>
-                    hmcInit(creationParams)
-                }
+//                MethodChannelManage.getInstance().invokeMethod(ChannelConstant.METHOD_CLOUD_INIT_BEGAN)
+//                if (activity != null) {
+//                    val creationParams = call.arguments as Map<String, Any>
+//                    hmcInit(creationParams)
+//                }
+
+                startHmcpActivity()
+
             }
             "stopGame" -> {
                 HmcpVideoManage.getInstance().onDestroy()
@@ -145,7 +149,6 @@ class HmCloudPlugin : FlutterPlugin,
     private fun startHmcpActivity() {
         // 跳转横屏移除海马云的view
         HmcpVideoManage.getInstance().removeView()
-
         activity?.let { activity ->
             HMcpVideoActivity.startActivityForResult(activity)
         }

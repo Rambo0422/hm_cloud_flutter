@@ -19,12 +19,12 @@ import com.haima.hmcp.listeners.HmcpPlayerListener
 import com.haima.hmcp.listeners.OnLivingListener
 import com.haima.hmcp.utils.StatusCallbackUtil
 import com.haima.hmcp.widgets.HmcpVideoView
+import com.orhanobut.logger.Logger
 import org.json.JSONException
 import org.json.JSONObject
 
 class HmcpVideoManage : HmcpPlayerListener {
 
-    val TAG = "guozewen"
     private var userId = ""
     private var pushUrl = ""
     private var isFirstFrameArrival = false
@@ -47,21 +47,25 @@ class HmcpVideoManage : HmcpPlayerListener {
     }
 
     fun addView(parentView: ViewGroup) {
-        Log.e(TAG, "parentView addView hmcpVideoView")
-        if (hmcpVideoView != null && hmcpVideoView?.parent == null) {
-            parentView.addView(hmcpVideoView, 0, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+        Logger.e("parentView addView hmcpVideoView")
+        hmcpVideoView?.apply {
+            if (parent == null) {
+                val layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+                parentView.addView(hmcpVideoView, 0, layoutParams)
+            }
         }
+
     }
 
     fun removeView() {
-        if (hmcpVideoView != null && hmcpVideoView?.parent != null) {
-            (hmcpVideoView?.parent as? ViewGroup)?.removeView(hmcpVideoView)
+        hmcpVideoView?.apply {
+            (parent as? ViewGroup)?.removeView(hmcpVideoView)
         }
     }
 
     fun playVideo(params: Map<String, Any>) {
         isFirstFrameArrival = false
-        Log.e(TAG, "params: $params")
+        Logger.e("params: $params")
         val curGamePackageName = params["gameId"].toString()
         val channelId = params["channelId"].toString()
 
@@ -80,8 +84,6 @@ class HmcpVideoManage : HmcpPlayerListener {
         val expireTime = kotlin.runCatching {
             params["expireTime"] as Long
         }.getOrElse { Int.MAX_VALUE.toLong() }
-
-        Log.i(TAG, "expireTime: $expireTime")
 
         val cToken = kotlin.runCatching {
             params["token"].toString()
@@ -118,22 +120,22 @@ class HmcpVideoManage : HmcpPlayerListener {
     }
 
     override fun onError(errorType: ErrorType, s: String) {
-        Log.e(TAG, "onError errorType: $errorType s: $s")
+        Logger.e("onError errorType: $errorType s: $s")
     }
 
     override fun onSuccess() {
-        Log.e(TAG, "onSuccess: ")
+        Logger.e("onSuccess: ")
     }
 
     override fun onExitQueue() {
     }
 
     override fun onMessage(message: Message) {
-        Log.e(TAG, "onMessage: " + message.payload)
+        Logger.e("onMessage: " + message.payload)
     }
 
     override fun onSceneChanged(s: String) {
-        Log.e(TAG, "onSceneChanged: $s")
+        Logger.e("onSceneChanged: $s")
     }
 
     override fun onNetworkChanged(netWorkState: NetWorkState?) {}
@@ -141,17 +143,18 @@ class HmcpVideoManage : HmcpPlayerListener {
     override fun onPlayStatus(i: Int, l: Long, s: String?) {}
 
     override fun HmcpPlayerStatusCallback(messageInfo: String) {
-        Log.d(TAG, "HmcpPlayerStatusCallback message: $messageInfo")
+        Logger.e("HmcpPlayerStatusCallback message: $messageInfo");
+
         try {
             val obj = JSONObject(messageInfo)
             when (obj.getInt(StatusCallbackUtil.STATUS)) {
                 Constants.STATUS_PLAY_INTERNAL -> {
-                    Log.d(TAG, "HmcpPlayerStatusCallback STATUS_PLAY_INTERNAL")
+                    Logger.e("HmcpPlayerStatusCallback STATUS_PLAY_INTERNAL")
                     hmcpVideoView?.play()
 
                 }
                 Constants.STATUS_FIRST_FRAME_ARRIVAL -> {
-                    Log.d(TAG, "HmcpPlayerStatusCallback 首帧出来了")
+                    Logger.e("HmcpPlayerStatusCallback 首帧出来了")
                     if (!isFirstFrameArrival) {
                         isFirstFrameArrival = true
                         // 首帧出来再加载 View
@@ -160,12 +163,12 @@ class HmcpVideoManage : HmcpPlayerListener {
                     }
                 }
                 Constants.STATUS_WAIT_CHOOSE -> {
-                    Log.e(TAG, "HmcpPlayerStatusCallback: STATUS_WAIT_CHOOSE")
+                    Logger.e("HmcpPlayerStatusCallback: STATUS_WAIT_CHOOSE")
                     MethodChannelManage.getInstance().invokeMethod(ChannelConstant.METHOD_CLOUD_QUEUE_INFO)
                     entryQueue()
                 }
                 Constants.STATUS_OPERATION_HMCP_ERROR -> {
-                    Log.d(TAG, "HmcpPlayerStatusCallback STATUS_OPERATION_HMCP_ERROR: ${obj.get("data")}")
+                    Logger.e("HmcpPlayerStatusCallback STATUS_OPERATION_HMCP_ERROR: ${obj.get("data")}")
                 }
                 else -> {}
             }
@@ -209,31 +212,31 @@ class HmcpVideoManage : HmcpPlayerListener {
 
     private fun startLiving(livingId: String, livingUrl: String) {
         val cloudId = HmcpManager.getInstance().cloudId
-        Log.d(TAG, "startLiving cloudId: $cloudId livingId: $livingId livingUrl: $livingUrl")
+        Logger.e("startLiving cloudId: $cloudId livingId: $livingId livingUrl: $livingUrl")
 
         if (livingId.isNotEmpty() && livingUrl.isNotEmpty()) {
             hmcpVideoView?.startLiving(livingId, livingUrl, object : OnLivingListener {
                 override fun start(success: Boolean, msg: String?) {
-                    Log.d(TAG, "startLiving start success:$success msg: $msg")
+                    Logger.e("startLiving start success:$success msg: $msg")
                     if (success) {
                         MethodChannelManage.getInstance().invokeMethod(ChannelConstant.METHOD_VIDEO_VISIBLE)
                     }
                 }
 
                 override fun stop(success: Boolean, msg: String) {
-                    Log.d(TAG, "startLiving stop :$success msg: $msg")
+                    Logger.e("startLiving stop :$success msg: $msg")
                 }
             })
         }
     }
 
     fun entryQueue() {
-        Log.d(TAG, "entryQueue")
+        Logger.e("entryQueue")
         hmcpVideoView?.entryQueue()
     }
 
     fun exitQueue() {
-        Log.d(TAG, "exitQueue")
+        Logger.e("exitQueue")
         hmcpVideoView?.exitQueue()
     }
 }

@@ -3,20 +3,20 @@
 package com.example.hm_cloud.ui.activity
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
+import android.view.ViewGroup
 import android.view.Window
 import android.view.WindowManager
+import androidx.appcompat.app.AppCompatActivity
 import com.example.hm_cloud.databinding.ActivityHmcpVideoBinding
 import com.example.hm_cloud.manage.HmcpVideoManage
 import com.example.hm_cloud.manage.MethodChannelManage
-
-import androidx.appcompat.app.AppCompatActivity
 import com.example.hm_cloud.pluginconstant.ChannelConstant
+import com.example.hm_cloud.ui.view.HorizontalSettingIcon
 
 class HMcpVideoActivity : AppCompatActivity(), View.OnSystemUiVisibilityChangeListener {
 
@@ -48,10 +48,6 @@ class HMcpVideoActivity : AppCompatActivity(), View.OnSystemUiVisibilityChangeLi
     }
 
     private fun initView() {
-        binding.button.setOnClickListener {
-            binding.drawerLayout.openDrawer(binding.rightDrawerLayout)
-        }
-
         binding.buttonExitFull.setOnClickListener {
             exitFullScreen()
         }
@@ -59,6 +55,19 @@ class HMcpVideoActivity : AppCompatActivity(), View.OnSystemUiVisibilityChangeLi
         binding.switchSound.setOnCheckedChangeListener { _, _ ->
             MethodChannelManage.getInstance().invokeMethod(ChannelConstant.METHOD_CHANGE_SOUND)
         }
+
+        initFloatView()
+    }
+
+    private fun initFloatView() {
+        val params = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        val settingIcon = HorizontalSettingIcon(this)
+        settingIcon.setOnClickListener {
+            binding.drawerLayout.openDrawer(binding.rightDrawerLayout)
+        }
+        binding.layoutContent.addView(settingIcon, params)
     }
 
     private fun initHmc() {
