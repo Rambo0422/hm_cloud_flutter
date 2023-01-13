@@ -29,7 +29,7 @@
 @property (nonatomic, strong)   NSString *userToken;
 @property (nonatomic, strong)   NSString *channelId;
 @property (nonatomic, strong)   NSString *gameId;
-@property (nonatomic, strong)   NSNumber *expireTime;
+@property (nonatomic, strong)   NSString *expireTime;
 @property (nonatomic, strong)   NSString *pushUrl;
 
 
