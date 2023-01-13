@@ -19,13 +19,19 @@ allprojects {
         google()
         mavenCentral()
     }
+
+//    configurations.all {
+//        resolutionStrategy {
+//            force 'androidx.core:core-ktx:1.8.0'
+//        }
+//    }
 }
 
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 33
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -36,21 +42,34 @@ android {
         jvmTarget = '1.8'
     }
 
+    viewBinding {
+        enabled = true
+    }
+
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
     defaultConfig {
         minSdkVersion 16
+        consumerProguardFiles 'proguard.txt'
     }
 
     dependencies {
-        implementation 'com.alibaba:fastjson:1.2.0'
+        implementation 'com.alibaba:fastjson:1.2.73'
         implementation('io.socket:socket.io-client:1.0.0') {
             exclude group: 'org.json', module: 'json'
         }
         implementation(name: 'saas-sdk-master-5.1.85.1-1dee6161', ext: 'aar')
     }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.5.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'com.google.android.material:material:1.7.0'
+    implementation "androidx.drawerlayout:drawerlayout:1.1.1"
+    implementation 'com.orhanobut:logger:2.2.0'
 }
 
 rootProject.allprojects {

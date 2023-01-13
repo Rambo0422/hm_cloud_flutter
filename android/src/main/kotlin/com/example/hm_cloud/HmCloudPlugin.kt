@@ -1,8 +1,18 @@
 package com.example.hm_cloud
 
+import android.app.Activity
 import android.content.Context
-import android.util.Log
+import android.content.Intent
 import androidx.lifecycle.Lifecycle
+import com.example.hm_cloud.manage.HmcpVideoManage
+import com.example.hm_cloud.manage.MethodCallListener
+import com.example.hm_cloud.manage.MethodChannelManage
+import com.example.hm_cloud.pluginconstant.ChannelConstant
+import com.example.hm_cloud.pluginconstant.EventConstant
+import com.example.hm_cloud.ui.activity.HMcpVideoActivity
+import com.example.hm_cloud.utils.LoggerUtils
+import com.example.hmcpdemo.listener.FirstFrameArrivalListener
+import com.haima.hmcp.listeners.OnInitCallBackListener
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -10,24 +20,30 @@ import io.flutter.embedding.engine.plugins.lifecycle.FlutterLifecycleAdapter
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
+import io.flutter.plugin.common.PluginRegistry
 
 /** HmCloudPlugin */
-class HmCloudPlugin : FlutterPlugin, ActivityAware, MethodChannel.MethodCallHandler, HmCloudPluginListener {
+@Suppress("UNCHECKED_CAST")
+class HmCloudPlugin : FlutterPlugin,
+    ActivityAware,
+    HmCloudPluginListener,
+    PluginRegistry.ActivityResultListener {
 
-    val TAG = this.javaClass.simpleName
+    companion object {
+        private const val VIEW_TYPE = "plugins.flutter.io/hm_cloud_view"
+    }
 
     private lateinit var context: Context
-    private val VIEW_TYPE = "plugins.flutter.io/hm_cloud_view"
+    private var activity: Activity? = null
     private lateinit var flutterPluginBinding: FlutterPlugin.FlutterPluginBinding
     private var lifecycle: Lifecycle? = null
-    private var mHMcpVideoNativeListener: HMcpVideoNativeListener? = null
-
-    private lateinit var methodChannel: MethodChannel
-    private val HM_CLOUD_CHANNEL_NAME = "hm_cloud_controller"
+    private var hmcpVideoNativeListener: HMcpVideoNativeListener? = null
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         this.flutterPluginBinding = flutterPluginBinding
         this.context = flutterPluginBinding.applicationContext
+
+        LoggerUtils.init()
 
         setMethodChannel(flutterPluginBinding.binaryMessenger)
 
@@ -49,7 +65,9 @@ class HmCloudPlugin : FlutterPlugin, ActivityAware, MethodChannel.MethodCallHand
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+        activity = binding.activity
         lifecycle = FlutterLifecycleAdapter.getActivityLifecycle(binding)
+        binding.addActivityResultListener(this)
     }
 
     override fun onDetachedFromActivityForConfigChanges() {
@@ -62,38 +80,84 @@ class HmCloudPlugin : FlutterPlugin, ActivityAware, MethodChannel.MethodCallHand
 
     override fun onDetachedFromActivity() {
         lifecycle = null
-        mHMcpVideoNativeListener = null
-        methodChannel.setMethodCallHandler(null)
+        activity = null
+        hmcpVideoNativeListener = null
+        MethodChannelManage.getInstance().removeMethodCallHandler()
     }
 
     private fun setMethodChannel(binaryMessenger: BinaryMessenger) {
-        methodChannel = MethodChannel(binaryMessenger, HM_CLOUD_CHANNEL_NAME)
-        methodChannel.setMethodCallHandler(this)
+        MethodChannelManage.getInstance().apply {
+            setMethodChannel(binaryMessenger)
+            setMethodCallListener(object : MethodCallListener {
+                override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
+                    this@HmCloudPlugin.onMethodCall(call, result)
+                }
+            })
+        }
     }
 
-    override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
-        Log.e(TAG, "onMethodCall: ${call.method} eventListener: $mHMcpVideoNativeListener")
-        mHMcpVideoNativeListener?.onEvent(call.method)
+    fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
+        hmcpVideoNativeListener?.onEvent(call.method)
         when (call.method) {
             "startCloudGame" -> {
+                MethodChannelManage.getInstance().invokeMethod(ChannelConstant.METHOD_CLOUD_INIT_BEGAN)
+                if (activity != null) {
+                    val creationParams = call.arguments as Map<String, Any>
+                    hmcInit(creationParams)
+                }
             }
             "stopGame" -> {
+                HmcpVideoManage.getInstance().onDestroy()
             }
             "fullCloudGame" -> {
+                // 跳转横屏页面
+                startHmcpActivity()
             }
             else -> {}
         }
     }
 
     override fun setHMcpVideoNativeListener(mHMcpVideoNativeListener: HMcpVideoNativeListener) {
-        this.mHMcpVideoNativeListener = mHMcpVideoNativeListener
+        this.hmcpVideoNativeListener = mHMcpVideoNativeListener
     }
 
-    override fun setHmcpPlayerStatusCallback(json: String) {
+    private fun hmcInit(creationParams: Map<String, Any>) {
+        activity?.let { activity ->
+            HmcpManagerIml.init(activity, creationParams, object : OnInitCallBackListener {
+                override fun success() {
+                    HmcpVideoManage.getInstance().apply {
+                        initHMcpVideoView(activity)
+                        playVideo(creationParams)
+                        setFirstFrameArrivalListener(object : FirstFrameArrivalListener {
+                            override fun onFirstFrameArrival() {
+                                removeFirstFrameArrivalListener()
+                                startHmcpActivity()
+                            }
+                        })
+                    }
+                }
 
+                override fun fail(msg: String) {
+                }
+            })
+        }
     }
 
-    override fun onSuccess() {
-        methodChannel.invokeMethod("startSuccess", null)
+    private fun startHmcpActivity() {
+        // 跳转横屏移除海马云的view
+        HmcpVideoManage.getInstance().removeView()
+        activity?.let { activity ->
+            HMcpVideoActivity.startActivityForResult(activity)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
+        if (requestCode == HMcpVideoActivity.REQUEST_CODE) {
+            if (resultCode == HMcpVideoActivity.FULL_RESULT_CODE) {
+                // 退出了全屏，加载到横屏页面
+                hmcpVideoNativeListener?.onEvent(EventConstant.EVENT_EXIT_FULL)
+            }
+        }
+        return false
     }
 }

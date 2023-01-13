@@ -24,37 +24,41 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeLeft, //全屏时旋转方向，左边
-    ]);
-
-    // SystemChrome.setEnabledSystemUIOverlays([]);
-    WidgetsFlutterBinding.ensureInitialized(); // add this line
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
-
-    // HmCloudController.instance.setCallback((actionName, {pragma}) {
+    //
+    // SystemChrome.setPreferredOrientations([
+    //   DeviceOrientation.landscapeLeft, //全屏时旋转方向，左边
+    // ]);
+    //
+    // // SystemChrome.setEnabledSystemUIOverlays([]);
+    // WidgetsFlutterBinding.ensureInitialized(); // add this line
+    // SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
+    //
+    // // HmCloudController.instance.setCallback((actionName, {pragma}) {
+    // //   print('来自iOS的回调$actionName');
+    // // });
+    // HmCloudController.instance.setCallback((actionName, {params}) {
     //   print('来自iOS的回调$actionName');
     // });
-    HmCloudController.instance.setCallback((actionName, {params}) {
-      print('来自iOS的回调$actionName');
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        body: Container(
-          child: HmCloudView(
-            accessKey: '8a7a7a623d25ee7a3c87f688287bd4ba',
-            accessKeyId: 'b14605e9d68',
-            channelId: 'luehu',
-            userId: 'test123',
-            gameId: 'com.tencent.tmgp.sgame',
-            isPortrait: false,
-            playTime: 1000000,
-            videoViewType: 1,
+        body: Center(
+          child: MaterialButton(
+            onPressed: () {
+              HmCloudController.instance.startCloudGame({
+                'accessKey': '8a7a7a623d25ee7a3c87f688287bd4ba',
+                'accessKeyId': 'b14605e9d68',
+                'channelId': 'luehu',
+                'userId': 'test123',
+                'gameId': 'com.tencent.tmgp.sgame',
+                'isPortrait': false,
+                'playTime': 1000000,
+              });
+            },
+            child: Text('跳转'),
           ),
         ),
       ),
