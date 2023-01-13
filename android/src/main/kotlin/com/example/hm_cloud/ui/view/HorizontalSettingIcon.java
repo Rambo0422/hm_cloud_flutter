@@ -10,6 +10,7 @@ import android.widget.RelativeLayout;
 
 import com.example.hm_cloud.R;
 import com.example.hm_cloud.utils.TouchUtils;
+import com.orhanobut.logger.Logger;
 
 /**
  * <pre>
@@ -62,7 +63,7 @@ public class HorizontalSettingIcon extends RelativeLayout {
                 view.animate()
                         .setInterpolator(new DecelerateInterpolator())
                         .translationX(view.getX() + viewWidth / 2f > rootViewWidth / 2f ? rootViewWidth - viewWidth : 0)
-                        .setDuration(100)
+                        .setDuration(300)
                         .withEndAction(new Runnable() {
                             @Override
                             public void run() {
@@ -77,7 +78,7 @@ public class HorizontalSettingIcon extends RelativeLayout {
                 view.animate()
                         .scaleX(value)
                         .scaleY(value)
-                        .setDuration(300)
+                        .setDuration(100)
                         .start();
             }
         });
@@ -112,16 +113,9 @@ public class HorizontalSettingIcon extends RelativeLayout {
             public void run() {
                 View contentView = getRootView().findViewById(android.R.id.content);
                 if (contentView == null) return;
-                int y = (int) (contentView.getHeight() * 0.75f);
-                int x = contentView.getWidth() - getWidth();
-                setX(x);
-                setY(y);
+                setY(contentView.getHeight() * 0.70f);
+                setX(getX() + getWidth() / 2f > contentView.getWidth() / 2f ? contentView.getWidth() - getWidth() : 0);
             }
         });
-    }
-
-    public void setIconId(final int iconId) {
-        ImageView debugPanelIconIv = findViewById(R.id.iv_setting_icon);
-//        debugPanelIconIv.setImageResource(mIconId);
     }
 }

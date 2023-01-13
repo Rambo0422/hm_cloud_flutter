@@ -200,8 +200,8 @@ class HmcpVideoManage : HmcpPlayerListener {
     override fun onCloudPlayerKeyboardStatusChanged(cloudPlayerKeyboardStatus: CloudPlayerKeyboardStatus?) {}
 
     fun onDestroy() {
-        this.firstFrameArrivalListener = null
         removeView()
+        this.firstFrameArrivalListener = null
         hmcpVideoView?.onDestroy()
         hmcpVideoView = null
     }
