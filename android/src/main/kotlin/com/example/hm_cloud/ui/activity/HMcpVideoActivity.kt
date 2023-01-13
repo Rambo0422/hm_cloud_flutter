@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.view.Window
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
+import androidx.drawerlayout.widget.DrawerLayout
 import com.example.hm_cloud.databinding.ActivityHmcpVideoBinding
 import com.example.hm_cloud.manage.HmcpVideoManage
 import com.example.hm_cloud.manage.MethodChannelManage
@@ -21,6 +22,7 @@ import com.example.hm_cloud.ui.view.HorizontalSettingIcon
 class HMcpVideoActivity : AppCompatActivity(), View.OnSystemUiVisibilityChangeListener {
 
     private lateinit var binding: ActivityHmcpVideoBinding
+    private var settingIcon: HorizontalSettingIcon? = null
 
     companion object {
         const val REQUEST_CODE = 100
@@ -45,6 +47,9 @@ class HMcpVideoActivity : AppCompatActivity(), View.OnSystemUiVisibilityChangeLi
 
         initView()
         initHmc()
+
+        // 禁用 drawLayout 的手势拖动
+        binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
     }
 
     private fun initView() {
@@ -108,5 +113,12 @@ class HMcpVideoActivity : AppCompatActivity(), View.OnSystemUiVisibilityChangeLi
         HmcpVideoManage.getInstance().removeView()
         setResult(FULL_RESULT_CODE)
         finish()
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        if (settingIcon != null) {
+            binding.layoutContent.removeView(settingIcon)
+        }
     }
 }

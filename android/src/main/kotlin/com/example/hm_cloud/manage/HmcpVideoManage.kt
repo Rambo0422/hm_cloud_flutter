@@ -65,7 +65,9 @@ class HmcpVideoManage : HmcpPlayerListener {
 
     fun playVideo(params: Map<String, Any>) {
         isFirstFrameArrival = false
-        Logger.e("params: $params")
+
+        Logger.e("playVideo params: $params")
+
         val curGamePackageName = params["gameId"].toString()
         val channelId = params["channelId"].toString()
 
@@ -81,9 +83,12 @@ class HmcpVideoManage : HmcpPlayerListener {
             params["extraInfo"].toString()
         }.getOrElse { "" }
 
+
         val expireTime = kotlin.runCatching {
-            params["expireTime"] as Long
-        }.getOrElse { Int.MAX_VALUE.toLong() }
+            params["expireTime"].toString().toLong()
+        }.getOrElse {
+            -1L
+        }
 
         val cToken = kotlin.runCatching {
             params["token"].toString()
@@ -143,7 +148,8 @@ class HmcpVideoManage : HmcpPlayerListener {
     override fun onPlayStatus(i: Int, l: Long, s: String?) {}
 
     override fun HmcpPlayerStatusCallback(messageInfo: String) {
-        Logger.e("HmcpPlayerStatusCallback message: $messageInfo");
+        val cloudId = HmcpManager.getInstance().cloudId
+        Logger.e("HmcpPlayerStatusCallback message: $messageInfo cloudId: $cloudId")
 
         try {
             val obj = JSONObject(messageInfo)
@@ -154,7 +160,7 @@ class HmcpVideoManage : HmcpPlayerListener {
 
                 }
                 Constants.STATUS_FIRST_FRAME_ARRIVAL -> {
-                    Logger.e("HmcpPlayerStatusCallback 首帧出来了")
+                    Logger.e("HmcpPlayerStatusCallback STATUS_PLAY_INTERNAL 首帧出来了")
                     if (!isFirstFrameArrival) {
                         isFirstFrameArrival = true
                         // 首帧出来再加载 View
@@ -194,8 +200,8 @@ class HmcpVideoManage : HmcpPlayerListener {
     override fun onCloudPlayerKeyboardStatusChanged(cloudPlayerKeyboardStatus: CloudPlayerKeyboardStatus?) {}
 
     fun onDestroy() {
-        this.firstFrameArrivalListener = null
         removeView()
+        this.firstFrameArrivalListener = null
         hmcpVideoView?.onDestroy()
         hmcpVideoView = null
     }
