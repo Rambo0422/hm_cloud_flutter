@@ -14,6 +14,7 @@ import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import com.example.hm_cloud.databinding.ActivityHmcpVideoBinding
+import com.example.hm_cloud.listener.NoOperationListener
 import com.example.hm_cloud.manage.HmcpVideoManage
 import com.example.hm_cloud.manage.MethodChannelManage
 import com.example.hm_cloud.pluginconstant.ChannelConstant
@@ -36,7 +37,7 @@ class HMcpVideoActivity : AppCompatActivity(), View.OnSystemUiVisibilityChangeLi
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        requestWindowFeature(Window.FEATURE_NO_TITLE)
+        supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
         window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
         window.decorView.setOnSystemUiVisibilityChangeListener(this)
@@ -50,6 +51,13 @@ class HMcpVideoActivity : AppCompatActivity(), View.OnSystemUiVisibilityChangeLi
 
         // 禁用 drawLayout 的手势拖动
         binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+
+        HmcpVideoManage.getInstance().setNoOperationListener(object : NoOperationListener {
+            override fun noOperation() {
+                setResult(FULL_RESULT_CODE)
+                finish()
+            }
+        })
     }
 
     private fun initView() {
@@ -110,6 +118,7 @@ class HMcpVideoActivity : AppCompatActivity(), View.OnSystemUiVisibilityChangeLi
 
     private fun exitFullScreen() {
         // 移除 hmcpView
+        HmcpVideoManage.getInstance().removeNoOperationListener()
         HmcpVideoManage.getInstance().removeView()
         setResult(FULL_RESULT_CODE)
         finish()

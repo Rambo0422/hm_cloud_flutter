@@ -11,7 +11,7 @@ import com.example.hm_cloud.pluginconstant.ChannelConstant
 import com.example.hm_cloud.pluginconstant.EventConstant
 import com.example.hm_cloud.ui.activity.HMcpVideoActivity
 import com.example.hm_cloud.utils.LoggerUtils
-import com.example.hmcpdemo.listener.FirstFrameArrivalListener
+import com.example.hm_cloud.listener.FirstFrameArrivalListener
 import com.haima.hmcp.listeners.OnInitCallBackListener
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
