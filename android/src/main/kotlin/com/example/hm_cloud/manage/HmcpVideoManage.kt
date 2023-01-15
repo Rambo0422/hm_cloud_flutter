@@ -2,11 +2,10 @@ package com.example.hm_cloud.manage
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.ViewGroup
 import com.example.hm_cloud.pluginconstant.ChannelConstant
-import com.example.hm_cloud.pluginconstant.EventConstant
-import com.example.hmcpdemo.listener.FirstFrameArrivalListener
+import com.example.hm_cloud.listener.FirstFrameArrivalListener
+import com.example.hm_cloud.listener.NoOperationListener
 import com.haima.hmcp.Constants
 import com.haima.hmcp.HmcpManager
 import com.haima.hmcp.beans.Message
@@ -28,6 +27,9 @@ class HmcpVideoManage : HmcpPlayerListener {
     private var userId = ""
     private var pushUrl = ""
     private var isFirstFrameArrival = false
+
+    private var firstFrameArrivalListener: FirstFrameArrivalListener? = null
+    private var noOperationListener: NoOperationListener? = null
 
     companion object {
         @Volatile
@@ -139,8 +141,30 @@ class HmcpVideoManage : HmcpPlayerListener {
         Logger.e("onMessage: " + message.payload)
     }
 
-    override fun onSceneChanged(s: String) {
-        Logger.e("onSceneChanged: $s")
+    override fun onSceneChanged(json: String) {
+        Logger.e("onSceneChanged: $json")
+        try {
+            val jsonObject = JSONObject(json)
+            val sceneId = jsonObject.getString("sceneId")
+            if (sceneId == "stop") {
+                val extraInfo = jsonObject.getString("extraInfo")
+                // 去除 extraInfo 头尾的冒号
+                val extraInfoStr = extraInfo.substring(1, extraInfo.length - 1)
+                val extraInfoJson = JSONObject("{$extraInfoStr}")
+                val reason = extraInfoJson.getString("reason")
+                if (reason == "no_operation"){
+                    noOperationListener?.noOperation()
+                    // 说明长时间未操作，被海马云系统自动销毁了
+                    onDestroy()
+                    // 发送消息
+                    MethodChannelManage.getInstance().invokeMethod("videoFailed")
+                }
+            }
+
+        } catch (e: Exception) {
+            Logger.e("onSceneChanged: ${e.message}")
+            e.printStackTrace()
+        }
     }
 
     override fun onNetworkChanged(netWorkState: NetWorkState?) {}
@@ -176,6 +200,13 @@ class HmcpVideoManage : HmcpPlayerListener {
                 Constants.STATUS_OPERATION_HMCP_ERROR -> {
                     Logger.e("HmcpPlayerStatusCallback STATUS_OPERATION_HMCP_ERROR: ${obj.get("data")}")
                 }
+                Constants.STATUS_TOAST_NO_INPUT -> {
+
+                }
+
+                Constants.STATUS_STOP_PLAY -> {
+
+                }
                 else -> {}
             }
         } catch (e: JSONException) {
@@ -200,13 +231,14 @@ class HmcpVideoManage : HmcpPlayerListener {
     override fun onCloudPlayerKeyboardStatusChanged(cloudPlayerKeyboardStatus: CloudPlayerKeyboardStatus?) {}
 
     fun onDestroy() {
+        Logger.e("onDestroy")
         removeView()
         this.firstFrameArrivalListener = null
+        this.noOperationListener = null
         hmcpVideoView?.onDestroy()
         hmcpVideoView = null
     }
 
-    private var firstFrameArrivalListener: FirstFrameArrivalListener? = null
 
     fun setFirstFrameArrivalListener(firstFrameArrivalListener: FirstFrameArrivalListener) {
         this.firstFrameArrivalListener = firstFrameArrivalListener
@@ -215,6 +247,16 @@ class HmcpVideoManage : HmcpPlayerListener {
     fun removeFirstFrameArrivalListener() {
         this.firstFrameArrivalListener = null
     }
+
+
+    fun setNoOperationListener(noOperationListener: NoOperationListener) {
+        this.noOperationListener = noOperationListener
+    }
+
+    fun removeNoOperationListener() {
+        this.noOperationListener = null
+    }
+
 
     private fun startLiving(livingId: String, livingUrl: String) {
         val cloudId = HmcpManager.getInstance().cloudId
