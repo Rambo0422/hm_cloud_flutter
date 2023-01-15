@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 #define k_cloudInitBegan    @"cloudInitBegan"
 #define k_cloudQueueInfo    @"cloudQueueInfo"
 #define k_videoVisble       @"videoVisble"
+#define k_videoFailed       @"videoFailed"
 
 #define k_DaShenBundle [NSBundle bundleWithPath:[[NSBundle bundleForClass:self.class] pathForResource:@"DaShen" ofType:@"bundle"]]
 #define k_BundleImage(name) [UIImage imageWithContentsOfFile:[k_DaShenBundle pathForResource:name ofType:@"png"]]

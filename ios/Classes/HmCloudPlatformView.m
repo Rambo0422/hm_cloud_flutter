@@ -16,8 +16,9 @@
 @interface HmCloudPlatformView ()<CloudPlayerWarpperDelegate>
 
 
-@property (nonatomic, strong)  FlutterMethodChannel  *channel;
-@property (nonatomic, strong)  UIViewController        *gameVC;
+@property (nonatomic, strong)  FlutterMethodChannel     *channel;
+@property (nonatomic, strong)  UIViewController         *gameVC;
+@property (nonatomic, strong)  CloudPreViewController   *vc;
 
 @end
 
@@ -168,25 +169,28 @@
             if (isFull) {
                 [_v.subviews.firstObject removeFromSuperview];
                 
-                CloudPreViewController * vc = [[CloudPreViewController alloc] initWithNibName:@"CloudPreViewController" bundle:k_DaShenBundle];
+                self.vc = [[CloudPreViewController alloc] initWithNibName:@"CloudPreViewController" bundle:k_DaShenBundle];
                 
-                vc.modalPresentationStyle = UIModalPresentationFullScreen;
-                vc.gameVC = self.gameVC;
-                vc.channelAction = ^(NSString * _Nonnull methodName, bool value) {
-                    [self sendToFlutter:methodName params:@{@"switch" : @(value)}];
+                self.vc.modalPresentationStyle = UIModalPresentationFullScreen;
+                self.vc.gameVC = self.gameVC;
+                __weak __typeof__(self) weakSelf = self;
+                self.vc.channelAction = ^(NSString * _Nonnull methodName, bool value) {
+                    __strong __typeof__(weakSelf) strongSelf = weakSelf;
+                    [strongSelf sendToFlutter:methodName params:@{@"switch" : @(value)}];
                 };
                 
-                vc.didDismiss = ^{
+                self.vc.didDismiss = ^{
                     
                     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                    
-                        self.gameVC.view.frame = self->_v.bounds;
-                        [self->_v insertSubview:self.gameVC.view atIndex:0];
-                                                                    
+                        __strong __typeof__(weakSelf) strongSelf = weakSelf;
+                        strongSelf.gameVC.view.frame = strongSelf->_v.bounds;
+                        [strongSelf->_v insertSubview:strongSelf.gameVC.view atIndex:0];
+                                                                        
+                        strongSelf.vc = nil;
                     });
                 };
                 
-                [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:vc animated:YES completion:^{
+                [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:self.vc animated:YES completion:^{
                     [self sendToFlutter:k_startSuccess params:nil];
                 }];
             }
@@ -280,27 +284,29 @@
                     return;
                 }
                 
-                CloudPreViewController * vc = [[CloudPreViewController alloc] initWithNibName:@"CloudPreViewController" bundle:k_DaShenBundle];
+                self.vc = [[CloudPreViewController alloc] initWithNibName:@"CloudPreViewController" bundle:k_DaShenBundle];
                 
-                vc.modalPresentationStyle = UIModalPresentationFullScreen;
-                vc.gameVC = self.gameVC;
-                vc.channelAction = ^(NSString * _Nonnull methodName, bool value) {
-                    [self sendToFlutter:methodName params:@{@"switch" : @(value)}];
+                self.vc.modalPresentationStyle = UIModalPresentationFullScreen;
+                self.vc.gameVC = self.gameVC;
+                __weak __typeof__(self) weakSelf = self;
+                self.vc.channelAction = ^(NSString * _Nonnull methodName, bool value) {
+                    __strong __typeof__(weakSelf) strongSelf = weakSelf;
+                    [strongSelf sendToFlutter:methodName params:@{@"switch" : @(value)}];
                 };
                 
-                vc.didDismiss = ^{
+                self.vc.didDismiss = ^{
                     
-                    
+                    __strong __typeof__(weakSelf) strongSelf = weakSelf;
                     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                     
-                        self.gameVC.view.frame = self->_v.bounds;
-                        [self->_v insertSubview:self.gameVC.view atIndex:0];
-                                                                    
+                        strongSelf.gameVC.view.frame = strongSelf->_v.bounds;
+                        [strongSelf->_v insertSubview:strongSelf.gameVC.view atIndex:0];
+                        strongSelf.vc = nil;
                     });
                     
                 };
                 
-                [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:vc animated:YES completion:^{
+                [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:self.vc animated:YES completion:^{
                     [self sendToFlutter:k_startSuccess params:nil];
                 }];
                 
@@ -325,6 +331,29 @@
 
         case PlayerStateStopCanRetry: { //可以“重新连接”的出错
             NSLog(@"%s Stoped.", __FUNCTION__);
+            
+            
+            
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                
+                [[CloudPlayerWarpper sharedWrapper] stop];
+                [[CloudPlayerWarpper sharedWrapper] stopNetMonitor];
+                
+                self.gameVC = nil;
+                if (self.vc) {
+                    [self.vc dismissViewControllerAnimated:YES completion:^{
+                        self.vc = nil;
+                    }];
+                } else {
+                
+                    [self->_v.subviews.firstObject removeFromSuperview];
+                }
+                
+                [self sendToFlutter:k_videoFailed params:nil];
+                
+            });
+            
 //            [self stopGame];
         }
             break;
