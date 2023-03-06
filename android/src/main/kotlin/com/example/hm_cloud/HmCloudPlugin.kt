@@ -113,6 +113,9 @@ class HmCloudPlugin : FlutterPlugin,
                 // 跳转横屏页面
                 startHmcpActivity()
             }
+            "updateGame" -> {
+                HmcpVideoManage.getInstance().updateGameUID(call.arguments as Map<String, Any>)
+            }
             else -> {}
         }
     }

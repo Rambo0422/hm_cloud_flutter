@@ -16,6 +16,7 @@ import com.haima.hmcp.enums.NetWorkState
 import com.haima.hmcp.enums.ScreenOrientation
 import com.haima.hmcp.listeners.HmcpPlayerListener
 import com.haima.hmcp.listeners.OnLivingListener
+import com.haima.hmcp.listeners.OnUpdataGameUIDListener
 import com.haima.hmcp.utils.StatusCallbackUtil
 import com.haima.hmcp.widgets.HmcpVideoView
 import com.orhanobut.logger.Logger
@@ -85,7 +86,6 @@ class HmcpVideoManage : HmcpPlayerListener {
             params["extraInfo"].toString()
         }.getOrElse { "" }
 
-
         val expireTime = kotlin.runCatching {
             params["expireTime"].toString().toLong()
         }.getOrElse {
@@ -152,7 +152,7 @@ class HmcpVideoManage : HmcpPlayerListener {
                 val extraInfoStr = extraInfo.substring(1, extraInfo.length - 1)
                 val extraInfoJson = JSONObject("{$extraInfoStr}")
                 val reason = extraInfoJson.getString("reason")
-                if (reason == "no_operation"){
+                if (reason == "no_operation") {
                     noOperationListener?.noOperation()
                     // 说明长时间未操作，被海马云系统自动销毁了
                     onDestroy()
@@ -281,10 +281,52 @@ class HmcpVideoManage : HmcpPlayerListener {
     fun entryQueue() {
         Logger.e("entryQueue")
         hmcpVideoView?.entryQueue()
+
+
     }
 
     fun exitQueue() {
         Logger.e("exitQueue")
         hmcpVideoView?.exitQueue()
+    }
+
+    /**
+     * 更新uid和游戏时长接口
+     * @param playingTime 游戏时长，单位为ms（注意确认时间单位是否与代码一致）
+     * @param userID 新的用户ID ，uid
+     * @param PayProtoData 更新的proto data
+     * @param cToken 更新的cToken ，用来校验参数的有效性
+     *
+     */
+    fun updateGameUID(params: Map<String, Any>) {
+        val playTime = kotlin.runCatching {
+            params["expireTime"].toString().toLong()
+        }.getOrElse {
+            -1L
+        }
+
+        val userID = params["userId"].toString()
+
+        val cToken = kotlin.runCatching {
+            params["token"].toString()
+        }.getOrElse { "" }
+
+        val bundle = Bundle()
+        bundle.putLong(HmcpVideoView.PLAY_TIME, playTime)
+        bundle.putString(HmcpVideoView.USER_ID, userID)
+        bundle.putString(HmcpVideoView.TIPS_MSG, "")
+        bundle.putString(HmcpVideoView.PAY_PROTO_DATA, "")
+        bundle.putString(HmcpVideoView.C_TOKEN, cToken)
+
+        hmcpVideoView?.updateGameUID(bundle, object : OnUpdataGameUIDListener {
+            override fun success(result: Boolean) {
+                Logger.e("updateGameUID success: $result")
+            }
+
+            override fun fail(message: String?) {
+                Logger.e("updateGameUID fail: ${message}")
+            }
+        })
+
     }
 }
