@@ -7,6 +7,8 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 
 class HmCloudView extends StatefulWidget {
+  const HmCloudView({super.key});
+
   // View 是否横屏或者竖屏
   // final bool isPortrait;
   // final String extraInfo;

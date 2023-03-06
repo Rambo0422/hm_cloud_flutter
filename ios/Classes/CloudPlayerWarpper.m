@@ -45,6 +45,16 @@
     [[HMCloudPlayer sharedCloudPlayer] registCloudPlayer:self.accessKeyId channelId:self.channelId options:nil];
 }
 
+- (void)updateGame{
+    
+    [[HMCloudPlayer sharedCloudPlayer] updateGameUID:self.userId userToken:self.userToken ctoken:self.cToken playingTime:[self.expireTime integerValue] tip:@"" protoData:nil success:^(BOOL successed) {
+        
+    } fail:^(NSString *errorCode) {
+        
+    }];
+    
+}
+
 - (UIViewController *) prepare:(NSDictionary *)options {
     if (!isInitialized) return NULL;
 

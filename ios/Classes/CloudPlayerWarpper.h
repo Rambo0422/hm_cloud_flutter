@@ -37,6 +37,7 @@
 - (UIViewController *) prepare:(NSDictionary *)options;
 - (void) setBackgroundImage:(UIImage *)bgImage;
 
+- (void) updateGame;
 - (void) play;
 - (void) queueConfirm;
 - (void) pause;

@@ -52,6 +52,12 @@ class HmCloudController {
     return methodChannel!.invokeMethod('fullCloudGame', {'isFull': isFull});
   }
 
+  Future<void> updateCloudGame(
+    Map<String, dynamic> params,
+  ) {
+    return methodChannel!.invokeMethod('updateGame', params);
+  }
+
   ///实现监听原生方法回调
   Future<dynamic> platformCallHandler(MethodCall call) async {
     if (callbak != null) {

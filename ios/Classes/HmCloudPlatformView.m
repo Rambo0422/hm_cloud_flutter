@@ -159,56 +159,120 @@
         
     }
     
-    
-    if ([[call method] isEqualToString:@"fullCloudGame"]) {
+    if ([[call method] isEqualToString:@"updateGame"]) {
+        
+        
         
         if ([call.arguments isKindOfClass:[NSDictionary class]]) {
-         
-            NSDictionary * arguments = (NSDictionary *)call.arguments;
-            NSNumber * isFull = arguments[@"isFull"];
-            if (isFull) {
-                [_v.subviews.firstObject removeFromSuperview];
+            
+            NSDictionary * params = (NSDictionary *)call.arguments;
+            
+            
+            
+            
+            [self updateGame:params];
+            
+        }
+        
+        
+        if ([[call method] isEqualToString:@"fullCloudGame"]) {
+            
+            if ([call.arguments isKindOfClass:[NSDictionary class]]) {
                 
-                self.vc = [[CloudPreViewController alloc] initWithNibName:@"CloudPreViewController" bundle:k_DaShenBundle];
-                
-                self.vc.modalPresentationStyle = UIModalPresentationFullScreen;
-                self.vc.gameVC = self.gameVC;
-                __weak __typeof__(self) weakSelf = self;
-                self.vc.channelAction = ^(NSString * _Nonnull methodName, bool value) {
-                    __strong __typeof__(weakSelf) strongSelf = weakSelf;
-                    [strongSelf sendToFlutter:methodName params:@{@"switch" : @(value)}];
-                };
-                
-                self.vc.didDismiss = ^{
+                NSDictionary * arguments = (NSDictionary *)call.arguments;
+                NSNumber * isFull = arguments[@"isFull"];
+                if (isFull) {
+                    [_v.subviews.firstObject removeFromSuperview];
                     
-                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    self.vc = [[CloudPreViewController alloc] initWithNibName:@"CloudPreViewController" bundle:k_DaShenBundle];
+                    
+                    self.vc.modalPresentationStyle = UIModalPresentationFullScreen;
+                    self.vc.gameVC = self.gameVC;
+                    __weak __typeof__(self) weakSelf = self;
+                    self.vc.channelAction = ^(NSString * _Nonnull methodName, bool value) {
                         __strong __typeof__(weakSelf) strongSelf = weakSelf;
-                        strongSelf.gameVC.view.frame = strongSelf->_v.bounds;
-                        [strongSelf->_v insertSubview:strongSelf.gameVC.view atIndex:0];
-                                                                        
-                        strongSelf.vc = nil;
-                    });
-                };
-                
-                [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:self.vc animated:YES completion:^{
-                    [self sendToFlutter:k_startSuccess params:nil];
-                }];
+                        [strongSelf sendToFlutter:methodName params:@{@"switch" : @(value)}];
+                    };
+                    
+                    self.vc.didDismiss = ^{
+                        
+                        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                            __strong __typeof__(weakSelf) strongSelf = weakSelf;
+                            strongSelf.gameVC.view.frame = strongSelf->_v.bounds;
+                            [strongSelf->_v insertSubview:strongSelf.gameVC.view atIndex:0];
+                            
+                            strongSelf.vc = nil;
+                        });
+                    };
+                    
+                    [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:self.vc animated:YES completion:^{
+                        [self sendToFlutter:k_startSuccess params:nil];
+                    }];
+                }
             }
         }
-    }
-    
-    
-    if ([call.method isEqualToString:@"stopGame"]) {
-     
-        [[CloudPlayerWarpper sharedWrapper] stop];
-        [[CloudPlayerWarpper sharedWrapper] stopNetMonitor];
         
-        [_v.subviews.firstObject removeFromSuperview];
-        self.gameVC = nil;
+        
+        if ([call.method isEqualToString:@"stopGame"]) {
+            
+            [[CloudPlayerWarpper sharedWrapper] stop];
+            [[CloudPlayerWarpper sharedWrapper] stopNetMonitor];
+            
+            [_v.subviews.firstObject removeFromSuperview];
+            self.gameVC = nil;
+        }
+        
+        
+    }
+}
+
+- (void)updateGame:(NSDictionary *)params {
+
+    // accessKey
+    if (params[@"token"]) {
+        [CloudPlayerWarpper sharedWrapper].cToken = params[@"token"];
     }
     
+    // accessKeyId
+    if (params[@"accessKeyId"]) {
+        [CloudPlayerWarpper sharedWrapper].accessKeyId = params[@"accessKeyId"];
+    }
+    
+    // expireTime
+    if (params[@"expireTime"]) {
+        [CloudPlayerWarpper sharedWrapper].expireTime = params[@"expireTime"];
+    }
+    
+    // userId
+    if (params[@"userId"]) {
+        [CloudPlayerWarpper sharedWrapper].userId = params[@"userId"];
+    }
+    
+    // gameId
+    if (params[@"gameId"]) {
+        [CloudPlayerWarpper sharedWrapper].gameId = params[@"gameId"];
+    }
+    
+    // channelId
+    if (params[@"channelId"]) {
+        [CloudPlayerWarpper sharedWrapper].channelId = params[@"channelId"];
+    }
+    
+    // userToken
+    if (params[@"userToken"]) {
+        [CloudPlayerWarpper sharedWrapper].userToken = params[@"userToken"];
+    }
+    
+    // pushUrl
+    if (params[@"pushUrl"]) {
+        [CloudPlayerWarpper sharedWrapper].pushUrl = params[@"pushUrl"];
+    }
+    
+    [[CloudPlayerWarpper sharedWrapper] updateGame];
     
 }
+    
+
 
 // 传值到flutter
 - (void)sendToFlutter:(NSString *)actionName params:(id _Nullable)params {
