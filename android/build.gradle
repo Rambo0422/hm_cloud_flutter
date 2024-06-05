@@ -1,15 +1,18 @@
-group 'com.example.hm_cloud'
+group 'com.sayx.hm_cloud'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.7.20'
+    ext.kotlin_version = '1.9.22'
     repositories {
         google()
         mavenCentral()
+        flatDir {
+            dirs 'libs'
+        }
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.1.3'
+        classpath 'com.android.tools.build:gradle:7.3.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -18,20 +21,17 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        flatDir {
+            dirs 'libs'
+        }
     }
-
-//    configurations.all {
-//        resolutionStrategy {
-//            force 'androidx.core:core-ktx:1.8.0'
-//        }
-//    }
 }
 
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 33
+    compileSdk 32
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -51,35 +51,37 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 16
+        namespace 'com.sayx.hm_cloud'
+        minSdkVersion 19
         consumerProguardFiles 'proguard.txt'
-    }
-
-    dependencies {
-        implementation 'com.alibaba:fastjson:1.2.73'
-        implementation('io.socket:socket.io-client:1.0.0') {
-            exclude group: 'org.json', module: 'json'
-        }
-        implementation(name: 'saas-sdk-master-5.1.85.1-1dee6161', ext: 'aar')
+        multiDexEnabled true
     }
 }
 
 dependencies {
+    implementation fileTree(include: ['*.jar', '*.aar'], dir: 'libs')
+
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.5.1'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'com.google.android.material:material:1.7.0'
-    implementation 'androidx.core:core-ktx:1.9.0'
-    implementation "androidx.drawerlayout:drawerlayout:1.1.1"
-    implementation 'com.orhanobut:logger:2.2.0'
+
+    implementation "androidx.multidex:multidex:2.0.1"
+
+    implementation "com.google.code.gson:gson:2.10.1"
+
+    implementation 'com.alibaba:fastjson:1.2.83'
+
+    implementation 'com.android.support:support-v4:28.0.0'
+    implementation 'com.google.protobuf:protobuf-java:3.22.3'
+    implementation('io.socket:socket.io-client:1.0.0') {
+        exclude group: 'org.json', module: 'json'
+    }
 }
 
 rootProject.allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
         flatDir {
-            dirs project(':hm_cloud').file('libs')
+            dirs 'libs'
         }
     }
 }

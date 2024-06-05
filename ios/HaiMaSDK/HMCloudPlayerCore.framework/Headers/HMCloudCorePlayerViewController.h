@@ -9,6 +9,8 @@
 #import <UIKit/UIKit.h>
 #import "HMCloudCoreMarco.h"
 #import "HMCloudPlayerWebRtcInfoModel.h"
+#import "HMInputOpData.h"
+
 @class HMDelayInfoModel;
 
 typedef NS_ENUM(NSInteger, HMCloudCorePlayerEvent) {
@@ -82,6 +84,10 @@ typedef NS_ENUM(NSInteger, HMCloudCorePlayerEvent) {
     HMCloudCorePlayerEventStartAskAnswer,                //13268 WEBRTC 开始askAnswer
     HMCloudCorePlayerEventAskAnswerSuccess,              //13269 WEBRTC askAnswer成功
     HMCloudCorePlayerEventAskAnswerFail,                 //13270 WEBRTC askAnswer失败
+    HMCloudCorePlayerEventGetScreenshotStart,            //12880 开始获取游戏截屏
+    HMCloudCorePlayerEventGetScreenshotSuccess,          //12881 获取游戏截屏成功
+    HMCloudCorePlayerEventGetScreenshotTimeOut,          //12882 获取游戏截屏超时
+    HMCloudCorePlayerEventGetScreenshotFail,             //12883 获取游戏截屏失败
 
     HMCloudCorePlayerEventDataChannelCreateDevice,      //WEBRTC DataChannel创建device
     HMCloudCorePlayerEventDataChannelReceiveFirstBinary,//WEBRTC DataChannel当收第一个二进制指令时上报，且仅上报一次
@@ -101,6 +107,15 @@ typedef NS_ENUM(NSInteger, HMCloudCorePlayerSubViewCenterStyle) {
     SubViewCenterStyleBoth          = (SubViewCenterStyleHorizitional|SubViewCenterStyleVertical),
 };
 
+typedef NS_ENUM(NSInteger, HMCloudCorePlayerFileListStatus) {
+    HMCloudCorePlayerFileListStatusSuccess,      //列表获取成功
+    HMCloudCorePlayerFileListStatusDisconnect,   //链接断开
+    HMCloudCorePlayerFileListStatusTimeout,      //请求超时
+    HMCloudCorePlayerFileListStatusNotInit,      //未初始化
+};
+
+typedef void (^HMCloudCorePlayerFileListBlock)(BOOL result, NSArray *fileList, HMCloudCorePlayerFileListStatus status);
+
 typedef NS_ENUM(NSInteger,HMCloudCorePlayerMouseType){
     HMCloudCorePlayerMouseTypeDisable = 0,
     HMCloudCorePlayerMouseTypeRelativeMove,
@@ -118,6 +133,25 @@ typedef NS_ENUM(NSInteger,HMCloudCorePlayerDataChannelType) {
     HMCloudCorePlayerDataChannelTypePingPong,
     HMCloudCorePlayerDataChannelTypePay,
 };
+
+typedef NS_ENUM(NSInteger,HMCloudCorePlayerRecordStatusType) {
+    HMCloudCorePlayerRecordStatusTypeStartRecordSuccess = 0,  // 开启录音成功
+    HMCloudCorePlayerRecordStatusTypeStartRecord,             // 开始录音
+    HMCloudCorePlayerRecordStatusTypeStopRecord,              // 停止录音
+    HMCloudCorePlayerRecordStatusTypeUnknown,                 // 异常
+};
+
+typedef NS_ENUM(NSInteger, HMCloudCorePlayerWebsocketType) {
+    HMCloudCorePlayerWebsocketTypeInput,
+    HMCloudCorePlayerWebsocketTypeScreen,
+};
+
+typedef NS_ENUM(NSInteger,CloudCorePlayerScreenshotStatus){
+    CloudCorePlayerScreenshotStatusSuccess,
+    CloudCorePlayerScreenshotStatusTimeout,
+    CloudCorePlayerScreenshotStatusInternalError,
+};
+typedef void (^CloudCorePlayerScreenshotBlock)(BOOL result,NSData *data,CloudCorePlayerScreenshotStatus status,NSString *errorMsg);
 
 @protocol HMCloudCorePlayerViewControllerDelegate <NSObject>
 @optional
@@ -218,6 +252,25 @@ typedef NS_ENUM(NSInteger,HMCloudCorePlayerDataChannelType) {
  @param message 消息内容
  */
 - (void)cloudCorePlayerReceiveDataChannel:(HMCloudCorePlayerDataChannelType)type message:(NSString *)message;
+
+/**
+ AudioSessionCategory发生改变
+ @param category 当前音频模式
+ */
+- (void)cloudCorePlayerAudioSessionCategoryChanged:(HMCloudCorePlayerAudioSessionCategory)category;
+
+/**
+ inputWebsocket或者screenWebsocket断开
+ @param socketType websoket类型
+ */
+
+- (void)cloudCorePlayerInputOrScreenSocketDisconned:(HMCloudCorePlayerWebsocketType)socketType;
+
+/**
+ RTC延迟信息回调
+ @param delayModel 延迟信息
+ */
+- (void)cloudCorePlayerDelayInfoCallBack:(HMDelayInfoModel *)delayModel;
 
 @end
 
@@ -435,9 +488,11 @@ openCameraPermissionCheckByServer:(BOOL)openCameraPermissionCheckByServer
  @param cid 实例id
  @param hidden 是否隐藏Player（池化重启，为true；池化非重启，非池化为false）
  @param notForceReconnect 不强行重连连接，等待streamer自己重连
+ @param audioSessionCategory webrtc音频模式
  */
 
-- (void)startPlayerWithWebrtcModel:(HMCloudPlayerWebRtcInfoModel *)model intputUrl:(NSString *)inputUrl screenUrl:(NSString *)screenUrl cid:(NSString *)cid hidden:(BOOL)hidden notForceReconnect:(BOOL)notForceReconnect;
+- (void)startPlayerWithWebrtcModel:(HMCloudPlayerWebRtcInfoModel *)model intputUrl:(NSString *)inputUrl screenUrl:(NSString *)screenUrl cid:(NSString *)cid hidden:(BOOL)hidden notForceReconnect:(BOOL)notForceReconnect audioSessionCategory:(HMCloudCorePlayerAudioSessionCategory)audioSessionCategory;
+
 
 /**
  获取debug延迟信息
@@ -503,8 +558,9 @@ openCameraPermissionCheckByServer:(BOOL)openCameraPermissionCheckByServer
  @param playWithControl 播放时是否带控制权
  @param pkgName 游戏包名
  @param userId 用户名
+ @param audioSessionCategory webrtc音频模式
  */
-- (void)startPlayerWithWebrtcX86Model:(HMCloudPlayerWebRtcInfoModel *)model cid:(NSString *)cid resolutionSize:(NSString *)resolutionSize gamePadDict:(NSDictionary *)gamePadDict playWithControl:(BOOL)playWithControl pkgName:(NSString *)pkgName userId:(NSString *)userId;
+- (void)startPlayerWithWebrtcX86Model:(HMCloudPlayerWebRtcInfoModel *)model cid:(NSString *)cid resolutionSize:(NSString *)resolutionSize gamePadDict:(NSDictionary *)gamePadDict playWithControl:(BOOL)playWithControl pkgName:(NSString *)pkgName userId:(NSString *)userId audioSessionCategory:(HMCloudCorePlayerAudioSessionCategory)audioSessionCategory;
 
 /**
  切换手柄模式
@@ -573,11 +629,48 @@ openCameraPermissionCheckByServer:(BOOL)openCameraPermissionCheckByServer
  @param offset offset表示分页（如20一页的话，0表示第一页，20表示第二页）
  @param cloudFileImageListBlock result 查询结果，imageList 图片列表 errorMsg result为NO时返回错误原因
  */
-- (void)getCloudImageList:(NSInteger)limit offset:(NSInteger)offset cloudFileImageListBlock:(void(^)(BOOL result,NSArray *imageList,NSString *errorMsg))cloudFileImageListBlock;
+- (void)getCloudImageList:(NSInteger)limit offset:(NSInteger)offset cloudFileImageListBlock:(HMCloudCorePlayerFileListBlock)cloudFileImageListBlock;
 
 /**
  停止请求云图片列表计时器
  */
 - (void)stopRequestCloudImageListTimer;
+
+/**
+ 获取云游戏视频列表
+ @param cloudFileVideoListBlock result 查询结果，videoList 视频列表 errorMsg result为NO时返回错误原因
+ */
+- (void)getCloudFileVideoList:(HMCloudCorePlayerFileListBlock)cloudFileVideoListBlock;
+
+/**
+ 停止请求云视频列表计时器
+ */
+- (void)stopRequestCloudVideoListTimer;
+
+/**
+ 停止播流（断流）
+ */
+- (void)stopPlayerStreaming;
+
+/**
+ 获取游戏截屏
+ @param scale 图片压缩比例,例如实例分辨率为  1280*720.  则scale传入“0.5”，收到的图片大小为640*360.
+ @param responseBlock 图片返回结果
+ */
+- (void)captureScreenshot:(float)scale responseBlock:(CloudCorePlayerScreenshotBlock)responseBlock;
+
+/**
+ 发送keycode值
+ 仅x86游戏使用
+ */
+- (BOOL)sendCustomKeycode:(HMInputOpData *)inputOPData;
+
+
+/**
+ 将鼠标模式切换成pc模式
+ 仅x86游戏使用
+ @param model true pc模式  false 移动端模式
+ */
+- (BOOL)convertToPcMouseModel:(BOOL)model;
 
 @end

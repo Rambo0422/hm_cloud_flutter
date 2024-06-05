@@ -1,26 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.hm_cloud">
+    package="com.sayx.hm_cloud">
 
-    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- network -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- screen light -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!-- external storage -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
-    <application>
-        <activity
-            android:name=".ui.activity.HMcpVideoActivity"
-            android:configChanges="orientation|screenSize"
-            android:exported="false"
-            android:launchMode="singleTask"
-            android:screenOrientation="userLandscape"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
-            <meta-data
-                android:name="android.app.lib_name"
-                android:value="" />
-        </activity>
-    </application>
 </manifest>

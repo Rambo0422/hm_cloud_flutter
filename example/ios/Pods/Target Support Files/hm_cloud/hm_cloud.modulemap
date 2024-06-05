@@ -1,0 +1,6 @@
+module hm_cloud {
+  umbrella header "hm_cloud-umbrella.h"
+
+  export *
+  module * { export * }
+}

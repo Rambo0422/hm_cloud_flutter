@@ -12,12 +12,17 @@
 #import "HMCCPayloadData.h"
 #import "HMCloudCorePlayerViewController.h"
 
-typedef NS_ENUM(NSInteger,HMLanguageType){
+typedef NS_ENUM(NSInteger, CloudPlayerDownloadMode){
+    CloudPlayerDownloadModeNormal = 0,      //正常播流
+    CloudPlayerDownloadModeDownloadOnly,    //断流下载
+};
+
+typedef NS_ENUM(NSInteger, HMLanguageType){
     HMLanguageTypeZh_CN = 0,         //中文
     HMLanguageTypeEn_US,             //英语
 };
 
-typedef NS_ENUM(NSInteger,CloudPlayerTimeoutStatus) {
+typedef NS_ENUM(NSInteger, CloudPlayerTimeoutStatus) {
     CloudPlayerGetStreamTimeout             = 100999001,          //没流地址211、201 未返回成功
     CloudPlayerSaasConnectTimeout           = 100999002,          //没流地址211、201成功 Access长连接失败
     CloudPlayerPingpongTimeout              = 100999003,          //没流地址211、201成功 Access长连接成功 乒乓状态异常
@@ -52,6 +57,16 @@ typedef NS_ENUM(NSInteger, CloudCorePlayerStatus) {
     PlayerStatusCanResume       = (PlayerStatusStarted|PlayerStatusPlaying),
 };
 
+typedef NS_ENUM(NSInteger, CloudPlayerFileListStatus) {
+    CloudPlayerFileListStatusSuccess,      //请求成功
+    CloudPlayerFileListStatusDisconnect,   //链接断开
+    CloudPlayerFileListStatusTimeout,      //请求超时
+    CloudPlayerFileListStatusNotInit,      //未初始化
+    CloudPlayerFileListStatusRomFailure,   //Rom返回失败
+};
+
+typedef void (^HMCloudFileListBlock)(BOOL result, NSArray *fileList, CloudPlayerFileListStatus status);
+
 // 设置x86鼠标类型
 typedef NS_ENUM(NSInteger, HMCloudCoreTouchMode) {
     HMCloudCoreTouchModeNone = 0, // 关 不传递数据
@@ -66,6 +81,17 @@ typedef NS_ENUM(NSInteger,HMCloudPlayerOperationType){
     HMCloudPlayerOperationTypeKeyboard,
 };
 
+typedef NS_ENUM(NSInteger,HMCloudPlayerUnexpectedError) {
+    HMCloudPlayerUnexpectedErrorPlayerIsNull,
+    HMCloudPlayerUnexpectedErrorPreStreamInstanceNotMatch,
+};
+
+typedef NS_ENUM(NSInteger,CloudPlayerScreenshotStatus){
+    CloudPlayerScreenshotStatusSuccess,
+    CloudPlayerScreenshotStatusTimeout,
+    CloudPlayerScreenshotStatusInternalError,
+};
+typedef void (^HMCloudScreenshotBlock)(BOOL result,NSData *data,CloudPlayerScreenshotStatus status,NSString *errorMsg);
 typedef void (^HMCloudFileImageListBlock)(BOOL result, NSArray *imageList,NSString *errorMsg);
 
 @interface HMCloudCorePlayer : NSObject
@@ -90,6 +116,7 @@ const extern NSString *CloudGameOptionKeyStasticDecodeInterval; //平均解码�
 
 const extern NSString *CloudGameOptionKeyEnableVideoFrameRenderCallback;
 const extern NSString *CloudGameOptionKeyEnableIpChangedCallback; //ip变化回调
+const extern NSString *CloudGameOptionKeyAudioSessionCategory;    //设置音频类型
 
 + (instancetype) sharedCloudPlayer;
 
@@ -113,14 +140,12 @@ const extern NSString *CloudGameOptionKeyEnableIpChangedCallback; //ip变化回�
 @property (nonatomic, assign)           HMCloudCorePlayerOrientation orientation;
 @property (nonatomic, assign)           BOOL isRotating;
 
-
 @property (nonatomic, copy)             NSString *cloudId;
 @property (nonatomic, copy)             NSString *sign;
 
 @property (nonatomic, assign)           int64_t stasticReportPostFailedCount;
 
 @property (nonatomic, assign)           CloudCorePlayerStatus playerStatus;
-
 
 @property (nonatomic, copy)             NSString *sdkVersion;       //sdk版本号
 @property (nonatomic, assign)           CGFloat autoModifyBrightness;   //server配置亮度
@@ -136,6 +161,8 @@ const extern NSString *CloudGameOptionKeyEnableIpChangedCallback; //ip变化回�
 @property (nonatomic, assign)           BOOL isNotMatchStreamType;
 @property (nonatomic, copy)             NSString *reportStatusCode;
 @property (nonatomic, assign)           BOOL enableNotifiyIpChangedCallback;
+
+@property (nonatomic, assign)           CloudPlayerDownloadMode cloudPlayerDownloadMode;
 
 - (NSString *) getFinalCountlyUrl;
 - (NSString *) getFinalCountlyKey;
@@ -496,20 +523,45 @@ const extern NSString *CloudGameOptionKeyEnableIpChangedCallback; //ip变化回�
  获取云游戏图库列表
  @param limit 获取图片列表的数量
  @param offset offset表示分页（如20一页的话，0表示第一页，20表示第二页）
- @param cloudFileImageListBlock result 查询结果，imageList 图片列表 errorMsg result为NO时返回错误原因
+ @param cloudFileImageListBlock result 查询结果，fileList 图片列表 errorMsg result为NO时返回错误原因
  */
-- (void)getCloudImageList:(NSInteger)limit offset:(NSInteger)offset cloudFileImageListBlock:(HMCloudFileImageListBlock)cloudFileImageListBlock;
-
-/**
- 处理请求图片列表消息
- @param msgDict 图片列表返回信息
- */
-- (void)handleImageListResponse:(NSDictionary *)msgDict;
+- (void)getCloudImageList:(NSInteger)limit offset:(NSInteger)offset cloudFileImageListBlock:(HMCloudFileListBlock)cloudFileImageListBlock DEPRECATED_MSG_ATTRIBUTE("Please use - (void)getCloudFileList:limit:offset:cloudFileListBlock:");
 
 /**
  下载连接失效刷新stoken
  */
 - (void)downloadUrlExpireRefreshStoken;
+
+/**
+ 获取云游戏视频列表
+ @param cloudFileListBlock result 查询结果，fileList 视频列表 errorMsg result为NO时返回错误原因
+ */
+- (void)getCloudFileVideoList:(HMCloudFileListBlock)cloudFileListBlock;
+
+/**
+ 停止播流
+ */
+- (void)stopPlayerStreaming;
+
+/**
+ 获取游戏截屏
+ @param scale 图片压缩比例,例如实例分辨率为  1280*720.  则scale传入“0.5”，收到的图片大小为640*360.
+ @param screenshotBlock 图片返回结果
+ */
+- (void)captureScreenshot:(float)scale screenshotBlock:(HMCloudScreenshotBlock)screenshotBlock;
+
+/**
+ 发送keycode值
+ 仅x86游戏使用
+ */
+- (BOOL)sendCustomKeycode:(HMInputOpData *)inputOPData;
+
+/**
+ 将鼠标模式切换成pc模式
+ 仅x86游戏使用
+ @param model true pc模式  false 移动端模式
+ */
+- (BOOL)convertToPcMouseModel:(BOOL)model;
 
 @end
 
@@ -527,6 +579,7 @@ typedef NS_ENUM (NSInteger, CloudPlayerStopReason) {
     CloudPlayerStopReasonLowSpeed,              //低于服务下限
     CloudPlayerStopReasonUrlTimeout,            //获取流地址超时
     CloudPlayerStopReasonLoseControl,           //失去控制权
+    CloudPlayerStopReasonReconnectError,        //云手机app设置时间戳后，需app重连
 };
 
 @interface HMCloudCorePlayerStopInfo : NSObject
@@ -592,6 +645,9 @@ typedef NS_ENUM (NSInteger, CloudPlayerStopReason) {
 
 - (void) getControlFailed:(HMCCPayloadData *)data;
 
+- (void) keepAliveTimeData:(HMCCPayloadData *)data;
+
+- (void) cloudCorePlayerDelayInfoCallBack:(HMDelayInfoModel *)delayModel;
 @end
 
 

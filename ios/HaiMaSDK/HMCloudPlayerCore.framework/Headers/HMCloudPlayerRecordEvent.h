@@ -218,6 +218,14 @@ typedef NS_ENUM(NSInteger, HMCPEventType) {
     HMCCEventDownloadComplete           = 12616,   //下载完成
     HMCCEventDownloadProgress           = 12617,   //下载状态
 
+    HMCCEventUploadStart                = 12601,   //开始上传
+    HMCCEventUploadSuccess              = 12602,   //文件上传成功
+    HMCCEventUploadStop                 = 12603,   //文件上传
+    HMCCEventUploadCancel               = 12604,   //取消上传
+    HMCCEventUploadError                = 12605,   //上传错误
+    HMCCEventUploadComplete             = 12606,   //上传完成
+    HMCCEventUploadStatus               = 12607,   //上传状态
+
     HMCCEventWebrtcDCCreateDevice       = 13455,   //WEBRTC DataChannel创建device
     HMCCEventWebrtcDCReceiveFirstBinary = 13456,   //WEBRTC DataChannel当收第一个二进制指令时上报，且仅上报一次
     HMCCEventWebrtcDCReceiveFirstText   = 13457,   //WEBRTC DataChannel当收第一个文本指令时上报，且仅上报一次
@@ -228,6 +236,35 @@ typedef NS_ENUM(NSInteger, HMCPEventType) {
     HMCCEventCameraApplyPermission      = 13471,   //正在申请相机权限
     HMCCEventCameraPermissionCheck      = 13472,   //是否需要每次对相机权限进行授权
     HMCCEventOperatorChange             = 17001,   //运营商发生变化
+
+    HMCCEventVideoDownloadFileCreated         = 12627,   //通知新文件（图片、视频)
+    HMCCEventVideoDownloadFileStatusChanged   = 12630,   //文件下载状态
+    HMCCEventVideoDownloadCalled              = 12631,   //文件下载api接口调用
+    HMCCEventVideoDownloadTaskStart           = 12632,   //文件下载任务开始
+    HMCCEventVideoDownloadFileStart           = 12633,   //开始文件下载
+    HMCCEventVideoDownloadApplyKeepalive      = 12634,   //申请下载保活
+    HMCCEventVideoDownloadCancelKeepalive     = 12635,   //取消下载保活
+    HMCCEventVideoDownloadKeepaliveTimeout    = 12636,   //文件保活时长耗尽
+    HMCCEventVideoDownloadApplyKeepaliveFail  = 12637,   //申请下载保活结果超时
+    HMCCEventVideoDownloadSuccess             = 12638,   //文件下载成功
+    HMCCEventVideoDownloadFail                = 12639,   //文件下载失败
+    HMCCEventVideoDownloadComplete            = 12640,   //文件下载完成
+    HMCCEventVideoDownloadCancelCalled        = 12642,   //取消文件下载api接口调用
+    HMCCEventVideoDownloadCancelResult        = 12643,   //取消文件下载结果
+    HMCCEventVideoDownloadUpdataCalled        = 12644,   //更新文件下载列表api接口调用
+    HMCCEventVideoDownloadUpdataResult        = 12645,   //更新文件下载列表结果
+    HMCCEventVideoDownloadCanQueryCalled      = 12646,   //查询可下载文件列表api接口调用
+    HMCCEventVideoDownloadCanQueryResult      = 12647,   //查询可下载文件列表结果
+    HMCCEventVideoDownloadingQueryCalled      = 12648,   //查询下载任务中,文件列表api接口调用
+    HMCCEventVideoDownloadingQueryResult      = 12649,   //查询下载任务中,文件列表结果
+    HMCCEventVideoDownloadSearchTmpFileList   = 12650,   //搜索可断点续传文件
+    HMCCEventVideoDownloadSearchTmpFileResult = 12651,   //搜索可断点续传文件结果
+    HMCCEventNotificationOpenCamera           = 12622,   //rom侧打开相机通知sdk
+    HMCCEventNotificationOpenAlbum            = 12623,   //rom侧打开相册通知sdk
+    HMCCEventGetScreenshotStart          = 12880,  //开始获取游戏截屏
+    HMCCEventGetScreenshotSuccess        = 12881,  //获取游戏截屏成功
+    HMCCEventGetScreenshotTimeOut        = 12882,  //获取游戏截屏超时
+    HMCCEventGetScreenshotFail           = 12883,  //获取游戏截屏失败
 };
 
 @interface HMCloudPlayerRecordEvent : NSObject

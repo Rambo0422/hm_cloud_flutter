@@ -24,7 +24,7 @@
 @interface HMStreamingModel : NSObject
 
 + (instancetype) instanceWithDictionary:(NSDictionary *)dict;
-- (instancetype) initWitDictionary:(NSDictionary *)dict;
+- (instancetype) initWithDictionary:(NSDictionary *)dict;
 
 + (instancetype) instanceWithKVArray:(NSArray *)arr kKey:(NSString *)kKey vKey:(NSString *)vKey;
 + (NSDictionary *) modelToDictionary:(id)model;

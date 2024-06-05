@@ -23,9 +23,10 @@ RTC_OBJC_EXPORT
 @property (nonatomic, assign) int width;
 @property (nonatomic, assign) int height;
 @property (nonatomic, assign) int framerate;
+@property (nonatomic, assign) bool ispreferultrawidecamera;
 @property (nonatomic, assign) bool usefrontcamera;
 @property (nonatomic, assign) bool isportrait;
-+ (instancetype) instanceWithCameraSettings:(int)width height:(int)height framerate:(int)framerate usefrontcamera:(bool)usefrontcamera;
++ (instancetype) instanceWithCameraSettings:(int)width height:(int)height framerate:(int)framerate usefrontcamera:(bool)usefrontcamera ispreferultrawidecamera:(bool)ispreferultrawidecamera;
 @end
 
 RTC_OBJC_EXPORT

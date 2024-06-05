@@ -1,0 +1,1468 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 54;
+	objects = {
+
+/* Begin PBXAggregateTarget section */
+		1EFDDC32A34D56D411E640A81DCD9E73 /* Flutter */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 94078A06C17E946ADC1F2C06726219E5 /* Build configuration list for PBXAggregateTarget "Flutter" */;
+			buildPhases = (
+			);
+			dependencies = (
+			);
+			name = Flutter;
+		};
+/* End PBXAggregateTarget section */
+
+/* Begin PBXBuildFile section */
+		00F0DEE3EFAC79AEE5B961CFD603D034 /* NSLayoutConstraint+MASDebugAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 5DB032F0BEDBBDDF91030E59ACA7DC98 /* NSLayoutConstraint+MASDebugAdditions.m */; };
+		024A17789016D9B13BCD689803262E74 /* HmCloudPlatformView.m in Sources */ = {isa = PBXBuildFile; fileRef = EFB39F348C952B993F2F5138A2ECCA9B /* HmCloudPlatformView.m */; };
+		05AC9C9906EB46D9FA27E7C06F6C43C6 /* HmCloudView.m in Sources */ = {isa = PBXBuildFile; fileRef = 94FEFC142A4E4590D660BA34BE601634 /* HmCloudView.m */; };
+		1220CF08ED29553B923C5B917871DDF7 /* ViewController+MASAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 553DA097256D24886D70E33FBA786911 /* ViewController+MASAdditions.m */; };
+		1B9899CB413C5A92E1987C317686ADF1 /* MASViewAttribute.h in Headers */ = {isa = PBXBuildFile; fileRef = 49AC5D4983C8BEF841BBE185811C5FB0 /* MASViewAttribute.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		1CCB07E71AB65C67E2DE6078F0D12E3D /* Pods-Runner-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 6E31232637003E198ED2C85DC81015F3 /* Pods-Runner-dummy.m */; };
+		23D946D292512615FD469E316AEAA734 /* CloudPlayerWarpper.m in Sources */ = {isa = PBXBuildFile; fileRef = 354682139C2043A51611DEBE0603B3AF /* CloudPlayerWarpper.m */; };
+		2BFA715705912019D88F9A956324755F /* hm_cloud-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 1AAFFF62ABA25D9961058DE1E7904C09 /* hm_cloud-dummy.m */; };
+		37BA950E62B6EA48035CB9A5E56A3B13 /* CloudPreViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = CBDBBDB5935EF6E45C14E56D7D84C683 /* CloudPreViewController.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		3B9E822F9ECF6D99C617C9D2FAC9D934 /* Masonry.h in Headers */ = {isa = PBXBuildFile; fileRef = 45892546416F43C43E8AA0E2AA27BC95 /* Masonry.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		54A42280ED747A3A0B9EC65BC40006C9 /* NSArray+MASAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 8967E66A2FCB5BA81BFA1E139139A237 /* NSArray+MASAdditions.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		568D794DF56E1D9A1A7F13DC4CF51906 /* cloud_set.png in Sources */ = {isa = PBXBuildFile; fileRef = AD46CE9B980689B719477F017E4B8556 /* cloud_set.png */; };
+		57B9AA5EC4D856F19DA531CACAD0CB24 /* MASLayoutConstraint.m in Sources */ = {isa = PBXBuildFile; fileRef = AA01142B191C535B620A7D90F8B79380 /* MASLayoutConstraint.m */; };
+		658E8D6B32810EC2EFC33267E864681A /* MASViewAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EE1660D370806B3EFD74C49D3471C1C /* MASViewAttribute.m */; };
+		67FE9026E2486FC899F4CA1E30EDCD6D /* HmCloudView.h in Headers */ = {isa = PBXBuildFile; fileRef = 8CD8225F30D7E5E1A7AEC14132FC065B /* HmCloudView.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		711731802B6B6CF55AF5D6313871647F /* NSLayoutConstraint+MASDebugAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = AA56AA7AF365E444271F9F4BE178D5A0 /* NSLayoutConstraint+MASDebugAdditions.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		728246BE1BB4DC7B2BEDCCF1D82B454D /* MASViewConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = A9244EA17B6E04FACE497603F0088190 /* MASViewConstraint.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		7566D40289D8B16B7C2DFDCE4815C858 /* MASLayoutConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = C8E52D0D54D9FDA8B5EE9BC43560E445 /* MASLayoutConstraint.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		757A6615B69F04D6048FB312F9A131C9 /* WMDragView.h in Headers */ = {isa = PBXBuildFile; fileRef = E37E56849BEF8DA5FF4132921E4DF190 /* WMDragView.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		787AD1D871633C76D248C6BB1B9493BF /* CloudPlayerWarpper.h in Headers */ = {isa = PBXBuildFile; fileRef = 40ECEB3284BEB769340A26CF803C5B7B /* CloudPlayerWarpper.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		7FF0178E2F7913EC1175DB65115D9F92 /* HmCloudPlugin.h in Headers */ = {isa = PBXBuildFile; fileRef = DAF72799715C002DBD888037D26DC22F /* HmCloudPlugin.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		819F63020C30B32ED29741E33B12E7D0 /* Masonry-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 16AEBAAA2225352CFA3BA703D5C21510 /* Masonry-dummy.m */; };
+		848F6448E031F0E0822D20F236468D67 /* cloud_set.png in Resources */ = {isa = PBXBuildFile; fileRef = AD46CE9B980689B719477F017E4B8556 /* cloud_set.png */; };
+		909233FA71E46560FD8C22C7CED17766 /* CloudPreViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A450860286A4934A7135EE8C03BFE0 /* CloudPreViewController.m */; };
+		914F0CAF4FC1836E46A76AF5F00B41CB /* WMDragView.m in Sources */ = {isa = PBXBuildFile; fileRef = 73516D8746ED067BC9436E7B6C96ABE6 /* WMDragView.m */; };
+		A404989A1FFCAE9C1D65BC6A72BE2944 /* CloudPreViewController.xib in Sources */ = {isa = PBXBuildFile; fileRef = 3F6ACC4AF383148D9DFC2790746C27F5 /* CloudPreViewController.xib */; };
+		A9705E3806E85C8D9AFF62E8C56AA787 /* hm_cloud-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 8EAA5B87662633ADCC3F0999B68AE666 /* hm_cloud-umbrella.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		AC2D71EBCD2590932FFFA3397B3F9A17 /* HmCloudPlatformView.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C17B829B246200FC44E3399D0C7A1C8 /* HmCloudPlatformView.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		B48DD004D3D793E099808C76B696565D /* MASConstraint.m in Sources */ = {isa = PBXBuildFile; fileRef = A301E9D7640CAAE872D2257184D64010 /* MASConstraint.m */; };
+		B854AF43F5A41E8E3933A2E4024BF79F /* CloudPreViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3F6ACC4AF383148D9DFC2790746C27F5 /* CloudPreViewController.xib */; };
+		BA718FFFB30299A7DF437B09E8565EF6 /* MASViewConstraint.m in Sources */ = {isa = PBXBuildFile; fileRef = 2F8160CD72114EFF3597CD4BF6F7F1F7 /* MASViewConstraint.m */; };
+		C162DBCE1846B6ADA405344930198F1F /* View+MASAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 64C2B405D244ABC4F0728546D75B2D86 /* View+MASAdditions.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		C2E3A08B39A00FAF5DCCDE72B9B50FDD /* MASConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = 411CCCE6A707DDA02AF236A6F4DD8B74 /* MASConstraint.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		C47967B13FC1CFD1735F7C934CCD639A /* HmCloudViewFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 03636B683A195B65D7254D5B9BCF140D /* HmCloudViewFactory.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		D51DD61877343524345AB499332351E4 /* View+MASAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 587E0B8E883D6AD4B29DA2365B8C2EFA /* View+MASAdditions.m */; };
+		DE66CF0782E57D50FBC6A64BFB25761F /* NSArray+MASShorthandAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = C5C44599FE7C1C51F94F910C9C3E7827 /* NSArray+MASShorthandAdditions.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		E0079F2DCA96EFDF4FE727DFBB24BCE7 /* NSArray+MASAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FBB3725D2C0052C8143BF229622340A /* NSArray+MASAdditions.m */; };
+		E331B064684601F9B0455887791062E3 /* HmCloudPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 20613C795E5BEA181A85D2F7596F1702 /* HmCloudPlugin.m */; };
+		E4697D1D0E6692ED25FFAADABB1D80D2 /* MASUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 5EFED6E52B374EE53B8B532C8A65A293 /* MASUtilities.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		E61F97853E0773C37D0E7A9E0EE57BBC /* View+MASShorthandAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 370F325DDBF27B3EF280D0011A024B35 /* View+MASShorthandAdditions.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		EF86DAD40F238F8199EAC65B78704C4B /* MASConstraint+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = D5BA9F847C587E22F8DD9250EDEC7CDA /* MASConstraint+Private.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		F140B1BBC6803E23DFFDE41709591162 /* MASConstraintMaker.h in Headers */ = {isa = PBXBuildFile; fileRef = 72A1A97E52C283A47BA4E8F48BC313FB /* MASConstraintMaker.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		F465EABB332DE4CA005A840588104A4B /* MASCompositeConstraint.m in Sources */ = {isa = PBXBuildFile; fileRef = 0D0AEA8F34CAE43AA76247FF577BAA68 /* MASCompositeConstraint.m */; };
+		F9AEE34B4561494E12699FCFB1F2FCAE /* ViewController+MASAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BA0898FAC44183744D557073E2F8AA5 /* ViewController+MASAdditions.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		FA23240852C16504CB1AAC0771DB8AFF /* MASConstraintMaker.m in Sources */ = {isa = PBXBuildFile; fileRef = 935171CB319C057FAEE8F843F46825FE /* MASConstraintMaker.m */; };
+		FE225A5403BFCAC598F428B6C42431B9 /* HmCloudViewFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 50C1F579A1CB0F06B4A5E084A3866956 /* HmCloudViewFactory.m */; };
+		FFBE2AB600E1FFC7F2EB192293FF1EC5 /* MASCompositeConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = 558B2763E324B8D237D904287AE7A690 /* MASCompositeConstraint.h */; settings = {ATTRIBUTES = (Project, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		28A215CB59B0FF5F54C8670CE3F42403 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 55AF53E6C77A10ED4985E04D74A8878E;
+			remoteInfo = Masonry;
+		};
+		3AF3D55F61C1D140D9491C978F02D9EF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1EFDDC32A34D56D411E640A81DCD9E73;
+			remoteInfo = Flutter;
+		};
+		B1BE78A780B0C29A13229DCDB52CA181 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 559FF1B30979C8BBB06B9625D1456B59;
+			remoteInfo = hm_cloud;
+		};
+		BAF6DACF537E465B34DD3584A5B9C706 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E3368CDDFA9F7419E4B8770C63BE4E6D;
+			remoteInfo = "hm_cloud-DaShen";
+		};
+		BE949BE3BFB9AE75CA9A69E12B3C85D2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 55AF53E6C77A10ED4985E04D74A8878E;
+			remoteInfo = Masonry;
+		};
+		F56382489FEDD732BC390EA856EDF6D0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1EFDDC32A34D56D411E640A81DCD9E73;
+			remoteInfo = Flutter;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		03636B683A195B65D7254D5B9BCF140D /* HmCloudViewFactory.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = HmCloudViewFactory.h; path = ../../../../../../../ios/Classes/HmCloudViewFactory.h; sourceTree = "<group>"; };
+		0AED768479B1819BE508D94E0CD88A5D /* Flutter.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Flutter.debug.xcconfig; sourceTree = "<group>"; };
+		0D0AEA8F34CAE43AA76247FF577BAA68 /* MASCompositeConstraint.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = MASCompositeConstraint.m; path = Masonry/MASCompositeConstraint.m; sourceTree = "<group>"; };
+		0F7DE2842298450A7E3A743D475189C4 /* hm_cloud.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = hm_cloud.debug.xcconfig; sourceTree = "<group>"; };
+		16AEBAAA2225352CFA3BA703D5C21510 /* Masonry-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Masonry-dummy.m"; sourceTree = "<group>"; };
+		1AAFFF62ABA25D9961058DE1E7904C09 /* hm_cloud-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "hm_cloud-dummy.m"; sourceTree = "<group>"; };
+		1C17B829B246200FC44E3399D0C7A1C8 /* HmCloudPlatformView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = HmCloudPlatformView.h; path = ../../../../../../../ios/Classes/HmCloudPlatformView.h; sourceTree = "<group>"; };
+		1FFED36A657123030ABB700256D73F15 /* Masonry */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = Masonry; path = libMasonry.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		20613C795E5BEA181A85D2F7596F1702 /* HmCloudPlugin.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = HmCloudPlugin.m; path = ../../../../../../../ios/Classes/HmCloudPlugin.m; sourceTree = "<group>"; };
+		2070C51BEE4F8FF425C02F836E099252 /* ResourceBundle-DaShen-hm_cloud-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "ResourceBundle-DaShen-hm_cloud-Info.plist"; sourceTree = "<group>"; };
+		23D1938A07EBD5A4FACD84E8B0D4492B /* hm_cloud.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = hm_cloud.release.xcconfig; sourceTree = "<group>"; };
+		2CB5F6C8463C776D8372CB53B845031B /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
+		2F8160CD72114EFF3597CD4BF6F7F1F7 /* MASViewConstraint.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = MASViewConstraint.m; path = Masonry/MASViewConstraint.m; sourceTree = "<group>"; };
+		354682139C2043A51611DEBE0603B3AF /* CloudPlayerWarpper.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = CloudPlayerWarpper.m; path = ../../../../../../../ios/Classes/CloudPlayerWarpper.m; sourceTree = "<group>"; };
+		370F325DDBF27B3EF280D0011A024B35 /* View+MASShorthandAdditions.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "View+MASShorthandAdditions.h"; path = "Masonry/View+MASShorthandAdditions.h"; sourceTree = "<group>"; };
+		37D45D4068C282E9C6E46646B542088A /* Pods-Runner-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-Runner-acknowledgements.plist"; sourceTree = "<group>"; };
+		3F6ACC4AF383148D9DFC2790746C27F5 /* CloudPreViewController.xib */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file.xib; name = CloudPreViewController.xib; path = ../../../../../../../ios/Classes/CloudPreViewController.xib; sourceTree = "<group>"; };
+		40ECEB3284BEB769340A26CF803C5B7B /* CloudPlayerWarpper.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CloudPlayerWarpper.h; path = ../../../../../../../ios/Classes/CloudPlayerWarpper.h; sourceTree = "<group>"; };
+		411CCCE6A707DDA02AF236A6F4DD8B74 /* MASConstraint.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = MASConstraint.h; path = Masonry/MASConstraint.h; sourceTree = "<group>"; };
+		44AEC6462659DC0098D6E58E0470E73F /* Masonry.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Masonry.release.xcconfig; sourceTree = "<group>"; };
+		45892546416F43C43E8AA0E2AA27BC95 /* Masonry.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = Masonry.h; path = Masonry/Masonry.h; sourceTree = "<group>"; };
+		49AC5D4983C8BEF841BBE185811C5FB0 /* MASViewAttribute.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = MASViewAttribute.h; path = Masonry/MASViewAttribute.h; sourceTree = "<group>"; };
+		49E860841B79F979EEC14EE7F5E70D7D /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
+		50C1F579A1CB0F06B4A5E084A3866956 /* HmCloudViewFactory.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = HmCloudViewFactory.m; path = ../../../../../../../ios/Classes/HmCloudViewFactory.m; sourceTree = "<group>"; };
+		553DA097256D24886D70E33FBA786911 /* ViewController+MASAdditions.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "ViewController+MASAdditions.m"; path = "Masonry/ViewController+MASAdditions.m"; sourceTree = "<group>"; };
+		558B2763E324B8D237D904287AE7A690 /* MASCompositeConstraint.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = MASCompositeConstraint.h; path = Masonry/MASCompositeConstraint.h; sourceTree = "<group>"; };
+		587E0B8E883D6AD4B29DA2365B8C2EFA /* View+MASAdditions.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "View+MASAdditions.m"; path = "Masonry/View+MASAdditions.m"; sourceTree = "<group>"; };
+		5DB032F0BEDBBDDF91030E59ACA7DC98 /* NSLayoutConstraint+MASDebugAdditions.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "NSLayoutConstraint+MASDebugAdditions.m"; path = "Masonry/NSLayoutConstraint+MASDebugAdditions.m"; sourceTree = "<group>"; };
+		5DC0F7F65A626CE5D68EC7267C3866A1 /* hm_cloud-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "hm_cloud-prefix.pch"; sourceTree = "<group>"; };
+		5EFED6E52B374EE53B8B532C8A65A293 /* MASUtilities.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = MASUtilities.h; path = Masonry/MASUtilities.h; sourceTree = "<group>"; };
+		64C2B405D244ABC4F0728546D75B2D86 /* View+MASAdditions.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "View+MASAdditions.h"; path = "Masonry/View+MASAdditions.h"; sourceTree = "<group>"; };
+		669E8F25E1897672BDB80B7EB784DA24 /* Pods-Runner */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = "Pods-Runner"; path = "libPods-Runner.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6E31232637003E198ED2C85DC81015F3 /* Pods-Runner-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-Runner-dummy.m"; sourceTree = "<group>"; };
+		6FBB3725D2C0052C8143BF229622340A /* NSArray+MASAdditions.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "NSArray+MASAdditions.m"; path = "Masonry/NSArray+MASAdditions.m"; sourceTree = "<group>"; };
+		72A1A97E52C283A47BA4E8F48BC313FB /* MASConstraintMaker.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = MASConstraintMaker.h; path = Masonry/MASConstraintMaker.h; sourceTree = "<group>"; };
+		72D98643BA30A79011275CBE433EF86F /* Masonry.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Masonry.debug.xcconfig; sourceTree = "<group>"; };
+		73516D8746ED067BC9436E7B6C96ABE6 /* WMDragView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = WMDragView.m; path = ../../../../../../../../ios/Classes/View/WMDragView.m; sourceTree = "<group>"; };
+		7464EBD99A8118E0CBC12A239F82A515 /* HMWebRTC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HMWebRTC.framework; path = ../../../../../../ios/HaiMaSDK/HMWebRTC.framework; sourceTree = "<group>"; };
+		76DD3403F3B1D234067A977D42E732BF /* hm_cloud */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = hm_cloud; path = libhm_cloud.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		7EE1660D370806B3EFD74C49D3471C1C /* MASViewAttribute.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = MASViewAttribute.m; path = Masonry/MASViewAttribute.m; sourceTree = "<group>"; };
+		8103D8EFAE8F8D0B6A8032D5AD6A4F89 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; name = LICENSE; path = ../../../../../../LICENSE; sourceTree = "<group>"; };
+		857C0D6ACF21645642CC42D494F652E6 /* hm_cloud.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = hm_cloud.modulemap; sourceTree = "<group>"; };
+		8967E66A2FCB5BA81BFA1E139139A237 /* NSArray+MASAdditions.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSArray+MASAdditions.h"; path = "Masonry/NSArray+MASAdditions.h"; sourceTree = "<group>"; };
+		8BA0898FAC44183744D557073E2F8AA5 /* ViewController+MASAdditions.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "ViewController+MASAdditions.h"; path = "Masonry/ViewController+MASAdditions.h"; sourceTree = "<group>"; };
+		8CD8225F30D7E5E1A7AEC14132FC065B /* HmCloudView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = HmCloudView.h; path = ../../../../../../../ios/Classes/HmCloudView.h; sourceTree = "<group>"; };
+		8EAA5B87662633ADCC3F0999B68AE666 /* hm_cloud-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "hm_cloud-umbrella.h"; sourceTree = "<group>"; };
+		91B2C59215FCF23A3053ED3AE2BACF32 /* Pods-Runner-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-Runner-frameworks.sh"; sourceTree = "<group>"; };
+		91F10A7E4BAA437E4DF7B3CED9B560B4 /* Masonry-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Masonry-prefix.pch"; sourceTree = "<group>"; };
+		935171CB319C057FAEE8F843F46825FE /* MASConstraintMaker.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = MASConstraintMaker.m; path = Masonry/MASConstraintMaker.m; sourceTree = "<group>"; };
+		94FEFC142A4E4590D660BA34BE601634 /* HmCloudView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = HmCloudView.m; path = ../../../../../../../ios/Classes/HmCloudView.m; sourceTree = "<group>"; };
+		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		A2A450860286A4934A7135EE8C03BFE0 /* CloudPreViewController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = CloudPreViewController.m; path = ../../../../../../../ios/Classes/CloudPreViewController.m; sourceTree = "<group>"; };
+		A301E9D7640CAAE872D2257184D64010 /* MASConstraint.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = MASConstraint.m; path = Masonry/MASConstraint.m; sourceTree = "<group>"; };
+		A9244EA17B6E04FACE497603F0088190 /* MASViewConstraint.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = MASViewConstraint.h; path = Masonry/MASViewConstraint.h; sourceTree = "<group>"; };
+		A9266BFAF01348768C30D8BB98D29BD1 /* Pods-Runner-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-Runner-acknowledgements.markdown"; sourceTree = "<group>"; };
+		AA01142B191C535B620A7D90F8B79380 /* MASLayoutConstraint.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = MASLayoutConstraint.m; path = Masonry/MASLayoutConstraint.m; sourceTree = "<group>"; };
+		AA56AA7AF365E444271F9F4BE178D5A0 /* NSLayoutConstraint+MASDebugAdditions.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSLayoutConstraint+MASDebugAdditions.h"; path = "Masonry/NSLayoutConstraint+MASDebugAdditions.h"; sourceTree = "<group>"; };
+		AD46CE9B980689B719477F017E4B8556 /* cloud_set.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; name = cloud_set.png; path = ../../../../../../../../ios/Classes/View/cloud_set.png; sourceTree = "<group>"; };
+		AF0833F0CEBFABD4862CEFB53135051D /* HMCloudPlayerCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HMCloudPlayerCore.framework; path = ../../../../../../ios/HaiMaSDK/HMCloudPlayerCore.framework; sourceTree = "<group>"; };
+		B294446C7BCCFDD9F7E187B1D8C32992 /* Flutter.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; path = Flutter.podspec; sourceTree = "<group>"; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		BBE80C2A425B6E905C7EAAB8C25A7D0F /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
+		BEE11A587C68544F2F19A8E75AD550AB /* Pods-Runner-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-Runner-resources.sh"; sourceTree = "<group>"; };
+		C1D9A39C0E05D2BC7B283BA88BD313D6 /* hm_cloud-DaShen */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = "hm_cloud-DaShen"; path = DaShen.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		C5C44599FE7C1C51F94F910C9C3E7827 /* NSArray+MASShorthandAdditions.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSArray+MASShorthandAdditions.h"; path = "Masonry/NSArray+MASShorthandAdditions.h"; sourceTree = "<group>"; };
+		C8E52D0D54D9FDA8B5EE9BC43560E445 /* MASLayoutConstraint.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = MASLayoutConstraint.h; path = Masonry/MASLayoutConstraint.h; sourceTree = "<group>"; };
+		CBDBBDB5935EF6E45C14E56D7D84C683 /* CloudPreViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CloudPreViewController.h; path = ../../../../../../../ios/Classes/CloudPreViewController.h; sourceTree = "<group>"; };
+		D5BA9F847C587E22F8DD9250EDEC7CDA /* MASConstraint+Private.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "MASConstraint+Private.h"; path = "Masonry/MASConstraint+Private.h"; sourceTree = "<group>"; };
+		D5EB940FCD2470D096764C7D8F55AE4F /* hm_cloud.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; name = hm_cloud.podspec; path = ../../../../../../ios/hm_cloud.podspec; sourceTree = "<group>"; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		DAF72799715C002DBD888037D26DC22F /* HmCloudPlugin.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = HmCloudPlugin.h; path = ../../../../../../../ios/Classes/HmCloudPlugin.h; sourceTree = "<group>"; };
+		E37E56849BEF8DA5FF4132921E4DF190 /* WMDragView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = WMDragView.h; path = ../../../../../../../../ios/Classes/View/WMDragView.h; sourceTree = "<group>"; };
+		EFB39F348C952B993F2F5138A2ECCA9B /* HmCloudPlatformView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = HmCloudPlatformView.m; path = ../../../../../../../ios/Classes/HmCloudPlatformView.m; sourceTree = "<group>"; };
+		F405D38B318CA2548EA2017892582A4D /* Flutter.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Flutter.release.xcconfig; sourceTree = "<group>"; };
+		F4BA6F824ED0757C51D0DA983E66807A /* HaiMaSDK_Bundle_iOS.bundle */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "wrapper.plug-in"; name = HaiMaSDK_Bundle_iOS.bundle; path = ../../../../../../../ios/HaiMaSDK/HaiMaSDK_Bundle_iOS.bundle; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		7A0852C7DA755759C9DDC85C8D316809 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7DDBE764189AA1DA61A157177722E1C6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A422828BCA72D97B4EE1223383E2E7E7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E83423BBDB3A6B9214B5544618CF3C6F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		10759A2B2745FADAA6B69D1D81975775 /* .. */ = {
+			isa = PBXGroup;
+			children = (
+				4BCFD0D2E688AD8B6E60D04067FA466A /* example */,
+			);
+			name = ..;
+			path = ..;
+			sourceTree = "<group>";
+		};
+		189E9EBF9C07700D19530793425C564F /* Pod */ = {
+			isa = PBXGroup;
+			children = (
+				D5EB940FCD2470D096764C7D8F55AE4F /* hm_cloud.podspec */,
+				8103D8EFAE8F8D0B6A8032D5AD6A4F89 /* LICENSE */,
+			);
+			name = Pod;
+			sourceTree = "<group>";
+		};
+		19FAB7B5D784C79CE3076D0563BEAF86 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				40ECEB3284BEB769340A26CF803C5B7B /* CloudPlayerWarpper.h */,
+				354682139C2043A51611DEBE0603B3AF /* CloudPlayerWarpper.m */,
+				CBDBBDB5935EF6E45C14E56D7D84C683 /* CloudPreViewController.h */,
+				A2A450860286A4934A7135EE8C03BFE0 /* CloudPreViewController.m */,
+				3F6ACC4AF383148D9DFC2790746C27F5 /* CloudPreViewController.xib */,
+				1C17B829B246200FC44E3399D0C7A1C8 /* HmCloudPlatformView.h */,
+				EFB39F348C952B993F2F5138A2ECCA9B /* HmCloudPlatformView.m */,
+				DAF72799715C002DBD888037D26DC22F /* HmCloudPlugin.h */,
+				20613C795E5BEA181A85D2F7596F1702 /* HmCloudPlugin.m */,
+				8CD8225F30D7E5E1A7AEC14132FC065B /* HmCloudView.h */,
+				94FEFC142A4E4590D660BA34BE601634 /* HmCloudView.m */,
+				03636B683A195B65D7254D5B9BCF140D /* HmCloudViewFactory.h */,
+				50C1F579A1CB0F06B4A5E084A3866956 /* HmCloudViewFactory.m */,
+				5965F2B4EB45091D4393229331004135 /* View */,
+			);
+			name = Classes;
+			path = Classes;
+			sourceTree = "<group>";
+		};
+		1F326502D878E6F514959AE5A326BAE9 /* Flutter */ = {
+			isa = PBXGroup;
+			children = (
+				38540BB5EC43825BC3B609AEDEA55960 /* Pod */,
+				4858B09EDB56321354DF93A12C6A96B0 /* Support Files */,
+			);
+			name = Flutter;
+			path = ../Flutter;
+			sourceTree = "<group>";
+		};
+		2B800BD2E58A566BDD843C7CE3330E7D /* ios */ = {
+			isa = PBXGroup;
+			children = (
+				E24096EF1BA3650E49E074A3CBBC90AB /* .symlinks */,
+			);
+			name = ios;
+			path = ios;
+			sourceTree = "<group>";
+		};
+		2EBA06FD814B52B96746FCF29005F022 /* Pods-Runner */ = {
+			isa = PBXGroup;
+			children = (
+				A9266BFAF01348768C30D8BB98D29BD1 /* Pods-Runner-acknowledgements.markdown */,
+				37D45D4068C282E9C6E46646B542088A /* Pods-Runner-acknowledgements.plist */,
+				6E31232637003E198ED2C85DC81015F3 /* Pods-Runner-dummy.m */,
+				91B2C59215FCF23A3053ED3AE2BACF32 /* Pods-Runner-frameworks.sh */,
+				BEE11A587C68544F2F19A8E75AD550AB /* Pods-Runner-resources.sh */,
+				BBE80C2A425B6E905C7EAAB8C25A7D0F /* Pods-Runner.debug.xcconfig */,
+				49E860841B79F979EEC14EE7F5E70D7D /* Pods-Runner.profile.xcconfig */,
+				2CB5F6C8463C776D8372CB53B845031B /* Pods-Runner.release.xcconfig */,
+			);
+			name = "Pods-Runner";
+			path = "Target Support Files/Pods-Runner";
+			sourceTree = "<group>";
+		};
+		38540BB5EC43825BC3B609AEDEA55960 /* Pod */ = {
+			isa = PBXGroup;
+			children = (
+				B294446C7BCCFDD9F7E187B1D8C32992 /* Flutter.podspec */,
+			);
+			name = Pod;
+			sourceTree = "<group>";
+		};
+		3B72908C6697E355FA90481254EF6971 /* hm_cloud */ = {
+			isa = PBXGroup;
+			children = (
+				E4C29A48CEC98CE85109346CC255260E /* .. */,
+				CA12720929A4119EFB8CF53147019DF0 /* Frameworks */,
+				189E9EBF9C07700D19530793425C564F /* Pod */,
+				AB7028C2323C0C9BCF280FDF20EAD6D0 /* Support Files */,
+			);
+			name = hm_cloud;
+			path = ../.symlinks/plugins/hm_cloud/ios;
+			sourceTree = "<group>";
+		};
+		4357C9F6652A94DC2CBCC1A30010EE33 /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				16AEBAAA2225352CFA3BA703D5C21510 /* Masonry-dummy.m */,
+				91F10A7E4BAA437E4DF7B3CED9B560B4 /* Masonry-prefix.pch */,
+				72D98643BA30A79011275CBE433EF86F /* Masonry.debug.xcconfig */,
+				44AEC6462659DC0098D6E58E0470E73F /* Masonry.release.xcconfig */,
+			);
+			name = "Support Files";
+			path = "../Target Support Files/Masonry";
+			sourceTree = "<group>";
+		};
+		4858B09EDB56321354DF93A12C6A96B0 /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				0AED768479B1819BE508D94E0CD88A5D /* Flutter.debug.xcconfig */,
+				F405D38B318CA2548EA2017892582A4D /* Flutter.release.xcconfig */,
+			);
+			name = "Support Files";
+			path = "../Pods/Target Support Files/Flutter";
+			sourceTree = "<group>";
+		};
+		4BCFD0D2E688AD8B6E60D04067FA466A /* example */ = {
+			isa = PBXGroup;
+			children = (
+				2B800BD2E58A566BDD843C7CE3330E7D /* ios */,
+			);
+			name = example;
+			path = example;
+			sourceTree = "<group>";
+		};
+		5965F2B4EB45091D4393229331004135 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				AD46CE9B980689B719477F017E4B8556 /* cloud_set.png */,
+				E37E56849BEF8DA5FF4132921E4DF190 /* WMDragView.h */,
+				73516D8746ED067BC9436E7B6C96ABE6 /* WMDragView.m */,
+			);
+			name = View;
+			path = View;
+			sourceTree = "<group>";
+		};
+		7529FD53BCE26816CCD46658378AAF1B /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				F47FDAAE8298DEBC98D156CFA4146C99 /* Masonry */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		76D459DE90B7688301CE4EC2F23A475F /* plugins */ = {
+			isa = PBXGroup;
+			children = (
+				AEFE68B95DEAD3DB26E2715A096A5CF4 /* hm_cloud */,
+			);
+			name = plugins;
+			path = plugins;
+			sourceTree = "<group>";
+		};
+		AB7028C2323C0C9BCF280FDF20EAD6D0 /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				857C0D6ACF21645642CC42D494F652E6 /* hm_cloud.modulemap */,
+				1AAFFF62ABA25D9961058DE1E7904C09 /* hm_cloud-dummy.m */,
+				5DC0F7F65A626CE5D68EC7267C3866A1 /* hm_cloud-prefix.pch */,
+				8EAA5B87662633ADCC3F0999B68AE666 /* hm_cloud-umbrella.h */,
+				0F7DE2842298450A7E3A743D475189C4 /* hm_cloud.debug.xcconfig */,
+				23D1938A07EBD5A4FACD84E8B0D4492B /* hm_cloud.release.xcconfig */,
+				2070C51BEE4F8FF425C02F836E099252 /* ResourceBundle-DaShen-hm_cloud-Info.plist */,
+			);
+			name = "Support Files";
+			path = "../../../../Pods/Target Support Files/hm_cloud";
+			sourceTree = "<group>";
+		};
+		AEED419BC09722E859A9D875044F8BD3 /* HaiMaSDK */ = {
+			isa = PBXGroup;
+			children = (
+				F4BA6F824ED0757C51D0DA983E66807A /* HaiMaSDK_Bundle_iOS.bundle */,
+			);
+			name = HaiMaSDK;
+			path = HaiMaSDK;
+			sourceTree = "<group>";
+		};
+		AEFE68B95DEAD3DB26E2715A096A5CF4 /* hm_cloud */ = {
+			isa = PBXGroup;
+			children = (
+				EA3033AD46B9D3EF394FE37F3E983035 /* ios */,
+			);
+			name = hm_cloud;
+			path = hm_cloud;
+			sourceTree = "<group>";
+		};
+		B5AD0D71395A17687BC40159E8392E32 /* Targets Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				2EBA06FD814B52B96746FCF29005F022 /* Pods-Runner */,
+			);
+			name = "Targets Support Files";
+			sourceTree = "<group>";
+		};
+		CA12720929A4119EFB8CF53147019DF0 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				AF0833F0CEBFABD4862CEFB53135051D /* HMCloudPlayerCore.framework */,
+				7464EBD99A8118E0CBC12A239F82A515 /* HMWebRTC.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		CF1408CF629C7361332E53B88F7BD30C = {
+			isa = PBXGroup;
+			children = (
+				9D940727FF8FB9C785EB98E56350EF41 /* Podfile */,
+				F9901FC0FD6E0575AA7B289F24C88377 /* Development Pods */,
+				D89477F20FB1DE18A04690586D7808C4 /* Frameworks */,
+				7529FD53BCE26816CCD46658378AAF1B /* Pods */,
+				F89EA0E89730A947E9AC7608D2FD134F /* Products */,
+				B5AD0D71395A17687BC40159E8392E32 /* Targets Support Files */,
+			);
+			sourceTree = "<group>";
+		};
+		D89477F20FB1DE18A04690586D7808C4 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		E24096EF1BA3650E49E074A3CBBC90AB /* .symlinks */ = {
+			isa = PBXGroup;
+			children = (
+				76D459DE90B7688301CE4EC2F23A475F /* plugins */,
+			);
+			name = .symlinks;
+			path = .symlinks;
+			sourceTree = "<group>";
+		};
+		E4C29A48CEC98CE85109346CC255260E /* .. */ = {
+			isa = PBXGroup;
+			children = (
+				10759A2B2745FADAA6B69D1D81975775 /* .. */,
+			);
+			name = ..;
+			path = ../../../../../../ios;
+			sourceTree = "<group>";
+		};
+		EA3033AD46B9D3EF394FE37F3E983035 /* ios */ = {
+			isa = PBXGroup;
+			children = (
+				19FAB7B5D784C79CE3076D0563BEAF86 /* Classes */,
+				AEED419BC09722E859A9D875044F8BD3 /* HaiMaSDK */,
+			);
+			name = ios;
+			path = ios;
+			sourceTree = "<group>";
+		};
+		F47FDAAE8298DEBC98D156CFA4146C99 /* Masonry */ = {
+			isa = PBXGroup;
+			children = (
+				558B2763E324B8D237D904287AE7A690 /* MASCompositeConstraint.h */,
+				0D0AEA8F34CAE43AA76247FF577BAA68 /* MASCompositeConstraint.m */,
+				411CCCE6A707DDA02AF236A6F4DD8B74 /* MASConstraint.h */,
+				A301E9D7640CAAE872D2257184D64010 /* MASConstraint.m */,
+				D5BA9F847C587E22F8DD9250EDEC7CDA /* MASConstraint+Private.h */,
+				72A1A97E52C283A47BA4E8F48BC313FB /* MASConstraintMaker.h */,
+				935171CB319C057FAEE8F843F46825FE /* MASConstraintMaker.m */,
+				C8E52D0D54D9FDA8B5EE9BC43560E445 /* MASLayoutConstraint.h */,
+				AA01142B191C535B620A7D90F8B79380 /* MASLayoutConstraint.m */,
+				45892546416F43C43E8AA0E2AA27BC95 /* Masonry.h */,
+				5EFED6E52B374EE53B8B532C8A65A293 /* MASUtilities.h */,
+				49AC5D4983C8BEF841BBE185811C5FB0 /* MASViewAttribute.h */,
+				7EE1660D370806B3EFD74C49D3471C1C /* MASViewAttribute.m */,
+				A9244EA17B6E04FACE497603F0088190 /* MASViewConstraint.h */,
+				2F8160CD72114EFF3597CD4BF6F7F1F7 /* MASViewConstraint.m */,
+				8967E66A2FCB5BA81BFA1E139139A237 /* NSArray+MASAdditions.h */,
+				6FBB3725D2C0052C8143BF229622340A /* NSArray+MASAdditions.m */,
+				C5C44599FE7C1C51F94F910C9C3E7827 /* NSArray+MASShorthandAdditions.h */,
+				AA56AA7AF365E444271F9F4BE178D5A0 /* NSLayoutConstraint+MASDebugAdditions.h */,
+				5DB032F0BEDBBDDF91030E59ACA7DC98 /* NSLayoutConstraint+MASDebugAdditions.m */,
+				64C2B405D244ABC4F0728546D75B2D86 /* View+MASAdditions.h */,
+				587E0B8E883D6AD4B29DA2365B8C2EFA /* View+MASAdditions.m */,
+				370F325DDBF27B3EF280D0011A024B35 /* View+MASShorthandAdditions.h */,
+				8BA0898FAC44183744D557073E2F8AA5 /* ViewController+MASAdditions.h */,
+				553DA097256D24886D70E33FBA786911 /* ViewController+MASAdditions.m */,
+				4357C9F6652A94DC2CBCC1A30010EE33 /* Support Files */,
+			);
+			name = Masonry;
+			path = Masonry;
+			sourceTree = "<group>";
+		};
+		F89EA0E89730A947E9AC7608D2FD134F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				76DD3403F3B1D234067A977D42E732BF /* hm_cloud */,
+				C1D9A39C0E05D2BC7B283BA88BD313D6 /* hm_cloud-DaShen */,
+				1FFED36A657123030ABB700256D73F15 /* Masonry */,
+				669E8F25E1897672BDB80B7EB784DA24 /* Pods-Runner */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F9901FC0FD6E0575AA7B289F24C88377 /* Development Pods */ = {
+			isa = PBXGroup;
+			children = (
+				1F326502D878E6F514959AE5A326BAE9 /* Flutter */,
+				3B72908C6697E355FA90481254EF6971 /* hm_cloud */,
+			);
+			name = "Development Pods";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		2916136FDC00689B258B38F594ADF0A7 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				787AD1D871633C76D248C6BB1B9493BF /* CloudPlayerWarpper.h in Headers */,
+				37BA950E62B6EA48035CB9A5E56A3B13 /* CloudPreViewController.h in Headers */,
+				A9705E3806E85C8D9AFF62E8C56AA787 /* hm_cloud-umbrella.h in Headers */,
+				AC2D71EBCD2590932FFFA3397B3F9A17 /* HmCloudPlatformView.h in Headers */,
+				7FF0178E2F7913EC1175DB65115D9F92 /* HmCloudPlugin.h in Headers */,
+				67FE9026E2486FC899F4CA1E30EDCD6D /* HmCloudView.h in Headers */,
+				C47967B13FC1CFD1735F7C934CCD639A /* HmCloudViewFactory.h in Headers */,
+				757A6615B69F04D6048FB312F9A131C9 /* WMDragView.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6C3A12D41D8AC2AAD74F354B8AF7728D /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FFBE2AB600E1FFC7F2EB192293FF1EC5 /* MASCompositeConstraint.h in Headers */,
+				C2E3A08B39A00FAF5DCCDE72B9B50FDD /* MASConstraint.h in Headers */,
+				EF86DAD40F238F8199EAC65B78704C4B /* MASConstraint+Private.h in Headers */,
+				F140B1BBC6803E23DFFDE41709591162 /* MASConstraintMaker.h in Headers */,
+				7566D40289D8B16B7C2DFDCE4815C858 /* MASLayoutConstraint.h in Headers */,
+				3B9E822F9ECF6D99C617C9D2FAC9D934 /* Masonry.h in Headers */,
+				E4697D1D0E6692ED25FFAADABB1D80D2 /* MASUtilities.h in Headers */,
+				1B9899CB413C5A92E1987C317686ADF1 /* MASViewAttribute.h in Headers */,
+				728246BE1BB4DC7B2BEDCCF1D82B454D /* MASViewConstraint.h in Headers */,
+				54A42280ED747A3A0B9EC65BC40006C9 /* NSArray+MASAdditions.h in Headers */,
+				DE66CF0782E57D50FBC6A64BFB25761F /* NSArray+MASShorthandAdditions.h in Headers */,
+				711731802B6B6CF55AF5D6313871647F /* NSLayoutConstraint+MASDebugAdditions.h in Headers */,
+				C162DBCE1846B6ADA405344930198F1F /* View+MASAdditions.h in Headers */,
+				E61F97853E0773C37D0E7A9E0EE57BBC /* View+MASShorthandAdditions.h in Headers */,
+				F9AEE34B4561494E12699FCFB1F2FCAE /* ViewController+MASAdditions.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		77B7499F89F385A7B02542F5765767A5 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		559FF1B30979C8BBB06B9625D1456B59 /* hm_cloud */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 35BFBBCF755E05131C5F97FB4D83A50A /* Build configuration list for PBXNativeTarget "hm_cloud" */;
+			buildPhases = (
+				2916136FDC00689B258B38F594ADF0A7 /* Headers */,
+				E5E8FD06417A3008CFBDE0C7AA2E6793 /* Sources */,
+				A422828BCA72D97B4EE1223383E2E7E7 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2D0DADCC0B8FD8B2E7652FFE52AD6944 /* PBXTargetDependency */,
+				89753A78CDEE74452BF2570179A203F7 /* PBXTargetDependency */,
+				5BC502BFB597BFC57B16B1BFF63F07C3 /* PBXTargetDependency */,
+			);
+			name = hm_cloud;
+			productName = hm_cloud;
+			productReference = 76DD3403F3B1D234067A977D42E732BF /* hm_cloud */;
+			productType = "com.apple.product-type.library.static";
+		};
+		55AF53E6C77A10ED4985E04D74A8878E /* Masonry */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DDC6B0D876AAC702196B6B590A3D9D9D /* Build configuration list for PBXNativeTarget "Masonry" */;
+			buildPhases = (
+				6C3A12D41D8AC2AAD74F354B8AF7728D /* Headers */,
+				F0DC3C16F2B5C682C622D217F1AB05A0 /* Sources */,
+				7A0852C7DA755759C9DDC85C8D316809 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Masonry;
+			productName = Masonry;
+			productReference = 1FFED36A657123030ABB700256D73F15 /* Masonry */;
+			productType = "com.apple.product-type.library.static";
+		};
+		8B74B458B450D74B75744B87BD747314 /* Pods-Runner */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4A6CDEA496A36E559192E1276AEF04C3 /* Build configuration list for PBXNativeTarget "Pods-Runner" */;
+			buildPhases = (
+				77B7499F89F385A7B02542F5765767A5 /* Headers */,
+				4C56B26C235A992B3FBB0AA2183306E9 /* Sources */,
+				7DDBE764189AA1DA61A157177722E1C6 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				20BC671E857F57A23A75239217CC4812 /* PBXTargetDependency */,
+				B1AD12FCBA914338B837811D6BFF9FA6 /* PBXTargetDependency */,
+				BADB77887337C07502ABB2E09C7041F9 /* PBXTargetDependency */,
+			);
+			name = "Pods-Runner";
+			productName = "Pods-Runner";
+			productReference = 669E8F25E1897672BDB80B7EB784DA24 /* Pods-Runner */;
+			productType = "com.apple.product-type.library.static";
+		};
+		E3368CDDFA9F7419E4B8770C63BE4E6D /* hm_cloud-DaShen */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DA96CC094448D30E1048226358BA9481 /* Build configuration list for PBXNativeTarget "hm_cloud-DaShen" */;
+			buildPhases = (
+				82FB1527EBACB59C23DA5DE7E0EE0A44 /* Sources */,
+				E83423BBDB3A6B9214B5544618CF3C6F /* Frameworks */,
+				3019F53649D58F07B5F55C42B166F498 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "hm_cloud-DaShen";
+			productName = DaShen;
+			productReference = C1D9A39C0E05D2BC7B283BA88BD313D6 /* hm_cloud-DaShen */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		BFDFE7DC352907FC980B868725387E98 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+			};
+			buildConfigurationList = 4821239608C13582E20E6DA73FD5F1F9 /* Build configuration list for PBXProject "Pods" */;
+			compatibilityVersion = "Xcode 12.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = CF1408CF629C7361332E53B88F7BD30C;
+			productRefGroup = F89EA0E89730A947E9AC7608D2FD134F /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1EFDDC32A34D56D411E640A81DCD9E73 /* Flutter */,
+				559FF1B30979C8BBB06B9625D1456B59 /* hm_cloud */,
+				E3368CDDFA9F7419E4B8770C63BE4E6D /* hm_cloud-DaShen */,
+				55AF53E6C77A10ED4985E04D74A8878E /* Masonry */,
+				8B74B458B450D74B75744B87BD747314 /* Pods-Runner */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		3019F53649D58F07B5F55C42B166F498 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				848F6448E031F0E0822D20F236468D67 /* cloud_set.png in Resources */,
+				B854AF43F5A41E8E3933A2E4024BF79F /* CloudPreViewController.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4C56B26C235A992B3FBB0AA2183306E9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1CCB07E71AB65C67E2DE6078F0D12E3D /* Pods-Runner-dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		82FB1527EBACB59C23DA5DE7E0EE0A44 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E5E8FD06417A3008CFBDE0C7AA2E6793 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				568D794DF56E1D9A1A7F13DC4CF51906 /* cloud_set.png in Sources */,
+				23D946D292512615FD469E316AEAA734 /* CloudPlayerWarpper.m in Sources */,
+				909233FA71E46560FD8C22C7CED17766 /* CloudPreViewController.m in Sources */,
+				A404989A1FFCAE9C1D65BC6A72BE2944 /* CloudPreViewController.xib in Sources */,
+				2BFA715705912019D88F9A956324755F /* hm_cloud-dummy.m in Sources */,
+				024A17789016D9B13BCD689803262E74 /* HmCloudPlatformView.m in Sources */,
+				E331B064684601F9B0455887791062E3 /* HmCloudPlugin.m in Sources */,
+				05AC9C9906EB46D9FA27E7C06F6C43C6 /* HmCloudView.m in Sources */,
+				FE225A5403BFCAC598F428B6C42431B9 /* HmCloudViewFactory.m in Sources */,
+				914F0CAF4FC1836E46A76AF5F00B41CB /* WMDragView.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F0DC3C16F2B5C682C622D217F1AB05A0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F465EABB332DE4CA005A840588104A4B /* MASCompositeConstraint.m in Sources */,
+				B48DD004D3D793E099808C76B696565D /* MASConstraint.m in Sources */,
+				FA23240852C16504CB1AAC0771DB8AFF /* MASConstraintMaker.m in Sources */,
+				57B9AA5EC4D856F19DA531CACAD0CB24 /* MASLayoutConstraint.m in Sources */,
+				819F63020C30B32ED29741E33B12E7D0 /* Masonry-dummy.m in Sources */,
+				658E8D6B32810EC2EFC33267E864681A /* MASViewAttribute.m in Sources */,
+				BA718FFFB30299A7DF437B09E8565EF6 /* MASViewConstraint.m in Sources */,
+				E0079F2DCA96EFDF4FE727DFBB24BCE7 /* NSArray+MASAdditions.m in Sources */,
+				00F0DEE3EFAC79AEE5B961CFD603D034 /* NSLayoutConstraint+MASDebugAdditions.m in Sources */,
+				D51DD61877343524345AB499332351E4 /* View+MASAdditions.m in Sources */,
+				1220CF08ED29553B923C5B917871DDF7 /* ViewController+MASAdditions.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		20BC671E857F57A23A75239217CC4812 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Flutter;
+			target = 1EFDDC32A34D56D411E640A81DCD9E73 /* Flutter */;
+			targetProxy = F56382489FEDD732BC390EA856EDF6D0 /* PBXContainerItemProxy */;
+		};
+		2D0DADCC0B8FD8B2E7652FFE52AD6944 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Flutter;
+			target = 1EFDDC32A34D56D411E640A81DCD9E73 /* Flutter */;
+			targetProxy = 3AF3D55F61C1D140D9491C978F02D9EF /* PBXContainerItemProxy */;
+		};
+		5BC502BFB597BFC57B16B1BFF63F07C3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "hm_cloud-DaShen";
+			target = E3368CDDFA9F7419E4B8770C63BE4E6D /* hm_cloud-DaShen */;
+			targetProxy = BAF6DACF537E465B34DD3584A5B9C706 /* PBXContainerItemProxy */;
+		};
+		89753A78CDEE74452BF2570179A203F7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Masonry;
+			target = 55AF53E6C77A10ED4985E04D74A8878E /* Masonry */;
+			targetProxy = 28A215CB59B0FF5F54C8670CE3F42403 /* PBXContainerItemProxy */;
+		};
+		B1AD12FCBA914338B837811D6BFF9FA6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Masonry;
+			target = 55AF53E6C77A10ED4985E04D74A8878E /* Masonry */;
+			targetProxy = BE949BE3BFB9AE75CA9A69E12B3C85D2 /* PBXContainerItemProxy */;
+		};
+		BADB77887337C07502ABB2E09C7041F9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = hm_cloud;
+			target = 559FF1B30979C8BBB06B9625D1456B59 /* hm_cloud */;
+			targetProxy = B1BE78A780B0C29A13229DCDB52CA181 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		058CDD7E3930D639AB2A299DB879F9EA /* Profile */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 23D1938A07EBD5A4FACD84E8B0D4492B /* hm_cloud.release.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_IDENTITY = "-";
+				CODE_SIGNING_REQUIRED = NO;
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/hm_cloud";
+				EXPANDED_CODE_SIGN_IDENTITY = "-";
+				IBSC_MODULE = hm_cloud;
+				INFOPLIST_FILE = "Target Support Files/hm_cloud/ResourceBundle-DaShen-hm_cloud-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				PRODUCT_NAME = DaShen;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Profile;
+		};
+		0AB6DD3BEF9484CACF8765A842C24BF4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 23D1938A07EBD5A4FACD84E8B0D4492B /* hm_cloud.release.xcconfig */;
+			buildSettings = {
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				ENABLE_BITCODE = NO;
+				"EXCLUDED_ARCHS[sdk=iphoneos*]" = "$(inherited) armv7";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "$(inherited) i386";
+				"FRAMEWORK_SEARCH_PATHS[sdk=iphoneos*]" = (
+					"\"/Users/edy/Documents/Dev/flutter/bin/cache/artifacts/engine/ios-release/Flutter.xcframework/ios-arm64\"",
+					"$(inherited)",
+				);
+				"FRAMEWORK_SEARCH_PATHS[sdk=iphonesimulator*]" = (
+					"\"/Users/edy/Documents/Dev/flutter/bin/cache/artifacts/engine/ios-release/Flutter.xcframework/ios-arm64_x86_64-simulator\"",
+					"$(inherited)",
+				);
+				GCC_PREFIX_HEADER = "Target Support Files/hm_cloud/hm_cloud-prefix.pch";
+				MODULEMAP_FILE = Headers/Public/hm_cloud/hm_cloud.modulemap;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					Flutter,
+				);
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = hm_cloud;
+				PRODUCT_NAME = hm_cloud;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				"VALID_ARCHS[sdk=iphonesimulator*]" = "$(ARCHS_STANDARD)";
+			};
+			name = Release;
+		};
+		0B8AC5A34391716553F1227EEFDD2523 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = BBE80C2A425B6E905C7EAAB8C25A7D0F /* Pods-Runner.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				ENABLE_BITCODE = NO;
+				"EXCLUDED_ARCHS[sdk=iphoneos*]" = "$(inherited) armv7";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "$(inherited) i386";
+				"FRAMEWORK_SEARCH_PATHS[sdk=iphoneos*]" = (
+					"\"/Users/edy/Documents/Dev/flutter/bin/cache/artifacts/engine/ios/Flutter.xcframework/ios-arm64\"",
+					"$(inherited)",
+				);
+				"FRAMEWORK_SEARCH_PATHS[sdk=iphonesimulator*]" = (
+					"\"/Users/edy/Documents/Dev/flutter/bin/cache/artifacts/engine/ios/Flutter.xcframework/ios-arm64_x86_64-simulator\"",
+					"$(inherited)",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				MACH_O_TYPE = staticlib;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					Flutter,
+				);
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				"VALID_ARCHS[sdk=iphonesimulator*]" = "$(ARCHS_STANDARD)";
+			};
+			name = Debug;
+		};
+		1819B7929BCB2F2927819074AB69357C /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F405D38B318CA2548EA2017892582A4D /* Flutter.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		19C1B5201485DFB3160241FA962BE606 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0AED768479B1819BE508D94E0CD88A5D /* Flutter.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				ONLY_ACTIVE_ARCH = NO;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		2002F49AAB2001AAED057806DB0CE00C /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 44AEC6462659DC0098D6E58E0470E73F /* Masonry.release.xcconfig */;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/Masonry/Masonry-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = Masonry;
+				PRODUCT_NAME = Masonry;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		2B9E26EAE2CD392AD762421F663075A1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"POD_CONFIGURATION_DEBUG=1",
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRIP_INSTALLED_PRODUCT = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				SYMROOT = "${SRCROOT}/../build";
+			};
+			name = Debug;
+		};
+		5AF1AC88E5F655C93D1E3B5012F6FDC8 /* Profile */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"POD_CONFIGURATION_PROFILE=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRIP_INSTALLED_PRODUCT = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				SYMROOT = "${SRCROOT}/../build";
+			};
+			name = Profile;
+		};
+		63FAF33E1C55B71A5F5A8B3CC8749F99 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"POD_CONFIGURATION_RELEASE=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRIP_INSTALLED_PRODUCT = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				SYMROOT = "${SRCROOT}/../build";
+			};
+			name = Release;
+		};
+		8507DABE60AD8AA4F8B9EABB3E4B3287 /* Profile */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 23D1938A07EBD5A4FACD84E8B0D4492B /* hm_cloud.release.xcconfig */;
+			buildSettings = {
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				ENABLE_BITCODE = NO;
+				"EXCLUDED_ARCHS[sdk=iphoneos*]" = "$(inherited) armv7";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "$(inherited) i386";
+				"FRAMEWORK_SEARCH_PATHS[sdk=iphoneos*]" = (
+					"\"/Users/edy/Documents/Dev/flutter/bin/cache/artifacts/engine/ios-release/Flutter.xcframework/ios-arm64\"",
+					"$(inherited)",
+				);
+				"FRAMEWORK_SEARCH_PATHS[sdk=iphonesimulator*]" = (
+					"\"/Users/edy/Documents/Dev/flutter/bin/cache/artifacts/engine/ios-release/Flutter.xcframework/ios-arm64_x86_64-simulator\"",
+					"$(inherited)",
+				);
+				GCC_PREFIX_HEADER = "Target Support Files/hm_cloud/hm_cloud-prefix.pch";
+				MODULEMAP_FILE = Headers/Public/hm_cloud/hm_cloud.modulemap;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					Flutter,
+				);
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = hm_cloud;
+				PRODUCT_NAME = hm_cloud;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				"VALID_ARCHS[sdk=iphonesimulator*]" = "$(ARCHS_STANDARD)";
+			};
+			name = Profile;
+		};
+		8FAFC5AC101FBAA3EB31C673ECCECAAD /* Profile */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 49E860841B79F979EEC14EE7F5E70D7D /* Pods-Runner.profile.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				ENABLE_BITCODE = NO;
+				"EXCLUDED_ARCHS[sdk=iphoneos*]" = "$(inherited) armv7";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "$(inherited) i386";
+				"FRAMEWORK_SEARCH_PATHS[sdk=iphoneos*]" = (
+					"\"/Users/edy/Documents/Dev/flutter/bin/cache/artifacts/engine/ios-release/Flutter.xcframework/ios-arm64\"",
+					"$(inherited)",
+				);
+				"FRAMEWORK_SEARCH_PATHS[sdk=iphonesimulator*]" = (
+					"\"/Users/edy/Documents/Dev/flutter/bin/cache/artifacts/engine/ios-release/Flutter.xcframework/ios-arm64_x86_64-simulator\"",
+					"$(inherited)",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				MACH_O_TYPE = staticlib;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					Flutter,
+				);
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				"VALID_ARCHS[sdk=iphonesimulator*]" = "$(ARCHS_STANDARD)";
+			};
+			name = Profile;
+		};
+		A7E4CAB524CFEB0551C72FA9AB442307 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 23D1938A07EBD5A4FACD84E8B0D4492B /* hm_cloud.release.xcconfig */;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_IDENTITY = "-";
+				CODE_SIGNING_REQUIRED = NO;
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/hm_cloud";
+				EXPANDED_CODE_SIGN_IDENTITY = "-";
+				IBSC_MODULE = hm_cloud;
+				INFOPLIST_FILE = "Target Support Files/hm_cloud/ResourceBundle-DaShen-hm_cloud-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				PRODUCT_NAME = DaShen;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Release;
+		};
+		DCB3D8F965C4E566DAD114006B1C7A70 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0F7DE2842298450A7E3A743D475189C4 /* hm_cloud.debug.xcconfig */;
+			buildSettings = {
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				ENABLE_BITCODE = NO;
+				"EXCLUDED_ARCHS[sdk=iphoneos*]" = "$(inherited) armv7";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "$(inherited) i386";
+				"FRAMEWORK_SEARCH_PATHS[sdk=iphoneos*]" = (
+					"\"/Users/edy/Documents/Dev/flutter/bin/cache/artifacts/engine/ios/Flutter.xcframework/ios-arm64\"",
+					"$(inherited)",
+				);
+				"FRAMEWORK_SEARCH_PATHS[sdk=iphonesimulator*]" = (
+					"\"/Users/edy/Documents/Dev/flutter/bin/cache/artifacts/engine/ios/Flutter.xcframework/ios-arm64_x86_64-simulator\"",
+					"$(inherited)",
+				);
+				GCC_PREFIX_HEADER = "Target Support Files/hm_cloud/hm_cloud-prefix.pch";
+				MODULEMAP_FILE = Headers/Public/hm_cloud/hm_cloud.modulemap;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					Flutter,
+				);
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = hm_cloud;
+				PRODUCT_NAME = hm_cloud;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				"VALID_ARCHS[sdk=iphonesimulator*]" = "$(ARCHS_STANDARD)";
+			};
+			name = Debug;
+		};
+		DEA23ABCDF121CD76272A3377C260F21 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 72D98643BA30A79011275CBE433EF86F /* Masonry.debug.xcconfig */;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/Masonry/Masonry-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = Masonry;
+				PRODUCT_NAME = Masonry;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E2AD2F2E4FC6E17E2DDD555FA05D708E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0F7DE2842298450A7E3A743D475189C4 /* hm_cloud.debug.xcconfig */;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_IDENTITY = "-";
+				CODE_SIGNING_REQUIRED = NO;
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/hm_cloud";
+				EXPANDED_CODE_SIGN_IDENTITY = "-";
+				IBSC_MODULE = hm_cloud;
+				INFOPLIST_FILE = "Target Support Files/hm_cloud/ResourceBundle-DaShen-hm_cloud-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_NAME = DaShen;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Debug;
+		};
+		F2C85DA0ABCDF8CC8736D551303C574A /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2CB5F6C8463C776D8372CB53B845031B /* Pods-Runner.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				ENABLE_BITCODE = NO;
+				"EXCLUDED_ARCHS[sdk=iphoneos*]" = "$(inherited) armv7";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "$(inherited) i386";
+				"FRAMEWORK_SEARCH_PATHS[sdk=iphoneos*]" = (
+					"\"/Users/edy/Documents/Dev/flutter/bin/cache/artifacts/engine/ios-release/Flutter.xcframework/ios-arm64\"",
+					"$(inherited)",
+				);
+				"FRAMEWORK_SEARCH_PATHS[sdk=iphonesimulator*]" = (
+					"\"/Users/edy/Documents/Dev/flutter/bin/cache/artifacts/engine/ios-release/Flutter.xcframework/ios-arm64_x86_64-simulator\"",
+					"$(inherited)",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				MACH_O_TYPE = staticlib;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					Flutter,
+				);
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				"VALID_ARCHS[sdk=iphonesimulator*]" = "$(ARCHS_STANDARD)";
+			};
+			name = Release;
+		};
+		F7E5F691B952670B5C5A703D24863EF1 /* Profile */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F405D38B318CA2548EA2017892582A4D /* Flutter.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Profile;
+		};
+		FFBC79AC3CCC6BC51EFC263C1FA615F9 /* Profile */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 44AEC6462659DC0098D6E58E0470E73F /* Masonry.release.xcconfig */;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/Masonry/Masonry-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = Masonry;
+				PRODUCT_NAME = Masonry;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Profile;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		35BFBBCF755E05131C5F97FB4D83A50A /* Build configuration list for PBXNativeTarget "hm_cloud" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DCB3D8F965C4E566DAD114006B1C7A70 /* Debug */,
+				8507DABE60AD8AA4F8B9EABB3E4B3287 /* Profile */,
+				0AB6DD3BEF9484CACF8765A842C24BF4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4821239608C13582E20E6DA73FD5F1F9 /* Build configuration list for PBXProject "Pods" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2B9E26EAE2CD392AD762421F663075A1 /* Debug */,
+				5AF1AC88E5F655C93D1E3B5012F6FDC8 /* Profile */,
+				63FAF33E1C55B71A5F5A8B3CC8749F99 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4A6CDEA496A36E559192E1276AEF04C3 /* Build configuration list for PBXNativeTarget "Pods-Runner" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0B8AC5A34391716553F1227EEFDD2523 /* Debug */,
+				8FAFC5AC101FBAA3EB31C673ECCECAAD /* Profile */,
+				F2C85DA0ABCDF8CC8736D551303C574A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		94078A06C17E946ADC1F2C06726219E5 /* Build configuration list for PBXAggregateTarget "Flutter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				19C1B5201485DFB3160241FA962BE606 /* Debug */,
+				F7E5F691B952670B5C5A703D24863EF1 /* Profile */,
+				1819B7929BCB2F2927819074AB69357C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DA96CC094448D30E1048226358BA9481 /* Build configuration list for PBXNativeTarget "hm_cloud-DaShen" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E2AD2F2E4FC6E17E2DDD555FA05D708E /* Debug */,
+				058CDD7E3930D639AB2A299DB879F9EA /* Profile */,
+				A7E4CAB524CFEB0551C72FA9AB442307 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DDC6B0D876AAC702196B6B590A3D9D9D /* Build configuration list for PBXNativeTarget "Masonry" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DEA23ABCDF121CD76272A3377C260F21 /* Debug */,
+				FFBC79AC3CCC6BC51EFC263C1FA615F9 /* Profile */,
+				2002F49AAB2001AAED057806DB0CE00C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+}

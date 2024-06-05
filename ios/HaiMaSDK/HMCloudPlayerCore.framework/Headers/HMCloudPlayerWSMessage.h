@@ -21,7 +21,12 @@ typedef NS_ENUM(NSInteger, CloudPlayerWSMessageType) {
     CloudPlayerWSMessageTypeShareWeiBo,
     CloudPlayerWSMessageTypeShareWeiXin,
     CloudPlayerWSMessageTypeShareAndroid,
-    CloudPlayerWSMesaageTypeShareLink,
+    CloudPlayerWSMessageTypeShareLink,
+    CloudPlayerWSMessageTypeDownloadFile,
+    CloudPlayerWSMessageTypeStorage,
+    CloudPlayerWSMessageTypeKeyboardChanged,
+    CloudPlayerWSMessageTypeOpenCamera,
+    CloudPlayerWSMessageTypeOpenPhotosAlbum,
 };
 
 typedef void (^HMCPWSMessageBlock)(BOOL successed, NSString *messageId, NSString *reason);
@@ -119,10 +124,33 @@ typedef NS_ENUM(NSInteger, CloudPlayerWSGPSMessageOperation) {
 + (instancetype) cloudPayerWSMessageAckWithCloudId:(NSString *)cloudId type:(CloudPlayerWSMessageType)type messageId:(NSString *)messageId;
 
 @property (nonatomic, copy, readonly) NSString *messageId;
+@property (nonatomic, copy)     NSString *cloudId;
+@property (nonatomic, assign)   int      code;
+@property (nonatomic, copy)     NSString *message;
+@property (nonatomic, assign)   CloudPlayerWSMessageType type;
 
 - (BOOL) isSuccessed;
 
 - (NSString *) jsonString;
+
+@end
+
+@interface HMCloudPlayerWSMessageFileAckResponse : HMCloudPlayerWSMessageAckResponse
+
++ (instancetype)cloudPayerWSMessageFileAckWithCloudId:(NSString *)cloudId bid:(NSString *)bid type:(CloudPlayerWSMessageType)type messageId:(NSString *)messageId event:(NSString *)event fileName:(NSString *)fileName;
+
+@end
+
+typedef NS_ENUM(NSInteger, CloudPlayerWSKeyboardMessage) {
+    CloudPlayerWSKeyboardMessageUnknown = -1,   //无法确定
+    CloudPlayerWSKeyboardMessageDidShow,        //显示
+    CloudPlayerWSKeyboardMessageDidHide,        //隐藏
+} ;
+
+@interface HMCloudPlayerWSKeyboardChangedMessage : HMCloudPlayerWSMessage
+
+@property (nonatomic, assign, readonly) CloudPlayerWSKeyboardMessage keyboardStatus;
+@property (nonatomic, copy, readonly)   NSString *message;
 
 @end
 

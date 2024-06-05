@@ -15,7 +15,8 @@
 @property (nonatomic, strong) NSString *inputUrl;
 @property (nonatomic, strong) NSString *screenUrl;
 @property (nonatomic, assign) int       supportLiving;
-@property(nonatomic,copy)     NSString *gsmUrl;
+@property (nonatomic, copy)   NSString *gsmUrl;
+@property (nonatomic, copy)   NSString *screenRecordUrl;
 
 - (BOOL) isValid;
 @end

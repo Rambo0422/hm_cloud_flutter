@@ -1,4 +1,4 @@
-package com.example.hm_cloud_example
+package com.sayx.hm_cloud_example
 
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine

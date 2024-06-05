@@ -22,6 +22,43 @@
 
 @protocol HMCloudPlayerDelegate;
 
+typedef NS_ENUM(NSInteger, CloudPlayerDownloadType) {
+    CloudPlayerDownloadTypeImage,
+    CloudPlayerDownloadTypeFile,
+};
+
+typedef NS_ENUM(NSInteger, CloudPlayerDownlodFileEventStatus) {
+    CloudPlayerDownlodFileEventStatusUndefined,      //未定义状态
+    CloudPlayerDownlodFileEventStatusCreateFile,     //创建录屏文件
+    CloudPlayerDownlodFileEventStatusFinishFile,     //录屏完成
+    CloudPlayerDownlodFileEventStatusListFile,       //可下载文件列表
+};
+
+typedef NS_ENUM(NSInteger, CloudPlayerDownloadResponseStatus) {
+    CloudPlayerDownloadResponseStatusSuccess,           //下载成功
+    CloudPlayerDownloadResponseStatusEmpty,             //下载队列空
+    CloudPlayerDownloadResponseStatusOutList,           //不在下载列表
+    CloudPlayerDownloadResponseStatusDownloaded,        //已下载完成
+    CloudPlayerDownloadResponseStatusTimeout,           //取消超时
+    CloudPlayerDownloadResponseStatusDisconnect,        //链接断开
+    CloudPlayerDownloadResponseStatusKeepAliveTimeout,  //保活时间用尽
+    CloudPlayerDownloadResponseStatusInternalError,     //内部错误
+};
+
+typedef NS_ENUM(NSInteger, CloudPlayerCancelDownloadResponseStatus) {
+    CloudPlayerCancelDownloadResponseStatusSuccess,      //取消成功
+    CloudPlayerCancelDownloadResponseStatusEmpty,        //下载队列空
+    CloudPlayerCancelDownloadResponseStatusOutList,      //不在下载列表
+    CloudPlayerCancelDownloadResponseStatusDownloaded,   //已下载完成
+    CloudPlayerCancelDownloadResponseStatusTimeout,      //取消超时
+    CloudPlayerCancelDownloadResponseStatusDisconnect,   //链接断开
+};
+
+typedef NS_ENUM(NSInteger,CloudPlayerPrivacyType) {
+    CloudPlayerPrivacyTypeCamera,
+    CloudPlayerPrivacyTypePhotosAlbum,
+};
+
 typedef NS_ENUM(NSInteger,CloudPlayerShareType) {
     CloudPlayerShareTypeQQ,
     CloudPlayerShareTypeWeiBo,
@@ -36,7 +73,6 @@ typedef NS_ENUM(NSInteger, CloudPlayerComponentType) {
     CloudPlayerComponentTypeService      = 1,   //Service
     CloudPlayerComponentTypeBroadcast    = 2,   //Broadcast
 };
-
 
 typedef NS_ENUM(NSInteger, CloudPlayerKeyboardStatus) {
     CloudPlayerKeyboardStatusNone       = -1,   //初始值
@@ -61,15 +97,32 @@ typedef NS_ENUM(NSInteger, CloudInstanceType) {
     CloudInstanceTypeX86            =  1, //x86
 };
 
+typedef NS_ENUM(NSInteger, CloudPlayerFileUploadResponseStatus) {
+    CloudPlayerFileUploadResponseStatusSuccess,        //上传成功
+    CloudPlayerFileUploadResponseStatusEmpty,          //上传队列空
+    CloudPlayerFileUploadResponseStatusTimeout,        //超时
+    CloudPlayerFileUploadResponseStatusCancel,         //取消
+    CloudPlayerFileUploadResponseStatusIncorrectFormat,//格式不正确
+    CloudPlayerFileUploadResponseStatusBeyondMaxLimit, //超过最大文件限制
+    CloudPlayerFileUploadResponseStatusInternalError,  //内部错误
+    CloudPlayerFileUploadResponseStatusDisconnect,     //链接断开
+};
+
 typedef void (^HMReservedIncetanceCallback)(NSArray <HMCloudPlayerReservedSingleIncetance*>*);
 
-typedef void (^HMCloudFileDownloadResponseBlock)(BOOL result, NSString *error, HMFile *file);
+typedef void (^HMCloudFileDownloadProgressBlock)(double downloadProgress,HMFile *file);
+
+typedef void (^HMCloudFileDownloadResponseBlock)(BOOL result, CloudPlayerDownloadResponseStatus status,NSString *errorMsg, HMFile *file);
 
 typedef void (^HMCloudFileDownloadComplete)(void);
 
-typedef void (^HMCloudFileCancelDownloadResponseBlock)(BOOL result, NSString *error, HMFile *file);
+typedef void (^HMCloudFileCancelDownloadResponseBlock)(BOOL result, CloudPlayerCancelDownloadResponseStatus status,HMFile *file);
 
 typedef void (^HMCloudFileCancelDownloadComplete)(void);
+
+typedef void (^HMCloudFileUploadResponseBlock)(BOOL result, CloudPlayerFileUploadResponseStatus status ,NSString *errorMsg, HMFile *file);
+
+typedef void (^HMCloudFileUploadComplete)(void);
 
 const extern NSString *CLOUDGAME_SDK_VERSION;
 
@@ -318,7 +371,7 @@ IDC路由查询
  @param fail 调用开启直播失败
  @return 是否开始开启直播
  */
-- (BOOL) startLivingWithLivingId:(NSString *)livingId pushStreamUrl:(NSString *)pushStreamUrl Success:(void(^)(BOOL success))success Fail:(void(^)(NSString *errorCode, NSString *errorMsg))fail;
+- (BOOL) startLivingWithLivingId:(NSString *)livingId pushStreamUrl:(NSString *)pushStreamUrl success:(void(^)(BOOL success))success fail:(void(^)(NSString *errorCode, NSString *errorMsg))fail;
 
 /**
  游戏过程中，关闭直播
@@ -410,8 +463,9 @@ typedef void (^HMAssignControlCallback)(NSArray<HMCloudPlayerControlInfo *>*);
  @param cloudFileDownloadComplete 下载完成回调
  @return 是否成功调用下载方法
  */
-
-- (BOOL)startDownload:(NSArray<HMFile *> *)downloadList cloudFileDownloadResponseBlock:(HMCloudFileDownloadResponseBlock)cloudFileDownloadResponseBlock cloudFileDownloadComplete:(HMCloudFileDownloadComplete)cloudFileDownloadComplete;
+- (BOOL)startDownload:(NSArray<HMFile *> *)downloadList
+    cloudFileDownloadResponseBlock:(HMCloudFileDownloadResponseBlock)cloudFileDownloadResponseBlock
+    cloudFileDownloadComplete:(HMCloudFileDownloadComplete)cloudFileDownloadComplete DEPRECATED_MSG_ATTRIBUTE("Please use - (BOOL)downloadFile:fileList:downloadStatus:cloudFileDownloadResponseBlock:cloudFileDownloadComplete:");
 
 /**
  取消下载图片
@@ -420,10 +474,74 @@ typedef void (^HMAssignControlCallback)(NSArray<HMCloudPlayerControlInfo *>*);
  @param cloudFileCancelDownloadComplete 取消完成回调
  @return 是否成功调用取消下载方法
  */
+- (BOOL)startCancelDownload:(NSArray <HMFile *> *)cancelList
+    cloudFileCancelDownloadResponseBlock:(HMCloudFileCancelDownloadResponseBlock)cloudFileCancelDownloadResponseBlock
+    cloudFileCancelDownloadComplete:(HMCloudFileCancelDownloadComplete)cloudFileCancelDownloadComplete DEPRECATED_MSG_ATTRIBUTE("Please use - (BOOL)cancelDownload:fileList:cloudFileCancelDownloadResponseBlock:cloudFileCancelDownloadComplete:");
 
-- (BOOL)startCancelDownload:(NSArray <HMFile *>*)cancelList
-cloudFileCancelDownloadResponseBlock:(HMCloudFileCancelDownloadResponseBlock)cloudFileCancelDownloadResponseBlock
-cloudFileCancelDownloadComplete:(HMCloudFileCancelDownloadComplete)cloudFileCancelDownloadComplete;
+/**
+ 获取可下载列表
+ @param type 下载类型
+ @param limit 获取图片列表的数量（适用于type为CloudPlayerDownloadTypeImage）
+ @param offset offset表示分页（如20一页的话，0表示第一页，20表示第二页 适用于type为CloudPlayerDownloadTypeImage）
+ @param cloudFileListBlock result 查询结果，fileList 可下载列表 errorMsg result为NO时返回错误原因
+ */
+- (void)getCloudFileList:(CloudPlayerDownloadType)type limit:(NSInteger)limit offset:(NSInteger)offset cloudFileListBlock:(HMCloudFileListBlock)cloudFileListBlock;
+
+/**
+ 文件下载
+ @param type 下载类型
+ @param fileList 下载列表
+ @param downloadProgressBlock 下载进度
+ @param downloadResponseBlock 下载某一个文件回调
+ @param downloadComplete 下载完成回调
+ @return 是否成功调用下载方法
+ */
+- (BOOL)downloadFile:(CloudPlayerDownloadType)type
+    fileList:(NSArray<HMFile *> *)fileList
+    downloadProgress:(HMCloudFileDownloadProgressBlock)downloadProgressBlock
+    cloudFileDownloadResponseBlock:(HMCloudFileDownloadResponseBlock)downloadResponseBlock
+    cloudFileDownloadComplete:(HMCloudFileDownloadComplete)downloadComplete;
+
+/**
+ 取消下载
+ @param type 下载类型
+ @param fileList 取消列表
+ @param cancelDownloadResponseBlock 取消某一个文件回调
+ @param cancelDownloadComplete 取消完成回调
+ @return 是否成功调用取消下载方法
+ */
+- (BOOL)cancelDownload:(CloudPlayerDownloadType)type
+    fileList:(NSArray<HMFile *> *)fileList
+    cloudFileCancelDownloadResponseBlock:(HMCloudFileCancelDownloadResponseBlock)cancelDownloadResponseBlock
+    cloudFileCancelDownloadComplete:(HMCloudFileCancelDownloadComplete)cancelDownloadComplete;
+
+/**
+ 更新下载列表,仅支持文件下载过程中使用
+ @param fileList 更新后的新的下载列表
+ @return 更新下载列表是否成功
+ */
+- (BOOL)updateDownloadFileList:(NSArray <HMFile *> *)fileList;
+
+/**
+ 获取待下载任务列表,仅支持文件下载过程中使用
+ @return 待下载任务列表
+ */
+- (NSArray <HMFile *>*)getDownloadTaskList;
+
+/**
+ 开始上传图片
+ @param uploadList 上传列表
+ @param cloudFileUploadResponseBlock 上传某一个文件回调
+ @param cloudFileUploadComplete 上传完成回调
+ @return 是否成功调用下载方法
+ */
+
+- (BOOL)startUpload:(NSArray<HMFile *> *)uploadList cloudFileUploadResponseBlock:(HMCloudFileUploadResponseBlock)cloudFileUploadResponseBlock cloudFileUploadComplete:(HMCloudFileUploadComplete)cloudFileUploadComplete;
+
+/**
+ 取消上传图片
+ */
+- (void)cancelUploadFileAllTask;
 
 @end
 
@@ -442,4 +560,7 @@ cloudFileCancelDownloadComplete:(HMCloudFileCancelDownloadComplete)cloudFileCanc
 - (void) cloudPlayerConnectionIpChanged:(NSDictionary *)dict;
 - (void) cloudPlayerScreenCap:(NSDictionary *)dict;
 - (void) cloudPlayerShared:(CloudPlayerShareType)shareType dataDict:(NSDictionary *)dataDict;
+- (void) cloudPlayerPrivacy:(CloudPlayerPrivacyType)privacyType;
+- (void) cloudPlayerDownloadFile:(CloudPlayerDownlodFileEventStatus)status dataDict:(NSDictionary *)dataDict;
+- (void) cloudPlayerDelayInfoCallBack:(HMDelayInfoModel *)delayModel;
 @end

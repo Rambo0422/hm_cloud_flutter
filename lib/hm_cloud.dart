@@ -1,67 +1,128 @@
-import 'package:flutter/services.dart';
-import 'hm_cloud_platform_interface.dart';
+import 'dart:developer';
 
-typedef OnRecvChannelCallback = void Function(
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'package:hm_cloud/hm_cloud_constants.dart';
+
+/// 通信回调声明
+typedef OnReceiveChannelCallback = void Function(
   String actionName, {
   dynamic params,
 });
 
-class HmCloud {
-  static final HmCloud _instance = HmCloud();
-
-  static HmCloud get instance => _instance;
-
-  Future<String?> getPlatformVersion() {
-    return HmCloudPlatform.instance.getPlatformVersion();
-  }
-
-  Future<String?> getBatteryLevel() {
-    return HmCloudPlatform.instance.getBatteryLevel();
-  }
-}
-
+/// 通信执行
 class HmCloudController {
-  MethodChannel? methodChannel;
+  MethodChannel methodChannel = const MethodChannel(HMCloudConstants.methodChannelName);
 
   HmCloudController() {
-    methodChannel = const MethodChannel('hm_cloud_controller');
-    methodChannel!.setMethodCallHandler(platformCallHandler);
+    methodChannel.setMethodCallHandler(platformCallHandler);
   }
 
   static final HmCloudController _instance = HmCloudController();
 
   static HmCloudController get instance => _instance;
 
-  OnRecvChannelCallback? callbak;
+  OnReceiveChannelCallback? callback;
 
-  setCallback(OnRecvChannelCallback callback) {
-    callbak = callback;
+  setCallback(OnReceiveChannelCallback callback) {
+    this.callback = callback;
   }
 
-  Future<void> startCloudGame(
-    Map<String, dynamic> params,
-  ) {
-    return methodChannel!.invokeMethod('startCloudGame', params);
+  /// 开始云游戏
+  void startCloudGame(Map<String, dynamic> params) async {
+    final result = await methodChannel.invokeMethod(HMCloudConstants.startCloudGame, params);
+    log("startCloudGame:$result");
   }
 
-  Future<void> stopGame() {
-    return methodChannel!.invokeMethod('stopGame');
+  /// 结束云游戏
+  void stopGame() async {
+    final result = await methodChannel.invokeMethod(HMCloudConstants.stopGame);
+    log("stopGame:$result");
+  }
+
+  Future<dynamic> checkPlayingGame() async {
+    await methodChannel.invokeMethod('checkPlayingGame');
+  }
+
+  /// 发送按键时间
+  void sendCustomKey({
+    int? inputOp,
+    int? inputState,
+    int? value,
+    int? posCursorX,
+    int? posCursorY,
+    int? posMouseX,
+    int? posMouseY,
+  }) async {
+    if (kDebugMode) {
+      debugPrint({
+        "inputOp": inputOp,
+        "inputState": inputState,
+        "value": value,
+        "posCursor_x": posCursorX,
+        "posCursor_y": posCursorY,
+        "posMouse_x": posMouseX,
+        "posMouse_y": posMouseY,
+      }.toString());
+    }
+
+    final result = await methodChannel.invokeMethod(HMCloudConstants.sendCustomKey, {
+      "inputOp": inputOp,
+      "inputState": inputState,
+      "value": value,
+      "posCursor_x": posCursorX,
+      "posCursor_y": posCursorY,
+      "posMouse_x": posMouseX,
+      "posMouse_y": posMouseY,
+    });
+    log("sendCustomKey:$result");
+  }
+
+  void setMouseMode(int mode) {
+    methodChannel.invokeMethod(HMCloudConstants.setMouseMode, {"mode": mode});
+  }
+
+  void setQuality(int quality) {
+    methodChannel.invokeMethod("setQuality", {"quality": quality});
+  }
+
+  void setMouseSensitivity(double sensitivity) {
+    methodChannel.invokeMethod(HMCloudConstants.setMouseSensitivity, {"sensitivity": sensitivity});
+  }
+
+  void showInput() {
+    methodChannel.invokeMethod(HMCloudConstants.showInput, null);
+  }
+
+  void switchInteraction(bool value) {
+    methodChannel.invokeMethod("switchInteraction", {"interaction": value});
+  }
+
+  void setMute(bool mute) {
+    methodChannel.invokeMethod("setMute", {"mute": mute});
   }
 
   Future<void> fullCloudGame(bool isFull) {
-    return methodChannel!.invokeMethod('fullCloudGame', {'isFull': isFull});
+    return methodChannel.invokeMethod('fullCloudGame', {'isFull': isFull});
   }
 
   Future<void> updateCloudGame(
     Map<String, dynamic> params,
   ) {
-    return methodChannel!.invokeMethod('updateGame', params);
+    return methodChannel.invokeMethod('updateGame', params);
   }
 
   ///实现监听原生方法回调
   Future<dynamic> platformCallHandler(MethodCall call) async {
-    if (callbak != null) {
-      callbak!(call.method, params: call.arguments);
+    if (callback != null) {
+      callback!(call.method, params: call.arguments);
     }
+  }
+
+  void getPinCode() {
+    methodChannel.invokeMethod('getPinCode', null);
+  }
+  void queryControlUsers() {
+    methodChannel.invokeMethod('queryControlUsers', null);
   }
 }

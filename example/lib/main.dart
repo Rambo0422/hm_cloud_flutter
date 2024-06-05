@@ -1,8 +1,4 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'dart:async';
-
 import 'package:flutter/services.dart';
 import 'package:hm_cloud/hm_cloud.dart';
 import 'package:hm_cloud/hm_cloud_view.dart';
@@ -24,6 +20,12 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+
+    SystemChrome.setPreferredOrientations([
+      // 强制横屏
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
     //
     // SystemChrome.setPreferredOrientations([
     //   DeviceOrientation.landscapeLeft, //全屏时旋转方向，左边
@@ -45,21 +47,55 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        body: Center(
-          child: MaterialButton(
-            onPressed: () {
-              HmCloudController.instance.startCloudGame({
-                'accessKey': '8a7a7a623d25ee7a3c87f688287bd4ba',
-                'accessKeyId': 'b14605e9d68',
-                'channelId': 'luehu',
-                'userId': 'test123',
-                'gameId': 'com.tencent.tmgp.sgame',
-                'isPortrait': false,
-                'playTime': 1000000,
-              });
-            },
-            child: Text('跳转'),
-          ),
+        body: Stack(
+          alignment: Alignment.center,
+          children: [
+            const SizedBox(
+              width: double.infinity,
+              height: double.infinity,
+              child: HmCloudView(),
+            ),
+            MaterialButton(
+              onPressed: () {
+                var params = {
+                  'token': 'cba578f98c3f6cef74a5c01b6eefab0b6af946f5',
+                  'accessKeyId': '615a1227dc8',
+                  'gameId': 'JustCause4',
+                  'channelId': 'szlk',
+                  'userId': '65d7ff1a09664cbba0722de6',
+                  'expireTime': 2000000,
+                  'userToken': '65d7ff1a09664cbba0722de6',
+                  'priority': 48
+                };
+
+                HmCloudController.instance.startCloudGame(
+                  params,
+                );
+              },
+              child: const Text('跳转'),
+            ),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: MaterialButton(
+                onPressed: () {
+                  HmCloudController.instance.sendCustomKey(
+                    inputOp: 1024,
+                    inputState: 1,
+                    value: 4096,
+                  );
+
+                  Future.delayed(const Duration(seconds: 1), () {
+                    HmCloudController.instance.sendCustomKey(
+                      inputOp: 1024,
+                      inputState: 1,
+                      value: 0,
+                    );
+                  });
+                },
+                child: const Text('sendCustomkey'),
+              ),
+            ),
+          ],
         ),
       ),
     );

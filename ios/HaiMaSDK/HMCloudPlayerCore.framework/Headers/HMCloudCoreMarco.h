@@ -30,4 +30,10 @@ typedef NS_ENUM(NSInteger, HMCloudPlayerUsageAuthorization){
     HMCloudPlayerUsageAuthorizationCamera          //相机权限回调
 };
 
+typedef NS_ENUM(NSInteger,HMCloudCorePlayerAudioSessionCategory) {
+    HMCloudCorePlayerAudioSessionCategoryDefault,       // AVAudioSessionCategorySoloAmbient
+    HMCloudCorePlayerAudioSessionCategoryPlayAndRecord, // AVAudioSessionCategoryPlayAndRecord
+};
+
+
 #endif /* HMCloudCoreMarco_h */

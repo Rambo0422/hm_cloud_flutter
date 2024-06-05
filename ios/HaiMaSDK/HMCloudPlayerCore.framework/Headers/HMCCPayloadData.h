@@ -11,7 +11,6 @@
 #import "HMCloudPlayerResolution.h"
 
 @class HMCCPayloadQueueItem;
-@class HMCloudPlayerResolution;
 
 @interface HMCCPayloadData : HMCCBaseModel
 
@@ -33,6 +32,7 @@
 @property (nonatomic, copy)     NSString    *audioUrl;
 @property (nonatomic, copy)     NSString    *inputUrl;
 @property (nonatomic, copy)     NSString    *screenUrl;
+@property (nonatomic, copy)     NSString    *screenRecordUrl;
 @property (nonatomic, copy)     NSString    *resolution;
 
 @property (nonatomic, copy)     NSString    *idcId;
@@ -69,6 +69,10 @@
 @property (nonatomic, strong)   NSDictionary *resolutionInfo;
 @property (nonatomic, strong)   HMCloudPlayerResolution *x86Resolution;
 @property (nonatomic, assign)   BOOL         reconnectStream;
+
+//大文件保活
+@property (nonatomic, assign)   BOOL flag;
+@property (nonatomic, assign)   int hangupTimeSeconds;
 
 + (instancetype) instanceWithDictionary:(NSDictionary *)dict errorCode:(NSString *)errorCode errorMsg:(NSString *)errorMsg;
 

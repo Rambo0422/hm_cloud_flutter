@@ -29,8 +29,9 @@
 @property (nonatomic, strong)   NSString *userToken;
 @property (nonatomic, strong)   NSString *channelId;
 @property (nonatomic, strong)   NSString *gameId;
-@property (nonatomic, strong)   NSString *expireTime;
+@property (nonatomic, strong)   NSNumber *expireTime;
 @property (nonatomic, strong)   NSString *pushUrl;
+@property (nonatomic, strong)   NSNumber *priority;
 
 
 - (void) regist;
@@ -48,6 +49,7 @@
 - (void) swithcResolutin:(NSInteger)resolutionId;
 
 - (void) sendMessage:(NSString *)msg;
+- (void)sendCustomKey:(HMInputOpData *)data;
 - (void) startNetMonitor;
 - (void) stopNetMonitor;
 

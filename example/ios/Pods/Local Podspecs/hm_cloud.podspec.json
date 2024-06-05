@@ -1,0 +1,43 @@
+{
+  "name": "hm_cloud",
+  "version": "0.0.1",
+  "summary": "A new Flutter plugin project.",
+  "description": "A new Flutter plugin project.",
+  "homepage": "http://example.com",
+  "license": {
+    "file": "../LICENSE"
+  },
+  "authors": {
+    "Your Company": "email@example.com"
+  },
+  "source": {
+    "path": "."
+  },
+  "source_files": "Classes/**/*",
+  "public_header_files": "Classes/**/*.h",
+  "resources": "HaiMaSDK/HaiMaSDK_Bundle_iOS.bundle",
+  "resource_bundles": {
+    "DaShen": [
+      "Classes/**/*.{xib,png,xcassets,json,plist}"
+    ]
+  },
+  "vendored_frameworks": [
+    "HaiMaSDK/HMCloudPlayerCore.framework",
+    "HaiMaSDK/HMWebRTC.framework"
+  ],
+  "dependencies": {
+    "Flutter": [
+
+    ],
+    "Masonry": [
+      "~> 1.1.0"
+    ]
+  },
+  "platforms": {
+    "ios": "9.0"
+  },
+  "pod_target_xcconfig": {
+    "DEFINES_MODULE": "YES",
+    "EXCLUDED_ARCHS[sdk=iphonesimulator*]": "i386"
+  }
+}

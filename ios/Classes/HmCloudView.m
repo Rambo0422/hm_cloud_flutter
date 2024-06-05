@@ -15,7 +15,9 @@
 
 - (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{}
 
-- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{}
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
+//    NSLog(@"%s,%d",__FUNCTION__,__LINE__);
+}
 
 - (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{}
 
@@ -35,8 +37,8 @@
     self = [super initWithFrame:frame];
     if (self) {
      
-        self._view = [[InterceptView alloc] initWithFrame:CGRectZero];
-        [self addSubview:self._view];
+//        self._view = [[InterceptView alloc] initWithFrame:CGRectZero];
+//        [self addSubview:self._view];
     }
     return self;
 }
@@ -53,7 +55,7 @@
     [super layoutSubviews];
     
     // 获取到正确的frame
-    self._view.frame = self.bounds;
+//    self._view.frame = self.bounds;
 }
 
 @end

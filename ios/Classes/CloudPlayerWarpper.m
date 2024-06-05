@@ -17,9 +17,10 @@
 
 @implementation CloudPlayerWarpper
 
-+ (instancetype) sharedWrapper {
++ (instancetype)sharedWrapper {
     static id cloudPlayerWarpper;
     static dispatch_once_t cloudPlayerWarpperToken;
+
     dispatch_once(&cloudPlayerWarpperToken, ^{
         cloudPlayerWarpper = [[self alloc] init];
     });
@@ -27,7 +28,7 @@
     return cloudPlayerWarpper;
 }
 
-- (instancetype) init {
+- (instancetype)init {
     if (self = [super init]) {
         isInitialized = NO;
     }
@@ -36,7 +37,7 @@
 }
 
 
-- (void) regist {
+- (void)regist {
 //    if (isInitialized) return;
 
     NSLog(@" =============== SDK_VERSION : %@", CLOUDGAME_SDK_VERSION);
@@ -45,85 +46,122 @@
     [[HMCloudPlayer sharedCloudPlayer] registCloudPlayer:self.accessKeyId channelId:self.channelId options:nil];
 }
 
-- (void)updateGame{
-    
-    [[HMCloudPlayer sharedCloudPlayer] updateGameUID:self.userId userToken:self.userToken ctoken:self.cToken playingTime:[self.expireTime integerValue] tip:@"" protoData:nil success:^(BOOL successed) {
-        
-    } fail:^(NSString *errorCode) {
-        
+- (void)updateGame {
+    [[HMCloudPlayer sharedCloudPlayer] updateGameUID:self.userId
+                                           userToken:self.userToken
+                                              ctoken:self.cToken
+                                         playingTime:[self.expireTime integerValue]
+                                                 tip:@""
+                                           protoData:nil
+                                             success:^(BOOL successed) {
+    }
+                                                fail:^(NSString *errorCode) {
     }];
-    
 }
 
-- (UIViewController *) prepare:(NSDictionary *)options {
-    if (!isInitialized) return NULL;
+- (UIViewController *)prepare:(NSDictionary *)options {
+    if (!isInitialized) {
+        return NULL;
+    }
 
     return [[HMCloudPlayer sharedCloudPlayer] prepare:options];
 }
 
-- (void) setBackgroundImage:(UIImage *)bgImage {
-    if (!isInitialized) return;
+- (void)setBackgroundImage:(UIImage *)bgImage {
+    if (!isInitialized) {
+        return;
+    }
 
     [[HMCloudPlayer sharedCloudPlayer] setBackgroundImage:bgImage];
 }
 
-- (void) play {
-    if (!isInitialized) return;
+- (void)play {
+    if (!isInitialized) {
+        return;
+    }
 
     [[HMCloudPlayer sharedCloudPlayer] play];
 }
-- (void) queueConfirm {
-    if (!isInitialized) return;
+
+- (void)queueConfirm {
+    if (!isInitialized) {
+        return;
+    }
 
     [[HMCloudPlayer sharedCloudPlayer] confirmQueue];
 }
 
-- (void) pause {
-    if (!isInitialized) return;
+- (void)pause {
+    if (!isInitialized) {
+        return;
+    }
 
     [[HMCloudPlayer sharedCloudPlayer] pause];
 }
 
-- (void) resume:(NSInteger)playingTime {
-    if (!isInitialized) return;
+- (void)resume:(NSInteger)playingTime {
+    if (!isInitialized) {
+        return;
+    }
 
     [[HMCloudPlayer sharedCloudPlayer] resume:playingTime];
 }
 
-- (void) stop {
-    if (!isInitialized) return;
+- (void)stop {
+    if (!isInitialized) {
+        return;
+    }
 
     [[HMCloudPlayer sharedCloudPlayer] stop];
 }
 
-- (void) stopAndDismiss:(BOOL)animated {
-    if (!isInitialized) return;
+- (void)stopAndDismiss:(BOOL)animated {
+    if (!isInitialized) {
+        return;
+    }
 
-    if ([NSThread isMainThread])
+    if ([NSThread isMainThread]) {
         [[HMCloudPlayer sharedCloudPlayer] stopAndDismiss:NO];
-    else {
+    } else {
         dispatch_async(dispatch_get_main_queue(), ^{
             [[HMCloudPlayer sharedCloudPlayer] stopAndDismiss:animated];
         });
     }
 }
 
-- (void) swithcResolutin:(NSInteger)resolutionId {
-    if (!isInitialized) return;
+- (void)swithcResolutin:(NSInteger)resolutionId {
+    if (!isInitialized) {
+        return;
+    }
 
     [[HMCloudPlayer sharedCloudPlayer] switchResolution:resolutionId];
 }
 
-- (void) sendMessage:(NSString *)msg {
-    if (!isInitialized) return;
-    if (!msg || ![msg isKindOfClass:[NSString class]] || !msg.length) return;
+- (void)sendMessage:(NSString *)msg {
+    if (!isInitialized) {
+        return;
+    }
+
+    if (!msg || ![msg isKindOfClass:[NSString class]] || !msg.length) {
+        return;
+    }
 
     [[HMCloudPlayer sharedCloudPlayer] sendMessage:msg];
 }
 
+- (void)sendCustomKey:(HMInputOpData *)data {
+    if (!isInitialized) {
+        return;
+    }
+
+    [[HMCloudPlayer sharedCloudPlayer] sendCustomKeycode:data];
+}
+
 #pragma mark CloudPlayer Delegate
-- (void) cloudPlayerSceneChangedCallback:(NSDictionary *)dict {
-    if (!dict || ![dict isKindOfClass:[NSDictionary class]]) return;
+- (void)cloudPlayerSceneChangedCallback:(NSDictionary *)dict {
+    if (!dict || ![dict isKindOfClass:[NSDictionary class]]) {
+        return;
+    }
 
     NSLog(@"%s : %@", __FUNCTION__, dict);
 

@@ -37,8 +37,10 @@ RTC_OBJC_EXPORT
 - (void)enableFrameRenderedCallback:(BOOL)enabled;
 
 /// CurrentImage
-- (UIImage *)getCurrentImage;
+- (UIImage *)getCurrentImage:(BOOL)is_portrait;
 
+/// Render fps, following up android func name.
+- (int)getEglRenderFps;
 @end
 
 RTC_OBJC_EXPORT

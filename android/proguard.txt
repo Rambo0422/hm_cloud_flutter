@@ -8,6 +8,7 @@
 # https://issuetracker.google.com/issues/142778206.
 -keep class androidx.lifecycle.DefaultLifecycleObserver
 
+# haima cloud
 -dontwarn org.codehaus.**
 -keep class org.codehaus.** {*;}
 -keep interface com.haima.hmcp.listeners.*{*;}
@@ -25,15 +26,21 @@
 -keep class com.hmcp.saas.sdk.enums.*{*;}
 -keep class com.hmcp.saas.sdk.SaasSDK{public <methods>;}
 -keep class de.tavendo.autobahn.**{*;}
--keep class tv.haima.hmcp.media.player.** { *; }
--keep interface tv.haima.hmcp.media.player.listeners.*{*;}
--keep interface tv.haima.hmcp.media.player.IMediaPlayer{*;}
--keep class com.netease.LDNetDiagnoService.LDNetDiagnoService{public <methods>;}
--keep interface com.netease.LDNetDiagnoService.LDNetDiagnoListener{public <methods>;}
--keep class com.netease.LDNetDiagnoService.LDNetTraceRoute { *; }
+-keep class tv.haima.ijk.media.player.** { *; }
+-keep interface tv.haima.ijk.media.player.listeners.*{*;}
+-keep interface tv.haima.ijk.media.player.IMediaPlayer{*;}
+-keep class com.netcheck.LDNetDiagnoService.LDNetDiagnoService{public <methods>;}
+-keep interface com.netcheck.LDNetDiagnoService.LDNetDiagnoListener{public <methods>;}
+-keep class com.netcheck.LDNetDiagnoService.LDNetTraceRoute { *; }
 -dontwarn org.openudid.**
 -keep class org.openudid.**{*;}
 -keep class org.hmwebrtc.**{*;}
 -keep class org.webrtc.haima.**{*;}
 -keep class io.socket.**{*;}
 -keep class com.haima.hmcp.rtc.widgets.RtcTextureViewRenderer{*;}
+# protobuf
+-dontwarn com.google.**
+-keep class com.google.protobuf.** {*;}
+
+-keep class com.sayx.hm_cloud.model.* { *; }
+-keep class com.sayx.hm_cloud.* { *; }

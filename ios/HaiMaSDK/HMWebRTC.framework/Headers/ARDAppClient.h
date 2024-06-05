@@ -93,6 +93,11 @@ typedef NS_ENUM(NSInteger, RTC_OBJC_TYPE(ARDAppClientGameType)) {
     kARDAppClientGameTypeX86,
 };
 
+typedef NS_ENUM(NSInteger, RTC_OBJC_TYPE(ARDAudioSessionCategory)) {
+  kARDAudioSessionCategoryDefault, // AVAudioSessionCategorySoloAmbient
+  kARDAudioSessionCategoryPlayAndRecord, // AVAudioSessionCategoryPlayAndRecord
+};
+
 @class RTC_OBJC_TYPE(ARDAppClient);
 @class RTC_OBJC_TYPE(ARDAppClientParameter);
 @class RTC_OBJC_TYPE(ARDAppClientDelayInfo);
@@ -122,7 +127,7 @@ RTC_OBJC_EXPORT
 // If |isLoopback| is true, the call will connect to itself.
 - (void)connectWithParameter:(RTC_OBJC_TYPE (ARDAppClientParameter) *)params rtcConfig:(RTC_OBJC_TYPE (ARDAppClientRtcConfig) *)rtcConfig cid:(NSString *)cid;
 
-- (void)connectWithParameter:(RTC_OBJC_TYPE (ARDAppClientParameter) *)params globalConfig:(NSDictionary *)globalConfig cid:(NSString *)cid capturemode:(RTC_OBJC_TYPE (ARDRtcCaptureMode))mode gametype:(RTC_OBJC_TYPE (ARDAppClientGameType)) type;
+- (void)connectWithParameter:(RTC_OBJC_TYPE (ARDAppClientParameter) *)params globalConfig:(NSDictionary *)globalConfig cid:(NSString *)cid capturemode:(RTC_OBJC_TYPE (ARDRtcCaptureMode))mode gametype:(RTC_OBJC_TYPE (ARDAppClientGameType)) type ascategory:(RTC_OBJC_TYPE (ARDAudioSessionCategory)) category;
 
 // Disconnects from the AppRTC servers and any connected clients.
 - (void)disconnect;
@@ -133,8 +138,10 @@ RTC_OBJC_EXPORT
 + (NSString *)getWebRTCVersion;
 
 - (void)enableFrameRenderedCallback:(BOOL)enabled;
-
+// Get a snapshot of the landscape game.
 - (UIImage *)getCurrentImage;
+// Get a snapshot of the landscape/portrait game controlled by argument `is_portait`.
+- (UIImage *)getCurrentImage:(BOOL)is_portrait;
 
 - (RTC_OBJC_TYPE (RTCDataChannel)*)createDataChannel:(NSString*)lable;
 
@@ -233,6 +240,8 @@ RTC_OBJC_EXPORT
 @property(nonatomic, assign) long long nowDelayTime;
 //帧大小 ssrc / video    bytesReceived (秒差)
 @property(nonatomic, assign) long long recvFrameSize;
+//ssrc / audio   bytesReceived per second
+@property(nonatomic, assign) long long recvAudioBytesSize;
 //展示帧率 ssrc / video    googFrameRateOutput
 @property(nonatomic, assign) int renderFps;
 //推流帧率 ssrc / video    googFrameRateReceived
@@ -245,6 +254,16 @@ RTC_OBJC_EXPORT
 @property(nonatomic, assign) long long targetDelayTime;
 //丢包率 ssrc / video    packetsLost / packetsReceived  (PL2-PL1)/((PL2-PL1)+(PR2-PR1))
 @property(nonatomic, assign) float packetsLostRate;
+//fec 保护率
+@property(nonatomic, assign) float fecPacketsPercent;
+//fec 恢复率
+@property(nonatomic, assign) float fecRecoveredPercent;
+//卡顿次数
+@property(nonatomic, assign) int jankCount;
+//卡顿时长
+@property(nonatomic, assign) int jankDuration;
+//pli个数
+@property(nonatomic, assign) long pliSent;
 
 #pragma mark - more debug info
 //分辨率
@@ -273,6 +292,33 @@ RTC_OBJC_EXPORT
 @property (nonatomic, assign)   long long ffTime;
 
 - (NSString *) detailInfo;
+
+// 本地和远端的系统时间差，`haimaRemoteToLocalClockOffset`
+@property(nonatomic, assign) int remoteToLocalClockTimeOffset;
+//音视频码率之和，单位是字节。 summed from ssrcStats
+@property(nonatomic, assign) long totalBitrate;
+// 统计周期内的freeze次数， `haimaFreezeCount`
+@property(nonatomic, assign) int freezeCount;
+// 解码器输出的帧间隔方差（帧间隔稳定度）`haimaDecodeVariance`
+@property(nonatomic, assign) int decodeVariance;
+// 显示模块的帧间隔方差（帧间隔稳定度）`haimaRenderVariance`
+@property(nonatomic, assign) int renderVariance;
+// `haimaJankDuration` + `haimaFreezeDuration`
+@property(nonatomic, assign) int jankAndFreezeDuration;
+// `googFrameRateDecoded`
+@property(nonatomic, assign) long realFrameRateDecode;
+// 实际的显示帧率，名称与安卓的名字保持一致。
+@property(nonatomic, assign) int frameRateEglRender;
+// 音频接收码率，单位是字节。`audio`: `bytesReceived`
+@property(nonatomic, assign) long bitrateAudio;
+//解码输出的音频数据的音量level, `audio`: `audioOutputLevel`
+@property(nonatomic, assign) int audioLevel;
+// streamer端统计的编码输入帧率，streamerReports: `inputFps`
+@property(nonatomic, assign) long videoInputFps;
+// streamer端统计的发送帧率， streamerReports: `sendFps`
+@property(nonatomic, assign) long videoSendFps;
+// streamer端统计的发送码率，单位是kbps. streamerReports: `sendKbps`
+@property(nonatomic, assign) long videoSendKbps;
 
 @end
 
