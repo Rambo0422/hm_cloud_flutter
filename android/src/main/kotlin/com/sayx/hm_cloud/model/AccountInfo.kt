@@ -1,18 +1,22 @@
 package com.sayx.hm_cloud.model
 
 import com.google.gson.annotations.SerializedName
-import java.io.Serializable
 
 data class AccountInfo(
-    val account: String?,
-    @SerializedName("gameid")
-    val gameId: String?,
-    val password: String?,
-    val platform: String?,
+    @SerializedName("account")
+    val account: String,
+    @SerializedName("key")
+    val key: String,
+    @SerializedName("password")
+    val password: String,
+    @SerializedName("platform")
+    val platform: String,
     @SerializedName("platform_game_id")
-    val platformGameId: String?,
+    val platformGameId: String,
+    @SerializedName("token")
+    val token: String,
     @SerializedName("userid")
-    val userId: String?,
-    val key: String?,
-    val token: String?,
-) : Serializable
+    val userId: String,
+    @SerializedName("gameid")
+    val gameId: String
+)

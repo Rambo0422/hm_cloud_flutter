@@ -119,9 +119,11 @@ class HmCloudController {
     }
   }
 
+  /// 无效，不用试了
   void getPinCode() {
     methodChannel.invokeMethod('getPinCode', null);
   }
+
   void queryControlUsers() {
     methodChannel.invokeMethod('queryControlUsers', null);
   }

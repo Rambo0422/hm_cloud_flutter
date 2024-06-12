@@ -39,13 +39,9 @@ object GameViewConstants {
     /// 画质
     const val setQuality = "setQuality"
 
-    /// 获取授权码
     const val getPinCode = "getPinCode"
 
-    /// 查询当前房间的用户
     const val queryControlUsers = "queryControlUsers"
 
-    // 获取控制权
     const val contronPlay = "contronPlay"
 }
-
