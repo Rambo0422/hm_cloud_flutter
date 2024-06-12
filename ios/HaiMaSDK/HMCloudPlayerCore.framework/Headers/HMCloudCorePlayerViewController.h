@@ -120,6 +120,8 @@ typedef NS_ENUM(NSInteger,HMCloudCorePlayerMouseType){
     HMCloudCorePlayerMouseTypeDisable = 0,
     HMCloudCorePlayerMouseTypeRelativeMove,
     HMCloudCorePlayerMouseTypeAbsoluteMove,
+    HMCloudCorePlayerMouseTypeSwipeMove,
+    HMCloudCorePlayerMouseTypeCustomRelativeMove,
     HMCloudCorePlayerMouseTypeFingerTouch,
 };
 
@@ -237,8 +239,9 @@ typedef void (^CloudCorePlayerScreenshotBlock)(BOOL result,NSData *data,CloudCor
 /**
  WebRtc切Rtmp
  */
+#ifndef PlayerCore_Thin
 - (void) cloudCorePlayerRtcToRtmp;
-
+#endif
 /**
  播放器ip发生改变
 
@@ -287,6 +290,7 @@ typedef void (^CloudCorePlayerScreenshotBlock)(BOOL result,NSData *data,CloudCor
 @property (nonatomic, assign) BOOL isAudioConnectSuccess;
 @property (nonatomic, assign) BOOL isInputConnectSuccess;
 @property (nonatomic, assign) BOOL isScreenConnectSuccess;
+@property (nonatomic, assign) BOOL stretching;
 
 
 /**
@@ -308,6 +312,7 @@ typedef void (^CloudCorePlayerScreenshotBlock)(BOOL result,NSData *data,CloudCor
  @param sdkStokenValidTime 对SDK的sToken有效期，单位秒
  @param notForceReconnect 不强行重连连接，等待streamer自己重连
  */
+#ifndef PlayerCore_Thin
 - (void) startPlayerWithVideoUrl:(NSString *)videoUrl
                         audioUrl:(NSString *)audioUrl
                         inputUrl:(NSString *)inputUrl
@@ -323,7 +328,7 @@ typedef void (^CloudCorePlayerScreenshotBlock)(BOOL result,NSData *data,CloudCor
               sdkStokenValidTime:(int)sdkStokenValidTime
                           hidden:(BOOL)hidden
                notForceReconnect:(BOOL)notForceReconnect;
-
+#endif
 /**
  视频画面可见（池化重启）
  */
@@ -672,5 +677,8 @@ openCameraPermissionCheckByServer:(BOOL)openCameraPermissionCheckByServer
  @param model true pc模式  false 移动端模式
  */
 - (BOOL)convertToPcMouseModel:(BOOL)model;
+
+
+- (void)setStretch:(BOOL)stretch;
 
 @end

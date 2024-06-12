@@ -19,99 +19,107 @@
 
 @interface CloudPlayerWarpper : NSObject
 
-+ (instancetype) sharedWrapper;
++ (instancetype)sharedWrapper;
 
 @property (nonatomic, assign) id<CloudPlayerWarpperDelegate> delegate;
 
 @property (nonatomic, strong)   NSString *accessKeyId;
-@property (nonatomic, strong)   NSString *cToken;
 @property (nonatomic, strong)   NSString *userId;
 @property (nonatomic, strong)   NSString *userToken;
-@property (nonatomic, strong)   NSString *channelId;
+@property (nonatomic, strong)   NSString *channelName;
 @property (nonatomic, strong)   NSString *gameId;
-@property (nonatomic, strong)   NSNumber *expireTime;
-@property (nonatomic, strong)   NSString *pushUrl;
+@property (nonatomic, strong)   NSString *gamePkName;
+@property (nonatomic, strong)   NSString *cToken;
+@property (nonatomic, strong)   NSNumber *playTime;
 @property (nonatomic, strong)   NSNumber *priority;
 
 
-- (void) regist;
-- (UIViewController *) prepare:(NSDictionary *)options;
-- (void) setBackgroundImage:(UIImage *)bgImage;
+//- (NSString *)getcToken;
 
-- (void) updateGame;
-- (void) play;
-- (void) queueConfirm;
-- (void) pause;
-- (void) resume:(NSInteger)playingTime;
-- (void) stop;
-- (void) stopAndDismiss:(BOOL)animated;
+- (void)regist;
+- (UIViewController *)prepare:(NSDictionary *)options;
+- (void)setBackgroundImage:(UIImage *)bgImage;
 
-- (void) swithcResolutin:(NSInteger)resolutionId;
+- (void)updateGame;
+- (void)play;
+- (void)queueConfirm;
+- (void)pause;
+- (void)resume:(NSInteger)playingTime;
+- (void)stop;
+- (void)stopAndDismiss:(BOOL)animated;
 
-- (void) sendMessage:(NSString *)msg;
+- (void)swithcResolutin:(NSInteger)resolutionId;
+
+- (void)sendMessage:(NSString *)msg;
 - (void)sendCustomKey:(HMInputOpData *)data;
-- (void) startNetMonitor;
-- (void) stopNetMonitor;
+- (void)setMouseMode:(HMCloudCoreTouchMode)mouseMode;
+- (void)setMouseSensitivity:(float)sensitivity;
+
+- (void)startNetMonitor;
+- (void)stopNetMonitor;
 
 @end
 
 typedef NS_ENUM(NSInteger, CloudPlayerState) {
     PlayerStateInstancePrepared,    //实例申请完成
-    PlayerStateVideoVisible,        //视频第一帧到达
-    PlayerStateStopCanRetry,        //可以“重新连接”的出错
-    PlayerStateStop,                //游戏结束，不可以“重新连接”
-    PlayerStateFailed,              //游戏失败
-    PlayerStateTimeout,             //游戏时长到，且不结束游戏
-    PlayerStateSToken               //刷新SToken
+    PlayerStateVideoVisible,       //视频第一帧到达
+    PlayerStateStopCanRetry,       //可以“重新连接”的出错
+    PlayerStateStop,               //游戏结束，不可以“重新连接”
+    PlayerStateFailed,             //游戏失败
+    PlayerStateTimeout,            //游戏时长到，且不结束游戏
+    PlayerStateSToken              //刷新SToken
 };
 
 typedef NS_ENUM(NSInteger, CloudPlayerQueueState) {
-    PlayerQueueStateConfirm,        //显示用户是否确认排队Dialog
-    PlayerQueueStateUpdate,         //排队进度更新
-    PlayerQueueStateEntering        //即将进入游戏
+    PlayerQueueStateConfirm,       //显示用户是否确认排队Dialog
+    PlayerQueueStateUpdate,        //排队进度更新
+    PlayerQueueStateEntering       //即将进入游戏
 };
 
 typedef NS_ENUM(NSInteger, CloudPlayerTimeState) {
-    PlayerTimeStateNotify,          //游戏时长提示
-    PlayerTimeStateUpdate,          //游戏时长更新通知
-    PlayerTimeStateTotalTime        //本次游戏总时长提示
+    PlayerTimeStateNotify,         //游戏时长提示
+    PlayerTimeStateUpdate,         //游戏时长更新通知
+    PlayerTimeStateTotalTime       //本次游戏总时长提示
 };
 
 typedef NS_ENUM(NSInteger, CloudPlayerResolutionState) {
-    PlayerResolutionStateNotify,        //当前播流清晰度通知
+    PlayerResolutionStateNotify,   //当前播流清晰度通知
     PlayerResolutionStateSwitchStart,   //开始切换清晰度
     PlayerResolutionStateSwitchEnd,     //切换清晰度完成
-    PlayerResolutionStateTip            //卡顿提示，建议用户切换网络
+    PlayerResolutionStateTip       //卡顿提示，建议用户切换网络
 };
 
 typedef NS_ENUM(NSInteger, CloudPlayerStasticState) {
-    PlayerStasticStateBandwidth,        //统计时段内，带宽使用及最大N帧数组
-    PlayerStasticStateFPS,              //统计时段内，视频总帧数
-    PlayerStasticStateDecodeTime        //统计时段内，平均解码耗时，单位ms
+    PlayerStasticStateBandwidth,   //统计时段内，带宽使用及最大N帧数组
+    PlayerStasticStateFPS,         //统计时段内，视频总帧数
+    PlayerStasticStateDecodeTime   //统计时段内，平均解码耗时，单位ms
 };
 
 typedef NS_ENUM(NSInteger, CloudPlayerMaintanceState) {
-    PlayerMaintanceStateSoon,           //即将维护提示，游戏中用户会收到
-    PlayerMaintanceStateStarted,        //维护开始，禁止进入游戏
+    PlayerMaintanceStateSoon,      //即将维护提示，游戏中用户会收到
+    PlayerMaintanceStateStarted,   //维护开始，禁止进入游戏
     PlayerMaintanceStateInProgress,     //维护中，禁止进入游戏
-    PlayerMaintanceStateDone            //维护完成
+    PlayerMaintanceStateDone       //维护完成
 };
 
 @protocol CloudPlayerWarpperDelegate <NSObject>
 @optional
 
-- (void) cloudPlayerReigsted:(BOOL)success;
-- (void) cloudPlayerResolutionList:(NSArray<HMCloudPlayerResolution*> *)resolutions;
-- (void) cloudPlayerRecvMessage:(NSString *)msg;
+- (void)cloudPlayerReigsted:(BOOL)success;
+- (void)cloudPlayerResolutionList:(NSArray<HMCloudPlayerResolution *> *)resolutions;
+- (void)cloudPlayerRecvMessage:(NSString *)msg;
 
-- (void) cloudPlayerPrepared:(BOOL)success;
+- (void)cloudPlayerPrepared:(BOOL)success;
 
-- (void) cloudPlayerStateChanged:(CloudPlayerState)state;
-- (void) cloudPlayerQueueStateChanged:(CloudPlayerQueueState)state;
-- (void) cloudPlayerTimeStateChanged:(CloudPlayerTimeState)state;
-- (void) cloudPlayerResolutionStateChange:(CloudPlayerResolutionState)state;
-- (void) cloudPlayerStasticInfoReport:(CloudPlayerStasticState)state;
-- (void) cloudPlayerMaintanceStateChanged:(CloudPlayerMaintanceState)state;
+- (void)cloudPlayerStateChanged:(CloudPlayerState)state;
+- (void)cloudPlayerQueueStateChanged:(CloudPlayerQueueState)state;
+- (void)cloudPlayerTimeStateChanged:(CloudPlayerTimeState)state;
+- (void)cloudPlayerResolutionStateChange:(CloudPlayerResolutionState)state;
+- (void)cloudPlayerStasticInfoReport:(CloudPlayerStasticState)state;
+- (void)cloudPlayerMaintanceStateChanged:(CloudPlayerMaintanceState)state;
+- (void)cloudPlayerDelayInfoCallBack:(HMDelayInfoModel *)delayModel;
+
+- (void)cloudPlayerStop:(NSDictionary *)info;
 
 @end
 

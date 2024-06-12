@@ -82,15 +82,11 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    
+
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-    
         self.setView.frame = CGRectMake(self.view.frame.size.width, 200, 40, 40);
         [self.view addSubview:self.setView];
-                                                    
     });
-    
-    
 }
 
 //- (BOOL)prefersHomeIndicatorAutoHidden {
@@ -110,7 +106,6 @@
 }
 
 - (IBAction)didChangeSoundSwitch:(UISwitch *)sender {
-    
     // 改变声音
     if (self.channelAction) {
         self.channelAction(k_changeSound, sender.on);

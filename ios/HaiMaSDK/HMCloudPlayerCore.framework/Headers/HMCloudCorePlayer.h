@@ -70,9 +70,11 @@ typedef void (^HMCloudFileListBlock)(BOOL result, NSArray *fileList, CloudPlayer
 // 设置x86鼠标类型
 typedef NS_ENUM(NSInteger, HMCloudCoreTouchMode) {
     HMCloudCoreTouchModeNone = 0, // 关 不传递数据
-    HMCloudCoreTouchModeMouse = 1, // 滑鼠模式
-    HMCloudCoreTouchModeScreen = 2, // 多点触控模式
-    HMCloudCoreTouchModeFingerTouch = 3, // 手指触控模式
+    HMCloudCoreTouchModeMouse = 1, // 滑鼠点击模式
+    HMCloudCoreTouchModeScreen = 2, // 单点触控模式
+    HMCloudCoreTouchModeFingerTouch = 3, // 多点触控模式
+    HMCloudCoreTouchSwipe           = 4, // 滑屏模式
+    HMCloudCoreTouchModeCustomMouse = 5, // 自定义滑鼠模式
 };
 
 typedef NS_ENUM(NSInteger,HMCloudPlayerOperationType){
@@ -117,6 +119,7 @@ const extern NSString *CloudGameOptionKeyStasticDecodeInterval; //平均解码�
 const extern NSString *CloudGameOptionKeyEnableVideoFrameRenderCallback;
 const extern NSString *CloudGameOptionKeyEnableIpChangedCallback; //ip变化回调
 const extern NSString *CloudGameOptionKeyAudioSessionCategory;    //设置音频类型
+const extern NSString *CloudGameOptionKeyStretch;                 //是否拉伸画面
 
 + (instancetype) sharedCloudPlayer;
 
@@ -203,6 +206,7 @@ const extern NSString *CloudGameOptionKeyAudioSessionCategory;    //设置音频
 
 - (BOOL) checkPlayerOptions;
 
+#ifndef PlayerCore_Thin
 - (void) playWithVideoUrl:(NSString *)videoUrl
                  audioUrl:(NSString *)audioUrl
                  inputUrl:(NSString *)inputUrl
@@ -218,6 +222,7 @@ const extern NSString *CloudGameOptionKeyAudioSessionCategory;    //设置音频
        sdkStokenValidTime:(int)sdkStokenValidTime
                    hidden:(BOOL)hidden
         notForceReconnect:(BOOL)notForceReconnect;
+#endif
 
 - (void) setPingPongParams:(NSInteger)interval
                  delayTime:(NSInteger)delayTime
@@ -563,6 +568,12 @@ const extern NSString *CloudGameOptionKeyAudioSessionCategory;    //设置音频
  */
 - (BOOL)convertToPcMouseModel:(BOOL)model;
 
+/**
+ 设置拉伸模式
+ @param stretch true 拉伸模式 false 正常比例模式
+ */
+- (void)setStretch:(BOOL)stretch;
+
 @end
 
 typedef NS_ENUM (NSInteger, CloudPlayerStopReason) {
@@ -579,7 +590,6 @@ typedef NS_ENUM (NSInteger, CloudPlayerStopReason) {
     CloudPlayerStopReasonLowSpeed,              //低于服务下限
     CloudPlayerStopReasonUrlTimeout,            //获取流地址超时
     CloudPlayerStopReasonLoseControl,           //失去控制权
-    CloudPlayerStopReasonReconnectError,        //云手机app设置时间戳后，需app重连
 };
 
 @interface HMCloudCorePlayerStopInfo : NSObject
@@ -602,7 +612,9 @@ typedef NS_ENUM (NSInteger, CloudPlayerStopReason) {
 - (void) saasWebSocketDisconnected:(NSError *)error;
 - (void) saasWebSocketHeartBeatPongTimeout;
 
+#ifndef PlayerCore_Thin
 - (void) streamUrlGot:(HMCCPayloadData *)data;
+#endif
 
 - (void) queueConfirmTip:(HMCCPayloadData *)data;
 - (void) queueStatesUpdate:(HMCCPayloadData *)data;

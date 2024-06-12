@@ -33,15 +33,15 @@
 
 @implementation HmCloudView
 
-- (instancetype)initWithFrame:(CGRect)frame{
-    self = [super initWithFrame:frame];
-    if (self) {
-     
-//        self._view = [[InterceptView alloc] initWithFrame:CGRectZero];
-//        [self addSubview:self._view];
-    }
-    return self;
-}
+//- (instancetype)initWithFrame:(CGRect)frame{
+//    self = [super initWithFrame:frame];
+//    if (self) {
+//     
+////        self._view = [[InterceptView alloc] initWithFrame:CGRectZero];
+////        [self addSubview:self._view];
+//    }
+//    return self;
+//}
 
 /*
 // Only override drawRect: if you perform custom drawing.
@@ -51,11 +51,11 @@
 }
 */
 
-- (void)layoutSubviews{
-    [super layoutSubviews];
-    
-    // 获取到正确的frame
+//- (void)layoutSubviews{
+//    [super layoutSubviews];
+//    
+//    // 获取到正确的frame
 //    self._view.frame = self.bounds;
-}
+//}
 
 @end
