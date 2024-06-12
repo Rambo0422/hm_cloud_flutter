@@ -30,7 +30,7 @@ android {
 }
 
 dependencies {
-    compileOnly fileTree(include: ['*.jar', '*.aar'], dir: 'libs')
+    implementation fileTree(include: ['*.jar', '*.aar'], dir: 'libs')
 
     implementation "androidx.multidex:multidex:2.0.1"
 
