@@ -17,6 +17,11 @@ NS_ASSUME_NONNULL_BEGIN
 #define k_videoVisble       @"videoVisble"
 #define k_videoFailed       @"videoFailed"
 
+// 横版
+#define k_DelayInfo             @"delayInfo"
+#define k_GameStop              @"gameStop"
+#define k_FirstFrameArrival     @"firstFrameArrival"
+
 #define k_DaShenBundle [NSBundle bundleWithPath:[[NSBundle bundleForClass:self.class] pathForResource:@"DaShen" ofType:@"bundle"]]
 #define k_BundleImage(name) [UIImage imageWithContentsOfFile:[k_DaShenBundle pathForResource:name ofType:@"png"]]
 
