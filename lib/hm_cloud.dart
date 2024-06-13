@@ -119,7 +119,7 @@ class HmCloudController {
     }
   }
 
-  /// 无效，不用试了
+  /// 获取授权码
   void getPinCode() {
     methodChannel.invokeMethod('getPinCode', null);
   }

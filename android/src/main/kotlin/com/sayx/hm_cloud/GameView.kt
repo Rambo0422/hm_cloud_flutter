@@ -43,7 +43,7 @@ import org.json.JSONObject
 
 class GameView(private val context: Context, viewId: Int, messenger: BinaryMessenger, args: Any?) :
     PlatformView, MethodChannel.MethodCallHandler,
-    HmcpPlayerListener {
+    HmcpPlayerListener, OnContronListener {
 
     private val channel: MethodChannel =
         MethodChannel(messenger, GameViewConstants.methodChannelName)
@@ -240,72 +240,7 @@ class GameView(private val context: Context, viewId: Int, messenger: BinaryMesse
      */
     private fun getPinCode() {
         LogUtils.logD("getPinCode gameView: $gameView")
-        gameView?.getPinCode(object : OnContronListener {
-            override fun pinCodeResult(
-                success: Boolean,
-                cid: String,
-                pinCode: String,
-                msg: String
-            ) {
-                LogUtils.logD("getPinCode pinCodeResult success :$success, cid: $cid pinCode: $pinCode msg: $msg")
-                val METHOD_PIN_CODE = "pinCodeResult"
-                val mutableMapOf = mutableMapOf<String, Any>()
-                mutableMapOf["success"] = success
-                if (success) {
-                    mutableMapOf["cid"] = cid
-                    mutableMapOf["pin_code"] = pinCode
-                    mutableMapOf["msg"] = msg
-                }
-                channel.invokeMethod(METHOD_PIN_CODE, mutableMapOf)
-            }
-
-            /**
-             * @param success 获取控制权成功
-             */
-            override fun contronResult(success: Boolean, msg: String) {
-                LogUtils.logD("getPinCode contronResult success :$success,  msg: $msg")
-
-                val METHOD_CONTRON_RESULT = "contronResult"
-                val mutableMapOf = mutableMapOf<String, Any>()
-                mutableMapOf["success"] = success
-                mutableMapOf["msg"] = msg
-                channel.invokeMethod(METHOD_CONTRON_RESULT, mutableMapOf)
-            }
-
-            /**
-             * 失去控制权
-             */
-            override fun contronLost() {
-                LogUtils.logD("getPinCode contronLost")
-                val METHOD_CONTRON_LOST = "contronLost"
-                channel.invokeMethod(METHOD_CONTRON_LOST, null)
-            }
-
-            /**
-             * 操作权限分配结果(仅x86使⽤)
-             */
-            override fun controlDistribute(
-                success: Boolean,
-                controlInfo: MutableList<ControlInfo>,
-                msg: String
-            ) {
-                LogUtils.logD("getPinCode controlDistribute")
-                val METHOD_CONTROL_DISTRIBUTE = "controlDistribute"
-                channel.invokeMethod(METHOD_CONTROL_DISTRIBUTE, null)
-            }
-
-            /**
-             * //此API触发qurey回调
-             * //查询操作权回调(仅x86使⽤)
-             */
-            override fun controlQuery(
-                success: Boolean,
-                controlInfo: MutableList<ControlInfo>,
-                msg: String
-            ) {
-                LogUtils.logD("getPinCode controlQuery")
-            }
-        })
+        gameView?.getPinCode(this)
     }
 
     /**
@@ -313,71 +248,7 @@ class GameView(private val context: Context, viewId: Int, messenger: BinaryMesse
      */
     private fun queryControlUsers() {
         LogUtils.logD("queryControlUsers")
-        gameView?.queryControlPermitUsers(object : OnContronListener {
-            /**
-             * @param success 获取授权码的状态
-             */
-            override fun pinCodeResult(
-                success: Boolean,
-                cid: String,
-                pinCode: String,
-                msg: String
-            ) {
-                LogUtils.logD("queryControlUsers pinCodeResult")
-            }
-
-            /**
-             * @param success 获取控制权的状态
-             */
-            override fun contronResult(success: Boolean, msg: String) {
-                LogUtils.logD("queryControlUsers contronResult")
-            }
-
-            /**
-             * 失去控制权(arm需主动结束当前播放并且在Activity#onDestroy⽅法中不调⽤
-             * HmcpVideoView#onDestroy⽅法,x86⽆需结束)
-             */
-            override fun contronLost() {
-                LogUtils.logD("queryControlUsers contronLost")
-            }
-
-            /**
-             * 操作权限分配结果(仅x86使⽤)
-             */
-            override fun controlDistribute(
-                success: Boolean,
-                controlInfo: MutableList<ControlInfo>?,
-                msg: String
-            ) {
-                LogUtils.logD("queryControlUsers controlDistribute")
-            }
-
-            /**
-             * 此API触发qurey回调
-             * 查询操作权回调(仅x86使⽤)
-             */
-            override fun controlQuery(
-                success: Boolean,
-                controlInfos: MutableList<ControlInfo>,
-                msg: String
-            ) {
-                LogUtils.logD("queryControlUsers controlQuery success: $success")
-
-                val METHOD_CONTROL_QUERY = "controlQuery"
-                val mutableMapOf = mutableMapOf<String, Any>()
-                mutableMapOf["success"] = success
-                if (success) {
-                    val gson = Gson()
-                    val jsonList = gson.toJsonTree(controlInfos).asJsonArray.toString()
-                    LogUtils.logD("queryControlUsers controlQuery jsonList: $jsonList")
-
-                    mutableMapOf["control_info_list"] = jsonList
-                }
-                mutableMapOf["msg"] = msg
-
-                channel.invokeMethod(METHOD_CONTROL_QUERY, mutableMapOf)
-            }
-        })
+        gameView?.queryControlPermitUsers(this)
     }
 
     private fun contronPlay() {
@@ -391,90 +262,11 @@ class GameView(private val context: Context, viewId: Int, messenger: BinaryMesse
         control.accessKeyID = ""
         control.isIPV6 = false
         control.orientation = ScreenOrientation.LANDSCAPE
-
-        gameView?.contronPlay(streamType, control, object : OnContronListener {
-            override fun pinCodeResult(
-                success: Boolean,
-                cid: String,
-                pinCode: String,
-                msg: String
-            ) {
-                LogUtils.logD("contronPlay pinCodeResult success: $success cid: $cid pinCode: $pinCode msg: $msg")
-            }
-
-            override fun contronResult(success: Boolean, msg: String) {
-                LogUtils.logD("contronPlay contronResult success: $success  msg: $msg")
-            }
-
-            // 失去控制权
-            override fun contronLost() {
-                LogUtils.logD("contronPlay contronLost")
-            }
-
-            /**
-             * 操作权限分配结果(仅x86使⽤)
-             */
-            override fun controlDistribute(
-                success: Boolean,
-                controlInfo: MutableList<ControlInfo>,
-                msg: String
-            ) {
-                LogUtils.logD("controlDistribute success msg: $msg")
-                for (controlInfo1 in controlInfo) {
-                    LogUtils.logD("controlDistribute controlInfo1: $controlInfo1")
-                }
-            }
-
-            override fun controlQuery(p0: Boolean, p1: MutableList<ControlInfo>?, p2: String?) {
-            }
-        })
+        gameView?.contronPlay(streamType, control, this)
     }
 
     private fun distributeControlPermit(controlInfos: List<ControlInfo>) {
-        gameView?.distributeControlPermit(controlInfos, object : OnContronListener {
-            /**
-             * @param success 获取授权码状态
-             */
-            override fun pinCodeResult(
-                success: Boolean,
-                cid: String,
-                pinCode: String,
-                msg: String
-            ) {
-
-            }
-
-            /**
-             *  @suppress 获取控制权状态
-             */
-            override fun contronResult(success: Boolean, msg: String) {
-            }
-
-            /**
-             * 失去控制权(arm需主动结束当前播放并且在Activity#onDestroy⽅法中不调⽤
-             * HmcpVideoView#onDestroy⽅法,x86⽆需结束)
-             */
-            override fun contronLost() {
-            }
-
-            override fun controlDistribute(
-                success: Boolean,
-                controlInfo: MutableList<ControlInfo>,
-                msg: String
-            ) {
-            }
-
-            /**
-             * 查询操作权回调(仅x86触发)
-             */
-            override fun controlQuery(
-                success: Boolean,
-                controlInfo: MutableList<ControlInfo>,
-                msg: String
-            ) {
-            }
-        })
-
+        gameView?.distributeControlPermit(controlInfos, this)
     }
 
     /// 初始化sdk
@@ -899,5 +691,56 @@ class GameView(private val context: Context, viewId: Int, messenger: BinaryMesse
                 }
             }
         )
+    }
+
+    override fun pinCodeResult(success: Boolean, cid: String?, pinCode: String?, msg: String?) {
+        LogUtils.logD("getPinCode pinCodeResult success :$success, cid: $cid pinCode: $pinCode msg: $msg")
+        val METHOD_PIN_CODE = "pinCodeResult"
+        val mutableMapOf = mutableMapOf<String, Any>()
+        mutableMapOf["success"] = success
+        if (success) {
+            mutableMapOf["cid"] = cid ?: ""
+            mutableMapOf["pin_code"] = pinCode ?: ""
+            mutableMapOf["msg"] = msg ?: ""
+        }
+        channel.invokeMethod(METHOD_PIN_CODE, mutableMapOf)
+    }
+
+    override fun contronResult(success: Boolean, msg: String?) {
+        LogUtils.logD("getPinCode contronResult success :$success,  msg: $msg")
+        val METHOD_CONTRON_RESULT = "contronResult"
+        val mutableMapOf = mutableMapOf<String, Any>()
+        mutableMapOf["success"] = success
+        mutableMapOf["msg"] = msg ?: ""
+        channel.invokeMethod(METHOD_CONTRON_RESULT, mutableMapOf)
+    }
+
+    override fun contronLost() {
+        LogUtils.logD("getPinCode contronLost")
+        val METHOD_CONTRON_LOST = "contronLost"
+        channel.invokeMethod(METHOD_CONTRON_LOST, null)
+    }
+
+    override fun controlDistribute(success: Boolean, controlInfo: MutableList<ControlInfo>?, msg: String?) {
+        LogUtils.logD("getPinCode controlDistribute")
+        val METHOD_CONTROL_DISTRIBUTE = "controlDistribute"
+        channel.invokeMethod(METHOD_CONTROL_DISTRIBUTE, null)
+    }
+
+    override fun controlQuery(success: Boolean, controlInfos: MutableList<ControlInfo>?, msg: String?) {
+        LogUtils.logD("queryControlUsers controlQuery success: $success")
+
+        val METHOD_CONTROL_QUERY = "controlQuery"
+        val mutableMapOf = mutableMapOf<String, Any>()
+        mutableMapOf["success"] = success
+        if (success) {
+            val gson = Gson()
+            val jsonList = gson.toJsonTree(controlInfos).asJsonArray.toString()
+            LogUtils.logD("queryControlUsers controlQuery jsonList: $jsonList")
+
+            mutableMapOf["control_info_list"] = jsonList
+        }
+        mutableMapOf["msg"] = msg ?: ""
+        channel.invokeMethod(METHOD_CONTROL_QUERY, mutableMapOf)
     }
 }

@@ -43,4 +43,7 @@ class HMCloudConstants {
 
   // 查询当前房间内⽤户
   static const controlQuery = "controlQuery";
+
+  // 获取授权码
+  static const pinCodeResult = "pinCodeResult";
 }
