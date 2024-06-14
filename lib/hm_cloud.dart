@@ -127,4 +127,8 @@ class HmCloudController {
   void queryControlUsers() {
     methodChannel.invokeMethod('queryControlUsers', null);
   }
+
+  void contronPlay(Map<String, dynamic> params) {
+    methodChannel.invokeMethod('contronPlay', params);
+  }
 }

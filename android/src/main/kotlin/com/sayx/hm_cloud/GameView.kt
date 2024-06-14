@@ -16,6 +16,7 @@ import com.haima.hmcp.beans.CheckCloudServiceResult
 import com.haima.hmcp.beans.Control
 import com.haima.hmcp.beans.ControlInfo
 import com.haima.hmcp.beans.HMInputOpData
+import com.haima.hmcp.beans.IntentExtraData
 import com.haima.hmcp.beans.PlayNotification
 import com.haima.hmcp.beans.UserInfo
 import com.haima.hmcp.beans.UserInfo2
@@ -32,8 +33,12 @@ import com.haima.hmcp.listeners.OnLivingListener
 import com.haima.hmcp.listeners.OnSaveGameCallBackListener
 import com.haima.hmcp.utils.StatusCallbackUtil
 import com.haima.hmcp.widgets.HmcpVideoView
+import com.haima.hmcp.widgets.beans.VirtualOperateType
+import com.sayx.hm_cloud.model.AccountInfo
+import com.sayx.hm_cloud.model.GameError
 import com.sayx.hm_cloud.model.GameParam
 import com.sayx.hm_cloud.utils.GameUtils
+import com.sayx.hm_cloud.utils.HmcpManagerUtils
 import com.sayx.hm_cloud.utils.LogUtils
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
@@ -44,6 +49,8 @@ import org.json.JSONObject
 class GameView(private val context: Context, viewId: Int, messenger: BinaryMessenger, args: Any?) :
     PlatformView, MethodChannel.MethodCallHandler,
     HmcpPlayerListener, OnContronListener {
+
+    private var initState = false
 
     private val channel: MethodChannel =
         MethodChannel(messenger, GameViewConstants.methodChannelName)
@@ -178,7 +185,9 @@ class GameView(private val context: Context, viewId: Int, messenger: BinaryMesse
             }
 
             GameViewConstants.contronPlay -> {
-                contronPlay()
+                if (arguments is Map<*, *>) {
+                    initHmcpSdk(arguments)
+                }
             }
 
             else -> {
@@ -194,6 +203,7 @@ class GameView(private val context: Context, viewId: Int, messenger: BinaryMesse
             }
 
             1 -> {
+                gameView?.setPCMouseMode(false)
                 gameView?.setTouchMode(TouchMode.TOUCH_MODE_MOUSE)
             }
 
@@ -203,6 +213,11 @@ class GameView(private val context: Context, viewId: Int, messenger: BinaryMesse
 
             3 -> {
                 gameView?.setTouchMode(TouchMode.TOUCH_MODE_SCREEN_SLIDE)
+            }
+
+            4 -> {
+                gameView?.setTouchMode(TouchMode.TOUCH_MODE_NONE)
+                gameView?.setPCMouseMode(true)
             }
         }
     }
@@ -251,17 +266,50 @@ class GameView(private val context: Context, viewId: Int, messenger: BinaryMesse
         gameView?.queryControlPermitUsers(this)
     }
 
-    private fun contronPlay() {
+    private fun initHmcpSdk(arguments: Map<*, *>) {
+        val accessKeyId = arguments["accessKeyId"]?.toString() ?: ""
+        val channel = arguments["channel"]?.toString() ?: "android"
+        val cid = arguments["cid"]?.toString() ?: ""
+        val pinCode = arguments["pinCode"]?.toString() ?: ""
+        val userId = arguments["userId"]?.toString() ?: ""
+        val userToken = arguments["userToken"]?.toString() ?: ""
+
+        if (initState) {
+            contronPlay(cid, pinCode, accessKeyId, userId, userToken)
+        } else {
+            HmcpManagerUtils.init(context, accessKeyId, channel, object : OnInitCallBackListener {
+                override fun success() {
+                    LogUtils.logD("HmcpManagerUtils.init success")
+                    initState = true
+                    contronPlay(cid, pinCode, accessKeyId, userId, userToken)
+                }
+
+                override fun fail(msg: String?) {
+                    initState = false
+                    LogUtils.logD("HmcpManagerUtils.init fail: $msg")
+                }
+            })
+        }
+
+    }
+
+    private fun contronPlay(cid: String, pinCode: String, accessKeyID: String, userId: String, userToken: String) {
+        val userInfo = UserInfo()
+        userInfo.userId = userId
+        userInfo.userToken = userToken
+        initHmcpView(userInfo)
+
         // 选择流类型。 0：表示RTMP  1：表示WEBRTC
-        val streamType = 0
+        val streamType = 1
 
         // 获取控制权参数对象
         val control = Control()
-        control.cid = ""
-        control.pinCode = ""
-        control.accessKeyID = ""
+        control.cid = cid
+        control.pinCode = pinCode
+        control.accessKeyID = accessKeyID
         control.isIPV6 = false
         control.orientation = ScreenOrientation.LANDSCAPE
+
         gameView?.contronPlay(streamType, control, this)
     }
 
@@ -286,11 +334,13 @@ class GameView(private val context: Context, viewId: Int, messenger: BinaryMesse
             LogUtils.logD("init haiMaSDK:${gameParam?.accessKeyId}")
             HmcpManager.getInstance().init(config, context, object : OnInitCallBackListener {
                 override fun success() {
+                    initState = true;
                     LogUtils.logD("haiMaSDK success:${HmcpManager.getInstance().sdkVersion}")
                     checkPlayingGame()
                 }
 
                 override fun fail(msg: String?) {
+                    initState = false;
                     LogUtils.logE("haiMaSDK fail:$msg")
                     channel.invokeMethod(
                         "errorInfo",
@@ -423,6 +473,24 @@ class GameView(private val context: Context, viewId: Int, messenger: BinaryMesse
         }
     }
 
+    private fun initHmcpView(userInfo: UserInfo) {
+        val layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
+        val frameLayout = view as FrameLayout
+        if (gameView != null) {
+            frameLayout.removeView(gameView)
+            gameView?.onDestroy()
+        }
+        gameView = HmcpVideoView(context)
+        frameLayout.addView(gameView, 0, layoutParams)
+
+        gameView?.setUserInfo(userInfo)
+
+        LogUtils.logD("initHmcpView hmcpPlayerListener this")
+
+        gameView?.hmcpPlayerListener = this
+        gameView?.virtualDeviceType = VirtualOperateType.NONE
+    }
+
     private fun playGame(bundle: Bundle) {
         LogUtils.logD("playGame:$gameView")
         if (gameView != null) {
@@ -449,13 +517,16 @@ class GameView(private val context: Context, viewId: Int, messenger: BinaryMesse
             it.userToken = gameParam?.userToken
         })
         // 上号助手
-//        gameParam?.accountInfo?.let { accountInfo ->
-//            val result = Gson().fromJson(accountInfo, AccountInfo::class.java)
-//            gameView?.setExtraData(IntentExtraData().also {
-//                it.setStringExtra(GameUtils.getStringData(result))
-//            })
-//        }
+        gameParam?.accountInfo?.let { accountInfo ->
+//            LogUtils.logD("AccountInfo 1:${accountInfo.javaClass}")
+            val result = Gson().fromJson(Gson().toJson(accountInfo), AccountInfo::class.java)
+//            LogUtils.logD("AccountInfo 2:${result}")
+            gameView?.setExtraData(IntentExtraData().also {
+                it.setStringExtra(GameUtils.getStringData(result))
+            })
+        }
         gameView?.hmcpPlayerListener = this
+        gameView?.virtualDeviceType = VirtualOperateType.NONE
         gameView?.play(bundle)
     }
 
@@ -489,15 +560,25 @@ class GameView(private val context: Context, viewId: Int, messenger: BinaryMesse
                             )
                         )
                     } else {
-                        LogUtils.logE("queue info error:$dataStr");
+                        LogUtils.logE("queue info error:$dataStr")
                     }
                 }
 
                 Constants.STATUS_FIRST_FRAME_ARRIVAL -> {
                     gameView?.setAudioMute(gameParam?.mute ?: true)
+                    gameView?.setPCMouseMode(gameParam?.mouseMode == 4)
+                    gameView?.virtualDeviceType = VirtualOperateType.NONE
                     updateInteraction(!(gameParam?.isVip ?: false))
-                    channel.invokeMethod(GameViewConstants.firstFrameArrival, null)
+                    channel.invokeMethod(
+                        GameViewConstants.firstFrameArrival, mapOf(
+                            Pair("cid", HmcpManager.getInstance().cloudId)
+                        )
+                    )
                     handler.postDelayed(runnable, 1000L);
+                }
+
+                Constants.STATUS_SWITCH_RESOLUTION -> {
+
                 }
                 // 9,连接失败
                 Constants.STATUS_CONNECTION_ERROR,
