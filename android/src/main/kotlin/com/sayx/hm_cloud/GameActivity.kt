@@ -32,7 +32,7 @@ import java.util.TimerTask
 
 class GameActivity : AppCompatActivity() {
 
-    private val noOperateTime = 180 * 1000L
+    private val noOperateTime = 30 * 1000L
 
     private lateinit var dataBinding: ActivityGameBinding
 
@@ -78,10 +78,20 @@ class GameActivity : AppCompatActivity() {
             )
         }
         GameManager.gameView?.setAttachContext(this)
-        GameManager.gameView?.virtualDeviceType = VirtualOperateType.NONE
-        GameManager.gameView?.onSwitchResolution(0, GameManager.gameView?.resolutionList?.first(),0)
         initGameSettings()
         startTimer()
+    }
+
+    /**
+     * 初始化大屏游戏配置
+     * 1，设置PC鼠标模式
+     * 2，设置隐藏虚拟按键
+     * 3，设置为超清
+     */
+    private fun initGameSettings() {
+        GameManager.gameView?.setPCMouseMode(true)
+        GameManager.gameView?.virtualDeviceType = VirtualOperateType.NONE
+        GameManager.gameView?.onSwitchResolution(0, GameManager.gameView?.resolutionList?.first(),0)
     }
 
     private fun startTimer() {
@@ -95,6 +105,8 @@ class GameActivity : AppCompatActivity() {
                 override fun run() {
                     LogUtils.d("startTimer->countTime:$countTime")
                     if (countTime == 0L) {
+                        gameTimer?.cancel()
+                        gameTimer = null
                         runOnUiThread {
                             // 3分钟无操作，提示下线
                             showNoOperateDialog()
@@ -121,18 +133,11 @@ class GameActivity : AppCompatActivity() {
             }
 
             override fun continuePlay() {
-                // 继续游戏，刷新无操作石坚
+                // 继续游戏，刷新无操作时间,重新开始计时
                 countTime = noOperateTime
+                startTimer()
             }
         })
-    }
-
-    /**
-     * 初始化大屏游戏配置
-     * 1，设置PC鼠标模式
-     */
-    private fun initGameSettings() {
-        GameManager.gameView?.setPCMouseMode(true)
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -224,6 +229,11 @@ class GameActivity : AppCompatActivity() {
     override fun onDestroy() {
         EventBus.getDefault().unregister(this)
         GameManager.gameView?.onDestroy()
+        try {
+            gameTimer?.cancel()
+        } catch (e : Exception) {
+            LogUtils.e("${e.message}")
+        }
         super.onDestroy()
     }
 
