@@ -100,6 +100,11 @@ class NoOperateOfflineDialog : DialogFragment() {
         startTimer()
     }
 
+    override fun onResume() {
+        super.onResume()
+        dataBinding.btnRight.requestFocus()
+    }
+
     private fun startTimer() {
         try {
             if (offlineTimer != null) {
@@ -128,13 +133,13 @@ class NoOperateOfflineDialog : DialogFragment() {
     }
 
     private fun buildText(): CharSequence {
-        val text = "长时间未操作@${TimeUtils.getCountTime(countTime)}@后自动下机"
+        val text = "长时间未操作${TimeUtils.getCountTime(countTime)}后自动下机"
         val spannableString = SpannableString(text)
-        val start = text.indexOf("@")
-        val end = text.lastIndexOf("@")
+        val start = text.indexOf("作") + 1
+        val end = text.lastIndexOf("后")
         val colorSpan = ForegroundColorSpan(Color.parseColor("#FFC6EC4B"))
         spannableString.setSpan(colorSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        return spannableString.toString().replace("@", "")
+        return spannableString
     }
 
     override fun onStart() {

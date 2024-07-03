@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:hm_cloud/hm_cloud_constants.dart';
 
@@ -26,7 +29,31 @@ class HmCloudController {
     methodChannel.invokeMethod(HMCloudConstants.startCloudGame, params);
   }
 
+  void showController({int? operation}) {
+    methodChannel.invokeMethod("showController", operation);
+  }
+
+  void setPCMouseMode() {
+    methodChannel.invokeMethod("setPCMouseMode");
+  }
+
+  void setControllerData(dynamic data) {
+    methodChannel.invokeMethod("setControllerData", data);
+  }
+
+  void onEditSuccess(params) {
+    methodChannel.invokeMethod("controllerEditSuccess", params);
+  }
+
+  void onEditFail(params) {
+    methodChannel.invokeMethod("controllerEditFail");
+  }
+
   Future<void> updateCloudGame(Map<String, dynamic> params) {
     return methodChannel.invokeMethod('updateGame', params);
+  }
+
+  Future<void> queryControlUsers() {
+    return methodChannel.invokeMethod('queryControlUsers', null);
   }
 }

@@ -67,6 +67,10 @@ class GameErrorDialog : DialogFragment() {
         dataBinding.layoutBg.setOnClickListener {
 
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
         dataBinding.btnLeft.requestFocus()
     }
 
