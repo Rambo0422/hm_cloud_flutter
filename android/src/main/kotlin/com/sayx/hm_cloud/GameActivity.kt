@@ -79,7 +79,7 @@ class GameActivity : AppCompatActivity() {
         }
         GameManager.gameView?.setAttachContext(this)
         GameManager.gameView?.virtualDeviceType = VirtualOperateType.NONE
-        GameManager.gameView?.onSwitchResolution(0, GameManager.gameView?.resolutionList?.last(),0)
+        GameManager.gameView?.onSwitchResolution(0, GameManager.gameView?.resolutionList?.first(),0)
         initGameSettings()
         startTimer()
     }
