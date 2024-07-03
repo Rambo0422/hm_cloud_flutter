@@ -67,6 +67,10 @@ class GameErrorDialog : DialogFragment() {
         dataBinding.layoutBg.setOnClickListener {
 
         }
+
+        dataBinding.btnLeft.isClickable = true
+        dataBinding.btnLeft.isFocusable = true
+        dataBinding.btnLeft.isFocusableInTouchMode = true
     }
 
     override fun onResume() {

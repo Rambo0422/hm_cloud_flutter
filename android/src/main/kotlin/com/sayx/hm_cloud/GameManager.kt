@@ -195,7 +195,7 @@ object GameManager : HmcpPlayerListener {
             })
             gameView?.setConfigInfo("configInfo")
             gameView?.hmcpPlayerListener = this
-            GameManager.gameView?.virtualDeviceType = VirtualOperateType.NONE
+            gameView?.virtualDeviceType = VirtualOperateType.NONE
             gameView?.play(bundle)
         }
     }

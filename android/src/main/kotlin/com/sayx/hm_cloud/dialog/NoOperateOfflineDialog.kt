@@ -87,7 +87,6 @@ class NoOperateOfflineDialog : DialogFragment() {
     private fun initDialog() {
         dataBinding.btnLeft.text = getString(R.string.exit_game)
         dataBinding.btnRight.text = getString(R.string.continue_game)
-        dataBinding.btnRight.requestFocus()
         dataBinding.tvMessage.text = buildText()
         dataBinding.btnLeft.setOnClickListener {
             dismiss()
@@ -97,6 +96,9 @@ class NoOperateOfflineDialog : DialogFragment() {
             dismiss()
             listener?.continuePlay()
         }
+        dataBinding.btnRight.isClickable = true
+        dataBinding.btnRight.isFocusable = true
+        dataBinding.btnRight.isFocusableInTouchMode = true
         startTimer()
     }
 

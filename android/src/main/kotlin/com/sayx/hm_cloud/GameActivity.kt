@@ -32,7 +32,7 @@ import java.util.TimerTask
 
 class GameActivity : AppCompatActivity() {
 
-    private val noOperateTime = 30 * 1000L
+    private val noOperateTime = 240 * 1000L
 
     private lateinit var dataBinding: ActivityGameBinding
 
@@ -207,6 +207,7 @@ class GameActivity : AppCompatActivity() {
 
     override fun onResume() {
         GameManager.gameView?.onResume()
+        dataBinding.root.requestFocus()
         hideNavigationBar()
         super.onResume()
     }
@@ -260,13 +261,14 @@ class GameActivity : AppCompatActivity() {
     }
 
     override fun onGenericMotionEvent(event: MotionEvent?): Boolean {
+        LogUtils.v("onGenericMotionEvent:$event")
         countTime = noOperateTime
         return super.onGenericMotionEvent(event)
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         countTime = noOperateTime
-//        LogUtils.d("onKeyDown:$event")
+        LogUtils.v("onKeyDown:$event")
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             return true
         }
@@ -274,7 +276,7 @@ class GameActivity : AppCompatActivity() {
     }
 
     override fun onKeyUp(keyCode: Int, event: KeyEvent): Boolean {
-//        LogUtils.d("onKeyUp:$event")
+        LogUtils.v("onKeyUp:$event")
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             return true
         }
