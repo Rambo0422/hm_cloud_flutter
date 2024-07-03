@@ -1,0 +1,275 @@
+package com.sayx.hm_cloud
+
+import android.os.Bundle
+import android.text.TextUtils
+import android.view.KeyEvent
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
+import android.view.WindowManager
+import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.databinding.DataBindingUtil
+import com.blankj.utilcode.util.LogUtils
+import com.gyf.immersionbar.BarHide
+import com.gyf.immersionbar.ImmersionBar.hasNavigationBar
+import com.gyf.immersionbar.ktx.immersionBar
+import com.haima.hmcp.HmcpManager
+import com.haima.hmcp.widgets.beans.VirtualOperateType
+import com.sayx.hm_cloud.callback.NoOperateListener
+import com.sayx.hm_cloud.databinding.ActivityGameBinding
+import com.sayx.hm_cloud.dialog.AppCommonDialog
+import com.sayx.hm_cloud.dialog.GameErrorDialog
+import com.sayx.hm_cloud.dialog.NoOperateOfflineDialog
+import com.sayx.hm_cloud.model.GameErrorEvent
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
+import java.util.Timer
+import java.util.TimerTask
+
+class GameActivity : AppCompatActivity() {
+
+    private val noOperateTime = 180 * 1000L
+
+    private lateinit var dataBinding: ActivityGameBinding
+
+    private var gameTimer: Timer? = null
+
+    private var countTime = noOperateTime
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // 全屏
+        immersionBar {
+            fullScreen(true)
+            hideBar(BarHide.FLAG_HIDE_BAR)
+        }
+        // 设置屏幕常亮
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        // 事件监听
+        EventBus.getDefault().register(this)
+        dataBinding = DataBindingUtil.setContentView(this, R.layout.activity_game)
+        dataBinding.lifecycleOwner = this
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+
+            }
+        })
+        initView()
+    }
+
+    private fun initView() {
+        GameManager.gameView?.let { gameView ->
+            val parent = gameView.parent
+            parent?.let {
+                (it as ViewGroup).removeView(gameView)
+            }
+            dataBinding.layoutGame.addView(
+                gameView,
+                0,
+                ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                )
+            )
+        }
+        GameManager.gameView?.setAttachContext(this)
+        GameManager.gameView?.virtualDeviceType = VirtualOperateType.NONE
+        GameManager.gameView?.onSwitchResolution(0, GameManager.gameView?.resolutionList?.last(),0)
+        initGameSettings()
+        startTimer()
+    }
+
+    private fun startTimer() {
+        try {
+            if (gameTimer != null) {
+                gameTimer?.cancel()
+                gameTimer = null
+            }
+            gameTimer = Timer()
+            gameTimer?.schedule(object : TimerTask() {
+                override fun run() {
+                    LogUtils.d("startTimer->countTime:$countTime")
+                    if (countTime == 0L) {
+                        runOnUiThread {
+                            // 3分钟无操作，提示下线
+                            showNoOperateDialog()
+                        }
+                    } else {
+                        countTime -= 1000L
+                    }
+                }
+            }, 0L, 1000L)
+        } catch (e: Exception) {
+            LogUtils.e("startTimer:${e.message}")
+        }
+    }
+
+    private fun showNoOperateDialog() {
+        NoOperateOfflineDialog.show(this, listener = object : NoOperateListener {
+            override fun overtime() {
+                // 提示下线30秒无操作，下线处理
+                LogUtils.w("No operation overtime")
+                GameManager.releaseGame(finish = "1", bundle = null)
+                finish()
+            }
+
+            override fun continuePlay() {
+                // 继续游戏，刷新无操作石坚
+                countTime = noOperateTime
+            }
+        })
+    }
+
+    /**
+     * 初始化大屏游戏配置
+     * 1，设置PC鼠标模式
+     */
+    private fun initGameSettings() {
+        GameManager.gameView?.setPCMouseMode(true)
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onGameError(event: GameErrorEvent) {
+        exitGame(errorCode = event.errorCode, errorMsg = event.errorMsg)
+    }
+
+    private fun exitGame(errorCode: String = "0", errorMsg: String? = null) {
+        val str =
+            "cid:${HmcpManager.getInstance().cloudId},uid:${GameManager.getGameParam()?.userId}"
+        LogUtils.d("exitGame:$str")
+        if (errorCode != "0") {
+            showErrorDialog(errorCode, errorMsg)
+        } else {
+            showExitGameDialog()
+        }
+    }
+
+    private fun showErrorDialog(errorCode: String, errorMsg: String? = null) {
+        GameManager.releaseGame(finish = errorCode, bundle = null)
+        try {
+            val title = StringBuilder()
+            if (TextUtils.isEmpty(errorMsg) || errorMsg == "null") {
+                title.append(getString(R.string.title_game_error))
+            } else {
+                title.append(errorMsg)
+            }
+            if (!TextUtils.isEmpty(errorCode)) {
+                title.append("\n").append("[$errorCode]")
+            }
+
+            val content =
+                StringBuilder().append("游戏名称:").append(GameManager.getGameParam()?.gameName)
+                    .append("\n")
+                    .append("CID:").append(HmcpManager.getInstance().cloudId).append("\n")
+                    .append("UID:").append(GameManager.getGameParam()?.userId).append("\n")
+                    .append("无法重连可截图联系客服QQ:3107321871")
+            GameErrorDialog.Builder(this)
+                .setTitle(title.toString())
+                .setSubTitle(content.toString())
+                .setLeftButtonClickListener {
+                    LogUtils.d("exitGameForError")
+                    finish()
+                }
+                .build().show()
+        } catch (e: Exception) {
+            LogUtils.e("showErrorDialog:${e.message}")
+        }
+    }
+
+    private fun showExitGameDialog() {
+        AppCommonDialog.Builder(this)
+            .setTitle(getString(R.string.title_exit_game))
+            .setLeftButton(getString(R.string.continue_game)) { AppCommonDialog.hideDialog(this@GameActivity) }
+            .setRightButton(getString(R.string.confirm)) {
+                LogUtils.d("exitGameByUser")
+                GameManager.releaseGame(finish = "1", bundle = null)
+                finish()
+            }
+            .build().show()
+    }
+
+    override fun onStart() {
+        GameManager.gameView?.onStart()
+        super.onStart()
+    }
+
+    override fun onResume() {
+        GameManager.gameView?.onResume()
+        hideNavigationBar()
+        super.onResume()
+    }
+
+    override fun onRestart() {
+        GameManager.gameView?.onRestart(1000)
+        super.onRestart()
+    }
+
+    override fun onPause() {
+        GameManager.gameView?.onPause()
+        super.onPause()
+    }
+
+    override fun onStop() {
+        GameManager.gameView?.onStop()
+        super.onStop()
+    }
+
+    override fun onDestroy() {
+        EventBus.getDefault().unregister(this)
+        GameManager.gameView?.onDestroy()
+        super.onDestroy()
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        hideNavigationBar()
+    }
+
+    @Suppress("DEPRECATION")
+    private fun hideNavigationBar() {
+        LogUtils.d("hideNavigationBar")
+        val insetsController = WindowCompat.getInsetsController(window, window.decorView)
+        insetsController.hide(WindowInsetsCompat.Type.navigationBars())
+        insetsController.hide(WindowInsetsCompat.Type.statusBars())
+        val isHas = hasNavigationBar(this)
+        if (isHas) {
+            window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    or View.SYSTEM_UI_FLAG_FULLSCREEN
+                    or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    or View.SYSTEM_UI_FLAG_IMMERSIVE)
+        }
+    }
+
+    override fun onGenericMotionEvent(event: MotionEvent?): Boolean {
+        countTime = noOperateTime
+        return super.onGenericMotionEvent(event)
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        countTime = noOperateTime
+//        LogUtils.d("onKeyDown:$event")
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            return true
+        }
+        return !(keyCode == KeyEvent.KEYCODE_VOLUME_DOWN || keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_MUTE)
+    }
+
+    override fun onKeyUp(keyCode: Int, event: KeyEvent): Boolean {
+//        LogUtils.d("onKeyUp:$event")
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            return true
+        }
+        return !(keyCode == KeyEvent.KEYCODE_VOLUME_DOWN || keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_MUTE)
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() {
+    }
+}

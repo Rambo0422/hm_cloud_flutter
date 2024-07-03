@@ -1,3 +1,170 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="lt" translatable="false">LT</string>
+    <string name="lb" translatable="false">LB</string>
+    <string name="rt" translatable="false">RT</string>
+    <string name="rb" translatable="false">RB</string>
+    <string name="ls" translatable="false">LS</string>
+    <string name="rs" translatable="false">RS</string>
+    <string name="y" translatable="false">Y</string>
+    <string name="b" translatable="false">B</string>
+    <string name="a" translatable="false">A</string>
+    <string name="x" translatable="false">X</string>
+    <string name="keyboard">键盘</string>
+    <string name="mouse_or_pad">鼠标/摇杆</string>
+    <string name="letter_pad">WSAD轮盘</string>
+    <string name="arrow_pad">上下左右轮盘</string>
+    <string name="pulley_down">滚轮下</string>
+    <string name="pulley_up">滚轮上</string>
+    <string name="mouse_middle">中键</string>
+    <string name="mouse_right">右键</string>
+    <string name="mouse_left">左键</string>
+    <string name="esc" translatable="false">Esc</string>
+    <string name="f1" translatable="false">F1</string>
+    <string name="f2" translatable="false">F2</string>
+    <string name="f3" translatable="false">F3</string>
+    <string name="f4" translatable="false">F4</string>
+    <string name="f5" translatable="false">F5</string>
+    <string name="f6" translatable="false">F6</string>
+    <string name="f7" translatable="false">F7</string>
+    <string name="f8" translatable="false">F8</string>
+    <string name="f9" translatable="false">F9</string>
+    <string name="f10" translatable="false">F10</string>
+    <string name="f11" translatable="false">F11</string>
+    <string name="f12" translatable="false">F12</string>
+    <string name="ins" translatable="false">Ins</string>
+    <string name="del" translatable="false">Del</string>
+    <string name="pg_up" translatable="false">PgUp</string>
+    <string name="pg_dn" translatable="false">PaDn</string>
+    <string name="home" translatable="false">Home</string>
+    <string name="end" translatable="false">End</string>
+    <string name="back_quote" translatable="false">`</string>
+    <string name="num_1" translatable="false">1</string>
+    <string name="num_2" translatable="false">2</string>
+    <string name="num_3" translatable="false">3</string>
+    <string name="num_4" translatable="false">4</string>
+    <string name="num_5" translatable="false">5</string>
+    <string name="num_6" translatable="false">6</string>
+    <string name="num_7" translatable="false">7</string>
+    <string name="num_8" translatable="false">8</string>
+    <string name="num_9" translatable="false">9</string>
+    <string name="num_0" translatable="false">0</string>
+    <string name="symbol_reduce" translatable="false">-</string>
+    <string name="symbol_equal" translatable="false">=</string>
+    <string name="symbol_bias" translatable="false">/</string>
+    <string name="symbol_mul" translatable="false">*</string>
+    <string name="symbol_add" translatable="false">+</string>
+    <string name="tab" translatable="false">Tab</string>
+    <string name="q" translatable="false">Q</string>
+    <string name="w" translatable="false">W</string>
+    <string name="e" translatable="false">E</string>
+    <string name="r" translatable="false">R</string>
+    <string name="t" translatable="false">T</string>
+    <string name="u" translatable="false">U</string>
+    <string name="i" translatable="false">I</string>
+    <string name="o" translatable="false">O</string>
+    <string name="p" translatable="false">P</string>
+    <string name="s" translatable="false">S</string>
+    <string name="d" translatable="false">D</string>
+    <string name="f" translatable="false">F</string>
+    <string name="g" translatable="false">G</string>
+    <string name="h" translatable="false">H</string>
+    <string name="j" translatable="false">J</string>
+    <string name="k" translatable="false">K</string>
+    <string name="l" translatable="false">L</string>
+    <string name="z" translatable="false">Z</string>
+    <string name="c" translatable="false">C</string>
+    <string name="v" translatable="false">V</string>
+    <string name="n" translatable="false">N</string>
+    <string name="m" translatable="false">M</string>
+    <string name="symbol_bracket_left" translatable="false">[</string>
+    <string name="symbol_bracket_right" translatable="false">]</string>
+    <string name="symbol_bias_re" translatable="false">\\</string>
+    <string name="symbol_quote" translatable="false">’</string>
+    <string name="symbol_semicolon" translatable="false">;</string>
+    <string name="symbol_comma" translatable="false">,</string>
+    <string name="symbol_dot" translatable="false">.</string>
+    <string name="key_enter" translatable="false">Enter</string>
+    <string name="key_capital" translatable="false">Caps</string>
+    <string name="key_shift" translatable="false">Shift</string>
+    <string name="key_ctrl" translatable="false">Ctrl</string>
+    <string name="key_alt" translatable="false">Alt</string>
+    <string name="key_space" translatable="false">Space</string>
+    <string name="key_back" translatable="false">Back</string>
+    <string name="key_up" translatable="false">↑</string>
+    <string name="key_left" translatable="false">←</string>
+    <string name="key_down" translatable="false">↓</string>
+    <string name="key_right" translatable="false">→</string>
+    <string name="key_interact">按键交互</string>
+    <string name="key_name">按键名称</string>
+    <string name="click">单击</string>
+    <string name="press">长按</string>
+    <string name="text_lozenge" translatable="false">◇</string>
+    <string name="text_comma" translatable="false">，</string>
+    <string name="drag_key">拖动按键</string>
+    <string name="adjust_position">调位置</string>
+    <string name="click_key_set">点击按键设置</string>
+    <string name="size_name">大小名称</string>
+    <string name="save">保存</string>
+    <string name="restore_default">还原默认</string>
+    <string name="add_key">新增按键</string>
+    <string name="combine_key">组合按键</string>
+    <string name="roulette_key">轮盘按键</string>
+    <string name="key_size">按键大小</string>
+    <string name="delete">删除</string>
+    <string name="key_opacity">透明度</string>
+    <string name="default_percent" translatable="false">0%</string>
+    <string name="edit">编辑</string>
+    <string name="edit_combine_key_tips">选择下方按键进行添加，至少2个</string>
+    <string name="save_roulette_key">保存轮盘键</string>
+    <string name="save_combine_key">保存组合键</string>
+    <string name="unselect_key">未选择按键</string>
+    <string name="save_at_least_two">请至少添加2个按键</string>
+    <string name="play_time_available">可用高峰时长:</string>
+    <string name="default_time" translatable="false">00:00</string>
+    <string name="touch_screen">触屏攻击</string>
+    <string name="net_delay">延迟</string>
+    <string name="net_lost_ratio">丢包率</string>
+    <string name="mouse_config">鼠标设置</string>
+    <string name="sensitivity">灵敏度</string>
+    <string name="mouse_click">鼠标点击</string>
+    <string name="touch_click">触控点击</string>
+    <string name="touch_attack">触屏攻击</string>
+    <string name="switch_text">开关</string>
+    <string name="key_vibrate">按键震动</string>
+    <string name="microphone">麦克风</string>
+    <string name="standard_quality">标清</string>
+    <string name="high_quality">高清</string>
+    <string name="blue_ray">蓝光</string>
+    <string name="not_open">未开放</string>
+    <string name="function_text">功能</string>
+    <string name="archive">存档</string>
+    <string name="chat_voice">聊天声音</string>
+    <string name="title_game_error">游戏已中止</string>
+    <string name="title_exit_game">是否结束游戏</string>
+    <string name="continue_game">继续玩</string>
+    <string name="interaction">云游互动</string>
+    <string name="hang">挂机</string>
+    <string name="exit_game">退出游戏</string>
+    <string name="debug_code">调试码</string>
+    <string name="control_method">操作方式</string>
+    <string name="custom">自定义</string>
+    <string name="gamepad_control">官方手柄</string>
+    <string name="keyboard_control">官方键鼠</string>
+    <string name="mouse_editable_notice">连接外设情况下，鼠标设置无法修改</string>
+    <string name="clip_success">已复制到剪切板</string>
+    <string name="try_reconnect">尝试重连</string>
+    <string name="confirm">确定</string>
+    <string name="choose_controller_type">选择按键类型</string>
+    <string name="title_exit_custom">你还没有保存，确定离开吗？</string>
+    <string name="title_save_custom">确认保存吗？</string>
+    <string name="leave">离开</string>
+    <string name="cancel">取消</string>
+    <string name="title_restore_custom">确认还原默认吗？</string>
+    <string name="confirm_save">确认保存</string>
+    <string name="confirm_restore">确认还原</string>
+    <string name="title_join_vip">VIP专属功能</string>
+    <string name="subtitle_join_vip">VIP每日可领1h高峰时长，双倍经验</string>
+    <string name="join_vip">我要开通</string>
+    <string name="game_time_lack">剩余游玩时间不足5分钟</string>
 </resources>

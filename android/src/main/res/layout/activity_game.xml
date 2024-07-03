@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="SmallSp">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="false">
+
+        <!-- 游戏层布局 -->
+        <FrameLayout
+            android:id="@+id/layout_game"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/black">
+
+            <!-- 水印 -->
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iv_watermark"
+                android:layout_width="80dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="21.5dp"
+                android:layout_marginTop="10dp"
+                android:alpha="0.3"
+                android:src="@drawable/img_watermark"
+                android:visibility="gone"
+                tools:visibility="visible"/>
+        </FrameLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

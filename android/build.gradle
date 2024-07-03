@@ -1,19 +1,48 @@
+group 'com.sayx.hm_cloud'
+version '1.0-SNAPSHOT'
+
+buildscript {
+    ext.kotlin_version = '1.9.22'
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.3.1'
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url "https://jitpack.io" }
+    }
+}
+
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdk 32
+    compileSdk 34
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = "17"
     }
 
     viewBinding {
+        enabled = true
+    }
+
+    dataBinding {
         enabled = true
     }
 
@@ -23,18 +52,34 @@ android {
 
     defaultConfig {
         namespace 'com.sayx.hm_cloud'
-        minSdkVersion 19
-        consumerProguardFiles 'proguard.txt'
+        minSdkVersion 21
+        consumerProguardFiles 'proguard.pro'
+
         multiDexEnabled true
     }
 }
 
 dependencies {
-    implementation fileTree(include: ['*.jar', '*.aar'], dir: 'libs')
+    api fileTree(include: ['*.jar', '*.aar'], dir: 'libs')
+    implementation 'androidx.appcompat:appcompat:1.6.1'
 
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+
+    // 约束布局
+    implementation "androidx.constraintlayout:constraintlayout:2.1.4"
+    // 工具
+    implementation "com.blankj:utilcodex:1.31.1"
+    // 通信
+    implementation("org.greenrobot:eventbus:3.3.1")
+    // 分包
     implementation "androidx.multidex:multidex:2.0.1"
-
+    // 解析
     implementation "com.google.code.gson:gson:2.10.1"
+    // 状态栏，导航栏处理
+    implementation 'com.geyifeng.immersionbar:immersionbar:3.2.2'
+    implementation 'com.geyifeng.immersionbar:immersionbar-ktx:3.2.2'
+    // 屏幕适配
+    implementation 'com.github.JessYanCoding:AndroidAutoSize:v1.2.1'
 
     implementation 'com.alibaba:fastjson:1.2.83'
 
@@ -43,14 +88,13 @@ dependencies {
     implementation('io.socket:socket.io-client:1.0.0') {
         exclude group: 'org.json', module: 'json'
     }
+    implementation 'androidx.databinding:databinding-runtime:8.5.0'
 }
 
 rootProject.allprojects {
     repositories {
         google()
         mavenCentral()
-        flatDir {
-            dirs 'libs'
-        }
+        maven { url "https://jitpack.io" }
     }
 }

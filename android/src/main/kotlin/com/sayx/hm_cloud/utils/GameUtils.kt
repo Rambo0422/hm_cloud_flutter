@@ -78,7 +78,7 @@ object GameUtils {
         map["type"] = type
         val json = gson.toJson(map)
         val encode = Base64.encodeToString(json.toByteArray(), Base64.NO_WRAP)
-        LogUtils.logD("getProtoData-->json:$json,\n$encode")
+        LogUtils.logD("getProtoData-->json:$json,\n$encode", "GameManager")
         return encode
     }
 

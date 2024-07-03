@@ -8,5 +8,7 @@ class GameError {
         const val gameParamErrorMsg = "游戏运行参数错误"
         const val gameConfigErrorCode = "100000003"
         const val gameConfigErrorMsg = "游戏配置参数错误"
+        const val gameReleaseErrorCode = "100000004"
+        const val gameReleaseErrorMsg = "游戏释放失败"
     }
 }
