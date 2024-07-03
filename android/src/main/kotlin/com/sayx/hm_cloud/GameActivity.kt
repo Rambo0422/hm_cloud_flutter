@@ -114,8 +114,10 @@ class GameActivity : AppCompatActivity() {
             override fun overtime() {
                 // 提示下线30秒无操作，下线处理
                 LogUtils.w("No operation overtime")
-                GameManager.releaseGame(finish = "1", bundle = null)
-                finish()
+                runOnUiThread {
+                    GameManager.releaseGame(finish = "1", bundle = null)
+                    finish()
+                }
             }
 
             override fun continuePlay() {
