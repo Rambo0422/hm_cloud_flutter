@@ -1,7 +1,6 @@
 package com.sayx.hm_cloud.utils
 
 import android.util.Log
-import io.flutter.BuildConfig
 
 object LogUtils {
 
@@ -17,31 +16,31 @@ object LogUtils {
     var level = levelE
 
     fun logI(msg: String, tag: String = this.tag) {
-        if (BuildConfig.DEBUG && level >= levelI) {
+        if (level >= levelI) {
             Log.i(tag, msg)
         }
     }
 
     fun logV(msg: String, tag: String = this.tag) {
-        if (BuildConfig.DEBUG && level >= levelV) {
+        if (level >= levelV) {
             Log.v(tag, msg)
         }
     }
 
     fun logD(msg: String, tag: String = this.tag) {
-        if (BuildConfig.DEBUG && level >= levelD) {
+        if (level >= levelD) {
             Log.d(tag, msg)
         }
     }
 
     fun logW(msg: String, tag: String = this.tag) {
-        if (BuildConfig.DEBUG && level >= levelW) {
+        if (level >= levelW) {
             Log.w(tag, msg)
         }
     }
 
     fun logE(msg: String, tag: String = this.tag, throwable: Throwable? = null) {
-        if (BuildConfig.DEBUG && level >= levelE) {
+        if (level >= levelE) {
             Log.e(tag, msg, throwable)
         }
     }

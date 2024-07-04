@@ -1,0 +1,759 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="SmallSp">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_settings"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_settings_left"
+            android:layout_width="280dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/img_game_settings_left_bg"
+            android:clickable="true"
+            android:clipChildren="false"
+            android:focusable="true"
+            android:visibility="invisible"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:visibility="visible">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/play_time_available"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="12dp"
+                android:text="@string/play_time_available"
+                android:textColor="#D6E3F2"
+                android:textSize="12sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.sayx.hm_cloud.widget.DrawableTextView
+                android:id="@+id/tv_available_time"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:drawablePadding="2dp"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="5dp"
+                android:text="@string/default_time"
+                android:textColor="#C6EC4B"
+                android:textSize="12sp"
+                app:drawableRight="@drawable/img_add_play_time"
+                app:drawableSize="16dp"
+                app:layout_constraintBaseline_toBaselineOf="@id/play_time_available"
+                app:layout_constraintStart_toEndOf="@id/play_time_available"
+                tools:text="1000:30:00" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_marginBottom="8dp"
+                android:src="@drawable/icon_light_value"
+                app:layout_constraintBottom_toTopOf="@id/sb_light"
+                app:layout_constraintEnd_toEndOf="@id/sb_light"
+                app:layout_constraintStart_toStartOf="@id/sb_light" />
+
+            <com.sayx.hm_cloud.widget.VerticalSeekBar
+                android:id="@+id/sb_light"
+                android:layout_width="20dp"
+                android:layout_height="200dp"
+                android:layout_marginEnd="30dp"
+                android:background="@android:color/transparent"
+                android:max="100"
+                android:maxHeight="9dp"
+                android:orientation="vertical"
+                android:paddingStart="2dp"
+                android:paddingTop="3dp"
+                android:paddingEnd="2dp"
+                android:paddingBottom="3dp"
+                android:progressDrawable="@drawable/shape_progress"
+                android:thumb="@drawable/icon_vertical_seek_bar_thumb"
+                android:thumbOffset="7.5dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:progress="0" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_quality"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/icon_video_quality_bg"
+                android:gravity="center"
+                android:textColor="#FF9EA2AD"
+                android:textSize="10sp"
+                app:layout_constraintEnd_toEndOf="@id/sb_light"
+                app:layout_constraintStart_toStartOf="@id/sb_light"
+                app:layout_constraintTop_toBottomOf="@id/sb_light"
+                tools:text="标清" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_quality"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:orientation="vertical"
+                android:visibility="invisible"
+                app:layout_constraintEnd_toEndOf="@id/tv_quality"
+                app:layout_constraintStart_toStartOf="@id/tv_quality"
+                app:layout_constraintTop_toBottomOf="@id/tv_quality"
+                tools:visibility="visible">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_standard_quality"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/shape_quality_bg"
+                    android:gravity="center"
+                    android:text="@string/standard_quality"
+                    android:textColor="#FF9EA2AD"
+                    android:textSize="10sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_standard_quality">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_blue_ray"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="-1dp"
+                        android:background="@drawable/shape_quality_bg"
+                        android:gravity="center"
+                        android:text="@string/blue_ray"
+                        android:textColor="#FF9EA2AD"
+                        android:textSize="10sp" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
+                        android:layout_gravity="top|end"
+                        android:src="@drawable/icon_vip_sign" />
+                </FrameLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iv_quality_arrow"
+                android:layout_width="7dp"
+                android:layout_height="7dp"
+                android:layout_marginBottom="-3.5dp"
+                android:rotation="-90"
+                android:src="@drawable/icon_left_arrow"
+                app:layout_constraintBottom_toBottomOf="@id/tv_quality"
+                app:layout_constraintEnd_toEndOf="@id/tv_quality"
+                app:layout_constraintStart_toStartOf="@id/tv_quality" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:text="@string/switch_text"
+                android:textColor="#FF727888"
+                android:textSize="10sp"
+                app:layout_constraintBottom_toTopOf="@id/layout_switch"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed"
+                tools:visibility="visible" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_switch"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="15dp"
+                android:background="@drawable/shape_settings_function_bg"
+                android:clipToPadding="false"
+                android:paddingHorizontal="15dp"
+                android:paddingVertical="10dp"
+                app:layout_constraintBottom_toTopOf="@id/tv_function"
+                app:layout_constraintEnd_toStartOf="@id/sb_light"
+                app:layout_constraintStart_toStartOf="@id/tv_switch"
+                app:layout_constraintTop_toBottomOf="@id/tv_switch">
+
+                <com.sayx.hm_cloud.widget.DrawableTextView
+                    android:id="@+id/btn_vibrate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="5dp"
+                    android:gravity="center"
+                    android:text="@string/key_vibrate"
+                    android:textColor="#ADB5CD"
+                    android:textSize="10sp"
+                    app:drawableSize="40dp"
+                    app:drawableTop="@drawable/selector_vibrate"
+                    app:layout_constraintEnd_toStartOf="@id/btn_interaction"
+                    app:layout_constraintHorizontal_chainStyle="spread_inside"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="visible" />
+
+                <com.sayx.hm_cloud.widget.DrawableTextView
+                    android:id="@+id/btn_interaction"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="5dp"
+                    android:gravity="center"
+                    android:text="@string/interaction"
+                    android:textColor="#ADB5CD"
+                    android:textSize="10sp"
+                    app:drawableSize="40dp"
+                    app:drawableTop="@drawable/selector_interaction"
+                    app:layout_constraintEnd_toStartOf="@id/btn_microphone"
+                    app:layout_constraintStart_toEndOf="@id/btn_vibrate"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="visible" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_marginTop="-5dp"
+                    android:layout_marginEnd="-5dp"
+                    android:src="@drawable/icon_vip_sign"
+                    app:layout_constraintEnd_toEndOf="@id/btn_interaction"
+                    app:layout_constraintTop_toTopOf="@id/btn_interaction" />
+
+                <com.sayx.hm_cloud.widget.DrawableTextView
+                    android:id="@+id/btn_microphone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="5dp"
+                    android:gravity="center"
+                    android:text="@string/microphone"
+                    android:textColor="#FF444855"
+                    android:textSize="10sp"
+                    app:drawableSize="40dp"
+                    app:drawableTop="@drawable/selector_microphone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/btn_interaction"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="visible" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="-5dp"
+                    android:layout_marginEnd="-5dp"
+                    android:background="@drawable/shape_not_open_bg"
+                    android:enabled="false"
+                    android:text="@string/not_open"
+                    android:textColor="#FF959AA9"
+                    android:textSize="8sp"
+                    app:layout_constraintEnd_toEndOf="@id/btn_microphone"
+                    app:layout_constraintTop_toTopOf="@id/btn_microphone" />
+
+                <com.sayx.hm_cloud.widget.DrawableTextView
+                    android:id="@+id/btn_chat_voice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:drawablePadding="5dp"
+                    android:gravity="center"
+                    android:text="@string/chat_voice"
+                    android:textColor="#FF444855"
+                    android:textSize="10sp"
+                    app:drawableSize="40dp"
+                    app:drawableTop="@drawable/selector_chat_voice"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/btn_vibrate"
+                    tools:visibility="visible" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="-5dp"
+                    android:layout_marginEnd="-5dp"
+                    android:background="@drawable/shape_not_open_bg"
+                    android:enabled="false"
+                    android:text="@string/not_open"
+                    android:textColor="#FF959AA9"
+                    android:textSize="8sp"
+                    app:layout_constraintEnd_toEndOf="@id/btn_chat_voice"
+                    app:layout_constraintTop_toTopOf="@id/btn_chat_voice" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_function"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="10dp"
+                android:text="@string/function_text"
+                android:textColor="#FF727888"
+                android:textSize="10sp"
+                app:layout_constraintBottom_toTopOf="@id/layout_function"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/layout_switch"
+                tools:visibility="visible" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_function"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="15dp"
+                android:background="@drawable/shape_settings_function_bg"
+                android:clipToPadding="false"
+                android:paddingHorizontal="15dp"
+                android:paddingVertical="10dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/sb_light"
+                app:layout_constraintStart_toStartOf="@id/tv_function"
+                app:layout_constraintTop_toBottomOf="@id/tv_function">
+
+                <com.sayx.hm_cloud.widget.DrawableTextView
+                    android:id="@+id/btn_archive"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="5dp"
+                    android:gravity="center"
+                    android:text="@string/archive"
+                    android:textColor="#FF444855"
+                    android:textSize="10sp"
+                    app:drawableSize="40dp"
+                    app:drawableTop="@drawable/selector_archive"
+                    app:layout_constraintEnd_toStartOf="@id/btn_hang"
+                    app:layout_constraintHorizontal_chainStyle="spread_inside"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="visible" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="-5dp"
+                    android:layout_marginEnd="-5dp"
+                    android:background="@drawable/shape_not_open_bg"
+                    android:enabled="false"
+                    android:text="@string/not_open"
+                    android:textColor="#FF959AA9"
+                    android:textSize="8sp"
+                    app:layout_constraintEnd_toEndOf="@id/btn_archive"
+                    app:layout_constraintTop_toTopOf="@id/btn_archive" />
+
+                <com.sayx.hm_cloud.widget.DrawableTextView
+                    android:id="@+id/btn_hang"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="5dp"
+                    android:gravity="center"
+                    android:text="@string/hang"
+                    android:textColor="#FF444855"
+                    android:textSize="10sp"
+                    app:drawableSize="40dp"
+                    app:drawableTop="@drawable/selector_hang"
+                    app:layout_constraintEnd_toStartOf="@id/btn_empty_3"
+                    app:layout_constraintStart_toEndOf="@id/btn_archive"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="visible" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="-5dp"
+                    android:layout_marginEnd="-5dp"
+                    android:background="@drawable/shape_not_open_bg"
+                    android:enabled="false"
+                    android:text="@string/not_open"
+                    android:textColor="#FF959AA9"
+                    android:textSize="8sp"
+                    app:layout_constraintEnd_toEndOf="@id/btn_hang"
+                    app:layout_constraintTop_toTopOf="@id/btn_hang" />
+
+                <com.sayx.hm_cloud.widget.DrawableTextView
+                    android:id="@+id/btn_empty_3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="5dp"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="#ADB5CD"
+                    android:textSize="10sp"
+                    app:drawableSize="40dp"
+                    app:drawableTop="@drawable/selector_empty"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/btn_hang"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="visible" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.sayx.hm_cloud.widget.DrawableTextView
+                android:id="@+id/btn_exit_game"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginBottom="12dp"
+                android:padding="5dp"
+                android:drawablePadding="3dp"
+                android:gravity="center"
+                android:text="@string/exit_game"
+                android:textColor="#959CB1"
+                android:textSize="12sp"
+                app:drawableLeft="@drawable/icon_exit_game"
+                app:drawableSize="20dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_status"
+            android:layout_width="215dp"
+            android:layout_height="32dp"
+            android:background="@drawable/img_game_status_bg"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iv_wifi"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_marginEnd="2dp"
+                android:src="@drawable/icon_wifi_full" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="3dp"
+                android:text="@string/net_delay"
+                android:textSize="10sp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_net_delay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FF00D38E"
+                android:textSize="10sp"
+                tools:text="999ms" />
+
+            <View
+                android:layout_width="0.5dp"
+                android:layout_height="9dp"
+                android:layout_marginStart="6dp"
+                android:layout_marginEnd="6dp"
+                android:background="#FF323642" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="3dp"
+                android:text="@string/net_lost_ratio"
+                android:textSize="10sp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_lost_ratio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FFC6EC4B"
+                android:textSize="10sp"
+                tools:text="100%" />
+        </LinearLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_settings_right"
+            android:layout_width="280dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/img_game_settings_right_bg"
+            android:clickable="true"
+            android:clipChildren="false"
+            android:focusable="true"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:visibility="visible">
+
+            <com.sayx.hm_cloud.widget.DrawableTextView
+                android:id="@+id/tv_debug_code"
+                android:layout_width="wrap_content"
+                android:layout_height="20dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="15dp"
+                android:background="@drawable/shape_debug_code_bg"
+                android:drawablePadding="2dp"
+                android:gravity="center"
+                android:text="@string/debug_code"
+                android:textColor="#6A6F7D"
+                android:textSize="10sp"
+                app:drawableLeft="@drawable/img_copy"
+                app:drawableSize="13dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="SmallSp" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_marginBottom="8dp"
+                android:src="@drawable/icon_voice_value"
+                app:layout_constraintBottom_toTopOf="@id/sb_voice"
+                app:layout_constraintEnd_toEndOf="@id/sb_voice"
+                app:layout_constraintStart_toStartOf="@id/sb_voice" />
+
+            <com.sayx.hm_cloud.widget.VerticalSeekBar
+                android:id="@+id/sb_voice"
+                android:layout_width="20dp"
+                android:layout_height="200dp"
+                android:layout_marginStart="30dp"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"
+                android:paddingStart="2dp"
+                android:paddingTop="3dp"
+                android:paddingEnd="2dp"
+                android:maxHeight="9dp"
+                android:paddingBottom="3dp"
+                android:progressDrawable="@drawable/shape_progress"
+                android:thumb="@drawable/icon_vertical_seek_bar_thumb"
+                android:thumbOffset="7.5dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:max="100"
+                tools:progress="0" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/btn_mute"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginTop="10dp"
+                android:padding="3dp"
+                android:src="@drawable/selector_mute"
+                app:layout_constraintEnd_toEndOf="@id/sb_voice"
+                app:layout_constraintStart_toStartOf="@id/sb_voice"
+                app:layout_constraintTop_toBottomOf="@id/sb_voice" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/control_method"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:text="@string/control_method"
+                android:textColor="#FF727888"
+                android:textSize="10sp"
+                app:layout_constraintBottom_toTopOf="@id/layout_control_method"
+                app:layout_constraintStart_toEndOf="@id/sb_voice"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed"
+                tools:visibility="visible" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_control_method"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="15dp"
+                android:background="@drawable/shape_settings_function_bg"
+                android:clipToPadding="false"
+                android:paddingHorizontal="15dp"
+                android:paddingVertical="10dp"
+                app:layout_constraintBottom_toTopOf="@id/mouse_config"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/control_method"
+                app:layout_constraintTop_toBottomOf="@id/control_method">
+
+                <com.sayx.hm_cloud.widget.DrawableTextView
+                    android:id="@+id/btn_gamepad"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="5dp"
+                    android:gravity="center"
+                    android:text="@string/gamepad_control"
+                    android:textColor="#ADB5CD"
+                    android:textSize="10sp"
+                    app:drawableSize="40dp"
+                    app:drawableTop="@drawable/selector_gamepad"
+                    app:layout_constraintEnd_toStartOf="@id/btn_keyboard"
+                    app:layout_constraintHorizontal_chainStyle="spread_inside"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="visible" />
+
+                <com.sayx.hm_cloud.widget.DrawableTextView
+                    android:id="@+id/btn_keyboard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="5dp"
+                    android:gravity="center"
+                    android:text="@string/keyboard_control"
+                    android:textColor="#ADB5CD"
+                    android:textSize="10sp"
+                    app:drawableSize="40dp"
+                    app:drawableTop="@drawable/selector_keyboard"
+                    app:layout_constraintEnd_toStartOf="@id/btn_custom"
+                    app:layout_constraintStart_toEndOf="@id/btn_gamepad"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="visible" />
+
+                <com.sayx.hm_cloud.widget.DrawableTextView
+                    android:id="@+id/btn_custom"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="5dp"
+                    android:gravity="center"
+                    android:text="@string/custom"
+                    android:textColor="#ADB5CD"
+                    android:textSize="10sp"
+                    app:drawableSize="40dp"
+                    app:drawableTop="@drawable/selector_custom"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/btn_keyboard"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="visible" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_marginTop="-5dp"
+                    android:layout_marginEnd="-5dp"
+                    android:src="@drawable/icon_vip_sign"
+                    app:layout_constraintEnd_toEndOf="@id/btn_custom"
+                    app:layout_constraintTop_toTopOf="@id/btn_custom" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/mouse_config"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="10dp"
+                android:text="@string/mouse_config"
+                android:textColor="#FF727888"
+                android:textSize="10sp"
+                app:layout_constraintBottom_toTopOf="@id/layout_mouse_config"
+                app:layout_constraintStart_toEndOf="@id/sb_voice"
+                app:layout_constraintTop_toBottomOf="@id/layout_control_method"
+                tools:visibility="visible" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switch_mouse_config"
+                android:layout_width="30dp"
+                android:layout_height="15dp"
+                android:layout_marginEnd="15dp"
+                android:background="@android:color/transparent"
+                android:thumb="@drawable/selector_switch_thumb"
+                app:layout_constraintBottom_toBottomOf="@id/mouse_config"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/mouse_config"
+                app:track="@drawable/selector_switch_track"
+                tools:checked="true" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_mouse_config"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="15dp"
+                android:background="@drawable/shape_settings_function_bg"
+                android:paddingHorizontal="15dp"
+                android:paddingVertical="10dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/mouse_config"
+                app:layout_constraintTop_toBottomOf="@id/mouse_config">
+
+                <com.sayx.hm_cloud.widget.DrawableTextView
+                    android:id="@+id/btn_mouse_click"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="5dp"
+                    android:gravity="center"
+                    android:text="@string/mouse_click"
+                    android:textColor="#ADB5CD"
+                    android:textSize="10sp"
+                    app:drawableSize="40dp"
+                    app:drawableTop="@drawable/selector_mouse_click"
+                    app:layout_constraintEnd_toStartOf="@id/btn_touch_click"
+                    app:layout_constraintHorizontal_chainStyle="spread_inside"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="visible" />
+
+                <com.sayx.hm_cloud.widget.DrawableTextView
+                    android:id="@+id/btn_touch_click"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="5dp"
+                    android:gravity="center"
+                    android:text="@string/touch_click"
+                    android:textColor="#ADB5CD"
+                    android:textSize="10sp"
+                    app:drawableSize="40dp"
+                    app:drawableTop="@drawable/selector_touch_click"
+                    app:layout_constraintEnd_toStartOf="@id/btn_touch_attack"
+                    app:layout_constraintStart_toEndOf="@id/btn_mouse_click"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="visible" />
+
+                <com.sayx.hm_cloud.widget.DrawableTextView
+                    android:id="@+id/btn_touch_attack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="5dp"
+                    android:gravity="center"
+                    android:text="@string/touch_attack"
+                    android:textColor="#ADB5CD"
+                    android:textSize="10sp"
+                    app:drawableSize="40dp"
+                    app:drawableTop="@drawable/selector_touch_attack"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/btn_touch_click"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="visible" />
+
+                <androidx.appcompat.widget.AppCompatSeekBar
+                    android:id="@+id/sb_sensitivity"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:background="@android:color/transparent"
+                    android:maxHeight="4dp"
+                    android:paddingStart="0dp"
+                    android:paddingEnd="0dp"
+                    android:progressDrawable="@drawable/shape_progress"
+                    android:thumb="@drawable/icon_sensitivity_thumb"
+                    android:thumbOffset="0dp"
+                    app:layout_constraintTop_toBottomOf="@id/btn_mouse_click" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/sensitivity"
+                    android:textColor="#ADB5CD"
+                    android:textSize="10sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/sb_sensitivity" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_sensitivity_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textColor="#ADB5CD"
+                    android:textSize="10sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/sb_sensitivity"
+                    tools:text="100%" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

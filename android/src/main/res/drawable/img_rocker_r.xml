@@ -1,0 +1,43 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="110"
+    android:viewportHeight="110">
+  <path
+      android:pathData="M55,55m-54.55,0a54.55,54.55 0,1 1,109.09 0a54.55,54.55 0,1 1,-109.09 0"
+      android:strokeAlpha="0.4"
+      android:strokeWidth="1"
+      android:fillType="nonZero"
+      android:strokeColor="#00000000"
+      android:fillAlpha="0.4">
+    <aapt:attr name="android:fillColor">
+      <gradient 
+          android:startX="54.99"
+          android:startY="111.19"
+          android:endX="54.99"
+          android:endY="3.29"
+          android:type="linear">
+        <item android:offset="0" android:color="#FFB9B9B9"/>
+        <item android:offset="0" android:color="#FFBDBDBD"/>
+        <item android:offset="1" android:color="#FFFFFFFF"/>
+      </gradient>
+    </aapt:attr>
+  </path>
+  <path
+      android:pathData="M55,55m-43.64,0a43.64,43.64 0,1 1,87.27 0a43.64,43.64 0,1 1,-87.27 0"
+      android:strokeAlpha="0.09900716"
+      android:strokeWidth="3.11688312"
+      android:fillColor="#00000000"
+      android:strokeColor="#1A2530"
+      android:fillType="nonZero"
+      android:fillAlpha="0.09900716"/>
+  <path
+      android:pathData="M63.84,65.63L58.78,65.63L55.54,60.26C54.87,59.15 54.33,58.44 53.9,58.12C53.48,57.8 53.02,57.64 52.54,57.64L51.21,57.64L51.21,65.63L46.82,65.63L46.82,45L54.05,45C58.96,45 61.41,46.86 61.41,50.59C61.41,52 61,53.2 60.18,54.2C59.36,55.21 58.23,55.91 56.79,56.32L56.79,56.37C57.74,56.69 58.79,57.74 59.95,59.52L63.84,65.63ZM51.21,48.34L51.21,54.28L53.37,54.28C54.4,54.28 55.23,53.98 55.85,53.38C56.48,52.78 56.79,52.04 56.79,51.14C56.79,49.27 55.68,48.34 53.45,48.34L51.21,48.34Z"
+      android:strokeAlpha="0.25012702"
+      android:strokeWidth="1"
+      android:fillColor="#FFFFFF"
+      android:fillType="nonZero"
+      android:strokeColor="#00000000"
+      android:fillAlpha="0.25012702"/>
+</vector>

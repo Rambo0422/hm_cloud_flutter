@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/btn_hide"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="end"
+            android:background="@drawable/shape_hide_keyboard_bg"
+            android:padding="10dp"
+            android:src="@drawable/img_down_arrow"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="140dp"
+            android:background="#232837"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            app:layout_constraintTop_toBottomOf="@id/btn_hide">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/btn_key_edit_lt"
+                android:layout_width="50dp"
+                android:layout_height="37.5dp"
+                android:background="@drawable/img_key_middle_bg"
+                android:gravity="center"
+                android:text="@string/lt"
+                android:textColor="#99FFFFFF"
+                android:textSize="11sp"
+                app:layout_constraintHorizontal_chainStyle="spread"
+                app:layout_constraintBottom_toTopOf="@id/btn_key_edit_ls"
+                app:layout_constraintEnd_toStartOf="@id/btn_key_edit_lb"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/btn_key_edit_lb"
+                android:layout_width="50dp"
+                android:layout_height="37.5dp"
+                android:background="@drawable/img_key_middle_bg"
+                android:gravity="center"
+                android:text="@string/lb"
+                android:textColor="#99FFFFFF"
+                android:textSize="11sp"
+                app:layout_constraintBottom_toBottomOf="@id/btn_key_edit_lt"
+                app:layout_constraintEnd_toStartOf="@id/btn_edit_rocker_l"
+                app:layout_constraintStart_toEndOf="@id/btn_key_edit_lt"
+                app:layout_constraintTop_toTopOf="@id/btn_key_edit_lt" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/btn_key_edit_ls"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_marginTop="12.5dp"
+                android:background="@drawable/selector_key_round_bg"
+                android:gravity="center"
+                android:text="@string/ls"
+                android:textColor="#99FFFFFF"
+                android:textSize="11sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@id/btn_key_edit_lt"
+                app:layout_constraintTop_toBottomOf="@id/btn_key_edit_lt" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/btn_edit_rocker_l"
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                android:background="@drawable/img_rocker_bg"
+                android:padding="17dp"
+                android:src="@drawable/img_rocker_l"
+                tools:visibility="visible"
+                app:layout_constraintEnd_toStartOf="@id/btn_edit_d_pad"
+                app:layout_constraintStart_toEndOf="@id/btn_key_edit_lb"
+                app:layout_constraintTop_toTopOf="@id/btn_key_edit_lt" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/btn_edit_d_pad"
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                android:src="@drawable/img_d_pad_default"
+                tools:visibility="visible"
+                app:layout_constraintEnd_toStartOf="@id/btn_key_setting"
+                app:layout_constraintStart_toEndOf="@id/btn_edit_rocker_l"
+                app:layout_constraintTop_toTopOf="@id/btn_key_edit_lt" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/btn_key_setting"
+                android:layout_width="40dp"
+                android:layout_height="25dp"
+                android:src="@drawable/img_key_setting"
+                tools:visibility="visible"
+                app:layout_constraintEnd_toStartOf="@id/btn_key_menu"
+                app:layout_constraintStart_toEndOf="@id/btn_edit_d_pad"
+                app:layout_constraintTop_toTopOf="@id/btn_edit_d_pad" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/btn_key_menu"
+                android:layout_width="40dp"
+                android:layout_height="25dp"
+                android:src="@drawable/img_key_menu"
+                tools:visibility="visible"
+                app:layout_constraintEnd_toStartOf="@id/btn_edit_rocker_r"
+                app:layout_constraintStart_toEndOf="@id/btn_key_setting"
+                app:layout_constraintTop_toTopOf="@id/btn_edit_rocker_r" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/btn_edit_rocker_r"
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                android:background="@drawable/img_rocker_bg"
+                android:padding="17dp"
+                android:src="@drawable/img_rocker_r"
+                tools:visibility="visible"
+                app:layout_constraintEnd_toStartOf="@id/btn_key_edit_x"
+                app:layout_constraintStart_toEndOf="@id/btn_key_menu"
+                app:layout_constraintTop_toTopOf="@id/btn_key_edit_rt" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/btn_key_edit_x"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/selector_key_round_bg"
+                android:gravity="center"
+                android:text="@string/x"
+                android:textColor="#99FFFFFF"
+                android:textSize="11sp"
+                app:layout_constraintBottom_toBottomOf="@id/btn_key_edit_a"
+                app:layout_constraintEnd_toStartOf="@id/btn_key_edit_y"
+                app:layout_constraintStart_toEndOf="@id/btn_edit_rocker_r"
+                app:layout_constraintTop_toTopOf="@id/btn_key_edit_y" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/btn_key_edit_y"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/selector_key_round_bg"
+                android:gravity="center"
+                android:text="@string/y"
+                android:textColor="#99FFFFFF"
+                android:textSize="11sp"
+                app:layout_constraintBottom_toTopOf="@id/btn_key_edit_a"
+                app:layout_constraintEnd_toStartOf="@id/btn_key_edit_b"
+                app:layout_constraintStart_toEndOf="@id/btn_key_edit_x"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/btn_key_edit_a"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/selector_key_round_bg"
+                android:gravity="center"
+                android:text="@string/a"
+                android:textColor="#99FFFFFF"
+                android:textSize="11sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/btn_key_edit_y"
+                app:layout_constraintStart_toStartOf="@id/btn_key_edit_y"
+                app:layout_constraintTop_toBottomOf="@id/btn_key_edit_y" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/btn_key_edit_b"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/selector_key_round_bg"
+                android:gravity="center"
+                android:text="@string/b"
+                android:textColor="#99FFFFFF"
+                android:textSize="11sp"
+                app:layout_constraintBottom_toBottomOf="@id/btn_key_edit_a"
+                app:layout_constraintEnd_toStartOf="@id/btn_key_edit_rb"
+                app:layout_constraintStart_toEndOf="@id/btn_key_edit_y"
+                app:layout_constraintTop_toTopOf="@id/btn_key_edit_y" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/btn_key_edit_rb"
+                android:layout_width="50dp"
+                android:layout_height="37.5dp"
+                android:background="@drawable/img_key_middle_bg"
+                android:gravity="center"
+                android:text="@string/rb"
+                android:textColor="#99FFFFFF"
+                android:textSize="11sp"
+                app:layout_constraintBottom_toBottomOf="@id/btn_key_edit_rt"
+                app:layout_constraintEnd_toStartOf="@id/btn_key_edit_rt"
+                app:layout_constraintStart_toEndOf="@id/btn_key_edit_b"
+                app:layout_constraintTop_toTopOf="@id/btn_key_edit_rt" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/btn_key_edit_rt"
+                android:layout_width="50dp"
+                android:layout_height="37.5dp"
+                android:background="@drawable/img_key_middle_bg"
+                android:gravity="center"
+                android:text="@string/rt"
+                android:textColor="#99FFFFFF"
+                android:textSize="11sp"
+                app:layout_constraintBottom_toTopOf="@id/btn_key_edit_rs"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/btn_key_edit_rb"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/btn_key_edit_rs"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_marginTop="12.5dp"
+                android:background="@drawable/selector_key_round_bg"
+                android:gravity="center"
+                android:text="@string/rs"
+                android:textColor="#99FFFFFF"
+                android:textSize="11sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/btn_key_edit_rt"
+                app:layout_constraintTop_toBottomOf="@id/btn_key_edit_rt" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+</layout>

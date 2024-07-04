@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="SmallSp">
+
+    <data>
+
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <!-- 编辑面板 -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_board"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#E6232837">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/btn_exit_edit"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="5dp"
+                android:padding="10dp"
+                android:src="@drawable/img_exit_edit"
+                app:layout_constraintBottom_toTopOf="@id/edit_bg"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <View
+                android:id="@+id/line1"
+                android:layout_width="0.5dp"
+                android:layout_height="15dp"
+                android:layout_marginStart="5dp"
+                android:background="#1AFFFFFF"
+                app:layout_constraintBottom_toBottomOf="@id/btn_exit_edit"
+                app:layout_constraintStart_toEndOf="@id/btn_exit_edit"
+                app:layout_constraintTop_toTopOf="@id/btn_exit_edit" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:gravity="center_vertical"
+                app:layout_constraintBottom_toBottomOf="@id/btn_exit_edit"
+                app:layout_constraintStart_toEndOf="@id/line1"
+                app:layout_constraintTop_toTopOf="@id/btn_exit_edit">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/text_lozenge"
+                    android:textColor="@android:color/white"
+                    android:textSize="5sp" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:text="@string/drag_key"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/adjust_position"
+                    android:textColor="#C6EC4B"
+                    android:textSize="10sp" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/text_comma"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/click_key_set"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/size_name"
+                    android:textColor="#C6EC4B"
+                    android:textSize="10sp" />
+            </LinearLayout>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/btn_save_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="25dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/shape_save_edit_bg"
+                android:gravity="center"
+                android:minWidth="70dp"
+                android:paddingStart="15dp"
+                android:paddingEnd="15dp"
+                android:text="@string/save"
+                android:textColor="@android:color/black"
+                android:textSize="10sp"
+                app:layout_constraintBottom_toBottomOf="@id/btn_exit_edit"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/btn_exit_edit" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/btn_restore_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="25dp"
+                android:layout_marginEnd="7dp"
+                android:background="@drawable/shape_restore_edit_bg"
+                android:gravity="center"
+                android:minWidth="70dp"
+                android:paddingStart="15dp"
+                android:paddingEnd="15dp"
+                android:text="@string/restore_default"
+                android:textColor="@android:color/white"
+                android:textSize="10sp"
+                app:layout_constraintBottom_toBottomOf="@id/btn_exit_edit"
+                app:layout_constraintEnd_toStartOf="@id/btn_save_edit"
+                app:layout_constraintTop_toTopOf="@id/btn_exit_edit" />
+
+            <View
+                android:id="@+id/line2"
+                android:layout_width="0.5dp"
+                android:layout_height="15dp"
+                android:layout_marginEnd="10dp"
+                android:background="#1AFFFFFF"
+                app:layout_constraintBottom_toBottomOf="@id/btn_exit_edit"
+                app:layout_constraintEnd_toStartOf="@id/btn_restore_edit"
+                app:layout_constraintTop_toTopOf="@id/btn_exit_edit" />
+
+            <com.sayx.hm_cloud.widget.DrawableTextView
+                android:id="@+id/btn_add_roulette_key"
+                android:layout_width="wrap_content"
+                android:layout_height="25dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/shape_add_key_bg"
+                android:gravity="center"
+                android:minWidth="70dp"
+                android:text="@string/roulette_key"
+                android:textColor="@android:color/white"
+                android:textSize="10sp"
+                android:visibility="visible"
+                app:drawableLeft="@drawable/img_add_key"
+                app:drawableSize="14dp"
+                app:layout_constraintBottom_toBottomOf="@id/btn_exit_edit"
+                app:layout_constraintEnd_toStartOf="@id/line2"
+                app:layout_constraintTop_toTopOf="@id/btn_exit_edit" />
+
+            <com.sayx.hm_cloud.widget.DrawableTextView
+                android:id="@+id/btn_add_combine_key"
+                android:layout_width="wrap_content"
+                android:layout_height="25dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/shape_add_key_bg"
+                android:gravity="center"
+                android:minWidth="70dp"
+                android:text="@string/combine_key"
+                android:textColor="@android:color/white"
+                android:textSize="10sp"
+                android:visibility="visible"
+                app:drawableLeft="@drawable/img_add_key"
+                app:drawableSize="14dp"
+                app:layout_constraintBottom_toBottomOf="@id/btn_exit_edit"
+                app:layout_constraintEnd_toStartOf="@id/btn_add_roulette_key"
+                app:layout_constraintTop_toTopOf="@id/btn_exit_edit" />
+
+            <com.sayx.hm_cloud.widget.DrawableTextView
+                android:id="@+id/btn_add_key"
+                android:layout_width="wrap_content"
+                android:layout_height="25dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/shape_add_key_bg"
+                android:gravity="center"
+                android:minWidth="70dp"
+                android:text="@string/add_key"
+                android:textColor="@android:color/white"
+                android:textSize="10sp"
+                app:drawableLeft="@drawable/img_add_key"
+                app:drawableSize="14dp"
+                app:layout_constraintBottom_toBottomOf="@id/btn_exit_edit"
+                app:layout_constraintEnd_toStartOf="@id/btn_add_combine_key"
+                app:layout_constraintTop_toTopOf="@id/btn_exit_edit" />
+
+            <View
+                android:id="@+id/edit_bg"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="50dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/shape_controller_edit_bg"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/key_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="@string/key_size"
+                android:textColor="@android:color/white"
+                android:textSize="10sp"
+                app:layout_constraintBottom_toBottomOf="@id/edit_bg"
+                app:layout_constraintStart_toStartOf="@id/edit_bg"
+                app:layout_constraintTop_toTopOf="@id/edit_bg" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/btn_add_key_size"
+                android:layout_width="20dp"
+                android:layout_height="15dp"
+                android:layout_marginStart="5dp"
+                android:src="@drawable/img_add_edit"
+                app:layout_constraintBottom_toBottomOf="@id/edit_bg"
+                app:layout_constraintStart_toEndOf="@id/key_size"
+                app:layout_constraintTop_toTopOf="@id/edit_bg" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_key_size"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="2dp"
+                android:background="@drawable/shape_edit_key_bg"
+                android:gravity="center"
+                android:paddingTop="0.5dp"
+                android:paddingBottom="0.5dp"
+                android:text="@string/default_percent"
+                android:textColor="#C4D7EB"
+                android:textSize="10sp"
+                app:layout_constraintBottom_toBottomOf="@id/edit_bg"
+                app:layout_constraintStart_toEndOf="@id/btn_add_key_size"
+                app:layout_constraintTop_toTopOf="@id/edit_bg"
+                tools:text="100%" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/btn_reduce_key_size"
+                android:layout_width="20dp"
+                android:layout_height="15dp"
+                android:layout_marginStart="2dp"
+                android:src="@drawable/img_reduce_edit"
+                app:layout_constraintBottom_toBottomOf="@id/edit_bg"
+                app:layout_constraintStart_toEndOf="@id/tv_key_size"
+                app:layout_constraintTop_toTopOf="@id/edit_bg" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/key_opacity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="25dp"
+                android:text="@string/key_opacity"
+                android:textColor="@android:color/white"
+                android:textSize="10sp"
+                app:layout_constraintBottom_toBottomOf="@id/edit_bg"
+                app:layout_constraintStart_toEndOf="@id/btn_reduce_key_size"
+                app:layout_constraintTop_toTopOf="@id/edit_bg" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/btn_add_key_opacity"
+                android:layout_width="20dp"
+                android:layout_height="15dp"
+                android:layout_marginStart="5dp"
+                android:src="@drawable/img_add_edit"
+                app:layout_constraintBottom_toBottomOf="@id/edit_bg"
+                app:layout_constraintStart_toEndOf="@id/key_opacity"
+                app:layout_constraintTop_toTopOf="@id/edit_bg" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_key_opacity"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="2dp"
+                android:background="@drawable/shape_edit_key_bg"
+                android:gravity="center"
+                android:paddingTop="0.5dp"
+                android:paddingBottom="0.5dp"
+                android:text="@string/default_percent"
+                android:textColor="#C4D7EB"
+                android:textSize="10sp"
+                app:layout_constraintBottom_toBottomOf="@id/edit_bg"
+                app:layout_constraintStart_toEndOf="@id/btn_add_key_opacity"
+                app:layout_constraintTop_toTopOf="@id/edit_bg"
+                tools:text="100%" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/btn_reduce_key_opacity"
+                android:layout_width="20dp"
+                android:layout_height="15dp"
+                android:layout_marginStart="2dp"
+                android:src="@drawable/img_reduce_edit"
+                app:layout_constraintBottom_toBottomOf="@id/edit_bg"
+                app:layout_constraintStart_toEndOf="@id/tv_key_opacity"
+                app:layout_constraintTop_toTopOf="@id/edit_bg" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/key_interact"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="25dp"
+                android:text="@string/key_interact"
+                android:textColor="@android:color/white"
+                android:textSize="10sp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@id/edit_bg"
+                app:layout_constraintStart_toEndOf="@id/btn_reduce_key_opacity"
+                app:layout_constraintTop_toTopOf="@id/edit_bg"
+                tools:visibility="visible" />
+
+            <com.sayx.hm_cloud.widget.DrawableTextView
+                android:id="@+id/btn_click"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:background="@drawable/shape_key_interact_bg"
+                android:drawablePadding="3dp"
+                android:gravity="center"
+                android:paddingStart="10dp"
+                android:paddingTop="3dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="3dp"
+                android:text="@string/click"
+                android:textSize="10sp"
+                android:textColor="@android:color/white"
+                android:visibility="gone"
+                app:drawableLeft="@drawable/selector_key_interact"
+                app:drawableSize="12dp"
+                app:layout_constraintBottom_toBottomOf="@id/edit_bg"
+                app:layout_constraintStart_toEndOf="@id/key_interact"
+                app:layout_constraintTop_toTopOf="@id/edit_bg"
+                tools:visibility="visible" />
+
+            <com.sayx.hm_cloud.widget.DrawableTextView
+                android:id="@+id/btn_press"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:background="@drawable/shape_key_interact_bg"
+                android:drawablePadding="3dp"
+                android:gravity="center"
+                android:paddingStart="10dp"
+                android:paddingTop="3dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="3dp"
+                android:textColor="@android:color/white"
+                android:text="@string/press"
+                android:textSize="10sp"
+                android:visibility="gone"
+                app:drawableLeft="@drawable/selector_key_interact"
+                app:drawableSize="12dp"
+                app:layout_constraintBottom_toBottomOf="@id/edit_bg"
+                app:layout_constraintStart_toEndOf="@id/btn_click"
+                app:layout_constraintTop_toTopOf="@id/edit_bg"
+                tools:visibility="visible" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/key_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="25dp"
+                android:text="@string/key_name"
+                android:textColor="@android:color/white"
+                android:textSize="10sp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@id/edit_bg"
+                app:layout_constraintStart_toEndOf="@id/btn_press"
+                app:layout_constraintTop_toTopOf="@id/edit_bg"
+                tools:visibility="visible" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/et_key_name"
+                android:layout_width="wrap_content"
+                android:layout_height="20dp"
+                android:layout_marginStart="5dp"
+                android:background="@drawable/shape_key_name_bg"
+                android:lines="1"
+                android:minWidth="80dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:singleLine="true"
+                android:textColor="#ABB1C3"
+                android:gravity="center|start"
+                android:textSize="10sp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@id/edit_bg"
+                app:layout_constraintStart_toEndOf="@id/key_name"
+                app:layout_constraintTop_toTopOf="@id/edit_bg"
+                tools:text="X"
+                tools:visibility="visible" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/btn_edit_key"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/shape_delete_key_bg"
+                android:paddingStart="10dp"
+                android:paddingTop="3dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="3dp"
+                android:text="@string/edit"
+                android:textColor="#A9B6C3"
+                android:textSize="10sp"
+                android:visibility="gone"
+                tools:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="@id/edit_bg"
+                app:layout_constraintEnd_toStartOf="@id/btn_delete_key"
+                app:layout_constraintTop_toTopOf="@id/edit_bg" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/btn_delete_key"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/shape_delete_key_bg"
+                android:paddingStart="10dp"
+                android:paddingTop="3dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="3dp"
+                android:text="@string/delete"
+                android:textColor="#A9B6C3"
+                android:textSize="10sp"
+                app:layout_constraintBottom_toBottomOf="@id/edit_bg"
+                app:layout_constraintEnd_toEndOf="@id/edit_bg"
+                app:layout_constraintTop_toTopOf="@id/edit_bg" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/btn_edit_fold"
+            android:layout_width="85dp"
+            android:layout_height="24dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="5dp"
+            android:src="@drawable/selector_edit_menu_fold" />
+    </LinearLayout>
+</layout>

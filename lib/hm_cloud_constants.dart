@@ -41,9 +41,7 @@ class HMCloudConstants {
   // 错误信息
   static const queueInfo = "queueInfo";
 
-  // 查询当前房间内⽤户
   static const controlQuery = "controlQuery";
 
-  // 获取授权码
   static const pinCodeResult = "pinCodeResult";
 }
