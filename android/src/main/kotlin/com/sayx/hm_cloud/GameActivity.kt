@@ -21,15 +21,12 @@ import android.view.animation.ScaleAnimation
 import android.widget.FrameLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.SPUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.google.gson.JsonObject
 import com.gyf.immersionbar.BarHide
-import com.gyf.immersionbar.ImmersionBar.hasNavigationBar
 import com.gyf.immersionbar.ktx.immersionBar
 import com.gyf.immersionbar.ktx.navigationBarHeight
 import com.haima.hmcp.HmcpManager
@@ -311,6 +308,7 @@ class GameActivity : AppCompatActivity() {
                         ?.startLiving(cloudId, liveUrl, object : OnLivingListener {
                             override fun start(success: Boolean, msg: String?) {
                                 LogUtils.d("startLiving:$success, $msg, url:$liveUrl")
+                                GameManager.openInteraction(cloudId)
                             }
 
                             override fun stop(success: Boolean, msg: String?) {
