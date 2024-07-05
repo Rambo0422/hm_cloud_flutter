@@ -442,4 +442,8 @@ object GameManager : HmcpPlayerListener {
             }
         )
     }
+
+    fun exitGame(data: Map<*, *>) {
+        channel.invokeMethod("exitGame", data)
+    }
 }

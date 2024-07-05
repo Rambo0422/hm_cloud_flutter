@@ -1,5 +1,7 @@
 package com.sayx.hm_cloud
 
+import android.annotation.SuppressLint
+import android.graphics.Color
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.KeyEvent
@@ -113,12 +115,61 @@ class GameActivity : AppCompatActivity() {
                         }
                     } else {
                         countTime -= 1000L
+                        runOnUiThread {
+                            updateNetDelay()
+                        }
                     }
                 }
             }, 0L, 1000L)
         } catch (e: Exception) {
             LogUtils.e("startTimer:${e.message}")
         }
+    }
+
+    private var lastDelay = 0
+
+    private var lastLost = 0.0
+
+    @SuppressLint("SetTextI18n")
+    private fun updateNetDelay() {
+        val latencyInfo = GameManager.gameView?.clockDiffVideoLatencyInfo
+//        LogUtils.d("updateNetDelay:${latencyInfo}")
+        val delay = latencyInfo?.netDelay ?: 999
+        val netDelay = if (delay > 450) 450 else delay
+//        val netDelay = (40..400).random()
+        // 延迟在0~60，展示满信号
+        if (netDelay <= 60) {
+            if (lastDelay > 60) {
+                dataBinding.ivNetStatus.setImageResource(R.drawable.icon_wifi_full)
+            }
+        } else if (netDelay in 61..200) {
+            // 延迟在61~200，展示中信号
+            if (lastDelay <= 60 || lastDelay > 200) {
+                dataBinding.ivNetStatus.setImageResource(R.drawable.icon_wifi_middle)
+            }
+        } else {
+            // 延迟在201~999，展示无信号
+            if (lastDelay <= 200) {
+                dataBinding.ivNetStatus.setImageResource(R.drawable.icon_wifi_low)
+            }
+        }
+        lastDelay = netDelay
+        val lostRate = latencyInfo?.packetsLostRate?.toDouble() ?: 0.0
+        if (lostRate < 1.0) {
+            if (lastLost >= 1.0) {
+                dataBinding.tvLossPacket.setTextColor(Color.parseColor("#00D38E"))
+            }
+        } else if (lostRate in 1.0..3.0) {
+            if (lastLost < 1.0 || lastLost > 3.0) {
+                dataBinding.tvLossPacket.setTextColor(Color.parseColor("#F7DC00"))
+            }
+        } else {
+            if (lastLost < 3.0) {
+                dataBinding.tvLossPacket.setTextColor(Color.parseColor("#FF2D2D"))
+            }
+        }
+        lastLost = lostRate
+        dataBinding.tvLossPacket.text = "$netDelay ms/$lostRate%"
     }
 
     private fun showNoOperateDialog() {
@@ -230,6 +281,9 @@ class GameActivity : AppCompatActivity() {
     override fun onDestroy() {
         EventBus.getDefault().unregister(this)
         GameManager.gameView?.onDestroy()
+        if (GameManager.isPlaying) {
+            GameManager.exitGame(mapOf(Pair("action", "")))
+        }
         try {
             gameTimer?.cancel()
         } catch (e : Exception) {
