@@ -513,7 +513,11 @@ class GameSettings @JvmOverloads constructor(
         }
         lastDelay = netDelay
         dataBinding.tvNetDelay.text = "${netDelay}ms"
-        val lostRate = latencyInfo?.packetsLostRate?.toDouble() ?: 0.0
+        val packetsLostRate = latencyInfo?.packetsLostRate
+        if (packetsLostRate?.isEmpty() != false) {
+            return
+        }
+        val lostRate = packetsLostRate.toDouble()
         if (lostRate < 1.0) {
             if (lastLost >= 1.0) {
                 dataBinding.tvLostRatio.setTextColor(Color.parseColor("#00D38E"))
