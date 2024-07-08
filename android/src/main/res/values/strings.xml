@@ -167,4 +167,5 @@
     <string name="subtitle_join_vip">VIP每日可领1h高峰时长，双倍经验</string>
     <string name="join_vip">我要开通</string>
     <string name="game_time_lack">剩余游玩时间不足5分钟</string>
+    <string name="recharge">充值</string>
 </resources>

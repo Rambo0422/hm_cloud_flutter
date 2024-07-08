@@ -71,7 +71,7 @@ object GameManager : HmcpPlayerListener {
     fun startGame(gameParam: GameParam) {
         this.gameParam = gameParam
         if (gameSdkInt) {
-            prepareGame()
+            checkPlayingGame()
         } else {
             initGameSdk()
         }
@@ -98,7 +98,7 @@ object GameManager : HmcpPlayerListener {
         channel.invokeMethod("updateKeyboardData", data.toString())
     }
 
-    fun initGameSdk() {
+    private fun initGameSdk() {
         try {
 //            Log.e("CloudGame", "init haiMaSDK:$gameParam")
             LogUtils.d("init haiMaSDK:${gson.toJson(gameParam)}")
@@ -250,6 +250,7 @@ object GameManager : HmcpPlayerListener {
     private fun playGame(bundle: Bundle?) {
         LogUtils.d("playGame:$gameView")
         if (gameView != null) {
+            // 通常是已进入普通队列，切换高速队列，释放普通队列实例，重新进入高速队列
             releaseGame(finish = "0", bundle)
         } else {
             gameView = HmcpVideoView(context)
@@ -279,11 +280,12 @@ object GameManager : HmcpPlayerListener {
     fun releaseGame(finish: String, bundle: Bundle?) {
         LogUtils.d("releaseGame:$finish")
         if (finish != "0") {
+            // 非切换队列调用此方法，认定为退出游戏
             channel.invokeMethod("exitGame", mapOf(Pair("action", finish)))
         }
+        isPlaying = false
         val cloudId = HmcpManager.getInstance().cloudId
         if (TextUtils.isEmpty(cloudId)) {
-            isPlaying = false
             LogUtils.d("undo releaseGame, cid is empty")
             gameView?.onDestroy()
             gameView = null
@@ -301,7 +303,7 @@ object GameManager : HmcpPlayerListener {
             },
             object : OnSaveGameCallBackListener {
                 override fun success(result: Boolean) {
-                    isPlaying = false
+                    // 游戏释放成功
                     LogUtils.d("releaseGame:$result")
                     gameView?.onDestroy()
                     gameView = null
@@ -312,6 +314,7 @@ object GameManager : HmcpPlayerListener {
                 }
 
                 override fun fail(error: String?) {
+                    // 游戏释放失败
                     LogUtils.e("releaseGame:$error")
                     gameView?.onDestroy()
                     gameView = null
@@ -335,15 +338,15 @@ object GameManager : HmcpPlayerListener {
                 Constants.STATUS_PLAY_INTERNAL -> {
                     gameView?.play()
                 }
-
+                // sdk反馈需选择是否进入排队，直接进入排队
                 Constants.STATUS_WAIT_CHOOSE -> {
                     gameView?.entryQueue()
                 }
-
+                // 网络切换，尝试重连
                 Constants.STATUS_TIPS_CHANGE_WIFI_TO_4G -> {
                     gameView?.reconnection()
                 }
-
+                // 实例进入排队，sdk反馈排队时间
                 Constants.STATUS_OPERATION_INTERVAL_TIME -> {
                     val dataStr = data.getString(StatusCallbackUtil.DATA)
                     if (dataStr is String && !TextUtils.isEmpty(dataStr)) {
@@ -355,7 +358,7 @@ object GameManager : HmcpPlayerListener {
                             )
                         )
                     } else {
-                        LogUtils.e("queue info error:$dataStr");
+                        LogUtils.e("queue info error:$dataStr")
                     }
                 }
 
@@ -374,7 +377,7 @@ object GameManager : HmcpPlayerListener {
                             context.startActivity(this)
                         }
                     } else {
-
+                        LogUtils.e("The game feeds back the first frame again.")
                     }
                 }
 
@@ -382,9 +385,9 @@ object GameManager : HmcpPlayerListener {
                     val dataStr = data.getString(StatusCallbackUtil.DATA)
                     if (dataStr is String && !TextUtils.isEmpty(dataStr)) {
                         val resultData = gson.fromJson(dataStr, Map::class.java)
-                        LogUtils.d("下线倒计时:${resultData["ahead"]}");
+                        LogUtils.d("下线倒计时:${resultData["ahead"]}")
                     } else {
-                        LogUtils.e("gameTimeCountDown error:$dataStr");
+                        LogUtils.e("gameTimeCountDown error:$dataStr")
                     }
                 }
                 // 9,连接失败

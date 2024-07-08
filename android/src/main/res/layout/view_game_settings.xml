@@ -13,6 +13,41 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <LinearLayout
+            android:id="@+id/layout_game_off_notice"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:background="@drawable/img_game_off_notice_bg"
+            android:gravity="center_vertical"
+            android:visibility="gone"
+            android:elevation="1.0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_game_off_notice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="25dp"
+                android:ellipsize="end"
+                android:lines="1"
+                android:textColor="@android:color/white"
+                android:textSize="12sp"
+                tools:text="高峰时长不足04:59，首充¥0.09/小时" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/btn_recharge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="25dp"
+                android:background="@drawable/shape_recharge_bg"
+                android:text="@string/recharge"
+                android:textColor="#FFC6EC4B"
+                android:textSize="12sp" />
+        </LinearLayout>
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layout_settings_left"
             android:layout_width="280dp"
@@ -400,9 +435,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="15dp"
                 android:layout_marginBottom="12dp"
-                android:padding="5dp"
                 android:drawablePadding="3dp"
                 android:gravity="center"
+                android:padding="5dp"
                 android:text="@string/exit_game"
                 android:textColor="#959CB1"
                 android:textSize="12sp"
@@ -515,11 +550,11 @@
                 android:layout_height="200dp"
                 android:layout_marginStart="30dp"
                 android:background="@android:color/transparent"
+                android:maxHeight="9dp"
                 android:orientation="vertical"
                 android:paddingStart="2dp"
                 android:paddingTop="3dp"
                 android:paddingEnd="2dp"
-                android:maxHeight="9dp"
                 android:paddingBottom="3dp"
                 android:progressDrawable="@drawable/shape_progress"
                 android:thumb="@drawable/icon_vertical_seek_bar_thumb"

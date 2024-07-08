@@ -6,6 +6,9 @@ import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.util.AttributeSet
 import android.util.Log
 import android.view.LayoutInflater
@@ -50,16 +53,10 @@ class GameSettings @JvmOverloads constructor(
 
     private var gameView: HmcpVideoView? = null
 
-    // 用户当前可用高峰时长
+    // 用户当前可用高峰时长（单位：秒）
     private var playTime: Long = 0
 
-    // 用户当前游戏已玩时长
-    private var playedTime: Long = 0
-
-    // 用户会员到期时间
-    private var vipTime: Long = 0L
-
-    // 当前游戏可玩时长
+    // 当前游戏可玩时长（单位：秒）
     private var currentPlayTime: Long = 0L
 
     private var taskScheduled = false
@@ -84,11 +81,12 @@ class GameSettings @JvmOverloads constructor(
             updateControlType(value)
         }
 
-    private var lastControlType: AppVirtualOperateType = AppVirtualOperateType.NONE
-
     init {
         // 可用时长点击，添加可用时长
         dataBinding.tvAvailableTime.setOnClickListener {
+            gameSettingChangeListener?.onAddAvailableTime()
+        }
+        dataBinding.btnRecharge.setOnClickListener {
             gameSettingChangeListener?.onAddAvailableTime()
         }
         // 调试码点击，复制调试码到剪切板
@@ -97,18 +95,16 @@ class GameSettings @JvmOverloads constructor(
         }
         // 控制方法
         dataBinding.btnGamepad.setOnClickListener {
-            lastControlType = AppVirtualOperateType.APP_STICK_XBOX
             controllerType = AppVirtualOperateType.APP_STICK_XBOX
             gameSettingChangeListener?.onControlMethodChange(AppVirtualOperateType.APP_STICK_XBOX)
         }
         dataBinding.btnKeyboard.setOnClickListener {
-            lastControlType = AppVirtualOperateType.APP_KEYBOARD
             controllerType = AppVirtualOperateType.APP_KEYBOARD
             gameSettingChangeListener?.onControlMethodChange(AppVirtualOperateType.APP_KEYBOARD)
         }
         dataBinding.btnCustom.setOnClickListener {
             hideLayout()
-            if (vipTime > (GameManager.getGameParam()?.realTime ?: 0L)) {
+            if (GameManager.getGameParam()?.isVip() == true) {
                 gameSettingChangeListener?.onCustomSettings()
             } else {
                 gameSettingChangeListener?.onShowVipDialog()
@@ -131,19 +127,20 @@ class GameSettings @JvmOverloads constructor(
         }
         // 画质选择
         dataBinding.tvQuality.setOnClickListener {
-            dataBinding.layoutQuality.visibility = if (dataBinding.layoutQuality.visibility == INVISIBLE) VISIBLE else INVISIBLE
+            dataBinding.layoutQuality.visibility =
+                if (dataBinding.layoutQuality.visibility == INVISIBLE) VISIBLE else INVISIBLE
         }
         dataBinding.tvStandardQuality.setOnClickListener {
             dataBinding.layoutQuality.visibility = INVISIBLE
-            dataBinding.tvQuality.text = "标清"
+            dataBinding.tvQuality.text = context.getString(R.string.standard_quality)
             gameView?.resolutionList?.let { list ->
                 gameSettingChangeListener?.onImageQualityChange(list.last())
             }
         }
         dataBinding.tvBlueRay.setOnClickListener {
             dataBinding.layoutQuality.visibility = INVISIBLE
-            if (vipTime > (GameManager.getGameParam()?.realTime ?: 0L)) {
-                dataBinding.tvQuality.text = "蓝光"
+            if (GameManager.getGameParam()?.isVip() == true) {
+                dataBinding.tvQuality.text = context.getString(R.string.blue_ray)
                 gameView?.resolutionList?.let { list ->
                     gameSettingChangeListener?.onImageQualityChange(list.first())
                 }
@@ -154,7 +151,7 @@ class GameSettings @JvmOverloads constructor(
         }
         // 云游互动开关
         dataBinding.btnInteraction.setOnClickListener {
-            if (vipTime > (GameManager.getGameParam()?.realTime ?: 0L)) {
+            if (GameManager.getGameParam()?.isVip() == true) {
                 val value = !dataBinding.btnInteraction.isSelected
                 dataBinding.btnInteraction.isSelected = value
                 gameSettingChangeListener?.onLiveInteractionChange(value)
@@ -171,7 +168,8 @@ class GameSettings @JvmOverloads constructor(
             } else {
                 currentTouchMode = gameView?.touchMode ?: currentTouchMode
                 gameView?.touchMode = TouchMode.TOUCH_MODE_NONE
-                SPUtils.getInstance().put(GameConstants.mouseMode, TouchMode.TOUCH_MODE_NONE.ordinal)
+                SPUtils.getInstance()
+                    .put(GameConstants.mouseMode, TouchMode.TOUCH_MODE_NONE.ordinal)
             }
             dataBinding.btnMouseClick.isEnabled = isChecked
             dataBinding.btnTouchClick.isEnabled = isChecked
@@ -190,10 +188,12 @@ class GameSettings @JvmOverloads constructor(
             if (value) {
                 currentTouchMode = TouchMode.TOUCH_MODE_MOUSE
                 gameView?.touchMode = TouchMode.TOUCH_MODE_MOUSE
-                SPUtils.getInstance().put(GameConstants.mouseMode, TouchMode.TOUCH_MODE_MOUSE.ordinal)
+                SPUtils.getInstance()
+                    .put(GameConstants.mouseMode, TouchMode.TOUCH_MODE_MOUSE.ordinal)
             } else {
                 gameView?.touchMode = TouchMode.TOUCH_MODE_NONE
-                SPUtils.getInstance().put(GameConstants.mouseMode, TouchMode.TOUCH_MODE_NONE.ordinal)
+                SPUtils.getInstance()
+                    .put(GameConstants.mouseMode, TouchMode.TOUCH_MODE_NONE.ordinal)
             }
             updateMouseMode()
         }
@@ -208,10 +208,12 @@ class GameSettings @JvmOverloads constructor(
             if (value) {
                 currentTouchMode = TouchMode.TOUCH_MODE_SCREEN
                 gameView?.touchMode = TouchMode.TOUCH_MODE_SCREEN
-                SPUtils.getInstance().put(GameConstants.mouseMode, TouchMode.TOUCH_MODE_SCREEN.ordinal)
+                SPUtils.getInstance()
+                    .put(GameConstants.mouseMode, TouchMode.TOUCH_MODE_SCREEN.ordinal)
             } else {
                 gameView?.touchMode = TouchMode.TOUCH_MODE_NONE
-                SPUtils.getInstance().put(GameConstants.mouseMode, TouchMode.TOUCH_MODE_NONE.ordinal)
+                SPUtils.getInstance()
+                    .put(GameConstants.mouseMode, TouchMode.TOUCH_MODE_NONE.ordinal)
             }
             updateMouseMode()
         }
@@ -226,10 +228,12 @@ class GameSettings @JvmOverloads constructor(
             if (value) {
                 currentTouchMode = TouchMode.TOUCH_MODE_SCREEN_SLIDE
                 gameView?.touchMode = TouchMode.TOUCH_MODE_SCREEN_SLIDE
-                SPUtils.getInstance().put(GameConstants.mouseMode, TouchMode.TOUCH_MODE_SCREEN_SLIDE.ordinal)
+                SPUtils.getInstance()
+                    .put(GameConstants.mouseMode, TouchMode.TOUCH_MODE_SCREEN_SLIDE.ordinal)
             } else {
                 gameView?.touchMode = TouchMode.TOUCH_MODE_NONE
-                SPUtils.getInstance().put(GameConstants.mouseMode, TouchMode.TOUCH_MODE_NONE.ordinal)
+                SPUtils.getInstance()
+                    .put(GameConstants.mouseMode, TouchMode.TOUCH_MODE_NONE.ordinal)
             }
             updateMouseMode()
         }
@@ -276,16 +280,14 @@ class GameSettings @JvmOverloads constructor(
         maxVolume: Int,
         light: Float,
         virtualOperateType: AppVirtualOperateType,
-        playTime: Long,
+        userPeakTime: Long,
         playStartTime: Long,
         gamePlayTime: Long,
-        vipTime: Long,
         peakChannel: Boolean,
         mobileGame: Boolean
     ) {
         this.gameView = gameView
         // 控制方法
-        this.lastControlType = virtualOperateType
         this.controllerType = virtualOperateType
         // 是否高峰通道
         this.peakChannel = peakChannel
@@ -295,34 +297,33 @@ class GameSettings @JvmOverloads constructor(
         updateVoice(maxVolume, volume)
         updateLight((light * 100).toInt())
         // 按键震动
-        dataBinding.btnVibrate.isSelected = SPUtils.getInstance().getBoolean(GameConstants.vibrable, true)
+        dataBinding.btnVibrate.isSelected =
+            SPUtils.getInstance().getBoolean(GameConstants.vibrable, true)
+        // 鼠标灵敏度
         initSensitivity()
         // 鼠标模式
         initMouseMode()
-        // 会员处理
-        this.vipTime = vipTime
         // 非VIP用户，无法自定义控制方法，切换清晰度，关闭云互动
-        if (vipTime <= (GameManager.getGameParam()?.realTime ?: 0)) {
+        if (GameManager.getGameParam()?.isVip() != true) {
             dataBinding.btnInteraction.isSelected = true
             gameSettingChangeListener?.onLiveInteractionChange(true)
         }
-        if (vipTime <= (GameManager.getGameParam()?.realTime ?: 0)) {
-            dataBinding.tvQuality.text = "标清"
+        if (GameManager.getGameParam()?.isVip() != true) {
+            dataBinding.tvQuality.text = context.getString(R.string.standard_quality)
             gameView?.resolutionList?.let { list ->
                 gameSettingChangeListener?.onImageQualityChange(list.last())
             }
         } else {
-            dataBinding.tvQuality.text = "蓝光"
+            dataBinding.tvQuality.text = context.getString(R.string.blue_ray)
             gameView?.resolutionList?.let { list ->
                 gameSettingChangeListener?.onImageQualityChange(list.first())
             }
         }
         // 时间处理
-        this.playTime = playTime
-        updateAvailableTime(playTime)
-        this.playedTime = if (playStartTime > 0) ((GameManager.getGameParam()?.realTime ?: 0) - playStartTime) / 1000L else 0L
+        this.playTime = userPeakTime
+        updateAvailableTime(userPeakTime)
         this.currentPlayTime = gamePlayTime / 1000L
-        LogUtils.d("playTime=$playTime, playedTime=$playedTime, currentPlayTime=$currentPlayTime")
+        LogUtils.d("playTime=$userPeakTime, currentPlayTime=$currentPlayTime")
         startCountTime()
         initialized = true
     }
@@ -422,7 +423,7 @@ class GameSettings @JvmOverloads constructor(
         SPUtils.getInstance().put(GameConstants.vibrable, dataBinding.btnVibrate.isSelected)
     }
 
-    // 显示可用时长
+    // 显示可用高峰时长
     private fun updateAvailableTime(time: Long) {
         LogUtils.d("updateAvailableTime:$time")
         dataBinding.tvAvailableTime.text = TimeUtils.getTimeString(time)
@@ -462,22 +463,12 @@ class GameSettings @JvmOverloads constructor(
         override fun run() {
             taskScheduled = true
             post {
-                playedTime += 1
                 currentPlayTime -= 1
-                if (currentPlayTime <= 300) {
+                if (currentPlayTime <= 300L) {
+                    // 临下机还有5分钟
                     gameSettingChangeListener?.onPlayTimeLack()
                 }
-                if (playedTime.toInt() % 2 == 0) {
-                    updateNetDelay()
-                }
-//                if (peakChannel && GameManager.getGameParam()?.) {
-//                    if (playTime > 0) {
-//                        playTime -= 1
-//                        updateAvailableTime(playTime)
-//                    } else {
-//                        updateAvailableTime(0)
-//                    }
-//                }
+                updateNetDelay()
             }
         }
     }
@@ -535,6 +526,38 @@ class GameSettings @JvmOverloads constructor(
         dataBinding.tvLostRatio.text = "$lostRate%"
     }
 
+    @SuppressLint("SetTextI18n")
+    fun showGameOffNotice() {
+        val text = "本次游玩即将结束:${TimeUtils.getCountTime(currentPlayTime)}"
+        val spannableString = SpannableString(text)
+        val start = text.indexOf(":") + 1
+        val colorSpan = ForegroundColorSpan(Color.parseColor("#FFC6EC4B"))
+        spannableString.setSpan(colorSpan, start, text.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        dataBinding.tvGameOffNotice.text = spannableString
+        if (dataBinding.layoutGameOffNotice.visibility == VISIBLE) {
+            return
+        }
+        val animatorSet = AnimatorSet()
+        val translation = ObjectAnimator.ofFloat(
+            dataBinding.layoutGameOffNotice,
+            "translationY",
+            -dataBinding.layoutGameOffNotice.height.toFloat(),
+            0.0f
+        )
+        translation.duration = 400L
+        translation.interpolator = LinearInterpolator()
+        val alpha = ObjectAnimator.ofFloat(dataBinding.layoutGameOffNotice, "alpha", 0.0f, 1.0f)
+        alpha.duration = 400L
+        alpha.interpolator = LinearInterpolator()
+        animatorSet.playTogether(translation, alpha)
+        animatorSet.addListener(object : AnimatorListenerImp() {
+            override fun onAnimationStart(animation: Animator) {
+                dataBinding.layoutGameOffNotice.visibility = VISIBLE
+            }
+        })
+        animatorSet.start()
+    }
+
     fun showLayout() {
         if (animated) {
             return
@@ -542,7 +565,12 @@ class GameSettings @JvmOverloads constructor(
         animated = true
         val animatorSet = AnimatorSet()
 
-        val topTranslation = ObjectAnimator.ofFloat(dataBinding.layoutStatus, "translationY", -dataBinding.layoutStatus.height.toFloat(), 0.0f)
+        val topTranslation = ObjectAnimator.ofFloat(
+            dataBinding.layoutStatus,
+            "translationY",
+            -dataBinding.layoutStatus.height.toFloat(),
+            0.0f
+        )
         topTranslation.duration = 400L
         topTranslation.interpolator = LinearInterpolator()
         val topAlpha = ObjectAnimator.ofFloat(dataBinding.layoutStatus, "alpha", 0.0f, 1.0f)
@@ -550,7 +578,12 @@ class GameSettings @JvmOverloads constructor(
         topAlpha.interpolator = LinearInterpolator()
 
         val leftTranslation =
-            ObjectAnimator.ofFloat(dataBinding.layoutSettingsLeft, "translationX", -dataBinding.layoutSettingsLeft.width.toFloat(), 0.0f)
+            ObjectAnimator.ofFloat(
+                dataBinding.layoutSettingsLeft,
+                "translationX",
+                -dataBinding.layoutSettingsLeft.width.toFloat(),
+                0.0f
+            )
         leftTranslation.duration = 400L
         leftTranslation.interpolator = LinearInterpolator()
         val leftAlpha = ObjectAnimator.ofFloat(dataBinding.layoutSettingsLeft, "alpha", 0.0f, 1.0f)
@@ -558,14 +591,27 @@ class GameSettings @JvmOverloads constructor(
         leftAlpha.interpolator = LinearInterpolator()
 
         val rightTranslation =
-            ObjectAnimator.ofFloat(dataBinding.layoutSettingsRight, "translationX", dataBinding.layoutSettingsRight.width.toFloat(), 0.0f)
+            ObjectAnimator.ofFloat(
+                dataBinding.layoutSettingsRight,
+                "translationX",
+                dataBinding.layoutSettingsRight.width.toFloat(),
+                0.0f
+            )
         rightTranslation.duration = 400L
         rightTranslation.interpolator = LinearInterpolator()
-        val rightAlpha = ObjectAnimator.ofFloat(dataBinding.layoutSettingsRight, "alpha", 0.0f, 1.0f)
+        val rightAlpha =
+            ObjectAnimator.ofFloat(dataBinding.layoutSettingsRight, "alpha", 0.0f, 1.0f)
         rightAlpha.duration = 400L
         rightAlpha.interpolator = LinearInterpolator()
 
-        animatorSet.playTogether(topTranslation, topAlpha, leftTranslation, leftAlpha, rightTranslation, rightAlpha)
+        animatorSet.playTogether(
+            topTranslation,
+            topAlpha,
+            leftTranslation,
+            leftAlpha,
+            rightTranslation,
+            rightAlpha
+        )
         animatorSet.addListener(object : AnimatorListenerImp() {
             override fun onAnimationStart(animation: Animator) {
                 dataBinding.layoutSettingsLeft.visibility = VISIBLE
@@ -588,7 +634,12 @@ class GameSettings @JvmOverloads constructor(
         }
         animated = true
         val animatorSet = AnimatorSet()
-        val topTranslation = ObjectAnimator.ofFloat(dataBinding.layoutStatus, "translationY", 0.0f, -dataBinding.layoutStatus.height.toFloat())
+        val topTranslation = ObjectAnimator.ofFloat(
+            dataBinding.layoutStatus,
+            "translationY",
+            0.0f,
+            -dataBinding.layoutStatus.height.toFloat()
+        )
         topTranslation.duration = 400L
         topTranslation.interpolator = LinearInterpolator()
         val topAlpha = ObjectAnimator.ofFloat(dataBinding.layoutStatus, "alpha", 1.0f, 0.0f)
@@ -596,7 +647,12 @@ class GameSettings @JvmOverloads constructor(
         topAlpha.interpolator = LinearInterpolator()
 
         val leftTranslation =
-            ObjectAnimator.ofFloat(dataBinding.layoutSettingsLeft, "translationX", 0.0f, -dataBinding.layoutSettingsLeft.width.toFloat())
+            ObjectAnimator.ofFloat(
+                dataBinding.layoutSettingsLeft,
+                "translationX",
+                0.0f,
+                -dataBinding.layoutSettingsLeft.width.toFloat()
+            )
         leftTranslation.duration = 400L
         leftTranslation.interpolator = LinearInterpolator()
         val leftAlpha = ObjectAnimator.ofFloat(dataBinding.layoutSettingsLeft, "alpha", 1.0f, 0.0f)
@@ -604,14 +660,27 @@ class GameSettings @JvmOverloads constructor(
         leftAlpha.interpolator = LinearInterpolator()
 
         val rightTranslation =
-            ObjectAnimator.ofFloat(dataBinding.layoutSettingsRight, "translationX", 0.0f, dataBinding.layoutSettingsRight.width.toFloat())
+            ObjectAnimator.ofFloat(
+                dataBinding.layoutSettingsRight,
+                "translationX",
+                0.0f,
+                dataBinding.layoutSettingsRight.width.toFloat()
+            )
         rightTranslation.duration = 400L
         rightTranslation.interpolator = LinearInterpolator()
-        val rightAlpha = ObjectAnimator.ofFloat(dataBinding.layoutSettingsRight, "alpha", 1.0f, 0.0f)
+        val rightAlpha =
+            ObjectAnimator.ofFloat(dataBinding.layoutSettingsRight, "alpha", 1.0f, 0.0f)
         rightAlpha.duration = 400L
         rightAlpha.interpolator = LinearInterpolator()
 
-        animatorSet.playTogether(topTranslation, topAlpha, leftTranslation, leftAlpha, rightTranslation, rightAlpha)
+        animatorSet.playTogether(
+            topTranslation,
+            topAlpha,
+            leftTranslation,
+            leftAlpha,
+            rightTranslation,
+            rightAlpha
+        )
         animatorSet.addListener(object : AnimatorListenerImp() {
 
             override fun onAnimationEnd(animation: Animator) {

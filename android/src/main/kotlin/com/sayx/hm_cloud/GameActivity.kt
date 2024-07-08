@@ -161,31 +161,44 @@ class GameActivity : AppCompatActivity() {
                 controllerEditLayout?.setKeyInfo(keyInfo)
             }
         }
+        // 游戏控制器数据反馈
         dataBinding.gameController.controllerCallback = object : ControllerEventCallback {
             override fun getDefaultKeyboardData() {
+                // 需要默认键盘配置
                 GameManager.getDefaultKeyboardData()
             }
 
             override fun getKeyboardData() {
+                // 需要键盘配置
                 GameManager.getKeyboardData()
             }
 
             override fun getDefaultGamepadData() {
+                // 需要默认手柄配置
                 GameManager.getDefaultGamepadData()
             }
 
             override fun getGamepadData() {
+                // 需要手柄配置
                 GameManager.getGamepadData()
             }
 
             override fun updateKeyboardData(data: JsonObject) {
+                // 需要更新配置
                 GameManager.updateKeyboardData(data)
             }
         }
+        // 游戏控制器按键操作处理
         dataBinding.gameController.keyEventListener = object : OnKeyEventListenerImp() {}
 
+        // 游戏控制器摇杆操作处理
         dataBinding.gameController.rockerListener = object : OnRockerOperationListenerImp() {}
+
+        // 检查是否展示引导
         checkGuideShow()
+
+        // 初始化设置面板
+        initGameSettings()
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -198,9 +211,11 @@ class GameActivity : AppCompatActivity() {
         if (!showGuide) {
             showGuideView()
         }
-        initGameSettings()
     }
 
+    /**
+     * 引导面板动画
+     */
     private fun showGuideView() {
         dataBinding.layoutGuide.visibility = View.VISIBLE
         dataBinding.guideMaskView.visibility = View.VISIBLE
@@ -223,22 +238,25 @@ class GameActivity : AppCompatActivity() {
 
     private fun initGameSettings() {
         if (gameSettings != null) {
+            // 避免二次初始化
             return
         }
+        // 获取系统音量
         val volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
+        // 获取系统最高音量
         val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
-        val attributes = window.attributes
-        var light = attributes.screenBrightness
-        val brightness = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS)
-        if (light == -1f) {
-            // 亮度模式为跟随系统情况下，读取系统屏幕亮度
-            light = brightness / 255f
-        } else {
-            attributes.screenBrightness = brightness / 255f
-            window.attributes = attributes
-        }
-        dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
 
+        // 获取系统屏幕亮度值
+        val brightness = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS)
+        // 取得亮度比
+        val light = brightness / 255f
+        LogUtils.d("screenBrightness:$light, systemBrightness:$brightness")
+        // 设置当前window亮度
+        val attributes = window.attributes
+        attributes.screenBrightness = light
+        window.attributes = attributes
+
+        // 创建设置面板控件
         gameSettings = GameSettings(this)
         configSettingCallback()
         gameSettings?.initSettings(
@@ -247,13 +265,18 @@ class GameActivity : AppCompatActivity() {
             maxVolume,
             light,
             AppVirtualOperateType.NONE,
+            // 用户高峰时长
             GameManager.getGameParam()?.peakTime ?: 0L,
+            // 本次游戏开始时间（重连获取游戏记录可获取本次游戏开始时间，目前重连存在问题，待完善）
             0,
+            // 本次游戏可玩时长
             GameManager.getGameParam()?.playTime ?: 0L,
-            GameManager.getGameParam()?.vipExpiredTime ?: 0L,
+            // 本次是否使用高峰通道进入
             GameManager.getGameParam()?.isPeakChannel ?: false,
+            // 当前是否海马手游
             false
         )
+        // 将设置面板控件加入主面板
         val layoutParams = FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.MATCH_PARENT
@@ -268,6 +291,7 @@ class GameActivity : AppCompatActivity() {
         gameSettings?.gameSettingChangeListener = object : GameSettingChangeListener {
             override fun onAddAvailableTime() {
                 LogUtils.d("onAddAvailableTime")
+                // 前往购买时长
                 GameManager.openBuyPeakTime()
             }
 
@@ -363,10 +387,13 @@ class GameActivity : AppCompatActivity() {
 
             override fun onHideLayout() {
                 dataBinding.btnGameSettings.visibility = View.VISIBLE
+                dataBinding.btnVirtualKeyboard.visibility = View.VISIBLE
             }
 
             override fun onPlayTimeLack() {
-                ToastUtils.showLong(R.string.game_time_lack)
+                runOnUiThread {
+                    gameSettings?.showGameOffNotice()
+                }
             }
 
             override fun updateNetSignal(icon: Int) {
@@ -377,6 +404,7 @@ class GameActivity : AppCompatActivity() {
 
     private fun showGameSetting() {
         dataBinding.btnGameSettings.visibility = View.INVISIBLE
+        dataBinding.btnVirtualKeyboard.visibility = View.INVISIBLE
         gameSettings?.showLayout()
     }
 
