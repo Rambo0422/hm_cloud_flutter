@@ -60,5 +60,4 @@ class HmCloudController {
   Future<void> queryControlUsers() {
     return methodChannel.invokeMethod('queryControlUsers', null);
   }
-  // test
 }
