@@ -18,9 +18,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import com.blankj.utilcode.util.LogUtils
-import com.blankj.utilcode.util.SizeUtils
 import com.sayx.hm_cloud.R
-import com.sayx.hm_cloud.databinding.DialogCommonBinding
+import com.sayx.hm_cloud.databinding.DialogCommonAppBinding
 
 class AppCommonDialog : DialogFragment() {
 
@@ -35,7 +34,7 @@ class AppCommonDialog : DialogFragment() {
 
     var enableCancel = false
 
-    private lateinit var dataBinding: DialogCommonBinding
+    private lateinit var dataBinding: DialogCommonAppBinding
 
     @SuppressLint("GestureBackNavigation")
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -56,7 +55,7 @@ class AppCommonDialog : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        dataBinding = DataBindingUtil.inflate(inflater, R.layout.dialog_common, container, false)
+        dataBinding = DataBindingUtil.inflate(inflater, R.layout.dialog_common_app, container, false)
         return dataBinding.root
     }
 
