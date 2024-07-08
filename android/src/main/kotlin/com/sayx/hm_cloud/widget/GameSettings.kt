@@ -7,6 +7,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.LinearInterpolator
@@ -18,6 +19,7 @@ import com.blankj.utilcode.util.SPUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.haima.hmcp.enums.TouchMode
 import com.haima.hmcp.widgets.HmcpVideoView
+import com.sayx.hm_cloud.BuildConfig
 import com.sayx.hm_cloud.GameManager
 import com.sayx.hm_cloud.R
 import com.sayx.hm_cloud.callback.AnimatorListenerImp
@@ -129,8 +131,7 @@ class GameSettings @JvmOverloads constructor(
         }
         // 画质选择
         dataBinding.tvQuality.setOnClickListener {
-            dataBinding.layoutQuality.visibility =
-                if (dataBinding.layoutQuality.visibility == INVISIBLE) VISIBLE else INVISIBLE
+            dataBinding.layoutQuality.visibility = if (dataBinding.layoutQuality.visibility == INVISIBLE) VISIBLE else INVISIBLE
         }
         dataBinding.tvStandardQuality.setOnClickListener {
             dataBinding.layoutQuality.visibility = INVISIBLE
@@ -170,8 +171,7 @@ class GameSettings @JvmOverloads constructor(
             } else {
                 currentTouchMode = gameView?.touchMode ?: currentTouchMode
                 gameView?.touchMode = TouchMode.TOUCH_MODE_NONE
-                SPUtils.getInstance()
-                    .put(GameConstants.mouseMode, TouchMode.TOUCH_MODE_NONE.ordinal)
+                SPUtils.getInstance().put(GameConstants.mouseMode, TouchMode.TOUCH_MODE_NONE.ordinal)
             }
             dataBinding.btnMouseClick.isEnabled = isChecked
             dataBinding.btnTouchClick.isEnabled = isChecked
@@ -190,12 +190,10 @@ class GameSettings @JvmOverloads constructor(
             if (value) {
                 currentTouchMode = TouchMode.TOUCH_MODE_MOUSE
                 gameView?.touchMode = TouchMode.TOUCH_MODE_MOUSE
-                SPUtils.getInstance()
-                    .put(GameConstants.mouseMode, TouchMode.TOUCH_MODE_MOUSE.ordinal)
+                SPUtils.getInstance().put(GameConstants.mouseMode, TouchMode.TOUCH_MODE_MOUSE.ordinal)
             } else {
                 gameView?.touchMode = TouchMode.TOUCH_MODE_NONE
-                SPUtils.getInstance()
-                    .put(GameConstants.mouseMode, TouchMode.TOUCH_MODE_NONE.ordinal)
+                SPUtils.getInstance().put(GameConstants.mouseMode, TouchMode.TOUCH_MODE_NONE.ordinal)
             }
             updateMouseMode()
         }
@@ -210,12 +208,10 @@ class GameSettings @JvmOverloads constructor(
             if (value) {
                 currentTouchMode = TouchMode.TOUCH_MODE_SCREEN
                 gameView?.touchMode = TouchMode.TOUCH_MODE_SCREEN
-                SPUtils.getInstance()
-                    .put(GameConstants.mouseMode, TouchMode.TOUCH_MODE_SCREEN.ordinal)
+                SPUtils.getInstance().put(GameConstants.mouseMode, TouchMode.TOUCH_MODE_SCREEN.ordinal)
             } else {
                 gameView?.touchMode = TouchMode.TOUCH_MODE_NONE
-                SPUtils.getInstance()
-                    .put(GameConstants.mouseMode, TouchMode.TOUCH_MODE_NONE.ordinal)
+                SPUtils.getInstance().put(GameConstants.mouseMode, TouchMode.TOUCH_MODE_NONE.ordinal)
             }
             updateMouseMode()
         }
@@ -230,12 +226,10 @@ class GameSettings @JvmOverloads constructor(
             if (value) {
                 currentTouchMode = TouchMode.TOUCH_MODE_SCREEN_SLIDE
                 gameView?.touchMode = TouchMode.TOUCH_MODE_SCREEN_SLIDE
-                SPUtils.getInstance()
-                    .put(GameConstants.mouseMode, TouchMode.TOUCH_MODE_SCREEN_SLIDE.ordinal)
+                SPUtils.getInstance().put(GameConstants.mouseMode, TouchMode.TOUCH_MODE_SCREEN_SLIDE.ordinal)
             } else {
                 gameView?.touchMode = TouchMode.TOUCH_MODE_NONE
-                SPUtils.getInstance()
-                    .put(GameConstants.mouseMode, TouchMode.TOUCH_MODE_NONE.ordinal)
+                SPUtils.getInstance().put(GameConstants.mouseMode, TouchMode.TOUCH_MODE_NONE.ordinal)
             }
             updateMouseMode()
         }
@@ -301,8 +295,7 @@ class GameSettings @JvmOverloads constructor(
         updateVoice(maxVolume, volume)
         updateLight((light * 100).toInt())
         // 按键震动
-        dataBinding.btnVibrate.isSelected =
-            SPUtils.getInstance().getBoolean(GameConstants.vibrable, true)
+        dataBinding.btnVibrate.isSelected = SPUtils.getInstance().getBoolean(GameConstants.vibrable, true)
         initSensitivity()
         // 鼠标模式
         initMouseMode()
@@ -327,8 +320,7 @@ class GameSettings @JvmOverloads constructor(
         // 时间处理
         this.playTime = playTime
         updateAvailableTime(playTime)
-        this.playedTime = if (playStartTime > 0) ((GameManager.getGameParam()?.realTime
-            ?: 0) - playStartTime) / 1000L else 0L
+        this.playedTime = if (playStartTime > 0) ((GameManager.getGameParam()?.realTime ?: 0) - playStartTime) / 1000L else 0L
         this.currentPlayTime = gamePlayTime / 1000L
         LogUtils.d("playTime=$playTime, playedTime=$playedTime, currentPlayTime=$currentPlayTime")
         startCountTime()
@@ -550,12 +542,7 @@ class GameSettings @JvmOverloads constructor(
         animated = true
         val animatorSet = AnimatorSet()
 
-        val topTranslation = ObjectAnimator.ofFloat(
-            dataBinding.layoutStatus,
-            "translationY",
-            -dataBinding.layoutStatus.height.toFloat(),
-            0.0f
-        )
+        val topTranslation = ObjectAnimator.ofFloat(dataBinding.layoutStatus, "translationY", -dataBinding.layoutStatus.height.toFloat(), 0.0f)
         topTranslation.duration = 400L
         topTranslation.interpolator = LinearInterpolator()
         val topAlpha = ObjectAnimator.ofFloat(dataBinding.layoutStatus, "alpha", 0.0f, 1.0f)
@@ -563,12 +550,7 @@ class GameSettings @JvmOverloads constructor(
         topAlpha.interpolator = LinearInterpolator()
 
         val leftTranslation =
-            ObjectAnimator.ofFloat(
-                dataBinding.layoutSettingsLeft,
-                "translationX",
-                -dataBinding.layoutSettingsLeft.width.toFloat(),
-                0.0f
-            )
+            ObjectAnimator.ofFloat(dataBinding.layoutSettingsLeft, "translationX", -dataBinding.layoutSettingsLeft.width.toFloat(), 0.0f)
         leftTranslation.duration = 400L
         leftTranslation.interpolator = LinearInterpolator()
         val leftAlpha = ObjectAnimator.ofFloat(dataBinding.layoutSettingsLeft, "alpha", 0.0f, 1.0f)
@@ -576,27 +558,14 @@ class GameSettings @JvmOverloads constructor(
         leftAlpha.interpolator = LinearInterpolator()
 
         val rightTranslation =
-            ObjectAnimator.ofFloat(
-                dataBinding.layoutSettingsRight,
-                "translationX",
-                dataBinding.layoutSettingsRight.width.toFloat(),
-                0.0f
-            )
+            ObjectAnimator.ofFloat(dataBinding.layoutSettingsRight, "translationX", dataBinding.layoutSettingsRight.width.toFloat(), 0.0f)
         rightTranslation.duration = 400L
         rightTranslation.interpolator = LinearInterpolator()
-        val rightAlpha =
-            ObjectAnimator.ofFloat(dataBinding.layoutSettingsRight, "alpha", 0.0f, 1.0f)
+        val rightAlpha = ObjectAnimator.ofFloat(dataBinding.layoutSettingsRight, "alpha", 0.0f, 1.0f)
         rightAlpha.duration = 400L
         rightAlpha.interpolator = LinearInterpolator()
 
-        animatorSet.playTogether(
-            topTranslation,
-            topAlpha,
-            leftTranslation,
-            leftAlpha,
-            rightTranslation,
-            rightAlpha
-        )
+        animatorSet.playTogether(topTranslation, topAlpha, leftTranslation, leftAlpha, rightTranslation, rightAlpha)
         animatorSet.addListener(object : AnimatorListenerImp() {
             override fun onAnimationStart(animation: Animator) {
                 dataBinding.layoutSettingsLeft.visibility = VISIBLE
@@ -619,12 +588,7 @@ class GameSettings @JvmOverloads constructor(
         }
         animated = true
         val animatorSet = AnimatorSet()
-        val topTranslation = ObjectAnimator.ofFloat(
-            dataBinding.layoutStatus,
-            "translationY",
-            0.0f,
-            -dataBinding.layoutStatus.height.toFloat()
-        )
+        val topTranslation = ObjectAnimator.ofFloat(dataBinding.layoutStatus, "translationY", 0.0f, -dataBinding.layoutStatus.height.toFloat())
         topTranslation.duration = 400L
         topTranslation.interpolator = LinearInterpolator()
         val topAlpha = ObjectAnimator.ofFloat(dataBinding.layoutStatus, "alpha", 1.0f, 0.0f)
@@ -632,12 +596,7 @@ class GameSettings @JvmOverloads constructor(
         topAlpha.interpolator = LinearInterpolator()
 
         val leftTranslation =
-            ObjectAnimator.ofFloat(
-                dataBinding.layoutSettingsLeft,
-                "translationX",
-                0.0f,
-                -dataBinding.layoutSettingsLeft.width.toFloat()
-            )
+            ObjectAnimator.ofFloat(dataBinding.layoutSettingsLeft, "translationX", 0.0f, -dataBinding.layoutSettingsLeft.width.toFloat())
         leftTranslation.duration = 400L
         leftTranslation.interpolator = LinearInterpolator()
         val leftAlpha = ObjectAnimator.ofFloat(dataBinding.layoutSettingsLeft, "alpha", 1.0f, 0.0f)
@@ -645,27 +604,14 @@ class GameSettings @JvmOverloads constructor(
         leftAlpha.interpolator = LinearInterpolator()
 
         val rightTranslation =
-            ObjectAnimator.ofFloat(
-                dataBinding.layoutSettingsRight,
-                "translationX",
-                0.0f,
-                dataBinding.layoutSettingsRight.width.toFloat()
-            )
+            ObjectAnimator.ofFloat(dataBinding.layoutSettingsRight, "translationX", 0.0f, dataBinding.layoutSettingsRight.width.toFloat())
         rightTranslation.duration = 400L
         rightTranslation.interpolator = LinearInterpolator()
-        val rightAlpha =
-            ObjectAnimator.ofFloat(dataBinding.layoutSettingsRight, "alpha", 1.0f, 0.0f)
+        val rightAlpha = ObjectAnimator.ofFloat(dataBinding.layoutSettingsRight, "alpha", 1.0f, 0.0f)
         rightAlpha.duration = 400L
         rightAlpha.interpolator = LinearInterpolator()
 
-        animatorSet.playTogether(
-            topTranslation,
-            topAlpha,
-            leftTranslation,
-            leftAlpha,
-            rightTranslation,
-            rightAlpha
-        )
+        animatorSet.playTogether(topTranslation, topAlpha, leftTranslation, leftAlpha, rightTranslation, rightAlpha)
         animatorSet.addListener(object : AnimatorListenerImp() {
 
             override fun onAnimationEnd(animation: Animator) {
