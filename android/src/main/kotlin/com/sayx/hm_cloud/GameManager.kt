@@ -277,7 +277,6 @@ object GameManager : HmcpPlayerListener {
     }
 
     fun releaseGame(finish: String, bundle: Bundle?) {
-        LogUtils.d("releaseGame:$finish")
         if (finish != "0") {
             channel.invokeMethod("exitGame", mapOf(Pair("action", finish)))
         }
@@ -573,13 +572,5 @@ object GameManager : HmcpPlayerListener {
             override fun notImplemented() {
             }
         })
-    }
-
-    fun exitGame(data: Map<*, *>) {
-        channel.invokeMethod("exitGame", data)
-    }
-
-    fun openInteraction(cid: String?) {
-        channel.invokeMethod("openInteraction", cid)
     }
 }
