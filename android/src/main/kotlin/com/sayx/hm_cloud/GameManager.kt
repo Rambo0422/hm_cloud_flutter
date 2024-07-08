@@ -579,7 +579,7 @@ object GameManager : HmcpPlayerListener {
         channel.invokeMethod("exitGame", data)
     }
 
-    fun openInteraction(cid: String?) {
-        channel.invokeMethod("openInteraction", cid)
+    fun openInteraction(cid: String?, open: Boolean) {
+        channel.invokeMethod("openInteraction", mapOf(Pair("cid", cid), Pair("open", open)))
     }
 }

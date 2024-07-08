@@ -308,7 +308,7 @@ class GameActivity : AppCompatActivity() {
                         ?.startLiving(cloudId, liveUrl, object : OnLivingListener {
                             override fun start(success: Boolean, msg: String?) {
                                 LogUtils.d("startLiving:$success, $msg, url:$liveUrl")
-                                GameManager.openInteraction(cloudId)
+                                GameManager.openInteraction(cloudId, true)
                             }
 
                             override fun stop(success: Boolean, msg: String?) {
@@ -324,6 +324,7 @@ class GameActivity : AppCompatActivity() {
 
                         override fun stop(success: Boolean, msg: String?) {
                             LogUtils.d("stopLiving:$success, $msg")
+                            GameManager.openInteraction(cloudId, false)
                         }
                     })
                 }
