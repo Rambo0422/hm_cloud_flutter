@@ -2,6 +2,7 @@ package com.sayx.hm_cloud
 
 import android.annotation.SuppressLint
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.KeyEvent
@@ -14,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
+import androidx.multidex.BuildConfig
 import com.blankj.utilcode.util.LogUtils
 import com.gyf.immersionbar.BarHide
 import com.gyf.immersionbar.ImmersionBar.hasNavigationBar
@@ -93,7 +95,11 @@ class GameActivity : AppCompatActivity() {
     private fun initGameSettings() {
         GameManager.gameView?.setPCMouseMode(true)
         GameManager.gameView?.virtualDeviceType = VirtualOperateType.NONE
-        GameManager.gameView?.onSwitchResolution(0, GameManager.gameView?.resolutionList?.first(),0)
+        GameManager.gameView?.onSwitchResolution(
+            0,
+            GameManager.gameView?.resolutionList?.first(),
+            0
+        )
     }
 
     private fun startTimer() {
@@ -128,8 +134,6 @@ class GameActivity : AppCompatActivity() {
 
     private var lastDelay = 0
 
-    private var lastLost = 0.0
-
     @SuppressLint("SetTextI18n")
     private fun updateNetDelay() {
         val latencyInfo = GameManager.gameView?.clockDiffVideoLatencyInfo
@@ -154,22 +158,17 @@ class GameActivity : AppCompatActivity() {
             }
         }
         lastDelay = netDelay
-        val lostRate = latencyInfo?.packetsLostRate?.toDouble() ?: 0.0
-        if (lostRate < 1.0) {
-            if (lastLost >= 1.0) {
-                dataBinding.tvLossPacket.setTextColor(Color.parseColor("#00D38E"))
-            }
-        } else if (lostRate in 1.0..3.0) {
-            if (lastLost < 1.0 || lastLost > 3.0) {
-                dataBinding.tvLossPacket.setTextColor(Color.parseColor("#F7DC00"))
-            }
-        } else {
-            if (lastLost < 3.0) {
-                dataBinding.tvLossPacket.setTextColor(Color.parseColor("#FF2D2D"))
-            }
+        if (BuildConfig.DEBUG) {
+            dataBinding.tvLossPacket.text =
+                "netDelay:${latencyInfo?.netDelay}\n" +
+                        "decodeDelay:${latencyInfo?.decodeDelay}\n" +
+                        "renderDelay:${latencyInfo?.renderDelay}\n" +
+                        "videoFps:${latencyInfo?.videoFps}\n" +
+                        "bitRate:${latencyInfo?.bitRate}\n" +
+                        "packetsLostRate:${latencyInfo?.packetsLostRate}\n" +
+                        "receivedBitrate:${latencyInfo?.receivedBitrate}\n" +
+                        "audioBitrate:${latencyInfo?.audioBitrate}\n"
         }
-        lastLost = lostRate
-        dataBinding.tvLossPacket.text = "$netDelay ms/$lostRate%"
 
         val cloudId = HmcpManager.getInstance().cloudId
         if (!TextUtils.isEmpty(cloudId)) {
@@ -291,7 +290,7 @@ class GameActivity : AppCompatActivity() {
         }
         try {
             gameTimer?.cancel()
-        } catch (e : Exception) {
+        } catch (e: Exception) {
             LogUtils.e("${e.message}")
         }
         super.onDestroy()
