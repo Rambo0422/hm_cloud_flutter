@@ -1,8 +1,6 @@
 package com.sayx.hm_cloud
 
 import android.annotation.SuppressLint
-import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.KeyEvent
@@ -15,7 +13,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
-import androidx.multidex.BuildConfig
 import com.blankj.utilcode.util.LogUtils
 import com.gyf.immersionbar.BarHide
 import com.gyf.immersionbar.ImmersionBar.hasNavigationBar
@@ -158,17 +155,15 @@ class GameActivity : AppCompatActivity() {
             }
         }
         lastDelay = netDelay
-        if (BuildConfig.DEBUG) {
-            dataBinding.tvLossPacket.text =
-                "netDelay:${latencyInfo?.netDelay}\n" +
-                        "decodeDelay:${latencyInfo?.decodeDelay}\n" +
-                        "renderDelay:${latencyInfo?.renderDelay}\n" +
-                        "videoFps:${latencyInfo?.videoFps}\n" +
-                        "bitRate:${latencyInfo?.bitRate}\n" +
-                        "packetsLostRate:${latencyInfo?.packetsLostRate}\n" +
-                        "receivedBitrate:${latencyInfo?.receivedBitrate}\n" +
-                        "audioBitrate:${latencyInfo?.audioBitrate}\n"
-        }
+        dataBinding.tvLossPacket.text =
+            "netDelay:${latencyInfo?.netDelay}\n" +
+                    "decodeDelay:${latencyInfo?.decodeDelay}\n" +
+                    "renderDelay:${latencyInfo?.renderDelay}\n" +
+                    "videoFps:${latencyInfo?.videoFps}\n" +
+                    "bitRate:${latencyInfo?.bitRate}\n" +
+                    "packetsLostRate:${latencyInfo?.packetsLostRate}\n" +
+                    "receivedBitrate:${latencyInfo?.receivedBitrate}\n" +
+                    "audioBitrate:${latencyInfo?.audioBitrate}\n"
 
         val cloudId = HmcpManager.getInstance().cloudId
         if (!TextUtils.isEmpty(cloudId)) {
