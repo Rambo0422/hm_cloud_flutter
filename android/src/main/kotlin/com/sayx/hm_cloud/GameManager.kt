@@ -41,8 +41,6 @@ import org.json.JSONObject
 @SuppressLint("StaticFieldLeak")
 object GameManager : HmcpPlayerListener {
 
-    private var gameSdkInt = false
-
     private lateinit var channel: MethodChannel
 
     val gson: Gson by lazy {
@@ -70,11 +68,7 @@ object GameManager : HmcpPlayerListener {
 
     fun startGame(gameParam: GameParam) {
         this.gameParam = gameParam
-        if (gameSdkInt) {
-            checkPlayingGame()
-        } else {
-            initGameSdk()
-        }
+        initGameSdk()
     }
 
     fun getDefaultKeyboardData() {
