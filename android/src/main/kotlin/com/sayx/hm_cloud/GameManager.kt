@@ -166,7 +166,6 @@ object GameManager : HmcpPlayerListener {
      * 准备进入游戏队列
      */
     private fun prepareGame(cid: String? = null) {
-        gameSdkInt = true
         LogUtils.d("prepareGame:${cid}, priority:${gameParam?.priority}")
         try {
             val bundle = Bundle().also {
