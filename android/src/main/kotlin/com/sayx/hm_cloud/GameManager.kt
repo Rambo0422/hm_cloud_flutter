@@ -1,11 +1,11 @@
 package com.sayx.hm_cloud
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
+import androidx.multidex.BuildConfig
 import com.blankj.utilcode.util.LogUtils
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -52,13 +52,15 @@ object GameManager : HmcpPlayerListener {
 
     lateinit var flutterEngine: FlutterEngine
 
-    var activity: Activity? = null
-
     var isPlaying = false
 
     fun init(channel: MethodChannel, context: Context) {
         this.channel = channel
         this.context = context
+        LogUtils.getConfig().also {
+            it.isLogSwitch = BuildConfig.DEBUG
+            it.globalTag = "GameManager"
+        }
     }
 
     fun getGameParam(): GameParam? {
@@ -76,6 +78,7 @@ object GameManager : HmcpPlayerListener {
 
     fun initGameSdk() {
         try {
+//            Log.e("CloudGame", "init haiMaSDK:$gameParam")
             LogUtils.d("init haiMaSDK:${gson.toJson(gameParam)}")
             val config: Bundle = Bundle().also {
                 it.putString(HmcpManager.ACCESS_KEY_ID, gameParam?.accessKeyId)
@@ -186,6 +189,7 @@ object GameManager : HmcpPlayerListener {
     private fun playGame(bundle: Bundle?) {
         LogUtils.d("playGame:$gameView")
         if (gameView != null) {
+            // 通常是已进入普通队列，切换高速队列，释放普通队列实例，重新进入高速队列
             releaseGame(finish = "0", bundle)
         } else {
             gameView = HmcpVideoView(context)
@@ -197,6 +201,9 @@ object GameManager : HmcpPlayerListener {
             gameView?.hmcpPlayerListener = this
             gameView?.virtualDeviceType = VirtualOperateType.NONE
             gameView?.play(bundle)
+            // 默认静音启动，隐藏云端操作
+            gameView?.setAudioMute(true)
+            gameView?.virtualDeviceType = VirtualOperateType.NONE
         }
     }
 
@@ -208,15 +215,15 @@ object GameManager : HmcpPlayerListener {
                 Constants.STATUS_PLAY_INTERNAL -> {
                     gameView?.play()
                 }
-
+                // sdk反馈需选择是否进入排队，直接进入排队
                 Constants.STATUS_WAIT_CHOOSE -> {
                     gameView?.entryQueue()
                 }
-
+                // 网络切换，尝试重连
                 Constants.STATUS_TIPS_CHANGE_WIFI_TO_4G -> {
                     gameView?.reconnection()
                 }
-
+                // 实例进入排队，sdk反馈排队时间
                 Constants.STATUS_OPERATION_INTERVAL_TIME -> {
                     val dataStr = data.getString(StatusCallbackUtil.DATA)
                     if (dataStr is String && !TextUtils.isEmpty(dataStr)) {
@@ -228,7 +235,7 @@ object GameManager : HmcpPlayerListener {
                             )
                         )
                     } else {
-                        LogUtils.e("queue info error:$dataStr");
+                        LogUtils.e("queue info error:$dataStr")
                     }
                 }
 
@@ -247,7 +254,7 @@ object GameManager : HmcpPlayerListener {
                             context.startActivity(this)
                         }
                     } else {
-                        LogUtils.d("game already play")
+                        LogUtils.e("The game feeds back the first frame again.")
                     }
                 }
 
@@ -255,9 +262,9 @@ object GameManager : HmcpPlayerListener {
                     val dataStr = data.getString(StatusCallbackUtil.DATA)
                     if (dataStr is String && !TextUtils.isEmpty(dataStr)) {
                         val resultData = gson.fromJson(dataStr, Map::class.java)
-                        LogUtils.d("下线倒计时:${resultData["ahead"]}");
+                        LogUtils.d("下线倒计时:${resultData["ahead"]}")
                     } else {
-                        LogUtils.e("gameTimeCountDown error:$dataStr");
+                        LogUtils.e("gameTimeCountDown error:$dataStr")
                     }
                 }
                 // 9,连接失败
@@ -396,18 +403,20 @@ object GameManager : HmcpPlayerListener {
     }
 
     fun releaseGame(finish: String, bundle: Bundle?) {
+        LogUtils.d("releaseGame:$finish")
         if (finish != "0") {
+            // 非切换队列调用此方法，认定为退出游戏
             channel.invokeMethod("exitGame", mapOf(Pair("action", finish)))
         }
+        isPlaying = false
         val cloudId = HmcpManager.getInstance().cloudId
         if (TextUtils.isEmpty(cloudId)) {
             LogUtils.d("undo releaseGame, cid is empty")
+            gameView?.onDestroy()
+            gameView = null
             if (finish == "0") {
-                gameView?.onDestroy()
-                gameView = null
+                // 切换队列
                 playGame(bundle)
-            } else {
-                isPlaying = false
             }
             return
         }
@@ -419,18 +428,21 @@ object GameManager : HmcpPlayerListener {
             },
             object : OnSaveGameCallBackListener {
                 override fun success(result: Boolean) {
+                    // 游戏释放成功
                     LogUtils.d("releaseGame:$result")
+                    gameView?.onDestroy()
+                    gameView = null
                     if (finish == "0") {
-                        gameView?.onDestroy()
-                        gameView = null
+                        // 切换队列
                         playGame(bundle)
-                    } else {
-                        isPlaying = false
                     }
                 }
 
                 override fun fail(error: String?) {
+                    // 游戏释放失败
                     LogUtils.e("releaseGame:$error")
+                    gameView?.onDestroy()
+                    gameView = null
                     channel.invokeMethod(
                         "errorInfo",
                         mapOf(

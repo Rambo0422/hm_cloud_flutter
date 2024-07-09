@@ -170,6 +170,11 @@ class GameActivity : AppCompatActivity() {
         }
         lastLost = lostRate
         dataBinding.tvLossPacket.text = "$netDelay ms/$lostRate%"
+
+        val cloudId = HmcpManager.getInstance().cloudId
+        if (!TextUtils.isEmpty(cloudId)) {
+            dataBinding.tvCid.text = cloudId
+        }
     }
 
     private fun showNoOperateDialog() {

@@ -59,5 +59,17 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/iv_net_status"
             tools:text="100%" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_cid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:alpha="0.2"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="cid:123456" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
