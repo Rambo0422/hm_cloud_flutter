@@ -341,16 +341,7 @@ class GameActivity : AppCompatActivity() {
                         })
                 } else {
                     // 停止直播
-                    GameManager.gameView?.stopLiving(cloudId, object : OnLivingListener {
-                        override fun start(success: Boolean, msg: String?) {
-                            LogUtils.d("stopLiving:$success, $msg")
-                        }
-
-                        override fun stop(success: Boolean, msg: String?) {
-                            LogUtils.d("stopLiving:$success, $msg")
-                            GameManager.openInteraction(cloudId, false)
-                        }
-                    })
+                    GameManager.openInteraction(cloudId, false)
                 }
             }
 
