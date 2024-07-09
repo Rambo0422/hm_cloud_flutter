@@ -155,15 +155,15 @@ class GameActivity : AppCompatActivity() {
             }
         }
         lastDelay = netDelay
-        dataBinding.tvLossPacket.text =
-            "netDelay:${latencyInfo?.netDelay}\n" +
-                    "decodeDelay:${latencyInfo?.decodeDelay}\n" +
-                    "renderDelay:${latencyInfo?.renderDelay}\n" +
-                    "videoFps:${latencyInfo?.videoFps}\n" +
-                    "bitRate:${latencyInfo?.bitRate}\n" +
-                    "packetsLostRate:${latencyInfo?.packetsLostRate}\n" +
-                    "receivedBitrate:${latencyInfo?.receivedBitrate}\n" +
-                    "audioBitrate:${latencyInfo?.audioBitrate}\n"
+//        dataBinding.tvLossPacket.text =
+//            "netDelay:${latencyInfo?.netDelay}\n" +
+//                    "decodeDelay:${latencyInfo?.decodeDelay}\n" +
+//                    "renderDelay:${latencyInfo?.renderDelay}\n" +
+//                    "videoFps:${latencyInfo?.videoFps}\n" +
+//                    "bitRate:${latencyInfo?.bitRate}\n" +
+//                    "packetsLostRate:${latencyInfo?.packetsLostRate}\n" +
+//                    "receivedBitrate:${latencyInfo?.receivedBitrate}\n" +
+//                    "audioBitrate:${latencyInfo?.audioBitrate}\n"
 
         val cloudId = HmcpManager.getInstance().cloudId
         if (!TextUtils.isEmpty(cloudId)) {

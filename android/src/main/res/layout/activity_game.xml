@@ -52,12 +52,13 @@
             android:id="@+id/tv_loss_packet"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="21.5dp"
             android:alpha="0.3"
             android:textColor="@android:color/white"
             android:textSize="12sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/iv_net_status"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/iv_watermark"
             tools:text="100%" />
 
         <androidx.appcompat.widget.AppCompatTextView
