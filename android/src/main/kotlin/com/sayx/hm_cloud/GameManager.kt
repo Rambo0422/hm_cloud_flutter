@@ -367,6 +367,7 @@ object GameManager : HmcpPlayerListener {
                         Intent().apply {
                             setClass(context, GameActivity::class.java)
                             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
                             context.startActivity(this)
                         }
                     } else {

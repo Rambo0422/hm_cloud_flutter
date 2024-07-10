@@ -125,6 +125,10 @@ class GameActivity : AppCompatActivity() {
 
     private fun initView() {
         GameManager.gameView?.let {
+            val parent = it.parent
+            if (parent != null && parent is ViewGroup) {
+                parent.removeView(it)
+            }
             dataBinding.gameController.addView(
                 it,
                 0,
