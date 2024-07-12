@@ -286,6 +286,7 @@ class GameSettings @JvmOverloads constructor(
         peakChannel: Boolean,
         mobileGame: Boolean
     ) {
+        LogUtils.d("initSettings")
         this.gameView = gameView
         // 控制方法
         this.controllerType = virtualOperateType

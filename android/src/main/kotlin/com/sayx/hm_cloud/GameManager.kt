@@ -51,7 +51,8 @@ object GameManager : HmcpPlayerListener {
 
     var gameView: HmcpVideoView? = null
 
-    private lateinit var context: Context
+    // 此处绑定的是HMCloudPlugin挂载的activity
+    private lateinit var activity: Context
 
     lateinit var flutterEngine: FlutterEngine
 
@@ -59,7 +60,7 @@ object GameManager : HmcpPlayerListener {
 
     fun init(channel: MethodChannel, context: Context) {
         this.channel = channel
-        this.context = context
+        this.activity = context
         LogUtils.getConfig().also {
             it.isLogSwitch = BuildConfig.DEBUG
             it.globalTag = "GameManager"
@@ -68,28 +69,8 @@ object GameManager : HmcpPlayerListener {
 
     fun startGame(gameParam: GameParam) {
         this.gameParam = gameParam
+        // 手游与端游对应的sdk配置不同，所以每次启动游戏都执行初始化
         initGameSdk()
-    }
-
-    fun getDefaultKeyboardData() {
-        channel.invokeMethod("getDefaultKeyboardData", null)
-    }
-
-    fun getKeyboardData() {
-        channel.invokeMethod("getKeyboardData", null)
-    }
-
-    fun getDefaultGamepadData() {
-        channel.invokeMethod("getDefaultGamepadData", null)
-    }
-
-    fun getGamepadData() {
-        channel.invokeMethod("getGamepadData", null)
-    }
-
-    fun updateKeyboardData(data: JsonObject) {
-        data.addProperty("game_id", gameParam?.gameId)
-        channel.invokeMethod("updateKeyboardData", data.toString())
     }
 
     private fun initGameSdk() {
@@ -105,7 +86,7 @@ object GameManager : HmcpPlayerListener {
             Constants.IS_INFO = false
 //            Log.e("CloudGame", "init haiMaSDK:${gameParam?.accessKeyId}")
             LogUtils.d("init haiMaSDK:${gameParam?.accessKeyId}")
-            HmcpManager.getInstance().init(config, context, object : OnInitCallBackListener {
+            HmcpManager.getInstance().init(config, activity, object : OnInitCallBackListener {
                 override fun success() {
                     LogUtils.d("haiMaSDK success:${HmcpManager.getInstance().sdkVersion}")
                     checkPlayingGame()
@@ -219,7 +200,10 @@ object GameManager : HmcpPlayerListener {
 //                it.putInt(HmcpVideoView.VIEW_RESOLUTION_WIDTH, 1920)
 //                it.putInt(HmcpVideoView.VIEW_RESOLUTION_HEIGHT, 1080)
                 // 流类型 0：表示RTMP 1：表示WEBRTC, 默认0
-                it.putInt(HmcpVideoView.STREAM_TYPE, 0)
+                // 建议使用rtc：1
+                // 建议使用rtc：1
+                // 建议使用rtc：1
+                it.putInt(HmcpVideoView.STREAM_TYPE, 1)
                 // rtmp解码类型 0：软解码 1：硬解码, 默认1
 //                it.putInt(HmcpVideoView.DECODE_TYPE, 1)
                 // 输入法类型 0：表示云端键盘 1：表示本地键盘
@@ -246,7 +230,7 @@ object GameManager : HmcpPlayerListener {
             // 通常是已进入普通队列，切换高速队列，释放普通队列实例，重新进入高速队列
             releaseGame(finish = "0", bundle)
         } else {
-            gameView = HmcpVideoView(context)
+            gameView = HmcpVideoView(activity)
             gameView?.setUserInfo(UserInfo().also {
                 it.userId = gameParam?.userId
                 it.userToken = gameParam?.userToken
@@ -365,10 +349,10 @@ object GameManager : HmcpPlayerListener {
                             )
                         )
                         Intent().apply {
-                            setClass(context, GameActivity::class.java)
+                            setClass(activity, GameActivity::class.java)
                             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                             addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                            context.startActivity(this)
+                            activity.startActivity(this)
                         }
                     } else {
                         LogUtils.e("The game feeds back the first frame again.")
@@ -442,6 +426,27 @@ object GameManager : HmcpPlayerListener {
                 else -> {}
             }
         }
+    }
+
+    fun getDefaultKeyboardData() {
+        channel.invokeMethod("getDefaultKeyboardData", null)
+    }
+
+    fun getKeyboardData() {
+        channel.invokeMethod("getKeyboardData", null)
+    }
+
+    fun getDefaultGamepadData() {
+        channel.invokeMethod("getDefaultGamepadData", null)
+    }
+
+    fun getGamepadData() {
+        channel.invokeMethod("getGamepadData", null)
+    }
+
+    fun updateKeyboardData(data: JsonObject) {
+        data.addProperty("game_id", gameParam?.gameId)
+        channel.invokeMethod("updateKeyboardData", data.toString())
     }
 
     fun setPCMouseMode(arguments: Any?) {
@@ -536,9 +541,9 @@ object GameManager : HmcpPlayerListener {
             putExtra("arguments", Bundle().also {
                 it.putString("type", "rechargeTime")
             })
-            setClass(context, AppFlutterActivity::class.java)
+            setClass(activity, AppFlutterActivity::class.java)
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            context.startActivity(this)
+            activity.startActivity(this)
         }
     }
 
@@ -548,9 +553,9 @@ object GameManager : HmcpPlayerListener {
             putExtra("arguments", Bundle().also {
                 it.putString("type", "rechargeVip")
             })
-            setClass(context, AppFlutterActivity::class.java)
+            setClass(activity, AppFlutterActivity::class.java)
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            context.startActivity(this)
+            activity.startActivity(this)
         }
     }
 
