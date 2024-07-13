@@ -22,6 +22,7 @@ public class AppFlutterActivity extends FlutterActivity {
             String route = extras.getString("route");
             Bundle arguments = extras.getBundle("arguments");
             LogUtils.v("route:" + route + ", arguments:" + arguments);
+            // 通过通信通道，让Flutter打开指定页面
             GameManager.openFlutterPage(route, arguments);
         }
     }

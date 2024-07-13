@@ -49,6 +49,10 @@ object GameManager : HmcpPlayerListener {
 
     private var gameParam: GameParam? = null
 
+    fun getGameParam(): GameParam? {
+        return gameParam
+    }
+
     var gameView: HmcpVideoView? = null
 
     // 此处绑定的是HMCloudPlugin挂载的activity
@@ -89,6 +93,7 @@ object GameManager : HmcpPlayerListener {
             HmcpManager.getInstance().init(config, activity, object : OnInitCallBackListener {
                 override fun success() {
                     LogUtils.d("haiMaSDK success:${HmcpManager.getInstance().sdkVersion}")
+                    // 检查是否有在游戏中的实例
                     checkPlayingGame()
                 }
 
@@ -129,6 +134,7 @@ object GameManager : HmcpPlayerListener {
                 if (!list.isNullOrEmpty()) {
                     // 有未释放的游戏实例
                     val channelInfo = list[0]
+                    // 未释放的游戏实例与本次开启的游戏实例相同，连接实例
                     if (channelInfo.pkgName.equals(gameParam?.gamePkName)) {
                         cid = channelInfo.cid
                     }
@@ -153,7 +159,7 @@ object GameManager : HmcpPlayerListener {
                 // 横屏
                 it.putSerializable(HmcpVideoView.ORIENTATION, ScreenOrientation.LANDSCAPE)
                 // 可玩时间
-                val playTime: Long = gameParam?.playTime ?: 0
+                val playTime: Long = gameParam?.playTime ?: 0L
                 it.putInt(
                     HmcpVideoView.PLAY_TIME,
                     if (playTime > Int.MAX_VALUE) Int.MAX_VALUE else playTime.toInt()
@@ -235,6 +241,7 @@ object GameManager : HmcpPlayerListener {
                 it.userId = gameParam?.userId
                 it.userToken = gameParam?.userToken
             })
+            LogUtils.d("playGame:${gameParam?.accountInfo}");
             // 上号助手
             gameParam?.accountInfo?.let { accountInfo ->
 //            LogUtils.d("AccountInfo 1:${accountInfo.javaClass}")
@@ -245,66 +252,14 @@ object GameManager : HmcpPlayerListener {
                 })
             }
             gameView?.setConfigInfo("configInfo")
+            // 状态监听
             gameView?.hmcpPlayerListener = this
             gameView?.virtualDeviceType = VirtualOperateType.NONE
             gameView?.play(bundle)
-            // 默认静音启动，隐藏云端操作
+            // 默认静音启动，隐藏虚拟操作按钮
             gameView?.setAudioMute(true)
             gameView?.virtualDeviceType = VirtualOperateType.NONE
         }
-    }
-
-    fun releaseGame(finish: String, bundle: Bundle?) {
-        LogUtils.d("releaseGame:$finish")
-        if (finish != "0") {
-            // 非切换队列调用此方法，认定为退出游戏
-            channel.invokeMethod("exitGame", mapOf(Pair("action", finish)))
-        }
-        isPlaying = false
-        val cloudId = HmcpManager.getInstance().cloudId
-        if (TextUtils.isEmpty(cloudId)) {
-            LogUtils.d("undo releaseGame, cid is empty")
-            gameView?.onDestroy()
-            gameView = null
-            if (finish == "0") {
-                // 切换队列
-                playGame(bundle)
-            }
-            return
-        }
-        HmcpManager.getInstance().setReleaseCid(
-            gameParam?.gamePkName, cloudId, gameParam?.cToken, gameParam?.channelName,
-            UserInfo2().also {
-                it.userId = gameParam?.userId
-                it.userToken = gameParam?.userToken
-            },
-            object : OnSaveGameCallBackListener {
-                override fun success(result: Boolean) {
-                    // 游戏释放成功
-                    LogUtils.d("releaseGame:$result")
-                    gameView?.onDestroy()
-                    gameView = null
-                    if (finish == "0") {
-                        // 切换队列
-                        playGame(bundle)
-                    }
-                }
-
-                override fun fail(error: String?) {
-                    // 游戏释放失败
-                    LogUtils.e("releaseGame:$error")
-                    gameView?.onDestroy()
-                    gameView = null
-                    channel.invokeMethod(
-                        "errorInfo",
-                        mapOf(
-                            Pair("errorCode", GameError.gameReleaseErrorCode),
-                            Pair("cid", cloudId)
-                        )
-                    )
-                }
-            }
-        )
     }
 
     override fun HmcpPlayerStatusCallback(statusData: String?) {
@@ -312,6 +267,7 @@ object GameManager : HmcpPlayerListener {
         statusData?.let {
             val data = JSONObject(it)
             when (val status = data.getInt(StatusCallbackUtil.STATUS)) {
+                // 游戏准备完成，可以启动游戏
                 Constants.STATUS_PLAY_INTERNAL -> {
                     gameView?.play()
                 }
@@ -338,7 +294,7 @@ object GameManager : HmcpPlayerListener {
                         LogUtils.e("queue info error:$dataStr")
                     }
                 }
-
+                // 游戏首帧画面到达，可展示游戏画面
                 Constants.STATUS_FIRST_FRAME_ARRIVAL -> {
                     if (!isPlaying) {
                         isPlaying = true
@@ -348,6 +304,7 @@ object GameManager : HmcpPlayerListener {
                                 Pair("cid", HmcpManager.getInstance().cloudId)
                             )
                         )
+                        // 打开新的页面展示游戏画面
                         Intent().apply {
                             setClass(activity, GameActivity::class.java)
                             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -358,7 +315,7 @@ object GameManager : HmcpPlayerListener {
                         LogUtils.e("The game feeds back the first frame again.")
                     }
                 }
-
+                // 游戏进入排队等候队列
                 Constants.STATUS_OPERATION_GAME_TIME_COUNT_DOWN -> {
                     val dataStr = data.getString(StatusCallbackUtil.DATA)
                     if (dataStr is String && !TextUtils.isEmpty(dataStr)) {
@@ -394,6 +351,7 @@ object GameManager : HmcpPlayerListener {
                 Constants.STATUS_GET_CONTRON_ERROR,
                     // 42,接⼊⽅连接服务端结束游戏
                 Constants.STATUS_OPERATION_STATE_CHANGE_REASON -> {
+                    // 各类游戏中断状态下，获取errorCode,errorMsg展示
                     val dataStr = data.getString(StatusCallbackUtil.DATA)
                     LogUtils.d("errorInfo:$dataStr")
                     var errorCode = ""
@@ -428,32 +386,47 @@ object GameManager : HmcpPlayerListener {
         }
     }
 
+    /// 游戏云游直播开关
+    fun openInteraction(cid: String?, open: Boolean) {
+        channel.invokeMethod("openInteraction", mapOf(Pair("cid", cid), Pair("open", open)))
+    }
+
+    // 获取默认虚拟键盘数据
     fun getDefaultKeyboardData() {
         channel.invokeMethod("getDefaultKeyboardData", null)
     }
 
+    // 获取虚拟键盘数据
     fun getKeyboardData() {
         channel.invokeMethod("getKeyboardData", null)
     }
 
+    // 获取默认虚拟手柄数据
     fun getDefaultGamepadData() {
         channel.invokeMethod("getDefaultGamepadData", null)
     }
 
+    // 获取默认手柄数据
     fun getGamepadData() {
         channel.invokeMethod("getGamepadData", null)
     }
 
+    // 更新虚拟操作数据
     fun updateKeyboardData(data: JsonObject) {
         data.addProperty("game_id", gameParam?.gameId)
         channel.invokeMethod("updateKeyboardData", data.toString())
     }
 
+    // 根据设备连接，修改鼠标模式
     fun setPCMouseMode(arguments: Any?) {
         if (arguments is Boolean) {
             gameView?.setPCMouseMode(arguments)
             EventBus.getDefault().post(PCMouseEvent(arguments))
         }
+    }
+
+    fun getGameData() {
+        channel.invokeMethod("getGameData", null)
     }
 
     override fun onCloudDeviceStatus(status: String?) {
@@ -531,10 +504,6 @@ object GameManager : HmcpPlayerListener {
         LogUtils.d("onSwitchConnectionCallback:$statusCode, $networkType")
     }
 
-    fun getGameParam(): GameParam? {
-        return gameParam
-    }
-
     fun openBuyPeakTime() {
         Intent().apply {
             putExtra("route", "/rechargeCenter")
@@ -577,11 +546,62 @@ object GameManager : HmcpPlayerListener {
         })
     }
 
+    /// 通知Flutter，游戏页面关闭
     fun exitGame(data: Map<*, *>) {
         channel.invokeMethod("exitGame", data)
     }
 
-    fun openInteraction(cid: String?, open: Boolean) {
-        channel.invokeMethod("openInteraction", mapOf(Pair("cid", cid), Pair("open", open)))
+    /// 游戏释放
+    fun releaseGame(finish: String, bundle: Bundle?) {
+        LogUtils.d("releaseGame:$finish")
+        if (finish != "0") {
+            // 非切换队列调用此方法，认定为退出游戏
+            channel.invokeMethod("exitGame", mapOf(Pair("action", finish)))
+            isPlaying = false
+        }
+        val cloudId = HmcpManager.getInstance().cloudId
+        if (TextUtils.isEmpty(cloudId)) {
+            LogUtils.d("undo releaseGame, cid is empty")
+            gameView?.onDestroy()
+            gameView = null
+            if (finish == "0") {
+                // 切换队列
+                playGame(bundle)
+            }
+            return
+        }
+        HmcpManager.getInstance().setReleaseCid(
+            gameParam?.gamePkName, cloudId, gameParam?.cToken, gameParam?.channelName,
+            UserInfo2().also {
+                it.userId = gameParam?.userId
+                it.userToken = gameParam?.userToken
+            },
+            object : OnSaveGameCallBackListener {
+                override fun success(result: Boolean) {
+                    // 游戏释放成功
+                    LogUtils.d("releaseGame:$result")
+                    gameView?.onDestroy()
+                    gameView = null
+                    if (finish == "0") {
+                        // 切换队列
+                        playGame(bundle)
+                    }
+                }
+
+                override fun fail(error: String?) {
+                    // 游戏释放失败
+                    LogUtils.e("releaseGame:$error")
+                    gameView?.onDestroy()
+                    gameView = null
+                    channel.invokeMethod(
+                        "errorInfo",
+                        mapOf(
+                            Pair("errorCode", GameError.gameReleaseErrorCode),
+                            Pair("cid", cloudId)
+                        )
+                    )
+                }
+            }
+        )
     }
 }
