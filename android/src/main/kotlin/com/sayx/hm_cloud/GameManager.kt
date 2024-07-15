@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import com.blankj.utilcode.util.LogUtils
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -12,6 +13,8 @@ import com.google.gson.JsonObject
 import com.haima.hmcp.Constants
 import com.haima.hmcp.HmcpManager
 import com.haima.hmcp.beans.CheckCloudServiceResult
+import com.haima.hmcp.beans.Control
+import com.haima.hmcp.beans.ControlInfo
 import com.haima.hmcp.beans.IntentExtraData
 import com.haima.hmcp.beans.PlayNotification
 import com.haima.hmcp.beans.UserInfo
@@ -21,6 +24,7 @@ import com.haima.hmcp.enums.ErrorType
 import com.haima.hmcp.enums.NetWorkState
 import com.haima.hmcp.enums.ScreenOrientation
 import com.haima.hmcp.listeners.HmcpPlayerListener
+import com.haima.hmcp.listeners.OnContronListener
 import com.haima.hmcp.listeners.OnGameIsAliveListener
 import com.haima.hmcp.listeners.OnInitCallBackListener
 import com.haima.hmcp.listeners.OnSaveGameCallBackListener
@@ -39,7 +43,7 @@ import org.greenrobot.eventbus.EventBus
 import org.json.JSONObject
 
 @SuppressLint("StaticFieldLeak")
-object GameManager : HmcpPlayerListener {
+object GameManager : HmcpPlayerListener, OnContronListener {
 
     private lateinit var channel: MethodChannel
 
@@ -132,7 +136,6 @@ object GameManager : HmcpPlayerListener {
                     Pair("cid", HmcpManager.getInstance().cloudId),
                 )
             )
-
         }
     }
 
@@ -369,6 +372,10 @@ object GameManager : HmcpPlayerListener {
                             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                             context.startActivity(this)
                         }
+
+                        getPinCode()
+                        queryControlUsers()
+                        sendCurrentCid()
                     } else {
                         LogUtils.e("The game feeds back the first frame again.")
                     }
@@ -577,5 +584,150 @@ object GameManager : HmcpPlayerListener {
 
     fun openInteraction(cid: String?, open: Boolean) {
         channel.invokeMethod("openInteraction", mapOf(Pair("cid", cid), Pair("open", open)))
+    }
+
+    override fun pinCodeResult(success: Boolean, cid: String?, pinCode: String?, msg: String?) {
+//        val METHOD_PIN_CODE = "pinCodeResult"
+//        val mutableMapOf = mutableMapOf<String, Any>()
+//        mutableMapOf["success"] = success
+//        if (success) {
+//            mutableMapOf["cid"] = cid ?: ""
+//            mutableMapOf["pin_code"] = pinCode ?: ""
+//            mutableMapOf["msg"] = msg ?: ""
+//        }
+//        channel.invokeMethod(METHOD_PIN_CODE, mutableMapOf)
+
+        LogUtils.d("pinCodeResult success: $success cid: $cid pinCode: $pinCode msg: $msg")
+
+    }
+
+    override fun contronResult(success: Boolean, msg: String?) {
+        channel.invokeMethod("pinCode", msg)
+    }
+
+    override fun contronLost() {
+        LogUtils.d("contronLost")
+        val METHOD_CONTRON_LOST = "contronLost"
+        channel.invokeMethod(METHOD_CONTRON_LOST, null)
+    }
+
+    override fun controlDistribute(success: Boolean, controlInfo: MutableList<ControlInfo>?, msg: String?) {
+        LogUtils.d("controlDistribute success: $success")
+        val METHOD_CONTROL_DISTRIBUTE = "controlDistribute"
+//        channel.invokeMethod(METHOD_CONTROL_DISTRIBUTE, null)
+    }
+
+    override fun controlQuery(success: Boolean, controlInfos: MutableList<ControlInfo>?, msg: String?) {
+        if (success) {
+//            val jsonArray = JSONArray()
+//            controlInfos?.forEach { controlInfo ->
+//                val jsonObject = JSONObject()
+//                jsonObject.put("index", controlInfo.position - 1)
+//                jsonObject.put("cid", controlInfo.cid)
+//                jsonArray.put(jsonObject)
+//            }
+//            val cidArr = "cidArr"
+//            channel.invokeMethod(cidArr, jsonArray.toString())
+        }
+    }
+
+    /**
+     * 获取授权码
+     */
+    fun getPinCode() {
+        LogUtils.d("getPinCode")
+        gameView?.getPinCode(this)
+    }
+
+    /**
+     * 查询当前房间内的⽤户
+     */
+    fun queryControlUsers() {
+        LogUtils.d("queryControlUsers")
+        gameView?.queryControlPermitUsers(this)
+    }
+
+    var initState = false
+    var roomIndex = -1
+    var userId = ""
+
+    /**
+     * 派对吧情况下才会用的到
+     * 主要提供给游客，因为游客初始之前是并没有初始化的
+     */
+    fun initHmcpSdk(arguments: Map<*, *>) {
+        val accessKeyId = arguments["accessKeyId"]?.toString() ?: ""
+        val channel = arguments["channel"]?.toString() ?: "android"
+        val cid = arguments["cid"]?.toString() ?: ""
+        val pinCode = arguments["pinCode"]?.toString() ?: ""
+        val userId = arguments["userId"]?.toString() ?: ""
+        val userToken = arguments["userToken"]?.toString() ?: ""
+        val roomIndex = (arguments["roomIndex"] as? Int) ?: -1
+
+        this.userId = userId
+        this.roomIndex = roomIndex
+
+        if (initState) {
+            controlPlay(cid, pinCode, accessKeyId, userId, userToken)
+        } else {
+            val config = Bundle().apply {
+                putString(HmcpManager.ACCESS_KEY_ID, accessKeyId)
+                putString(HmcpManager.CHANNEL_ID, "app_cloud_game")
+            }
+            HmcpManager.getInstance().init(config, context, object : OnInitCallBackListener {
+                override fun success() {
+                    initState = true
+                    controlPlay(cid, pinCode, accessKeyId, userId, userToken)
+                }
+
+                override fun fail(msg: String?) {
+                    initState = false
+                }
+            }, true)
+        }
+    }
+
+    fun controlPlay(cid: String, pinCode: String, accessKeyID: String, userId: String, userToken: String) {
+        val userInfo = UserInfo()
+        userInfo.userId = userId
+        userInfo.userToken = userToken
+        initHmcpView(userInfo)
+
+        // 选择流类型。 0：表示RTMP  1：表示WEBRTC
+        val streamType = 1
+
+        // 获取控制权参数对象
+        val control = Control()
+        control.cid = cid
+        control.pinCode = pinCode
+        control.accessKeyID = accessKeyID
+        control.isIPV6 = false
+        control.orientation = ScreenOrientation.LANDSCAPE
+
+        gameView?.contronPlay(streamType, control, this)
+    }
+
+    private fun initHmcpView(userInfo: UserInfo) {
+        gameView = HmcpVideoView(context)
+        gameView?.setUserInfo(userInfo)
+
+        gameView?.hmcpPlayerListener = this
+        gameView?.virtualDeviceType = VirtualOperateType.NONE
+        // 默认静音启动，隐藏云端操作
+        gameView?.setAudioMute(true)
+    }
+
+    private fun sendCurrentCid() {
+
+        val cloudId = HmcpManager.getInstance().cloudId
+        val cidArr = JSONObject().apply {
+            put("index", roomIndex)
+            put("uid", userId)
+            put("cid", cloudId)
+        }
+
+        Log.d("flutter","sendCurrentCid cidArr: ${cidArr.toString()}")
+
+        channel.invokeMethod("cidArr", cidArr.toString())
     }
 }

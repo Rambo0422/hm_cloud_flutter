@@ -46,6 +46,10 @@ class HmCloudController {
     methodChannel.invokeMethod("controllerEditFail");
   }
 
+  void controlPlay(params) {
+    methodChannel.invokeMethod("controlPlay", params);
+  }
+
   void closePage() {
     methodChannel.invokeMethod("closePage");
   }

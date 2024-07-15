@@ -2,6 +2,7 @@ package com.sayx.hm_cloud
 
 import android.app.Activity
 import android.content.res.Configuration
+import android.util.Log
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ScreenUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -10,7 +11,6 @@ import com.sayx.hm_cloud.model.ControllerConfigEvent
 import com.sayx.hm_cloud.model.ControllerEditEvent
 import com.sayx.hm_cloud.model.ControllerInfo
 import com.sayx.hm_cloud.model.GameParam
-import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -93,6 +93,21 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
             // 操作方式编辑失败
             "controllerEditFail" -> {
                 ToastUtils.showShort("编辑保存失败")
+            }
+
+            GameViewConstants.getPinCode -> {
+                GameManager.getPinCode()
+            }
+
+            GameViewConstants.queryControlUsers -> {
+                GameManager.queryControlUsers()
+            }
+
+            GameViewConstants.controlPlay -> {
+                Log.d("flutter","arguments: $arguments")
+                if (arguments is Map<*, *>) {
+                    GameManager.initHmcpSdk(arguments)
+                }
             }
 
             else -> {

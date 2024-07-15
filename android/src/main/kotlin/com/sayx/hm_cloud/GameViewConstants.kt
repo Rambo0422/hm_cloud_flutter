@@ -43,5 +43,5 @@ object GameViewConstants {
 
     const val queryControlUsers = "queryControlUsers"
 
-    const val contronPlay = "contronPlay"
+    const val controlPlay = "controlPlay"
 }
