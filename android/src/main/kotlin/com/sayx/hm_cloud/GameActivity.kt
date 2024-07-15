@@ -966,7 +966,7 @@ class GameActivity : AppCompatActivity() {
         EventBus.getDefault().unregister(this)
         GameManager.gameView?.onDestroy()
         if (GameManager.isPlaying) {
-            GameManager.exitGame(mapOf(Pair("action", "")))
+            GameManager.exitGame(mutableMapOf(Pair("action", "")))
         }
         super.onDestroy()
     }

@@ -95,6 +95,10 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
                 ToastUtils.showShort("编辑保存失败")
             }
 
+            "closePage" -> {
+                GameManager.flutterActivity?.finish()
+            }
+
             else -> {
                 callback.notImplemented()
             }

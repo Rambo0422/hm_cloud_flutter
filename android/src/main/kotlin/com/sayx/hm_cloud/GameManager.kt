@@ -58,9 +58,13 @@ object GameManager : HmcpPlayerListener {
     // 此处绑定的是HMCloudPlugin挂载的activity
     private lateinit var activity: Context
 
+    var flutterActivity: AppFlutterActivity? = null
+
     lateinit var flutterEngine: FlutterEngine
 
     var isPlaying = false
+
+    var needReattach = false
 
     fun init(channel: MethodChannel, context: Context) {
         this.channel = channel
@@ -509,11 +513,16 @@ object GameManager : HmcpPlayerListener {
             putExtra("route", "/rechargeCenter")
             putExtra("arguments", Bundle().also {
                 it.putString("type", "rechargeTime")
+                it.putString("from", "native")
             })
             setClass(activity, AppFlutterActivity::class.java)
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             activity.startActivity(this)
         }
+    }
+
+    fun statGameTime(time: Long) {
+        channel.invokeMethod("statGameTime", mapOf(Pair("time", time)))
     }
 
     fun openBuyVip() {
@@ -521,6 +530,7 @@ object GameManager : HmcpPlayerListener {
             putExtra("route", "/rechargeCenter")
             putExtra("arguments", Bundle().also {
                 it.putString("type", "rechargeVip")
+                it.putString("from", "native")
             })
             setClass(activity, AppFlutterActivity::class.java)
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -528,26 +538,17 @@ object GameManager : HmcpPlayerListener {
         }
     }
 
-    @JvmStatic
-    fun openFlutterPage(route: String?, arguments: Bundle?) {
+    fun openFlutterPage(route: String?, arguments: Map<String, Any>?) {
         val param = mutableMapOf<String, Any?>()
         param["route"] = route
-        param["arguments"] = arguments.toString()
-        channel.invokeMethod("openPage", param, object : MethodChannel.Result {
-            override fun success(result: Any?) {
-                LogUtils.d("openFlutterPage success:$result")
-            }
-
-            override fun error(errorCode: String, errorMessage: String?, errorDetails: Any?) {
-            }
-
-            override fun notImplemented() {
-            }
-        })
+        param["arguments"] = arguments
+        needReattach = true
+        channel.invokeMethod("openPage", param)
     }
 
     /// 通知Flutter，游戏页面关闭
-    fun exitGame(data: Map<*, *>) {
+    fun exitGame(data: MutableMap<String, Any>) {
+        data["needReattach"] = needReattach
         channel.invokeMethod("exitGame", data)
     }
 
@@ -556,7 +557,7 @@ object GameManager : HmcpPlayerListener {
         LogUtils.d("releaseGame:$finish")
         if (finish != "0") {
             // 非切换队列调用此方法，认定为退出游戏
-            channel.invokeMethod("exitGame", mapOf(Pair("action", finish)))
+            channel.invokeMethod("exitGame", mapOf(Pair("action", finish), Pair("needReattach", needReattach)))
             isPlaying = false
         }
         val cloudId = HmcpManager.getInstance().cloudId
