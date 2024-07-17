@@ -291,6 +291,8 @@ class GameSettings @JvmOverloads constructor(
             dataBinding.btnTouchClick.isEnabled = isChecked
             dataBinding.btnTouchAttack.isEnabled = isChecked
             dataBinding.sbSensitivity.isEnabled = isChecked
+
+            updateMouseMode()
         }
         // 亮度状态变更
         dataBinding.sbLight.setOnSeekBarChangeListener(object : SeekBarChangListenerImp() {
