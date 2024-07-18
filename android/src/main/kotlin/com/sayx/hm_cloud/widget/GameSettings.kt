@@ -277,7 +277,7 @@ class GameSettings @JvmOverloads constructor(
     private fun initStatusListener() {
         // 鼠标设置
         dataBinding.switchMouseConfig.setOnCheckedChangeListener { _, isChecked ->
-            LogUtils.v("MouseMode change:$isChecked, touchMode:${gameView?.touchMode}, currentTouchMode:$currentTouchMode");
+            LogUtils.v("MouseMode change:$isChecked, touchMode:${gameView?.touchMode}, currentTouchMode:$currentTouchMode")
             if (mouseModeEditable.not()) {
                 return@setOnCheckedChangeListener
             }
@@ -384,7 +384,7 @@ class GameSettings @JvmOverloads constructor(
                         dataBinding.btnTouchClick.isEnabled = false
                         dataBinding.btnTouchAttack.isEnabled = false
                         dataBinding.sbSensitivity.isEnabled = false
-                        dataBinding.switchMouseConfig.isChecked = false && enable
+                        dataBinding.switchMouseConfig.isChecked = false
                     }
 
                     else -> {}

@@ -15,6 +15,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.SizeUtils
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import com.sayx.hm_cloud.GameManager
 import com.sayx.hm_cloud.R
 import com.sayx.hm_cloud.callback.ControllerEventCallback
 import com.sayx.hm_cloud.callback.OnEditClickListener
@@ -76,17 +77,19 @@ class GameController @JvmOverloads constructor(
 
     var controllerType: AppVirtualOperateType = AppVirtualOperateType.NONE
         set(value) {
-            LogUtils.d("change controllerType = $value");
+            LogUtils.d("change controllerType = $value")
             if (value == field) {
                 return
             }
             field = value
             when (value) {
                 AppVirtualOperateType.APP_STICK_XBOX -> {
+                    GameManager.lastControllerType = value
                     showGamepad()
                 }
 
                 AppVirtualOperateType.APP_KEYBOARD -> {
+                    GameManager.lastControllerType = value
                     showKeyboard()
                 }
 

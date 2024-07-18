@@ -5,12 +5,12 @@ import android.content.res.Configuration
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ScreenUtils
 import com.blankj.utilcode.util.ToastUtils
+import com.sayx.hm_cloud.constants.AppVirtualOperateType
 import com.sayx.hm_cloud.model.ControllerChangeEvent
 import com.sayx.hm_cloud.model.ControllerConfigEvent
 import com.sayx.hm_cloud.model.ControllerEditEvent
 import com.sayx.hm_cloud.model.ControllerInfo
 import com.sayx.hm_cloud.model.GameParam
-import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -65,6 +65,19 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
             // 切换操作方式
             "showController" -> {
                 if (arguments is Int) {
+                    when (arguments) {
+                        0 -> {
+                            GameManager.lastControllerType = AppVirtualOperateType.NONE
+                        }
+
+                        1 -> {
+                            GameManager.lastControllerType = AppVirtualOperateType.APP_KEYBOARD
+                        }
+
+                        2 -> {
+                            GameManager.lastControllerType = AppVirtualOperateType.APP_STICK_XBOX
+                        }
+                    }
                     EventBus.getDefault().post(ControllerChangeEvent(arguments))
                 }
             }

@@ -27,6 +27,7 @@ import com.haima.hmcp.listeners.OnSaveGameCallBackListener
 import com.haima.hmcp.utils.StatusCallbackUtil
 import com.haima.hmcp.widgets.HmcpVideoView
 import com.haima.hmcp.widgets.beans.VirtualOperateType
+import com.sayx.hm_cloud.constants.AppVirtualOperateType
 import com.sayx.hm_cloud.model.AccountInfo
 import com.sayx.hm_cloud.model.GameError
 import com.sayx.hm_cloud.model.GameErrorEvent
@@ -61,6 +62,8 @@ object GameManager : HmcpPlayerListener {
     var flutterActivity: AppFlutterActivity? = null
 
     lateinit var flutterEngine: FlutterEngine
+
+    var lastControllerType = AppVirtualOperateType.NONE
 
     var isPlaying = false
 
@@ -245,7 +248,7 @@ object GameManager : HmcpPlayerListener {
                 it.userId = gameParam?.userId
                 it.userToken = gameParam?.userToken
             })
-            LogUtils.d("playGame:${gameParam?.accountInfo}");
+            LogUtils.d("playGame:${gameParam?.accountInfo}")
             // 上号助手
             gameParam?.accountInfo?.let { accountInfo ->
 //            LogUtils.d("AccountInfo 1:${accountInfo.javaClass}")
