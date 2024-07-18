@@ -319,11 +319,14 @@ class GameSettings @JvmOverloads constructor(
                 gameSettingChangeListener?.onImageQualityChange(list.first())
             }
         }
+
         // 时间处理
         this.playTime = userPeakTime
         updateAvailableTime(userPeakTime)
         this.currentPlayTime = gamePlayTime / 1000L
         LogUtils.d("playTime=$userPeakTime, currentPlayTime=$currentPlayTime")
+
+        // 如果是派对吧，且如果是游客，则不显示游戏倒计时
         startCountTime()
         initialized = true
     }

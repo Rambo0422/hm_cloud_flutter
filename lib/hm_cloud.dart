@@ -61,4 +61,8 @@ class HmCloudController {
   Future<void> queryControlUsers() {
     return methodChannel.invokeMethod('queryControlUsers', null);
   }
+
+  void distributeControl(String controlInfos) {
+    methodChannel.invokeMethod('distributeControl', controlInfos);
+  }
 }

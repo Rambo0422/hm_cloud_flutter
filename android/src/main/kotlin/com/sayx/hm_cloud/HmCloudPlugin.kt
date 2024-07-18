@@ -19,6 +19,7 @@ import io.flutter.plugin.common.MethodChannel
 import me.jessyan.autosize.AutoSizeConfig
 import me.jessyan.autosize.onAdaptListener
 import org.greenrobot.eventbus.EventBus
+import org.json.JSONArray
 
 class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware {
 
@@ -107,6 +108,14 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
                 Log.d("flutter","arguments: $arguments")
                 if (arguments is Map<*, *>) {
                     GameManager.initHmcpSdk(arguments)
+                }
+            }
+
+            "distributeControl" -> {
+                kotlin.runCatching {
+                    JSONArray(arguments.toString())
+                }.onSuccess { jsonArray ->
+                    GameManager.distributeControlPermit(jsonArray)
                 }
             }
 

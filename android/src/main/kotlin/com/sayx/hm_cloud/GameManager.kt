@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
-import android.util.Log
 import com.blankj.utilcode.util.LogUtils
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -40,6 +39,7 @@ import com.sayx.hm_cloud.utils.GameUtils
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import org.greenrobot.eventbus.EventBus
+import org.json.JSONArray
 import org.json.JSONObject
 
 @SuppressLint("StaticFieldLeak")
@@ -60,6 +60,10 @@ object GameManager : HmcpPlayerListener, OnContronListener {
     lateinit var flutterEngine: FlutterEngine
 
     var isPlaying = false
+
+    // 是否是派对吧
+    var isPartyPlay = false
+    var isPartyPlayOwner = false
 
     fun init(channel: MethodChannel, context: Context) {
         this.channel = channel
@@ -107,6 +111,12 @@ object GameManager : HmcpPlayerListener, OnContronListener {
             Constants.IS_DEBUG = false
             Constants.IS_ERROR = false
             Constants.IS_INFO = false
+
+            this.isPartyPlay = gameParam?.isPartyGame ?: false
+            this.isPartyPlayOwner = isPartyPlay
+            this.roomIndex = 0
+            this.userId = gameParam?.userId ?: ""
+
 //            Log.e("CloudGame", "init haiMaSDK:${gameParam?.accessKeyId}")
             LogUtils.d("init haiMaSDK:${gameParam?.accessKeyId}")
             HmcpManager.getInstance().init(config, context, object : OnInitCallBackListener {
@@ -373,9 +383,17 @@ object GameManager : HmcpPlayerListener, OnContronListener {
                             context.startActivity(this)
                         }
 
-                        getPinCode()
-                        queryControlUsers()
-                        sendCurrentCid()
+                        if (isPartyPlay) {
+                            if (isPartyPlayOwner) {
+                                // 如果是派对吧房主，则需要再查询当前房间内授权的用户和pincode
+                                queryControlUsers()
+                                getPinCode()
+                            }
+                            // 普通用户或者房主只需要查询cid就可以了
+                            sendCurrentCid()
+                        } else {
+                            LogUtils.e("current is no play party")
+                        }
                     } else {
                         LogUtils.e("The game feeds back the first frame again.")
                     }
@@ -587,28 +605,20 @@ object GameManager : HmcpPlayerListener, OnContronListener {
     }
 
     override fun pinCodeResult(success: Boolean, cid: String?, pinCode: String?, msg: String?) {
-//        val METHOD_PIN_CODE = "pinCodeResult"
-//        val mutableMapOf = mutableMapOf<String, Any>()
-//        mutableMapOf["success"] = success
-//        if (success) {
-//            mutableMapOf["cid"] = cid ?: ""
-//            mutableMapOf["pin_code"] = pinCode ?: ""
-//            mutableMapOf["msg"] = msg ?: ""
-//        }
-//        channel.invokeMethod(METHOD_PIN_CODE, mutableMapOf)
-
-        LogUtils.d("pinCodeResult success: $success cid: $cid pinCode: $pinCode msg: $msg")
-
+        if (success && !TextUtils.isEmpty(pinCode) && !TextUtils.isEmpty(cid)) {
+            val map = hashMapOf<String, String>()
+            map["pinCode"] = pinCode ?: ""
+            map["cid"] = cid ?: ""
+            channel.invokeMethod("pinCodeResult", map)
+        }
     }
 
     override fun contronResult(success: Boolean, msg: String?) {
-        channel.invokeMethod("pinCode", msg)
+        channel.invokeMethod("contronResult", msg)
     }
 
     override fun contronLost() {
-        LogUtils.d("contronLost")
-        val METHOD_CONTRON_LOST = "contronLost"
-        channel.invokeMethod(METHOD_CONTRON_LOST, null)
+        channel.invokeMethod("contronLost", null)
     }
 
     override fun controlDistribute(success: Boolean, controlInfo: MutableList<ControlInfo>?, msg: String?) {
@@ -619,15 +629,14 @@ object GameManager : HmcpPlayerListener, OnContronListener {
 
     override fun controlQuery(success: Boolean, controlInfos: MutableList<ControlInfo>?, msg: String?) {
         if (success) {
-//            val jsonArray = JSONArray()
-//            controlInfos?.forEach { controlInfo ->
-//                val jsonObject = JSONObject()
-//                jsonObject.put("index", controlInfo.position - 1)
-//                jsonObject.put("cid", controlInfo.cid)
-//                jsonArray.put(jsonObject)
-//            }
-//            val cidArr = "cidArr"
-//            channel.invokeMethod(cidArr, jsonArray.toString())
+            val jsonArray = JSONArray()
+            controlInfos?.forEach { controlInfo ->
+                val jsonObject = JSONObject()
+                jsonObject.put("position", controlInfo.position)
+                jsonObject.put("cid", controlInfo.cid.toString())
+                jsonArray.put(jsonObject)
+            }
+            channel.invokeMethod("controlInfos", jsonArray.toString())
         }
     }
 
@@ -656,6 +665,9 @@ object GameManager : HmcpPlayerListener, OnContronListener {
      * 主要提供给游客，因为游客初始之前是并没有初始化的
      */
     fun initHmcpSdk(arguments: Map<*, *>) {
+        isPartyPlay = true
+        isPartyPlayOwner = false
+
         val accessKeyId = arguments["accessKeyId"]?.toString() ?: ""
         val channel = arguments["channel"]?.toString() ?: "android"
         val cid = arguments["cid"]?.toString() ?: ""
@@ -718,16 +730,35 @@ object GameManager : HmcpPlayerListener, OnContronListener {
     }
 
     private fun sendCurrentCid() {
-
         val cloudId = HmcpManager.getInstance().cloudId
         val cidArr = JSONObject().apply {
             put("index", roomIndex)
             put("uid", userId)
             put("cid", cloudId)
         }
-
-        Log.d("flutter","sendCurrentCid cidArr: ${cidArr.toString()}")
-
         channel.invokeMethod("cidArr", cidArr.toString())
+    }
+
+    /**
+     * 设置派对吧每个用户的操作权限
+     */
+    fun distributeControlPermit(arguments: JSONArray) {
+        val list = arrayListOf<ControlInfo>()
+        for (i in 0 until arguments.length()) {
+            val jsonObject = arguments.getJSONObject(i)
+            val controlInfo = ControlInfo().apply {
+                cid = jsonObject.getString("cid").toLong()
+                position = jsonObject.getInt("position")
+            }
+            list.add(controlInfo)
+        }
+
+        if (list.isNotEmpty()) {
+            gameView?.distributeControlPermit(list, this)
+        }
+    }
+
+    fun getGameData() {
+        channel.invokeMethod("getGameData", null)
     }
 }

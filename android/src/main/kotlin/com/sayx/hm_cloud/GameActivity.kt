@@ -284,6 +284,9 @@ class GameActivity : AppCompatActivity() {
         dataBinding.layoutGame.post {
             dataBinding.layoutGame.addView(gameSettings, layoutParams)
         }
+
+        // 页面初始化完成，获取数据根据数据进行同步处理
+        GameManager.getGameData()
     }
 
     private fun configSettingCallback() {
