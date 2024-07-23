@@ -528,6 +528,10 @@ object GameManager : HmcpPlayerListener {
         channel.invokeMethod("statGameTime", mapOf(Pair("time", time)))
     }
 
+    fun statGamePlay() {
+        channel.invokeMethod("statGamePlay", null)
+    }
+
     fun openBuyVip() {
         Intent().apply {
             putExtra("route", "/rechargeCenter")

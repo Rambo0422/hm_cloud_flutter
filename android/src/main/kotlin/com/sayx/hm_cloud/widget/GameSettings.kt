@@ -441,7 +441,10 @@ class GameSettings @JvmOverloads constructor(
             post {
                 currentPlayTime -= 1
                 if (timeList.contains(gamePlayTime) || gamePlayTime % 3600 == 0L) {
-                    GameManager.statGameTime(gamePlayTime)
+                    GameManager.statGameTime(if (gamePlayTime > 3600 * 24) 3600 * 24 else gamePlayTime)
+                }
+                if (gamePlayTime % 60 == 0L) {
+                    GameManager.statGamePlay()
                 }
                 gamePlayTime += 1L
                 if (currentPlayTime <= 300L) {
