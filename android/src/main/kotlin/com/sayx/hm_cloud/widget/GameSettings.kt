@@ -160,6 +160,12 @@ class GameSettings @JvmOverloads constructor(
                 gameSettingChangeListener?.onShowVipDialog()
             }
         }
+
+        dataBinding.btnPlayParty.setOnClickListener {
+            hideLayout()
+            gameSettingChangeListener?.onShowPlayParty()
+        }
+
         // 鼠标设置
         dataBinding.switchMouseConfig.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {

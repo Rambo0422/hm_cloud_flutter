@@ -30,4 +30,6 @@ interface GameSettingChangeListener {
     fun onPlayTimeLack()
 
     fun updateNetSignal(icon: Int)
+
+    fun onShowPlayParty()
 }

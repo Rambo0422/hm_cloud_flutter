@@ -18,9 +18,9 @@
             android:layout_width="wrap_content"
             android:layout_height="32dp"
             android:background="@drawable/img_game_off_notice_bg"
+            android:elevation="1.0dp"
             android:gravity="center_vertical"
             android:visibility="gone"
-            android:elevation="1.0dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -308,6 +308,22 @@
                     app:drawableTop="@drawable/selector_chat_voice"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/btn_vibrate"
+                    tools:visibility="visible" />
+
+                <com.sayx.hm_cloud.widget.DrawableTextView
+                    android:id="@+id/btn_play_party"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:drawablePadding="5dp"
+                    android:gravity="center"
+                    android:text="派对吧"
+                    android:textColor="#FF444855"
+                    android:textSize="10sp"
+                    app:drawableSize="40dp"
+                    app:drawableTop="@drawable/selector_chat_voice"
+                    app:layout_constraintStart_toStartOf="@id/btn_interaction"
+                    app:layout_constraintTop_toBottomOf="@id/btn_interaction"
                     tools:visibility="visible" />
 
                 <androidx.appcompat.widget.AppCompatTextView

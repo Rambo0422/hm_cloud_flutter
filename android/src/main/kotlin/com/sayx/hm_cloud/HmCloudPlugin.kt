@@ -1,16 +1,20 @@
 package com.sayx.hm_cloud
 
 import android.app.Activity
+import android.content.Intent
 import android.content.res.Configuration
 import android.util.Log
-import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ScreenUtils
 import com.blankj.utilcode.util.ToastUtils
+import com.google.gson.reflect.TypeToken
+import com.sayx.hm_cloud.model.ControlInfo
 import com.sayx.hm_cloud.model.ControllerChangeEvent
 import com.sayx.hm_cloud.model.ControllerConfigEvent
 import com.sayx.hm_cloud.model.ControllerEditEvent
 import com.sayx.hm_cloud.model.ControllerInfo
 import com.sayx.hm_cloud.model.GameParam
+import com.sayx.hm_cloud.model.PlayPartyRoomInfo
+import com.sayx.hm_cloud.model.PlayPartyRoomInfoEvent
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -51,8 +55,9 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
     override fun onMethodCall(call: MethodCall, callback: MethodChannel.Result) {
         val arguments = call.arguments
 //        Log.e("CloudGame", "onMethodCall:${call.method}, param:$arguments")
-        LogUtils.d("onMethodCall:${call.method}, param:$arguments")
+//        LogUtils.d("onMethodCall:${call.method}, param:$arguments")
         when (call.method) {
+
             // 游戏启动
             GameViewConstants.startCloudGame -> {
                 if (arguments is Map<*, *>) {
@@ -105,7 +110,7 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
             }
 
             GameViewConstants.controlPlay -> {
-                Log.d("flutter","arguments: $arguments")
+                Log.d("flutter", "arguments: $arguments")
                 if (arguments is Map<*, *>) {
                     GameManager.initHmcpSdk(arguments)
                 }
@@ -119,6 +124,29 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
                 }
             }
 
+            "test" -> {
+                val intent = Intent().apply {
+                    setClass(activity, GameActivity::class.java)
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                activity.startActivity(intent)
+            }
+
+            "playPartyInfo" -> {
+                if (arguments is Map<*, *>) {
+                    val controlInfoJson = arguments["controlInfos"].toString()
+                    val gson = GameManager.gson
+                    val controlInfosType = object : TypeToken<List<ControlInfo>>() {}.type
+                    val controlInfos: List<ControlInfo> = gson.fromJson(controlInfoJson, controlInfosType)
+                    val roomInfoJson = arguments["roomInfo"].toString()
+                    val roomInfo = gson.fromJson(
+                        roomInfoJson,
+                        PlayPartyRoomInfo::class.java
+                    )
+                    EventBus.getDefault().post(PlayPartyRoomInfoEvent(controlInfos, roomInfo))
+                }
+            }
+
             else -> {
                 callback.notImplemented()
             }
@@ -129,7 +157,10 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
         channel.setMethodCallHandler(null)
     }
 
+    private lateinit var activity: Activity
+
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+        this.activity = binding.activity
         GameManager.init(channel, binding.activity)
     }
 

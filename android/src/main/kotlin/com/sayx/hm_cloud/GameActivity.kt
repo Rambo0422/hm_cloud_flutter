@@ -58,6 +58,7 @@ import com.sayx.hm_cloud.model.ControllerEditEvent
 import com.sayx.hm_cloud.model.GameErrorEvent
 import com.sayx.hm_cloud.model.KeyInfo
 import com.sayx.hm_cloud.model.PCMouseEvent
+import com.sayx.hm_cloud.model.PlayPartyRoomInfoEvent
 import com.sayx.hm_cloud.utils.AppSizeUtils
 import com.sayx.hm_cloud.widget.AddGamepadKey
 import com.sayx.hm_cloud.widget.AddKeyboardKey
@@ -65,6 +66,7 @@ import com.sayx.hm_cloud.widget.ControllerEditLayout
 import com.sayx.hm_cloud.widget.EditCombineKey
 import com.sayx.hm_cloud.widget.EditRouletteKey
 import com.sayx.hm_cloud.widget.GameSettings
+import com.sayx.hm_cloud.widget.PlayPartyGameView
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -199,6 +201,21 @@ class GameActivity : AppCompatActivity() {
 
         // 初始化设置面板
         initGameSettings()
+
+        initPlayPartyView()
+    }
+
+    private var playPartyGameView: PlayPartyGameView? = null
+
+    private fun initPlayPartyView() {
+        playPartyGameView = PlayPartyGameView(this)
+        playPartyGameView?.visibility = View.GONE
+        // 将设置面板控件加入主面板
+        val layoutParams = FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+        dataBinding.layoutGame.addView(playPartyGameView, layoutParams)
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -392,6 +409,10 @@ class GameActivity : AppCompatActivity() {
 
             override fun updateNetSignal(icon: Int) {
                 dataBinding.btnGameSettings.setImageResource(icon)
+            }
+
+            override fun onShowPlayParty() {
+                playPartyGameView?.show()
             }
         }
     }
@@ -986,5 +1007,13 @@ class GameActivity : AppCompatActivity() {
 
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onPlayPartyRoomInfoEvent(event: PlayPartyRoomInfoEvent) {
+        val roomInfo = event.roomInfo
+        val controlInfos = event.controlInfos
+        val partyPlayOwner = GameManager.isPartyPlayOwner
+        playPartyGameView?.onPlayPartyRoomInfoEvent(partyPlayOwner, roomInfo, controlInfos)
     }
 }

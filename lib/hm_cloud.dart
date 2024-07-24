@@ -65,4 +65,12 @@ class HmCloudController {
   void distributeControl(String controlInfos) {
     methodChannel.invokeMethod('distributeControl', controlInfos);
   }
+
+  void testPage() {
+    methodChannel.invokeMethod('test', null);
+  }
+
+  void sendPlaypartyInfo(Map<String, dynamic> params) {
+    methodChannel.invokeMethod('playPartyInfo', params);
+  }
 }
