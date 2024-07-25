@@ -6,10 +6,12 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.Typeface
 import android.media.AudioManager
 import android.os.Bundle
 import android.provider.Settings
 import android.text.TextUtils
+import android.util.TypedValue
 import android.view.Gravity
 import android.view.KeyEvent
 import android.view.View
@@ -19,8 +21,13 @@ import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
 import android.view.animation.ScaleAnimation
 import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.databinding.DataBindingUtil
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.SPUtils
@@ -33,6 +40,7 @@ import com.haima.hmcp.HmcpManager
 import com.haima.hmcp.beans.ResolutionInfo
 import com.haima.hmcp.listeners.OnLivingListener
 import com.haima.hmcp.widgets.beans.VirtualOperateType
+import com.noober.background.drawable.DrawableCreator
 import com.sayx.hm_cloud.callback.AddKeyListenerImp
 import com.sayx.hm_cloud.callback.AnimatorListenerImp
 import com.sayx.hm_cloud.callback.ControllerEventCallback
@@ -67,6 +75,7 @@ import com.sayx.hm_cloud.widget.EditCombineKey
 import com.sayx.hm_cloud.widget.EditRouletteKey
 import com.sayx.hm_cloud.widget.GameSettings
 import com.sayx.hm_cloud.widget.PlayPartyGameView
+import me.jessyan.autosize.utils.AutoSizeUtils
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -1017,5 +1026,80 @@ class GameActivity : AppCompatActivity() {
         val roomInfo = event.roomInfo
         val controlInfos = event.controlInfos
         playPartyGameView?.onPlayPartyRoomInfoEvent(roomInfo, controlInfos)
+
+        // 判断我自己是否有权限，如果没权限，就显示，有权限就隐藏
+        val position = controlInfos.find {
+            it.uid == GameManager.userId
+        }?.position ?: 0
+        if (position == 0) {
+            initWantPlayView()
+        } else {
+            // 如果有权限，则需要removeView
+            dataBinding.gameController.findViewById<View>(wantPlayViewId)?.let {
+                dataBinding.gameController.removeView(it)
+            }
+        }
+    }
+
+    private val wantPlayViewId = View.generateViewId()
+
+    private fun initWantPlayView() {
+        // 校验是否已经拥有
+        val view = dataBinding.gameController.findViewById<View>(wantPlayViewId)
+        if (view != null) {
+            return
+        }
+
+        val layoutWidth = AutoSizeUtils.dp2px(this, 100f)
+        val layoutHeight = AutoSizeUtils.dp2px(this, 40f)
+        val linearLayout = LinearLayout(this).apply {
+            id = wantPlayViewId
+            background = DrawableCreator.Builder()
+                .setCornersRadius(AutoSizeUtils.dp2px(this@GameActivity, 21f).toFloat())
+                .setSolidColor(Color.parseColor("#FFC6EC4B"))
+                .setStrokeColor(Color.parseColor("#FFA8C93E"))
+                .setStrokeWidth(AutoSizeUtils.dp2px(this@GameActivity, 2f).toFloat())
+                .build()
+
+            layoutParams = ConstraintLayout.LayoutParams(
+                layoutWidth,
+                layoutHeight
+            ).apply {
+                rightToRight = ConstraintSet.PARENT_ID
+                bottomToBottom = ConstraintSet.PARENT_ID
+
+                bottomMargin = AutoSizeUtils.dp2px(this@GameActivity, 20f)
+                marginEnd = AutoSizeUtils.dp2px(this@GameActivity, 20f)
+            }
+            gravity = Gravity.CENTER
+        }
+
+        linearLayout.setOnClickListener {
+            GameManager.wantPlay(GameManager.userId)
+        }
+
+        val imageView = ImageView(this).apply {
+            val width = AutoSizeUtils.dp2px(this@GameActivity, 20f)
+            layoutParams = LinearLayout.LayoutParams(width, width)
+            setImageResource(R.drawable.icon_play_party_want_play)
+        }
+        linearLayout.addView(imageView)
+
+        val textView = TextView(this).apply {
+            text = "我要玩"
+            setTextColor(Color.parseColor("#FF000000"))
+            setTextSize(TypedValue.COMPLEX_UNIT_PX, AutoSizeUtils.sp2px(this@GameActivity, 13f).toFloat())
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                marginStart = AutoSizeUtils.dp2px(this@GameActivity, 5f)
+            }
+            setTypeface(typeface, Typeface.BOLD)
+        }
+        linearLayout.addView(textView)
+
+        // 将 textView 添加到 ConstraintLayout
+        dataBinding.gameController.addView(linearLayout)
     }
 }
