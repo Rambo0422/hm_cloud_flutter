@@ -313,14 +313,19 @@ class GameActivity : AppCompatActivity() {
         }
     }
 
-    override fun onGenericMotionEvent(event: MotionEvent?): Boolean {
-        LogUtils.v("onGenericMotionEvent:$event")
+    override fun dispatchGenericMotionEvent(event: MotionEvent?): Boolean {
+        LogUtils.v("dispatchGenericMotionEvent:$event")
         countTime = noOperateTime
-        return super.onGenericMotionEvent(event)
+        return super.dispatchGenericMotionEvent(event)
+    }
+
+    override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
+        LogUtils.v("dispatchTouchEvent:$event")
+        countTime = noOperateTime
+        return super.dispatchTouchEvent(event)
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
-        countTime = noOperateTime
         LogUtils.v("onKeyDown:$event")
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             return true
