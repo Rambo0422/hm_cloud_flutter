@@ -333,7 +333,9 @@ class GameSettings @JvmOverloads constructor(
         LogUtils.d("playTime=$userPeakTime, currentPlayTime=$currentPlayTime")
 
         // 如果是派对吧，且如果是游客，则不显示游戏倒计时
-        startCountTime()
+        if (!GameManager.isPartyPlay || GameManager.isPartyPlayOwner) {
+            startCountTime()
+        }
         initialized = true
     }
 

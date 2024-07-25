@@ -321,7 +321,7 @@
                     android:textColor="#FF444855"
                     android:textSize="10sp"
                     app:drawableSize="40dp"
-                    app:drawableTop="@drawable/selector_chat_voice"
+                    app:drawableTop="@drawable/icon_play_party"
                     app:layout_constraintStart_toStartOf="@id/btn_interaction"
                     app:layout_constraintTop_toBottomOf="@id/btn_interaction"
                     tools:visibility="visible" />
