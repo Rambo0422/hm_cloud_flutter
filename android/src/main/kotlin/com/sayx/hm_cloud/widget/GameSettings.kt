@@ -333,8 +333,16 @@ class GameSettings @JvmOverloads constructor(
         LogUtils.d("playTime=$userPeakTime, currentPlayTime=$currentPlayTime")
 
         // 如果是派对吧，且如果是游客，则不显示游戏倒计时
-        if (!GameManager.isPartyPlay || GameManager.isPartyPlayOwner) {
+
+        if (GameManager.isPartyPlay) {
+            if (GameManager.isPartyPlayOwner) {
+                startCountTime()
+            }
+            dataBinding.btnPlayParty.visibility = View.VISIBLE
+        } else {
             startCountTime()
+            // 当前不是派对吧的情况下，隐藏派对吧条目
+            dataBinding.btnPlayParty.visibility = View.GONE
         }
         initialized = true
     }
