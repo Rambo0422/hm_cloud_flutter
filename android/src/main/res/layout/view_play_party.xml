@@ -116,10 +116,17 @@
         </LinearLayout>
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/btn_close_play_party"
-        android:layout_width="20.5dp"
-        android:layout_height="75dp"
-        android:layout_gravity="center_vertical"
-        android:src="@drawable/ic_play_party_close" />
+    <FrameLayout
+        android:id="@+id/layout_close_play_party"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/btn_close_play_party"
+            android:layout_width="20.5dp"
+            android:layout_height="75dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_play_party_close" />
+
+    </FrameLayout>
 </LinearLayout>

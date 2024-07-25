@@ -614,10 +614,12 @@ object GameManager : HmcpPlayerListener, OnContronListener {
     }
 
     override fun contronResult(success: Boolean, msg: String?) {
+        LogUtils.d("contronResult success: $success msg: $msg")
         channel.invokeMethod("contronResult", msg)
     }
 
     override fun contronLost() {
+        LogUtils.d("contronLost")
         channel.invokeMethod("contronLost", null)
     }
 
@@ -760,5 +762,21 @@ object GameManager : HmcpPlayerListener, OnContronListener {
 
     fun getGameData() {
         channel.invokeMethod("getGameData", null)
+    }
+
+    fun wantPlay(uid: String) {
+        channel.invokeMethod("wantPlay", uid)
+    }
+
+    fun closeUserPlay(uid: String) {
+        channel.invokeMethod("closeUserPlay", uid)
+    }
+
+    fun letPlay(uid: String) {
+        channel.invokeMethod("letPlay", uid)
+    }
+
+    fun updatePlayPartyRoomInfo() {
+        channel.invokeMethod("updatePlayPartyRoomInfo", null)
     }
 }

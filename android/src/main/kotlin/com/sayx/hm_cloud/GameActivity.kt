@@ -304,6 +304,9 @@ class GameActivity : AppCompatActivity() {
 
         // 页面初始化完成，获取数据根据数据进行同步处理
         GameManager.getGameData()
+        if (GameManager.isPartyPlay) {
+            GameManager.updatePlayPartyRoomInfo()
+        }
     }
 
     private fun configSettingCallback() {
@@ -1013,7 +1016,6 @@ class GameActivity : AppCompatActivity() {
     fun onPlayPartyRoomInfoEvent(event: PlayPartyRoomInfoEvent) {
         val roomInfo = event.roomInfo
         val controlInfos = event.controlInfos
-        val partyPlayOwner = GameManager.isPartyPlayOwner
-        playPartyGameView?.onPlayPartyRoomInfoEvent(partyPlayOwner, roomInfo, controlInfos)
+        playPartyGameView?.onPlayPartyRoomInfoEvent(roomInfo, controlInfos)
     }
 }

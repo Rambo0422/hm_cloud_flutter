@@ -24,7 +24,7 @@ class PlayPartyGameView @JvmOverloads constructor(
 
     init {
         inflate(context, R.layout.view_play_party, this)
-        findViewById<View>(R.id.btn_close_play_party).setOnClickListener {
+        findViewById<View>(R.id.layout_close_play_party).setOnClickListener {
             close()
         }
 
@@ -69,10 +69,8 @@ class PlayPartyGameView @JvmOverloads constructor(
         slideUpAnim.start()
     }
 
-    fun onPlayPartyRoomInfoEvent(partyPlayOwner: Boolean, roomInfo: PlayPartyRoomInfo, controlInfos: List<ControlInfo>) {
+    fun onPlayPartyRoomInfoEvent(roomInfo: PlayPartyRoomInfo, controlInfos: List<ControlInfo>) {
         tvRoomId.text = "房间ID: ${roomInfo.roomId}"
-        val roomStatus = roomInfo.roomStatus
-
         controlInfoViewList.forEachIndexed { index, playPartyGameViewItem ->
             val roomStatu = roomInfo.roomStatus[index]
             playPartyGameViewItem.onPlayPartyRoomInfoEvent(index, roomStatu, controlInfos)

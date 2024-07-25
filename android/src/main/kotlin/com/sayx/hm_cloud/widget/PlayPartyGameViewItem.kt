@@ -10,7 +10,6 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.Group
-import com.blankj.utilcode.util.LogUtils
 import com.bumptech.glide.Glide
 import com.noober.background.drawable.DrawableCreator
 import com.sayx.hm_cloud.GameManager
@@ -19,7 +18,6 @@ import com.sayx.hm_cloud.constants.PlayPartyPlayStatus
 import com.sayx.hm_cloud.model.ControlInfo
 import com.sayx.hm_cloud.model.PlayPartyRoomInfo
 import me.jessyan.autosize.utils.AutoSizeUtils
-import org.w3c.dom.Text
 
 class PlayPartyGameViewItem @JvmOverloads constructor(
     context: Context,
@@ -35,11 +33,13 @@ class PlayPartyGameViewItem @JvmOverloads constructor(
     private val iv_permission_tag: ImageView
     private val btn_play_status: TextView
     private val group_visitor: Group
+    private val btn_let_play: View
 
-    private val currentUid = "665eb60c1c90b65e435d3863"
+    private var currentUid = ""
+    private var isPartyPlayOwner = false
 
-    //    private val isPartyPlayOwner = GameManager.isPartyPlayOwner
-    private val isPartyPlayOwner = true
+    private var status: PlayPartyPlayStatus? = null
+    private var roomStatu: PlayPartyRoomInfo.RoomStatu? = null
 
     init {
         inflate(context, R.layout.view_play_party_item, this)
@@ -52,6 +52,41 @@ class PlayPartyGameViewItem @JvmOverloads constructor(
         iv_permission_tag = findViewById(R.id.iv_permission_tag)
         btn_play_status = findViewById(R.id.btn_play_status)
         group_visitor = findViewById(R.id.group_visitor)
+        btn_let_play = findViewById(R.id.btn_let_play)
+
+        btn_let_play.setOnClickListener {
+            GameManager.letPlay(roomStatu?.uid ?: "")
+        }
+
+        btn_play_status.setOnClickListener {
+            when (status) {
+                PlayPartyPlayStatus.HAVE_PERMISSION -> {
+                    GameManager.closeUserPlay(roomStatu?.uid ?: "")
+                }
+
+                PlayPartyPlayStatus.NO_PERMISSION -> {
+                    GameManager.letPlay(roomStatu?.uid ?: "")
+                }
+
+                PlayPartyPlayStatus.POSITION_LOCK -> {
+
+                }
+
+                PlayPartyPlayStatus.POSITION_OPEN -> {
+
+                }
+
+                PlayPartyPlayStatus.LET_ME_PLAY -> {
+                    GameManager.wantPlay(roomStatu?.uid ?: "")
+                }
+
+                PlayPartyPlayStatus.LET_TA_PLAY -> {
+                    GameManager.letPlay(roomStatu?.uid ?: "")
+                }
+
+                else -> {}
+            }
+        }
     }
 
     fun setIndex(index: Int) {
@@ -59,6 +94,9 @@ class PlayPartyGameViewItem @JvmOverloads constructor(
     }
 
     fun onPlayPartyRoomInfoEvent(index: Int, roomStatu: PlayPartyRoomInfo.RoomStatu, controlInfos: List<ControlInfo>) {
+        this.roomStatu = roomStatu
+        currentUid = GameManager.userId
+        isPartyPlayOwner = GameManager.isPartyPlayOwner
         view_home_owner_tag.visibility = if (index == 0) {
             View.VISIBLE
         } else {
@@ -80,6 +118,14 @@ class PlayPartyGameViewItem @JvmOverloads constructor(
                 iv_lock_tag.setImageResource(R.drawable.ic_play_party_position_unlock)
             }
 
+            if (isPartyPlayOwner) {
+                if (status == 2) {
+                    setStatus(PlayPartyPlayStatus.POSITION_LOCK)
+                } else {
+                    setStatus(PlayPartyPlayStatus.POSITION_OPEN)
+                }
+            }
+
             iv_lock_tag.visibility = View.VISIBLE
             iv_avatar.visibility = View.GONE
         } else {
@@ -93,60 +139,102 @@ class PlayPartyGameViewItem @JvmOverloads constructor(
             }?.position ?: 0) > 0
 
             // 判断当前item是否是自己
-            var itemIsMy = roomStatuUid == currentUid
+            val itemIsMy = roomStatuUid == currentUid
 
             if (isPartyPlayOwner) {
                 if (hasPermission) {
-                    iv_permission_tag.visibility = View.VISIBLE
-                    setStatus(PlayPartyPlayStatus.WANT_PLAY)
+                    setStatus(PlayPartyPlayStatus.HAVE_PERMISSION)
                 } else {
-                    iv_permission_tag.visibility = View.GONE
-                    setStatus(PlayPartyPlayStatus.NO_PERMISSION)
+                    if (itemIsMy) {
+                        setStatus(PlayPartyPlayStatus.NO_PERMISSION)
+                    } else {
+                        group_visitor.visibility = View.VISIBLE
+                        btn_play_status.visibility = View.GONE
+                    }
                 }
             } else {
-                if (hasPermission) {
-                    iv_permission_tag.visibility = View.VISIBLE
-                    setStatus(PlayPartyPlayStatus.HAS_PERMISSION)
+                if (itemIsMy && !hasPermission) {
+                    setStatus(PlayPartyPlayStatus.LET_ME_PLAY)
                 } else {
-                    iv_permission_tag.visibility = View.GONE
-                    setStatus(PlayPartyPlayStatus.NO_PERMISSION)
+                    group_visitor.visibility = View.GONE
+                    btn_play_status.visibility = View.GONE
                 }
+            }
+
+            if (hasPermission) {
+                iv_permission_tag.visibility = View.VISIBLE
+            } else {
+                iv_permission_tag.visibility = View.GONE
             }
         }
     }
 
     private fun setStatus(status: PlayPartyPlayStatus) {
+        this.status = status
         when (status) {
             PlayPartyPlayStatus.NO_PERMISSION -> {
-                if (isPartyPlayOwner) {
-                    btn_play_status.visibility = GONE
-                    group_visitor.visibility = VISIBLE
-                } else {
-                    btn_play_status.text = "让我玩"
-                    btn_play_status.setTextColor(Color.parseColor("#FF000000"))
-                    btn_play_status.background = setBg()
-                    btn_play_status.visibility = VISIBLE
-                }
+                btn_play_status.background = DrawableCreator.Builder()
+                    .setCornersRadius(AutoSizeUtils.dp2px(context, 4f).toFloat())
+                    .setSolidColor(Color.parseColor("#FFC6EC4B"))
+                    .build()
+                btn_play_status.visibility = View.VISIBLE
+                btn_play_status.text = "让Ta玩"
+                btn_play_status.setTextColor(Color.parseColor("#FF000000"))
             }
 
 
             PlayPartyPlayStatus.LET_ME_PLAY -> {
-
+                btn_play_status.background = DrawableCreator.Builder()
+                    .setCornersRadius(AutoSizeUtils.dp2px(context, 4f).toFloat())
+                    .setSolidColor(Color.parseColor("#FFC6EC4B"))
+                    .build()
+                btn_play_status.visibility = View.VISIBLE
+                btn_play_status.text = "让我玩"
+                btn_play_status.setTextColor(Color.parseColor("#FF000000"))
             }
-            PlayPartyPlayStatus.LET_TA_PLAY -> {
 
+            PlayPartyPlayStatus.LET_TA_PLAY -> {
+                btn_play_status.background = DrawableCreator.Builder()
+                    .setCornersRadius(AutoSizeUtils.dp2px(context, 4f).toFloat())
+                    .setSolidColor(Color.parseColor("#FFC6EC4B"))
+                    .build()
+                btn_play_status.visibility = View.VISIBLE
+                btn_play_status.text = "让Ta玩"
+                btn_play_status.setTextColor(Color.parseColor("#FF000000"))
             }
 
             PlayPartyPlayStatus.HAVE_PERMISSION -> {
-
+                btn_play_status.background = DrawableCreator.Builder()
+                    .setCornersRadius(AutoSizeUtils.dp2px(context, 4f).toFloat())
+                    .setSolidColor(Color.parseColor("#FFC6EC4B"))
+                    .build()
+                btn_play_status.visibility = View.VISIBLE
+                btn_play_status.text = "不让玩"
+                btn_play_status.setTextColor(Color.parseColor("#FF000000"))
             }
+
             PlayPartyPlayStatus.POSITION_LOCK -> {
-
+                btn_play_status.background = DrawableCreator.Builder()
+                    .setCornersRadius(AutoSizeUtils.dp2px(context, 4f).toFloat())
+                    .setSolidColor(Color.parseColor("#FF222A3A"))
+                    .build()
+                btn_play_status.visibility = View.VISIBLE
+                btn_play_status.text = "打开位置"
+                btn_play_status.setTextColor(Color.parseColor("#FF9CA3B4"))
             }
+
             PlayPartyPlayStatus.POSITION_OPEN -> {
+                btn_play_status.background = DrawableCreator.Builder()
+                    .setCornersRadius(AutoSizeUtils.dp2px(context, 4f).toFloat())
+                    .setSolidColor(Color.parseColor("#FF222A3A"))
+                    .build()
+                btn_play_status.visibility = View.VISIBLE
+                btn_play_status.text = "锁定位置"
+                btn_play_status.setTextColor(Color.parseColor("#FF9CA3B4"))
             }
         }
-
+        btn_play_status.visibility = View.VISIBLE
+        group_visitor.visibility = View.GONE
     }
 
     private fun setUserInfo(roomStatu: PlayPartyRoomInfo.RoomStatu) {
