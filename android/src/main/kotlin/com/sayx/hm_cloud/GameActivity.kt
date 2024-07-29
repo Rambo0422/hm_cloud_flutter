@@ -18,7 +18,7 @@ import com.gyf.immersionbar.BarHide
 import com.gyf.immersionbar.ImmersionBar.hasNavigationBar
 import com.gyf.immersionbar.ktx.immersionBar
 import com.haima.hmcp.HmcpManager
-import com.haima.hmcp.widgets.beans.VirtualOperateType
+//import com.haima.hmcp.widgets.beans.VirtualOperateType
 import com.sayx.hm_cloud.callback.NoOperateListener
 import com.sayx.hm_cloud.databinding.ActivityGameBinding
 import com.sayx.hm_cloud.dialog.AppCommonDialog
@@ -78,7 +78,7 @@ class GameActivity : AppCompatActivity() {
                 )
             )
         }
-        GameManager.gameView?.setAttachContext(this)
+//        GameManager.gameView?.setAttachContext(this)
         initGameSettings()
         startTimer()
     }
@@ -90,8 +90,8 @@ class GameActivity : AppCompatActivity() {
      * 3，设置为超清
      */
     private fun initGameSettings() {
-        GameManager.gameView?.setPCMouseMode(true)
-        GameManager.gameView?.virtualDeviceType = VirtualOperateType.NONE
+//        GameManager.gameView?.setPCMouseMode(true)
+//        GameManager.gameView?.virtualDeviceType = VirtualOperateType.NONE
         GameManager.gameView?.onSwitchResolution(
             0,
             GameManager.gameView?.resolutionList?.first(),

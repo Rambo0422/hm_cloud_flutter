@@ -11,7 +11,7 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.haima.hmcp.Constants
 import com.haima.hmcp.HmcpManager
-import com.haima.hmcp.beans.PlayNotification
+//import com.haima.hmcp.beans.PlayNotification
 import com.haima.hmcp.beans.UserInfo
 import com.haima.hmcp.beans.UserInfo2
 import com.haima.hmcp.enums.CloudPlayerKeyboardStatus
@@ -23,7 +23,7 @@ import com.haima.hmcp.listeners.OnInitCallBackListener
 import com.haima.hmcp.listeners.OnSaveGameCallBackListener
 import com.haima.hmcp.utils.StatusCallbackUtil
 import com.haima.hmcp.widgets.HmcpVideoView
-import com.haima.hmcp.widgets.beans.VirtualOperateType
+//import com.haima.hmcp.widgets.beans.VirtualOperateType
 import com.sayx.hm_cloud.model.GameError
 import com.sayx.hm_cloud.model.GameErrorEvent
 import com.sayx.hm_cloud.model.GameParam
@@ -199,11 +199,11 @@ object GameManager : HmcpPlayerListener {
             })
             gameView?.setConfigInfo("configInfo")
             gameView?.hmcpPlayerListener = this
-            gameView?.virtualDeviceType = VirtualOperateType.NONE
+//            gameView?.virtualDeviceType = VirtualOperateType.NONE
             gameView?.play(bundle)
             // 默认静音启动，隐藏云端操作
             gameView?.setAudioMute(true)
-            gameView?.virtualDeviceType = VirtualOperateType.NONE
+//            gameView?.virtualDeviceType = VirtualOperateType.NONE
         }
     }
 
@@ -242,7 +242,7 @@ object GameManager : HmcpPlayerListener {
                 Constants.STATUS_FIRST_FRAME_ARRIVAL -> {
                     if (!isPlaying) {
                         isPlaying = true
-                        gameView?.virtualDeviceType = VirtualOperateType.NONE
+//                        gameView?.virtualDeviceType = VirtualOperateType.NONE
                         channel.invokeMethod(
                             GameViewConstants.firstFrameArrival, mapOf(
                                 Pair("cid", HmcpManager.getInstance().cloudId)
@@ -327,17 +327,17 @@ object GameManager : HmcpPlayerListener {
         }
     }
 
-    override fun onCloudDeviceStatus(status: String?) {
-        LogUtils.d("onCloudDeviceStatus:$status")
-    }
-
-    override fun onInterceptIntent(intentData: String?) {
-        LogUtils.d("onInterceptIntent:$intentData")
-    }
-
-    override fun onCloudPlayerKeyboardStatusChanged(keyboardStatus: CloudPlayerKeyboardStatus?) {
-        LogUtils.d("onCloudPlayerKeyboardStatusChanged:${keyboardStatus?.name}")
-    }
+//    override fun onCloudDeviceStatus(status: String?) {
+//        LogUtils.d("onCloudDeviceStatus:$status")
+//    }
+//
+//    override fun onInterceptIntent(intentData: String?) {
+//        LogUtils.d("onInterceptIntent:$intentData")
+//    }
+//
+//    override fun onCloudPlayerKeyboardStatusChanged(keyboardStatus: CloudPlayerKeyboardStatus?) {
+//        LogUtils.d("onCloudPlayerKeyboardStatusChanged:${keyboardStatus?.name}")
+//    }
 
     override fun onError(errorType: ErrorType?, errorMsg: String?) {
         LogUtils.e("onError-> errorType:$errorType, errorMsg:$errorMsg")
@@ -387,20 +387,20 @@ object GameManager : HmcpPlayerListener {
         LogUtils.d("onInputMessage:$msg")
     }
 
-    override fun onAccProxyConnectStateChange(connectState: Int) {
-        super.onAccProxyConnectStateChange(connectState)
-        LogUtils.d("onAccProxyConnectStateChange:$connectState")
-    }
-
-    override fun onPlayNotification(playNotification: PlayNotification?) {
-        super.onPlayNotification(playNotification)
-        LogUtils.d("onPlayNotification")
-    }
-
-    override fun onSwitchConnectionCallback(statusCode: Int, networkType: Int) {
-        super.onSwitchConnectionCallback(statusCode, networkType)
-        LogUtils.d("onSwitchConnectionCallback:$statusCode, $networkType")
-    }
+//    override fun onAccProxyConnectStateChange(connectState: Int) {
+//        super.onAccProxyConnectStateChange(connectState)
+//        LogUtils.d("onAccProxyConnectStateChange:$connectState")
+//    }
+//
+//    override fun onPlayNotification(playNotification: PlayNotification?) {
+//        super.onPlayNotification(playNotification)
+//        LogUtils.d("onPlayNotification")
+//    }
+//
+//    override fun onSwitchConnectionCallback(statusCode: Int, networkType: Int) {
+//        super.onSwitchConnectionCallback(statusCode, networkType)
+//        LogUtils.d("onSwitchConnectionCallback:$statusCode, $networkType")
+//    }
 
     fun releaseGame(finish: String, bundle: Bundle?) {
         LogUtils.d("releaseGame:$finish")
