@@ -1032,10 +1032,10 @@ class GameActivity : AppCompatActivity() {
             LogUtils.e("exitCustom:${e.message}")
         }
         EventBus.getDefault().unregister(this)
-        GameManager.gameView?.onDestroy()
-        if (GameManager.isPlaying) {
-            GameManager.exitGame(mutableMapOf(Pair("action", "")))
-        }
+//        GameManager.gameView?.onDestroy()
+//        if (GameManager.isPlaying) {
+//            GameManager.exitGame(mutableMapOf(Pair("action", "")))
+//        }
         super.onDestroy()
     }
 }

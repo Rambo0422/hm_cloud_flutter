@@ -241,7 +241,9 @@ object GameManager : HmcpPlayerListener {
         LogUtils.d("playGame:$gameView")
         if (gameView != null) {
             // 通常是已进入普通队列，切换高速队列，释放普通队列实例，重新进入高速队列
-            releaseGame(finish = "0", bundle)
+            if (!isPlaying) {
+                releaseGame(finish = "0", bundle)
+            }
         } else {
             gameView = HmcpVideoView(activity)
             gameView?.setUserInfo(UserInfo().also {
@@ -282,6 +284,9 @@ object GameManager : HmcpPlayerListener {
                 Constants.STATUS_WAIT_CHOOSE -> {
                     gameView?.entryQueue()
                 }
+                Constants.STATUS_START_PLAY -> {
+                    isPlaying = true
+                }
                 // 网络切换，尝试重连
                 Constants.STATUS_TIPS_CHANGE_WIFI_TO_4G -> {
                     gameView?.reconnection()
@@ -304,7 +309,6 @@ object GameManager : HmcpPlayerListener {
                 // 游戏首帧画面到达，可展示游戏画面
                 Constants.STATUS_FIRST_FRAME_ARRIVAL -> {
                     if (!isPlaying) {
-                        isPlaying = true
                         gameView?.virtualDeviceType = VirtualOperateType.NONE
                         channel.invokeMethod(
                             GameViewConstants.firstFrameArrival, mapOf(
@@ -465,7 +469,16 @@ object GameManager : HmcpPlayerListener {
     }
 
     override fun onSceneChanged(sceneMessage: String?) {
-        LogUtils.d("onSceneChanged:$sceneMessage")
+        LogUtils.d("onSceneChanged:$sceneMessage, cid:${HmcpManager.getInstance().cloudId}")
+        sceneMessage?.let {
+            val data = gson.fromJson(it, Map::class.java)
+            val sceneId = data["sceneId"]
+            when (sceneId) {
+                "play" -> {
+                    isPlaying = true
+                }
+            }
+        }
     }
 
     override fun onNetworkChanged(networkState: NetWorkState?) {
@@ -553,18 +566,15 @@ object GameManager : HmcpPlayerListener {
         channel.invokeMethod("openPage", param)
     }
 
-    /// 通知Flutter，游戏页面关闭
-    fun exitGame(data: MutableMap<String, Any>) {
-        data["needReattach"] = needReattach
-        channel.invokeMethod("exitGame", data)
-    }
-
     /// 游戏释放
     fun releaseGame(finish: String, bundle: Bundle?) {
         LogUtils.d("releaseGame:$finish")
         if (finish != "0") {
             // 非切换队列调用此方法，认定为退出游戏
-            channel.invokeMethod("exitGame", mapOf(Pair("action", finish), Pair("needReattach", needReattach)))
+            channel.invokeMethod(
+                "exitGame",
+                mapOf(Pair("action", finish), Pair("needReattach", needReattach))
+            )
             isPlaying = false
         }
         val cloudId = HmcpManager.getInstance().cloudId
