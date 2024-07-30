@@ -1,6 +1,7 @@
 package com.sayx.hm_cloud
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -57,7 +58,7 @@ object GameManager : HmcpPlayerListener {
     var gameView: HmcpVideoView? = null
 
     // 此处绑定的是HMCloudPlugin挂载的activity
-    private lateinit var activity: Context
+    private lateinit var activity: Activity
 
     var flutterActivity: AppFlutterActivity? = null
 
@@ -67,9 +68,11 @@ object GameManager : HmcpPlayerListener {
 
     var isPlaying = false
 
+    var isVideoShowed = false
+
     var needReattach = false
 
-    fun init(channel: MethodChannel, context: Context) {
+    fun init(channel: MethodChannel, context: Activity) {
         this.channel = channel
         this.activity = context
         LogUtils.getConfig().also {
@@ -284,6 +287,7 @@ object GameManager : HmcpPlayerListener {
                 Constants.STATUS_WAIT_CHOOSE -> {
                     gameView?.entryQueue()
                 }
+
                 Constants.STATUS_START_PLAY -> {
                     isPlaying = true
                 }
@@ -308,7 +312,8 @@ object GameManager : HmcpPlayerListener {
                 }
                 // 游戏首帧画面到达，可展示游戏画面
                 Constants.STATUS_FIRST_FRAME_ARRIVAL -> {
-                    if (!isPlaying) {
+                    if (!isVideoShowed) {
+                        isVideoShowed = true
                         gameView?.virtualDeviceType = VirtualOperateType.NONE
                         channel.invokeMethod(
                             GameViewConstants.firstFrameArrival, mapOf(
@@ -318,9 +323,7 @@ object GameManager : HmcpPlayerListener {
                         // 打开新的页面展示游戏画面
                         Intent().apply {
                             setClass(activity, GameActivity::class.java)
-                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                            addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                            activity.startActivity(this)
+                            activity.startActivityForResult(this, 200)
                         }
                     } else {
                         LogUtils.e("The game feeds back the first frame again.")
@@ -566,6 +569,10 @@ object GameManager : HmcpPlayerListener {
         channel.invokeMethod("openPage", param)
     }
 
+    fun exitGame() {
+        channel.invokeMethod("exitGame", mapOf(Pair("action", "0")))
+    }
+
     /// 游戏释放
     fun releaseGame(finish: String, bundle: Bundle?) {
         LogUtils.d("releaseGame:$finish")
@@ -575,13 +582,14 @@ object GameManager : HmcpPlayerListener {
                 "exitGame",
                 mapOf(Pair("action", finish), Pair("needReattach", needReattach))
             )
-            isPlaying = false
         }
         val cloudId = HmcpManager.getInstance().cloudId
         if (TextUtils.isEmpty(cloudId)) {
             LogUtils.d("undo releaseGame, cid is empty")
             gameView?.onDestroy()
             gameView = null
+            isPlaying = false
+            isVideoShowed = false
             if (finish == "0") {
                 // 切换队列
                 playGame(bundle)
@@ -600,6 +608,8 @@ object GameManager : HmcpPlayerListener {
                     LogUtils.d("releaseGame:$result")
                     gameView?.onDestroy()
                     gameView = null
+                    isPlaying = false
+                    isVideoShowed = false
                     if (finish == "0") {
                         // 切换队列
                         playGame(bundle)
@@ -611,6 +621,8 @@ object GameManager : HmcpPlayerListener {
                     LogUtils.e("releaseGame:$error")
                     gameView?.onDestroy()
                     gameView = null
+                    isPlaying = false
+                    isVideoShowed = false
                     channel.invokeMethod(
                         "errorInfo",
                         mapOf(

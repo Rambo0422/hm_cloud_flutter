@@ -209,6 +209,7 @@ class GameActivity : AppCompatActivity() {
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
+        LogUtils.d("${this}: onNewIntent")
         this.intent = intent
     }
 

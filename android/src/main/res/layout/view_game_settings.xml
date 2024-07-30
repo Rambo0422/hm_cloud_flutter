@@ -211,7 +211,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/layout_switch"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="154dp"
                 android:layout_marginTop="5dp"
                 android:layout_marginEnd="15dp"
                 android:background="@drawable/shape_settings_function_bg"
@@ -225,8 +225,8 @@
 
                 <com.sayx.hm_cloud.widget.DrawableTextView
                     android:id="@+id/btn_vibrate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="50dp"
+                    android:layout_height="64dp"
                     android:drawablePadding="5dp"
                     android:gravity="center"
                     android:text="@string/key_vibrate"
@@ -242,8 +242,8 @@
 
                 <com.sayx.hm_cloud.widget.DrawableTextView
                     android:id="@+id/btn_interaction"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="50dp"
+                    android:layout_height="64dp"
                     android:drawablePadding="5dp"
                     android:gravity="center"
                     android:text="@string/interaction"
@@ -267,8 +267,8 @@
 
                 <com.sayx.hm_cloud.widget.DrawableTextView
                     android:id="@+id/btn_microphone"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="50dp"
+                    android:layout_height="64dp"
                     android:drawablePadding="5dp"
                     android:gravity="center"
                     android:text="@string/microphone"
@@ -296,8 +296,8 @@
 
                 <com.sayx.hm_cloud.widget.DrawableTextView
                     android:id="@+id/btn_chat_voice"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="50dp"
+                    android:layout_height="64dp"
                     android:layout_marginTop="10dp"
                     android:drawablePadding="5dp"
                     android:gravity="center"
@@ -341,7 +341,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/layout_function"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="80dp"
                 android:layout_marginTop="5dp"
                 android:layout_marginEnd="15dp"
                 android:background="@drawable/shape_settings_function_bg"
@@ -355,8 +355,8 @@
 
                 <com.sayx.hm_cloud.widget.DrawableTextView
                     android:id="@+id/btn_archive"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="50dp"
+                    android:layout_height="64dp"
                     android:drawablePadding="5dp"
                     android:gravity="center"
                     android:text="@string/archive"
@@ -385,8 +385,8 @@
 
                 <com.sayx.hm_cloud.widget.DrawableTextView
                     android:id="@+id/btn_hang"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="50dp"
+                    android:layout_height="64dp"
                     android:drawablePadding="5dp"
                     android:gravity="center"
                     android:text="@string/hang"
@@ -414,7 +414,7 @@
 
                 <com.sayx.hm_cloud.widget.DrawableTextView
                     android:id="@+id/btn_empty_3"
-                    android:layout_width="wrap_content"
+                    android:layout_width="50dp"
                     android:layout_height="wrap_content"
                     android:drawablePadding="5dp"
                     android:gravity="center"
@@ -593,7 +593,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/layout_control_method"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="80dp"
                 android:layout_marginTop="5dp"
                 android:layout_marginEnd="15dp"
                 android:background="@drawable/shape_settings_function_bg"
@@ -607,8 +607,8 @@
 
                 <com.sayx.hm_cloud.widget.DrawableTextView
                     android:id="@+id/btn_gamepad"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="50dp"
+                    android:layout_height="64dp"
                     android:drawablePadding="5dp"
                     android:gravity="center"
                     android:text="@string/gamepad_control"
@@ -624,8 +624,8 @@
 
                 <com.sayx.hm_cloud.widget.DrawableTextView
                     android:id="@+id/btn_keyboard"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="50dp"
+                    android:layout_height="64dp"
                     android:drawablePadding="5dp"
                     android:gravity="center"
                     android:text="@string/keyboard_control"
@@ -640,8 +640,8 @@
 
                 <com.sayx.hm_cloud.widget.DrawableTextView
                     android:id="@+id/btn_custom"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="50dp"
+                    android:layout_height="64dp"
                     android:drawablePadding="5dp"
                     android:gravity="center"
                     android:text="@string/custom"
@@ -694,7 +694,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/layout_mouse_config"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="130dp"
                 android:layout_marginTop="5dp"
                 android:layout_marginEnd="15dp"
                 android:background="@drawable/shape_settings_function_bg"
@@ -707,8 +707,8 @@
 
                 <com.sayx.hm_cloud.widget.DrawableTextView
                     android:id="@+id/btn_mouse_click"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="50dp"
+                    android:layout_height="64dp"
                     android:drawablePadding="5dp"
                     android:gravity="center"
                     android:text="@string/mouse_click"
@@ -724,8 +724,8 @@
 
                 <com.sayx.hm_cloud.widget.DrawableTextView
                     android:id="@+id/btn_touch_click"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="50dp"
+                    android:layout_height="64dp"
                     android:drawablePadding="5dp"
                     android:gravity="center"
                     android:text="@string/touch_click"
@@ -740,8 +740,8 @@
 
                 <com.sayx.hm_cloud.widget.DrawableTextView
                     android:id="@+id/btn_touch_attack"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="50dp"
+                    android:layout_height="64dp"
                     android:drawablePadding="5dp"
                     android:gravity="center"
                     android:text="@string/touch_attack"
