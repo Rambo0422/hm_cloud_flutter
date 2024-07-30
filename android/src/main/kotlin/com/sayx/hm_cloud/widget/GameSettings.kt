@@ -10,6 +10,7 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.LinearInterpolator
@@ -68,7 +69,7 @@ class GameSettings @JvmOverloads constructor(
 
     private var lastLost = 0.0
 
-    private var currentTouchMode = TouchMode.TOUCH_MODE_SCREEN
+    private var currentTouchMode = TouchMode.TOUCH_MODE_MOUSE
 
     private var animated = false
 
@@ -163,49 +164,34 @@ class GameSettings @JvmOverloads constructor(
         dataBinding.btnMouseClick.setOnClickListener {
             if (!mouseModeEditable) {
                 ToastUtils.showLong(R.string.mouse_editable_notice)
-                return@setOnClickListener
-            }
-            val value = !it.isSelected
-            it.isSelected = value
-            if (value) {
+            } else if (!it.isSelected) {
+                it.isSelected = true
                 currentTouchMode = TouchMode.TOUCH_MODE_MOUSE
                 gameView?.touchMode = TouchMode.TOUCH_MODE_MOUSE
-            } else {
-                gameView?.touchMode = TouchMode.TOUCH_MODE_NONE
+                updateMouseMode(currentTouchMode)
             }
-            updateMouseMode()
         }
         // 触控点击
         dataBinding.btnTouchClick.setOnClickListener {
             if (!mouseModeEditable) {
                 ToastUtils.showLong(R.string.mouse_editable_notice)
-                return@setOnClickListener
-            }
-            val value = !it.isSelected
-            it.isSelected = value
-            if (value) {
+            } else if (!it.isSelected) {
+                it.isSelected = true
                 currentTouchMode = TouchMode.TOUCH_MODE_SCREEN
                 gameView?.touchMode = TouchMode.TOUCH_MODE_SCREEN
-            } else {
-                gameView?.touchMode = TouchMode.TOUCH_MODE_NONE
+                updateMouseMode(currentTouchMode)
             }
-            updateMouseMode()
         }
         // 触屏攻击
         dataBinding.btnTouchAttack.setOnClickListener {
             if (!mouseModeEditable) {
                 ToastUtils.showLong(R.string.mouse_editable_notice)
-                return@setOnClickListener
-            }
-            val value = !it.isSelected
-            it.isSelected = value
-            if (value) {
+            } else if (!it.isSelected) {
+                it.isSelected = true
                 currentTouchMode = TouchMode.TOUCH_MODE_SCREEN_SLIDE
                 gameView?.touchMode = TouchMode.TOUCH_MODE_SCREEN_SLIDE
-            } else {
-                gameView?.touchMode = TouchMode.TOUCH_MODE_NONE
+                updateMouseMode(currentTouchMode)
             }
-            updateMouseMode()
         }
         // 退出游戏
         dataBinding.btnExitGame.setOnClickListener {
@@ -277,22 +263,18 @@ class GameSettings @JvmOverloads constructor(
     private fun initStatusListener() {
         // 鼠标设置
         dataBinding.switchMouseConfig.setOnCheckedChangeListener { _, isChecked ->
-            LogUtils.v("MouseMode change:$isChecked, touchMode:${gameView?.touchMode}, currentTouchMode:$currentTouchMode")
-            if (mouseModeEditable.not()) {
-                return@setOnCheckedChangeListener
+            LogUtils.v("MouseMode change:$isChecked, touchMode:${gameView?.touchMode}, currentTouchMode:$currentTouchMode, mouseModeEditable:$mouseModeEditable")
+            if (mouseModeEditable) {
+                if (isChecked) {
+                    gameView?.touchMode = currentTouchMode
+                    updateMouseMode(currentTouchMode)
+                } else {
+                    currentTouchMode = gameView?.touchMode ?: currentTouchMode
+                    gameView?.touchMode = TouchMode.TOUCH_MODE_NONE
+                    updateMouseMode(TouchMode.TOUCH_MODE_NONE)
+                }
+                dataBinding.sbSensitivity.isEnabled = isChecked
             }
-            if (isChecked) {
-                gameView?.touchMode = currentTouchMode
-            } else {
-                currentTouchMode = gameView?.touchMode ?: currentTouchMode
-                gameView?.touchMode = TouchMode.TOUCH_MODE_NONE
-            }
-            dataBinding.btnMouseClick.isEnabled = isChecked
-            dataBinding.btnTouchClick.isEnabled = isChecked
-            dataBinding.btnTouchAttack.isEnabled = isChecked
-            dataBinding.sbSensitivity.isEnabled = isChecked
-
-            updateMouseMode()
         }
         // 亮度状态变更
         dataBinding.sbLight.setOnSeekBarChangeListener(object : SeekBarChangListenerImp() {
@@ -345,52 +327,54 @@ class GameSettings @JvmOverloads constructor(
         }
     }
 
-    fun updateMouseMode(enable: Boolean = true) {
+    fun setPCMouseMode(enable: Boolean) {
         dataBinding.switchMouseConfig.isEnabled = enable
         dataBinding.sbSensitivity.isEnabled = enable
         mouseModeEditable = enable
+    }
 
-        dataBinding.sbSensitivity.postDelayed({
-            gameView?.touchMode?.let {
-                LogUtils.d("updateTouchMode:$it, enable:$enable")
-                when (it) {
-                    TouchMode.TOUCH_MODE_MOUSE -> {
-                        dataBinding.btnMouseClick.isSelected = true && enable
-                        dataBinding.btnTouchClick.isSelected = false
-                        dataBinding.btnTouchAttack.isSelected = false
-                        dataBinding.switchMouseConfig.isChecked = true && enable
-                    }
-
-                    TouchMode.TOUCH_MODE_SCREEN -> {
-                        dataBinding.btnMouseClick.isSelected = false
-                        dataBinding.btnTouchClick.isSelected = true && enable
-                        dataBinding.btnTouchAttack.isSelected = false
-                        dataBinding.switchMouseConfig.isChecked = true && enable
-                    }
-
-                    TouchMode.TOUCH_MODE_SCREEN_SLIDE -> {
-                        dataBinding.btnMouseClick.isSelected = false
-                        dataBinding.btnTouchClick.isSelected = false
-                        dataBinding.btnTouchAttack.isSelected = true && enable
-                        dataBinding.switchMouseConfig.isChecked = true && enable
-                    }
-
-                    TouchMode.TOUCH_MODE_NONE -> {
-                        dataBinding.btnMouseClick.isSelected = false
-                        dataBinding.btnTouchClick.isSelected = false
-                        dataBinding.btnTouchAttack.isSelected = false
-
-                        dataBinding.btnMouseClick.isEnabled = false
-                        dataBinding.btnTouchClick.isEnabled = false
-                        dataBinding.btnTouchAttack.isEnabled = false
-                        dataBinding.sbSensitivity.isEnabled = false
-                        dataBinding.switchMouseConfig.isChecked = false
-                    }
-
-                    else -> {}
+    private fun updateMouseMode(touchMode: TouchMode) {
+        when (touchMode) {
+            TouchMode.TOUCH_MODE_MOUSE -> {
+                dataBinding.btnMouseClick.isSelected = true
+                dataBinding.btnTouchClick.isSelected = false
+                dataBinding.btnTouchAttack.isSelected = false
+                if (!dataBinding.switchMouseConfig.isChecked) {
+                    dataBinding.switchMouseConfig.isChecked = true
                 }
             }
-        }, 100L)
+
+            TouchMode.TOUCH_MODE_SCREEN -> {
+                dataBinding.btnMouseClick.isSelected = false
+                dataBinding.btnTouchClick.isSelected = true
+                dataBinding.btnTouchAttack.isSelected = false
+                if (!dataBinding.switchMouseConfig.isChecked) {
+                    dataBinding.switchMouseConfig.isChecked = true
+                }
+            }
+
+            TouchMode.TOUCH_MODE_SCREEN_SLIDE -> {
+                dataBinding.btnMouseClick.isSelected = false
+                dataBinding.btnTouchClick.isSelected = false
+                dataBinding.btnTouchAttack.isSelected = true
+                if (!dataBinding.switchMouseConfig.isChecked) {
+                    dataBinding.switchMouseConfig.isChecked = true
+                }
+            }
+
+            TouchMode.TOUCH_MODE_NONE -> {
+                dataBinding.btnMouseClick.isSelected = false
+                dataBinding.btnTouchClick.isSelected = false
+                dataBinding.btnTouchAttack.isSelected = false
+
+                dataBinding.sbSensitivity.isEnabled = false
+                if (dataBinding.switchMouseConfig.isChecked) {
+                    dataBinding.switchMouseConfig.isChecked = false
+                }
+            }
+
+            else -> {}
+        }
     }
 
     private fun updateVibrate() {

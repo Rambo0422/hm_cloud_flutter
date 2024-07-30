@@ -877,9 +877,11 @@ class GameActivity : AppCompatActivity() {
         if (event.open) {
             dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
             gameSettings?.controllerType = AppVirtualOperateType.NONE
-            gameSettings?.updateMouseMode(false)
+            // PC模式，关闭鼠标操作
+            gameSettings?.setPCMouseMode(false)
         } else {
-            gameSettings?.updateMouseMode(true)
+            // 非PC模式，打开鼠标操作
+            gameSettings?.setPCMouseMode(true)
         }
     }
 
@@ -959,8 +961,10 @@ class GameActivity : AppCompatActivity() {
 
     override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
 //        LogUtils.d("$this->dispatchTouchEvent:$event")
-        dataBinding.gameController.controllerType = GameManager.lastControllerType
-        gameSettings?.controllerType = GameManager.lastControllerType
+        if (dataBinding.btnGameSettings.visibility == View.VISIBLE) {
+            dataBinding.gameController.controllerType = GameManager.lastControllerType
+            gameSettings?.controllerType = GameManager.lastControllerType
+        }
         return super.dispatchTouchEvent(event)
     }
 
