@@ -22,8 +22,8 @@ NS_ASSUME_NONNULL_BEGIN
 #define k_GameStop              @"gameStop"
 #define k_FirstFrameArrival     @"firstFrameArrival"
 
-#define k_DaShenBundle [NSBundle bundleWithPath:[[NSBundle bundleForClass:self.class] pathForResource:@"DaShen" ofType:@"bundle"]]
-#define k_BundleImage(name) [UIImage imageWithContentsOfFile:[k_DaShenBundle pathForResource:name ofType:@"png"]]
+#define k_SanABundle [NSBundle bundleWithPath:[[NSBundle bundleForClass:self.class] pathForResource:@"SanA_Game" ofType:@"bundle"]]
+#define k_BundleImage(name) [UIImage imageWithContentsOfFile:[k_SanABundle pathForResource:name ofType:@"png"]]
 
 @interface CloudPreViewController : UIViewController
 

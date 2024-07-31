@@ -10,6 +10,8 @@
 #import "HmCloudTool.h"
 #import "UIViewController+TopVc.h"
 
+#define SanA_Bundle [NSBundle bundleWithPath:[[NSBundle bundleForClass:self.class] pathForResource:@"SanA_Game" ofType:@"bundle"]]
+
 @interface HmCloudTool ()
 
 @property (nonatomic, strong)  UIViewController *gameVC;
@@ -128,17 +130,25 @@
     }
 
     if ([state isEqualToString:@"videoVisible"]) {
-        [[HMCloudPlayer sharedCloudPlayer] cloudSetTouchModel:HMCloudCoreTouchModeMouse];
+        [[HMCloudPlayer sharedCloudPlayer] cloudSetTouchModel:HMCloudCoreTouchModeScreen];
 
         if (!self.vc) {
-            self.vc = [[CloudPreViewController alloc] initWithNibName:@"CloudPreViewController" bundle:[NSBundle mainBundle]];
+            self.vc = [[CloudPreViewController alloc] initWithNibName:@"CloudPreViewController" bundle:SanA_Bundle];
             self.vc.gameVC = self.gameVC;
+
+            __weak typeof(self) weakSelf = self;
+
+            self.vc.didDismiss = ^{
+                typeof(self) strongSelf = weakSelf;
+                strongSelf.vc = nil;
+                [[HMCloudPlayer sharedCloudPlayer] stop];
+            };
             [[UIViewController topViewController] presentViewController:self.vc animated:YES completion:nil];
         }
     }
 
     if ([state isEqualToString:@"stopped"]) {
-        NSString *reason = [info objectForKey:@"stop_reason"];
+//        NSString *reason = [info objectForKey:@"stop_reason"];
 
 //            if ([reason isEqualToString:@"no_operation"] || [reason isEqualToString:@"url_timeout"]) {
 //                if (_delegate && [_delegate respondsToSelector:@selector(cloudPlayerStateChanged:)]) {
@@ -278,7 +288,7 @@
                 CloudGameOptionKeyPlayingTime: self.playTime,
                 CloudGameOptionKeyExtraId: @"",
                 CloudGameOptionKeyArchive: @(0),
-                CloudGameOptionKeyProtoData: @"",
+                CloudGameOptionKeyProtoData: jsonStr,
                 CloudGameOptionKeyAppChannel: self.channelName,
                 CloudGameOptionKeyStreamType: @(CloudCoreStreamingTypeRTC),
                 CloudGameOptionKeyPriority: self.priority

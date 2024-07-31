@@ -17,14 +17,14 @@ A new Flutter plugin project.
   s.public_header_files = 'Classes/**/*.h'
   s.resource              = 'HaiMaSDK/HaiMaSDK_Bundle_iOS.bundle'
   s.resource_bundles = {
-      'DaShen' => ['Classes/**/*.{xib,png,xcassets,json,plist}']
+      'SanA_Game' => ['Classes/**/*.{xib,png,xcassets,json,plist}']
     }
   s.vendored_frameworks   = 'HaiMaSDK/HMCloudPlayerCore.framework', 'HaiMaSDK/HMWebRTC.framework'
   s.dependency 'Flutter'
   s.dependency 'Masonry', '~> 1.1.0'
   s.dependency 'MJExtension', '~> 3.4.2'
   s.dependency 'AFNetworking', '~> 4.0'
-  s.platform = :ios, '9.0'
+  s.platform = :ios, '13.0'
 
   # Flutter.framework does not contain a i386 slice.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
