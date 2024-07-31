@@ -112,6 +112,10 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
                 GameManager.flutterActivity?.finish()
             }
 
+            "exitQueue" -> {
+                GameManager.exitQueue()
+            }
+
             else -> {
                 callback.notImplemented()
             }

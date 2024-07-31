@@ -57,4 +57,8 @@ class HmCloudController {
   Future<void> queryControlUsers() {
     return methodChannel.invokeMethod('queryControlUsers', null);
   }
+
+  Future<void> exitQueue() {
+    return methodChannel.invokeMethod('exitQueue', null);
+  }
 }

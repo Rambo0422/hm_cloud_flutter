@@ -14,6 +14,9 @@ object TimeUtils {
     }
 
     fun getCountTime(time: Long): String {
+        if (time <= 0) {
+            return "00:00"
+        }
         var seconds = time
         seconds %= 3600
         val minutes = seconds / 60

@@ -70,6 +70,8 @@ object GameManager : HmcpPlayerListener {
 
     var isVideoShowed = false
 
+    var inQueue = false
+
     var needReattach = false
 
     fun init(channel: MethodChannel, context: Activity) {
@@ -290,6 +292,7 @@ object GameManager : HmcpPlayerListener {
 
                 Constants.STATUS_START_PLAY -> {
                     isPlaying = true
+                    inQueue = false
                 }
                 // 网络切换，尝试重连
                 Constants.STATUS_TIPS_CHANGE_WIFI_TO_4G -> {
@@ -297,6 +300,7 @@ object GameManager : HmcpPlayerListener {
                 }
                 // 实例进入排队，sdk反馈排队时间
                 Constants.STATUS_OPERATION_INTERVAL_TIME -> {
+                    inQueue = true
                     val dataStr = data.getString(StatusCallbackUtil.DATA)
                     if (dataStr is String && !TextUtils.isEmpty(dataStr)) {
                         val resultData = gson.fromJson(dataStr, Map::class.java)
@@ -329,7 +333,7 @@ object GameManager : HmcpPlayerListener {
                         LogUtils.e("The game feeds back the first frame again.")
                     }
                 }
-                // 游戏进入排队等候队列
+                // sdk回调下线提醒
                 Constants.STATUS_OPERATION_GAME_TIME_COUNT_DOWN -> {
                     val dataStr = data.getString(StatusCallbackUtil.DATA)
                     if (dataStr is String && !TextUtils.isEmpty(dataStr)) {
@@ -569,12 +573,16 @@ object GameManager : HmcpPlayerListener {
         channel.invokeMethod("openPage", param)
     }
 
+    fun exitQueue() {
+        releaseGame("-1")
+    }
+
     fun exitGame() {
         channel.invokeMethod("exitGame", mapOf(Pair("action", "0")))
     }
 
     /// 游戏释放
-    fun releaseGame(finish: String, bundle: Bundle?) {
+    fun releaseGame(finish: String, bundle: Bundle? = null) {
         LogUtils.d("releaseGame:$finish")
         if (finish != "0") {
             // 非切换队列调用此方法，认定为退出游戏
@@ -589,6 +597,7 @@ object GameManager : HmcpPlayerListener {
             gameView?.onDestroy()
             gameView = null
             isPlaying = false
+            inQueue = false
             isVideoShowed = false
             if (finish == "0") {
                 // 切换队列
@@ -609,6 +618,7 @@ object GameManager : HmcpPlayerListener {
                     gameView?.onDestroy()
                     gameView = null
                     isPlaying = false
+                    inQueue = false
                     isVideoShowed = false
                     if (finish == "0") {
                         // 切换队列
@@ -622,6 +632,7 @@ object GameManager : HmcpPlayerListener {
                     gameView?.onDestroy()
                     gameView = null
                     isPlaying = false
+                    inQueue = false
                     isVideoShowed = false
                     channel.invokeMethod(
                         "errorInfo",
