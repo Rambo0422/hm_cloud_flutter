@@ -209,6 +209,7 @@ class GameActivity : AppCompatActivity() {
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
+        LogUtils.d("${this}: onNewIntent")
         this.intent = intent
     }
 
@@ -1032,10 +1033,10 @@ class GameActivity : AppCompatActivity() {
             LogUtils.e("exitCustom:${e.message}")
         }
         EventBus.getDefault().unregister(this)
-        GameManager.gameView?.onDestroy()
-        if (GameManager.isPlaying) {
-            GameManager.exitGame(mutableMapOf(Pair("action", "")))
-        }
+//        GameManager.gameView?.onDestroy()
+//        if (GameManager.isPlaying) {
+//            GameManager.exitGame(mutableMapOf(Pair("action", "")))
+//        }
         super.onDestroy()
     }
 }
