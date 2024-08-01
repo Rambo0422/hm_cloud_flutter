@@ -37,7 +37,8 @@
     [self mj_setKeyValues:params];
 }
 
-- (void)regist {
+- (void)registWithDelegate:(id<HmCloudToolDelegate>)delegate {
+    self.delegate = delegate;
     NSLog(@" =============== SDK_VERSION : %@", CLOUDGAME_SDK_VERSION);
 
     [[HMCloudPlayer sharedCloudPlayer] setDelegate:self];
@@ -142,6 +143,10 @@
                 typeof(self) strongSelf = weakSelf;
                 strongSelf.vc = nil;
                 [[HMCloudPlayer sharedCloudPlayer] stop];
+
+                if (strongSelf.delegate) {
+                    [strongSelf.delegate sendToFlutter:@"exitGame" params:@{ @"action": @1 }];
+                }
             };
             [[UIViewController topViewController] presentViewController:self.vc animated:YES completion:nil];
         }
@@ -183,6 +188,7 @@
     }
 
     if ([state isEqualToString:@"update"]) {
+        [self.delegate sendToFlutter:@"queueInfo" params:@{ @"queueTime": info[@"second"] }];
     }
 
     if ([state isEqualToString:@"entering"]) {

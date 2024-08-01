@@ -9,6 +9,11 @@
 #import <HMCloudPlayerCore/HMCloudPlayer.h>
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol HmCloudToolDelegate <NSObject>
+
+- (void)sendToFlutter:(NSString *)actionName params:(id _Nullable)params;
+
+@end
 
 
 @interface HmCloudTool : NSObject <HMCloudPlayerDelegate>
@@ -57,9 +62,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong)   NSNumber *realTime;
 
 
+@property (nonatomic, weak) id<HmCloudToolDelegate> delegate;
+
 + (instancetype)share;
 - (void)configWithParams:(NSDictionary *)params;
-- (void)regist;
+- (void)registWithDelegate:(id<HmCloudToolDelegate>)delegate;
 
 @end
 

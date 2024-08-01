@@ -25,7 +25,7 @@
         
         self.setView = [[WMDragView alloc] initWithFrame:CGRectMake(100, 100, 40, 40)];
         
-        self.setView.imageView.image = k_BundleImage(@"cloud_set");
+        self.setView.imageView.image = k_BundleImage(@"ic_wifi_high");
         self.setView.isKeepBounds = YES;
         self.setView.backgroundColor = [UIColor clearColor];
         __weak typeof(self) weakSelf = self;
