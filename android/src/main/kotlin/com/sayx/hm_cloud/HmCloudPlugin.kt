@@ -13,6 +13,7 @@ import com.sayx.hm_cloud.model.ControllerConfigEvent
 import com.sayx.hm_cloud.model.ControllerEditEvent
 import com.sayx.hm_cloud.model.ControllerInfo
 import com.sayx.hm_cloud.model.GameParam
+import com.sayx.hm_cloud.model.PartyPlayWantPlay
 import com.sayx.hm_cloud.model.PlayPartyRoomInfo
 import com.sayx.hm_cloud.model.PlayPartyRoomInfoEvent
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -144,6 +145,18 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
                         PlayPartyRoomInfo::class.java
                     )
                     EventBus.getDefault().post(PlayPartyRoomInfoEvent(controlInfos, roomInfo))
+                }
+            }
+
+            "requestWantPlayPermission" -> {
+                if (arguments is Map<*, *>) {
+                    // 转成对象
+                    val gson = GameManager.gson
+                    val wantPlayInfo = gson.fromJson(
+                        gson.toJson(arguments),
+                        PartyPlayWantPlay::class.java
+                    )
+                    EventBus.getDefault().post(wantPlayInfo)
                 }
             }
 

@@ -11,6 +11,7 @@ import android.widget.TextView
 import com.blankj.utilcode.util.ScreenUtils
 import com.sayx.hm_cloud.R
 import com.sayx.hm_cloud.model.ControlInfo
+import com.sayx.hm_cloud.model.PartyPlayWantPlay
 import com.sayx.hm_cloud.model.PlayPartyRoomInfo
 
 class PlayPartyGameView @JvmOverloads constructor(
@@ -74,6 +75,16 @@ class PlayPartyGameView @JvmOverloads constructor(
         controlInfoViewList.forEachIndexed { index, playPartyGameViewItem ->
             val roomStatu = roomInfo.roomStatus[index]
             playPartyGameViewItem.onPlayPartyRoomInfoEvent(index, roomStatu, controlInfos)
+        }
+    }
+
+    fun onPartyPlayWantPlay(partyPlayWantPlay: PartyPlayWantPlay) {
+        for (playPartyGameViewItem in controlInfoViewList) {
+            val uid = playPartyGameViewItem.getUserId()
+            if (uid == partyPlayWantPlay.uid) {
+                playPartyGameViewItem.startCountDown()
+                break
+            }
         }
     }
 }

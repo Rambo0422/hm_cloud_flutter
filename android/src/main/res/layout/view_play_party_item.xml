@@ -27,13 +27,11 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/space_1">
 
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/iv_avatar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:padding="1.5dp"
-            android:scaleType="fitXY"
             android:visibility="visible" />
 
         <ImageView
@@ -55,6 +53,26 @@
         app:layout_constraintCircle="@id/layout_avatar"
         app:layout_constraintCircleAngle="35"
         app:layout_constraintCircleRadius="15dp" />
+
+    <com.noober.background.view.BLTextView
+        android:id="@+id/tv_want_play_count_down"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:paddingHorizontal="3dp"
+        android:paddingVertical="1dp"
+        android:text=""
+        android:textColor="#000000"
+        android:textSize="10sp"
+        android:visibility="gone"
+        app:bl_corners_bottomRightRadius="6.5dp"
+        app:bl_corners_topLeftRadius="6.5dp"
+        app:bl_corners_topRightRadius="6.5dp"
+        app:bl_solid_color="#C6EC4B"
+        app:bl_stroke_color="#000000"
+        app:bl_stroke_width="1dp"
+        app:layout_constraintStart_toStartOf="@id/layout_avatar"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.legacy.widget.Space
         android:id="@+id/space_2"

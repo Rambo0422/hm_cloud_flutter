@@ -23,6 +23,7 @@ import android.view.animation.ScaleAnimation
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.LinearLayout.LayoutParams
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
@@ -66,6 +67,7 @@ import com.sayx.hm_cloud.model.ControllerEditEvent
 import com.sayx.hm_cloud.model.GameErrorEvent
 import com.sayx.hm_cloud.model.KeyInfo
 import com.sayx.hm_cloud.model.PCMouseEvent
+import com.sayx.hm_cloud.model.PartyPlayWantPlay
 import com.sayx.hm_cloud.model.PlayPartyRoomInfoEvent
 import com.sayx.hm_cloud.utils.AppSizeUtils
 import com.sayx.hm_cloud.widget.AddGamepadKey
@@ -75,6 +77,7 @@ import com.sayx.hm_cloud.widget.EditCombineKey
 import com.sayx.hm_cloud.widget.EditRouletteKey
 import com.sayx.hm_cloud.widget.GameSettings
 import com.sayx.hm_cloud.widget.PlayPartyGameView
+import com.sayx.hm_cloud.widget.PlayPartyPermissionView
 import me.jessyan.autosize.utils.AutoSizeUtils
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -1041,6 +1044,13 @@ class GameActivity : AppCompatActivity() {
         }
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onPartyPlayWantPlay(partyPlayWantPlay: PartyPlayWantPlay) {
+        showPlayPartyPermissionView(partyPlayWantPlay)
+        // 同时派对吧游戏页面去申请权限
+        playPartyGameView?.onPartyPlayWantPlay(partyPlayWantPlay)
+    }
+
     private val wantPlayViewId = View.generateViewId()
 
     private fun initWantPlayView() {
@@ -1075,7 +1085,12 @@ class GameActivity : AppCompatActivity() {
         }
 
         linearLayout.setOnClickListener {
-            GameManager.wantPlay(GameManager.userId)
+            // 判断我是不是房主，如果我是房主，就直接给权限，如果不是权限，就申请
+            if (GameManager.isPartyPlayOwner) {
+                GameManager.letPlay(GameManager.userId)
+            } else {
+                GameManager.wantPlay(GameManager.userId)
+            }
         }
 
         val imageView = ImageView(this).apply {
@@ -1101,5 +1116,21 @@ class GameActivity : AppCompatActivity() {
 
         // 将 textView 添加到 ConstraintLayout
         dataBinding.gameController.addView(linearLayout)
+    }
+
+    private fun showPlayPartyPermissionView(partyPlayWantPlay: PartyPlayWantPlay) {
+        val permissionView = PlayPartyPermissionView(partyPlayWantPlay, this).apply {
+            layoutParams = ConstraintLayout.LayoutParams(
+                LayoutParams.WRAP_CONTENT,
+                LayoutParams.WRAP_CONTENT
+            ).apply {
+                endToEnd = ConstraintSet.PARENT_ID
+                topToTop = ConstraintSet.PARENT_ID
+                startToStart = ConstraintSet.PARENT_ID
+            }
+        }
+
+        dataBinding.gameController.addView(permissionView)
+        permissionView.show()
     }
 }
