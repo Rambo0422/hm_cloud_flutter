@@ -128,6 +128,7 @@ class PlayPartyGameViewItem @JvmOverloads constructor(
 
             iv_lock_tag.visibility = View.VISIBLE
             iv_avatar.visibility = View.GONE
+            iv_permission_tag.visibility = View.GONE
         } else {
             setUserInfo(roomStatu)
 
