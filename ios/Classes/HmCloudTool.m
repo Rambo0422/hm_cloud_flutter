@@ -41,8 +41,14 @@
     self.delegate = delegate;
     NSLog(@" =============== SDK_VERSION : %@", CLOUDGAME_SDK_VERSION);
 
+
+
     [[HMCloudPlayer sharedCloudPlayer] setDelegate:self];
     [[HMCloudPlayer sharedCloudPlayer] registCloudPlayer:self.accessKeyId channelId:self.channelName options:nil];
+}
+
+- (void)stop {
+    [[HMCloudPlayer sharedCloudPlayer] stop];
 }
 
 #pragma mark - CloudPlayer Delegate Function
@@ -53,28 +59,30 @@
 
     NSLog(@"%s : %@", __FUNCTION__, dict);
 
-    NSString *scene = [dict objectForKey:@"sceneId"];
-    NSDictionary *extraInfo = [dict objectForKey:@"extraInfo"];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSString *scene = [dict objectForKey:@"sceneId"];
+        NSDictionary *extraInfo = [dict objectForKey:@"extraInfo"];
 
-    if ([scene isEqualToString:@"init"]) {
-        [self processSceneInitInfo:extraInfo];
-    } else if ([scene isEqualToString:@"data"]) {
-        [self processDataInfo:extraInfo];
-    } else if ([scene isEqualToString:@"prepare"]) {
-        [self processPrepareInfo:extraInfo];
-    } else if ([scene isEqualToString:@"playerState"]) {
-        [self processPlayerStateInfo:extraInfo];
-    } else if ([scene isEqualToString:@"queue"]) {
-        [self processQueueInfo:extraInfo];
-    } else if ([scene isEqualToString:@"playingtime"]) {
-        [self processPlayingTimeInfo:extraInfo];
-    } else if ([scene isEqualToString:@"resolution"]) {
-        [self processResolutionInfo:extraInfo];
-    } else if ([scene isEqualToString:@"stastic"]) {
-        [self processStasticInfo:extraInfo];
-    } else if ([scene isEqualToString:@"maintance"]) {
-        [self processMaintanceInfo:extraInfo];
-    }
+        if ([scene isEqualToString:@"init"]) {
+            [self processSceneInitInfo:extraInfo];
+        } else if ([scene isEqualToString:@"data"]) {
+            [self processDataInfo:extraInfo];
+        } else if ([scene isEqualToString:@"prepare"]) {
+            [self processPrepareInfo:extraInfo];
+        } else if ([scene isEqualToString:@"playerState"]) {
+            [self processPlayerStateInfo:extraInfo];
+        } else if ([scene isEqualToString:@"queue"]) {
+            [self processQueueInfo:extraInfo];
+        } else if ([scene isEqualToString:@"playingtime"]) {
+            [self processPlayingTimeInfo:extraInfo];
+        } else if ([scene isEqualToString:@"resolution"]) {
+            [self processResolutionInfo:extraInfo];
+        } else if ([scene isEqualToString:@"stastic"]) {
+            [self processStasticInfo:extraInfo];
+        } else if ([scene isEqualToString:@"maintance"]) {
+            [self processMaintanceInfo:extraInfo];
+        }
+    });
 }
 
 - (void)processSceneInitInfo:(NSDictionary *)info {
@@ -85,7 +93,28 @@
     NSString *state = [info objectForKey:@"state"];
 
     if ([state isEqualToString:@"success"]) {
-        [self initGameVC];
+        if (!self.vc) {
+            self.vc = [[CloudPreViewController alloc] initWithNibName:@"CloudPreViewController" bundle:SanA_Bundle];
+            self.vc.gameVC = self.gameVC;
+
+            __weak typeof(self) weakSelf = self;
+
+            self.vc.didDismiss = ^{
+                typeof(self) strongSelf = weakSelf;
+                strongSelf.vc = nil;
+                [strongSelf stop];
+
+                if (strongSelf.delegate) {
+                    [strongSelf.delegate sendToFlutter:ActionExitGame params:@{ @"action": @1 }];
+                }
+            };
+            
+            UIViewController *testV = [UIViewController topViewController];
+            
+            [testV presentViewController:self.vc animated:YES completion:nil];
+        }
+
+//        [self initGameVC];
     } else if ([state isEqualToString:@"failed"]) {
     }
 }
@@ -142,10 +171,10 @@
             self.vc.didDismiss = ^{
                 typeof(self) strongSelf = weakSelf;
                 strongSelf.vc = nil;
-                [[HMCloudPlayer sharedCloudPlayer] stop];
+                [strongSelf stop];
 
                 if (strongSelf.delegate) {
-                    [strongSelf.delegate sendToFlutter:@"exitGame" params:@{ @"action": @1 }];
+                    [strongSelf.delegate sendToFlutter:ActionExitGame params:@{ @"action": @1 }];
                 }
             };
             [[UIViewController topViewController] presentViewController:self.vc animated:YES completion:nil];
@@ -188,7 +217,7 @@
     }
 
     if ([state isEqualToString:@"update"]) {
-        [self.delegate sendToFlutter:@"queueInfo" params:@{ @"queueTime": info[@"second"] }];
+        [self.delegate sendToFlutter:ActionQueueInfo params:@{ @"queueTime": info[@"second"] }];
     }
 
     if ([state isEqualToString:@"entering"]) {

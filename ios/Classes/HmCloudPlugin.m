@@ -30,11 +30,14 @@
 }
 
 - (void)handleMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
-    if ([@"startCloudGame" isEqualToString:call.method]) {
-        NSLog(@"%@", call.arguments);
+    if ([call.method isEqualToString:MethodStart]) {
         [[HmCloudTool share] configWithParams:call.arguments];
 
         [[HmCloudTool share] registWithDelegate:self];
+    }
+
+    if ([call.method isEqualToString:MethodExitQueue]) {
+        [[HmCloudTool share] stop];
     }
 }
 

@@ -9,6 +9,15 @@
 #import <HMCloudPlayerCore/HMCloudPlayer.h>
 NS_ASSUME_NONNULL_BEGIN
 
+/// MARK: call method
+static NSString *MethodStart = @"startCloudGame";
+static NSString *MethodExitQueue = @"exitQueue";
+
+
+/// MARK: action name
+static NSString *ActionExitGame = @"exitGame";
+static NSString *ActionQueueInfo = @"queueInfo";
+
 @protocol HmCloudToolDelegate <NSObject>
 
 - (void)sendToFlutter:(NSString *)actionName params:(id _Nullable)params;
@@ -67,6 +76,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)share;
 - (void)configWithParams:(NSDictionary *)params;
 - (void)registWithDelegate:(id<HmCloudToolDelegate>)delegate;
+
+- (void)stop;
 
 @end
 

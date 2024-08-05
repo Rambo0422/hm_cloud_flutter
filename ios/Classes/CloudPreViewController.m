@@ -5,95 +5,72 @@
 //  Created by 周智水 on 2023/1/6.
 //
 
-#import "CloudPreViewController.h"
 #import <AVFAudio/AVFAudio.h>
-#import "WMDragView.h"
+#import "CloudPreViewController.h"
+
+
+#define kScreenW [UIScreen mainScreen].bounds.size.width
+#define kScreenH [UIScreen mainScreen].bounds.size.height
 
 @interface CloudPreViewController ()
-@property (weak, nonatomic) IBOutlet UIButton *disMissBtn;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *rightCos;
-@property (weak, nonatomic) IBOutlet UISwitch *soundSwitch;
 
-@property (nonatomic, strong) WMDragView    *setView;
+@property (weak, nonatomic) IBOutlet UIButton *setBtn;
+@property (weak, nonatomic) IBOutlet UIView *bgView;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *topCos;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *rightCos;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *leftCos;
 
 @end
 
 @implementation CloudPreViewController
 
-- (WMDragView *)setView {
-    if (!_setView) {
-        
-        self.setView = [[WMDragView alloc] initWithFrame:CGRectMake(100, 100, 40, 40)];
-        
-        self.setView.imageView.image = k_BundleImage(@"ic_wifi_high");
-        self.setView.isKeepBounds = YES;
-        self.setView.backgroundColor = [UIColor clearColor];
-        __weak typeof(self) weakSelf = self;
-        
-        self.setView.clickDragViewBlock = ^(WMDragView *dragView) {
-            
-            __strong typeof(weakSelf) strongSelf = weakSelf;
-            
-            [UIView animateWithDuration:0.25 animations:^{
-               
-                strongSelf.rightCos.constant = (strongSelf.rightCos.constant == 0) ? -160 : 0;
-                [strongSelf.view layoutIfNeeded];
-                
-            }];
-            
-        };
-        
-    }
-    return _setView;
-}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
-    
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(hideSetView) name:@"touchBegan" object:nil];
-    
+
     [self configView];
 }
 
-- (void)configView{
-    
-    self.disMissBtn.layer.cornerRadius = 5.0;
-    self.soundSwitch.transform = CGAffineTransformMakeScale(0.85, 0.85);
-    
+- (void)configView {
+//    self.soundSwitch.transform = CGAffineTransformMakeScale(0.85, 0.85);
+
+    [self.setBtn setImage:k_BundleImage(@"ic_4g_high") forState:UIControlStateNormal];
+
+    self.rightCos.constant = -kScreenH;
+    self.leftCos.constant = -kScreenH;
+    self.topCos.constant = -50;
+
+
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideSetView)];
+    [self.bgView addGestureRecognizer:tap];
 }
 
 - (void)hideSetView {
-    [UIView animateWithDuration:0.25 animations:^{
-       
-        self.rightCos.constant = -160;
+    __weak typeof(self) weakSelf = self;
+    [UIView animateWithDuration:0.25
+                     animations:^{
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        strongSelf.topCos.constant = (strongSelf.topCos.constant == 0) ? -50 : 0;
+        strongSelf.leftCos.constant = (strongSelf.leftCos.constant == 0) ? -kScreenH : 0;
+        strongSelf.rightCos.constant = (strongSelf.rightCos.constant == 0) ? -kScreenH : 0;
+
+        strongSelf.bgView.alpha = (strongSelf.rightCos.constant == 0) ? 0.3 : 0;
+
         [self.view layoutIfNeeded];
-        
     }];
 }
 
 - (void)viewWillLayoutSubviews {
-    
     self.gameVC.view.frame = self.view.bounds;
     [self.view insertSubview:self.gameVC.view atIndex:0];
 }
 
-
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        self.setView.frame = CGRectMake(self.view.frame.size.width, 200, 40, 40);
-        [self.view addSubview:self.setView];
-    });
+- (IBAction)didTapSet:(id)sender {
+    [self hideSetView];
 }
 
-//- (BOOL)prefersHomeIndicatorAutoHidden {
-//    return YES;
-//}
-
-- (UIRectEdge)preferredScreenEdgesDeferringSystemGestures{
+- (UIRectEdge)preferredScreenEdgesDeferringSystemGestures {
     return UIRectEdgeAll;
 }
 
@@ -102,6 +79,7 @@
         [self.view.subviews.firstObject removeFromSuperview];
         self.didDismiss();
     }
+
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
@@ -111,11 +89,12 @@
         self.channelAction(k_changeSound, sender.on);
     }
 }
+
 - (void)dealloc {
     NSLog(@"CloudPreViewController dealloc");
 }
 
-- (BOOL)shouldAutorotate{
+- (BOOL)shouldAutorotate {
     return YES;
 }
 
@@ -123,6 +102,5 @@
     // 如果该界面需要支持横竖屏切换
     return UIInterfaceOrientationMaskLandscapeRight;
 }
-
 
 @end

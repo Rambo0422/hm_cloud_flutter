@@ -23,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 #define k_FirstFrameArrival     @"firstFrameArrival"
 
 #define k_SanABundle [NSBundle bundleWithPath:[[NSBundle bundleForClass:self.class] pathForResource:@"SanA_Game" ofType:@"bundle"]]
-#define k_BundleImage(name) [UIImage imageWithContentsOfFile:[k_SanABundle pathForResource:name ofType:@"png"]]
+#define k_BundleImage(name) [UIImage imageNamed:name inBundle:k_SanABundle withConfiguration:nil]
 
 @interface CloudPreViewController : UIViewController
 
