@@ -73,4 +73,9 @@ class HmCloudController {
   void sendPlaypartyInfo(Map<String, dynamic> params) {
     methodChannel.invokeMethod('playPartyInfo', params);
   }
+
+  /// 游客向房主申请游玩权限
+  void requestWantPlayPermission(Map<String, dynamic> wantPlayParams) {
+    methodChannel.invokeMethod('requestWantPlayPermission', wantPlayParams);
+  }
 }
