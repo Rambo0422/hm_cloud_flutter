@@ -39,6 +39,10 @@
     if ([call.method isEqualToString:MethodExitQueue]) {
         [[HmCloudTool share] stop];
     }
+    
+    if ([call.method isEqualToString:MethodClosePage]) {
+        [[HmCloudTool share] restart];
+    }
 }
 
 - (void)sendToFlutter:(NSString *)actionName params:(id _Nullable)params {

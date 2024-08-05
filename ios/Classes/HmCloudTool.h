@@ -12,11 +12,14 @@ NS_ASSUME_NONNULL_BEGIN
 /// MARK: call method
 static NSString *MethodStart = @"startCloudGame";
 static NSString *MethodExitQueue = @"exitQueue";
+static NSString *MethodClosePage = @"closePage";
 
 
 /// MARK: action name
 static NSString *ActionExitGame = @"exitGame";
 static NSString *ActionQueueInfo = @"queueInfo";
+static NSString *ActionOpenPage = @"openPage";
+static NSString *ActionClosePage = @"closePage";
 
 @protocol HmCloudToolDelegate <NSObject>
 
@@ -78,6 +81,8 @@ static NSString *ActionQueueInfo = @"queueInfo";
 - (void)registWithDelegate:(id<HmCloudToolDelegate>)delegate;
 
 - (void)stop;
+/// 推出flutter 页面后，回到游戏页面的方法
+- (void)restart;
 
 @end
 

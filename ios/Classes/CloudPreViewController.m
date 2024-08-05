@@ -83,10 +83,10 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (IBAction)didChangeSoundSwitch:(UISwitch *)sender {
-    // 改变声音
-    if (self.channelAction) {
-        self.channelAction(k_changeSound, sender.on);
+- (IBAction)didTapPushPage:(id)sender {
+    if (self.pushFlutter) {
+        self.pushFlutter();
+        [self dismissViewControllerAnimated:YES completion:nil];
     }
 }
 

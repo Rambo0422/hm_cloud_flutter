@@ -51,6 +51,14 @@
     [[HMCloudPlayer sharedCloudPlayer] stop];
 }
 
+- (void)restart {
+    if (self.vc) {
+        [self.delegate sendToFlutter:ActionClosePage
+                              params:nil];
+        [[UIViewController topViewController] presentViewController:self.vc animated:NO completion:nil];
+    }
+}
+
 #pragma mark - CloudPlayer Delegate Function
 - (void)cloudPlayerSceneChangedCallback:(NSDictionary *)dict {
     if (!dict || ![dict isKindOfClass:[NSDictionary class]]) {
@@ -93,28 +101,7 @@
     NSString *state = [info objectForKey:@"state"];
 
     if ([state isEqualToString:@"success"]) {
-        if (!self.vc) {
-            self.vc = [[CloudPreViewController alloc] initWithNibName:@"CloudPreViewController" bundle:SanA_Bundle];
-            self.vc.gameVC = self.gameVC;
-
-            __weak typeof(self) weakSelf = self;
-
-            self.vc.didDismiss = ^{
-                typeof(self) strongSelf = weakSelf;
-                strongSelf.vc = nil;
-                [strongSelf stop];
-
-                if (strongSelf.delegate) {
-                    [strongSelf.delegate sendToFlutter:ActionExitGame params:@{ @"action": @1 }];
-                }
-            };
-            
-            UIViewController *testV = [UIViewController topViewController];
-            
-            [testV presentViewController:self.vc animated:YES completion:nil];
-        }
-
-//        [self initGameVC];
+        [self initGameVC];
     } else if ([state isEqualToString:@"failed"]) {
     }
 }
@@ -172,11 +159,20 @@
                 typeof(self) strongSelf = weakSelf;
                 strongSelf.vc = nil;
                 [strongSelf stop];
-
+                
                 if (strongSelf.delegate) {
                     [strongSelf.delegate sendToFlutter:ActionExitGame params:@{ @"action": @1 }];
                 }
             };
+
+            self.vc.pushFlutter = ^{
+                typeof(self) strongSelf = weakSelf;
+                [strongSelf.delegate sendToFlutter:ActionOpenPage
+                                            params:@{ @"arguments": @{ @"type": @"rechargeTime",
+                                                                       @"from": @"native" },
+                                                      @"route": @"/rechargeCenter" }];
+            };
+
             [[UIViewController topViewController] presentViewController:self.vc animated:YES completion:nil];
         }
     }

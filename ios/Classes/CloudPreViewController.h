@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) UIViewController *gameVC;
 
 @property (nonatomic, strong) void(^didDismiss)(void);
-@property (nonatomic, strong) void(^channelAction)(NSString *methodName, bool value);
+@property (nonatomic, strong) void(^pushFlutter)(void);
 
 
 @end

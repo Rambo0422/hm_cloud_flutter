@@ -68,11 +68,25 @@
                                         <action selector="didTapDismiss:" destination="-1" eventType="touchUpInside" id="QF0-6r-bHi"/>
                                     </connections>
                                 </button>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rj9-y4-vNy">
+                                    <rect key="frame" x="120" y="6.6666666666666288" width="87" height="30"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                                    <inset key="contentEdgeInsets" minX="5" minY="5" maxX="5" maxY="5"/>
+                                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                    <state key="normal" title="推出充值页" image="ic_shutdown.png">
+                                        <color key="titleColor" red="0.61960784310000006" green="0.63529411759999999" blue="0.67843137249999996" alpha="1" colorSpace="calibratedRGB"/>
+                                    </state>
+                                    <connections>
+                                        <action selector="didTapPushPage:" destination="-1" eventType="touchUpInside" id="I3h-O2-9nC"/>
+                                    </connections>
+                                </button>
                             </subviews>
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <constraints>
+                                <constraint firstItem="rj9-y4-vNy" firstAttribute="centerY" secondItem="xsk-uo-ZFM" secondAttribute="centerY" id="75u-fG-yQm"/>
                                 <constraint firstItem="xsk-uo-ZFM" firstAttribute="leading" secondItem="pVw-o6-c1i" secondAttribute="leading" constant="30" id="JKO-b3-0kW"/>
                                 <constraint firstItem="xsk-uo-ZFM" firstAttribute="centerY" secondItem="pVw-o6-c1i" secondAttribute="centerY" id="aow-Qx-uWD"/>
+                                <constraint firstItem="rj9-y4-vNy" firstAttribute="leading" secondItem="xsk-uo-ZFM" secondAttribute="trailing" constant="15" id="igi-j0-sPQ"/>
                             </constraints>
                         </view>
                     </subviews>
@@ -144,7 +158,7 @@
                 <constraint firstItem="1AV-Tz-6cG" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="uWt-pd-QHE"/>
                 <constraint firstItem="tEf-wG-RYs" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="v2g-On-Oxe"/>
             </constraints>
-            <point key="canvasLocation" x="139.43661971830986" y="19.083969465648853"/>
+            <point key="canvasLocation" x="-1" y="18"/>
         </view>
     </objects>
     <resources>
@@ -154,7 +168,7 @@
         <image name="ic_top_bg.png" width="217" height="32"/>
         <image name="ic_wifi_high.png" width="15" height="15"/>
         <systemColor name="systemTealColor">
-            <color red="0.18823529410000001" green="0.69019607839999997" blue="0.78039215689999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.18823529411764706" green="0.69019607843137254" blue="0.7803921568627451" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>
