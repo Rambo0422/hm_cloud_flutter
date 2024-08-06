@@ -75,6 +75,12 @@ class PlayPartyGameView @JvmOverloads constructor(
         controlInfoViewList.forEachIndexed { index, playPartyGameViewItem ->
             val roomStatu = roomInfo.roomStatus[index]
             playPartyGameViewItem.onPlayPartyRoomInfoEvent(index, roomStatu, controlInfos)
+            if (controlInfos.isEmpty()) {
+                // 因为 controlInfos 是空的，所以第一个默认有权限
+                if (index == 0) {
+                    playPartyGameViewItem.setPermission(true)
+                }
+            }
         }
     }
 

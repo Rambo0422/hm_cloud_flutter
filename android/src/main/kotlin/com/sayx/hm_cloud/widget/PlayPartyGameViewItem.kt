@@ -337,4 +337,12 @@ class PlayPartyGameViewItem @JvmOverloads constructor(
         super.onDetachedFromWindow()
         stopCountDown()
     }
+
+    fun setPermission(permission: Boolean) {
+        if (permission) {
+            iv_permission_tag.visibility = View.VISIBLE
+        } else {
+            iv_permission_tag.visibility = View.GONE
+        }
+    }
 }
