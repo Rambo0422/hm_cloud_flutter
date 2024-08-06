@@ -106,6 +106,7 @@ class GameActivity : AppCompatActivity() {
 
     // 编辑状态无响应处理
     private var inputTimer: Timer? = null
+    private var pinCodeTimer: Timer? = null
 
     // 声音控制
     private val audioManager: AudioManager by lazy {
@@ -221,7 +222,14 @@ class GameActivity : AppCompatActivity() {
         // 初始化设置面板
         initGameSettings()
 
-        initPlayPartyView()
+        if (GameManager.isPartyPlay) {
+            if (GameManager.isPartyPlayOwner) {
+                startUpdatePinCode()
+                GameManager.queryControlUsers()
+            }
+            GameManager.sendCurrentCid()
+            initPlayPartyView()
+        }
     }
 
     private var playPartyGameView: PlayPartyGameView? = null
@@ -1084,6 +1092,9 @@ class GameActivity : AppCompatActivity() {
         } catch (e: Exception) {
             LogUtils.e("exitCustom:${e.message}")
         }
+
+        stopUpdatePinCode()
+
         EventBus.getDefault().unregister(this)
 //        GameManager.gameView?.onDestroy()
 //        if (GameManager.isPlaying) {
@@ -1202,5 +1213,22 @@ class GameActivity : AppCompatActivity() {
 
         dataBinding.gameController.addView(permissionView)
         permissionView.show()
+    }
+
+    // 一分钟更新一次pinCode
+    private fun startUpdatePinCode() {
+        if (pinCodeTimer == null) {
+            pinCodeTimer = Timer()
+            val task = object : TimerTask() {
+                override fun run() {
+                    GameManager.getPinCode()
+                }
+            }
+            pinCodeTimer?.schedule(task, 0, 60000)
+        }
+    }
+
+    private fun stopUpdatePinCode() {
+        pinCodeTimer?.cancel()
     }
 }

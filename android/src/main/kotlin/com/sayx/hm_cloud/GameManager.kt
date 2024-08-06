@@ -2,7 +2,6 @@ package com.sayx.hm_cloud
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
@@ -77,7 +76,8 @@ object GameManager : HmcpPlayerListener, OnContronListener {
     var inQueue = false
 
     var needReattach = false
- // 是否是派对吧
+
+    // 是否是派对吧
     var isPartyPlay = false
     var isPartyPlayOwner = false
     fun init(channel: MethodChannel, context: Activity) {
@@ -339,18 +339,6 @@ object GameManager : HmcpPlayerListener, OnContronListener {
                         Intent().apply {
                             setClass(activity, GameActivity::class.java)
                             activity.startActivityForResult(this, 200)
-                        }
-
-                        if (isPartyPlay) {
-                            if (isPartyPlayOwner) {
-                                // 如果是派对吧房主，则需要再查询当前房间内授权的用户和pincode
-                                queryControlUsers()
-                                getPinCode()
-                            }
-                            // 普通用户或者房主只需要查询cid就可以了
-                            sendCurrentCid()
-                        } else {
-                            LogUtils.e("current is no play party")
                         }
                     } else {
                         LogUtils.e("The game feeds back the first frame again.")
@@ -680,7 +668,7 @@ object GameManager : HmcpPlayerListener, OnContronListener {
 
     override fun contronResult(success: Boolean, msg: String?) {
         LogUtils.d("contronResult success: $success msg: $msg")
-        channel.invokeMethod("contronResult", msg)
+//        channel.invokeMethod("contronResult", msg)
     }
 
     override fun contronLost() {
@@ -689,9 +677,7 @@ object GameManager : HmcpPlayerListener, OnContronListener {
     }
 
     override fun controlDistribute(success: Boolean, controlInfo: MutableList<ControlInfo>?, msg: String?) {
-        LogUtils.d("controlDistribute success: $success")
-        val METHOD_CONTROL_DISTRIBUTE = "controlDistribute"
-//        channel.invokeMethod(METHOD_CONTROL_DISTRIBUTE, null)
+        channel.invokeMethod("controlDistribute", controlInfo ?: emptyList<ControlInfo>())
     }
 
     override fun controlQuery(success: Boolean, controlInfos: MutableList<ControlInfo>?, msg: String?) {
@@ -711,7 +697,6 @@ object GameManager : HmcpPlayerListener, OnContronListener {
      * 获取授权码
      */
     fun getPinCode() {
-        LogUtils.d("getPinCode")
         gameView?.getPinCode(this)
     }
 
@@ -719,7 +704,6 @@ object GameManager : HmcpPlayerListener, OnContronListener {
      * 查询当前房间内的⽤户
      */
     fun queryControlUsers() {
-        LogUtils.d("queryControlUsers")
         gameView?.queryControlPermitUsers(this)
     }
 
@@ -796,7 +780,7 @@ object GameManager : HmcpPlayerListener, OnContronListener {
         gameView?.setAudioMute(true)
     }
 
-    private fun sendCurrentCid() {
+    fun sendCurrentCid() {
         val cloudId = HmcpManager.getInstance().cloudId
         val cidArr = JSONObject().apply {
             put("index", roomIndex)
