@@ -8,6 +8,7 @@ import com.blankj.utilcode.util.ScreenUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.google.gson.reflect.TypeToken
 import com.sayx.hm_cloud.model.ControlInfo
+import com.sayx.hm_cloud.constants.AppVirtualOperateType
 import com.sayx.hm_cloud.model.ControllerChangeEvent
 import com.sayx.hm_cloud.model.ControllerConfigEvent
 import com.sayx.hm_cloud.model.ControllerEditEvent
@@ -72,6 +73,19 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
             // 切换操作方式
             "showController" -> {
                 if (arguments is Int) {
+                    when (arguments) {
+                        0 -> {
+                            GameManager.lastControllerType = AppVirtualOperateType.NONE
+                        }
+
+                        1 -> {
+                            GameManager.lastControllerType = AppVirtualOperateType.APP_KEYBOARD
+                        }
+
+                        2 -> {
+                            GameManager.lastControllerType = AppVirtualOperateType.APP_STICK_XBOX
+                        }
+                    }
                     EventBus.getDefault().post(ControllerChangeEvent(arguments))
                 }
             }
@@ -92,7 +106,8 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
             // 操作方式编辑成功
             "controllerEditSuccess" -> {
                 ToastUtils.showShort("已保存")
-                val data = GameManager.gson.fromJson(arguments as String, ControllerInfo::class.java)
+                val data =
+                    GameManager.gson.fromJson(arguments as String, ControllerInfo::class.java)
                 EventBus.getDefault()
                     .post(ControllerEditEvent(data.type))
             }
@@ -138,7 +153,8 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
                     val controlInfoJson = arguments["controlInfos"].toString()
                     val gson = GameManager.gson
                     val controlInfosType = object : TypeToken<List<ControlInfo>>() {}.type
-                    val controlInfos: List<ControlInfo> = gson.fromJson(controlInfoJson, controlInfosType)
+                    val controlInfos: List<ControlInfo> =
+                        gson.fromJson(controlInfoJson, controlInfosType)
                     val roomInfoJson = arguments["roomInfo"].toString()
                     val roomInfo = gson.fromJson(
                         roomInfoJson,
@@ -159,6 +175,15 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
                     EventBus.getDefault().post(wantPlayInfo)
                 }
             }
+
+            "closePage" -> {
+                GameManager.flutterActivity?.finish()
+            }
+
+            "exitQueue" -> {
+                GameManager.exitQueue()
+            }
+
 
             else -> {
                 callback.notImplemented()

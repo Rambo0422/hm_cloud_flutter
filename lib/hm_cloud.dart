@@ -78,4 +78,8 @@ class HmCloudController {
   void requestWantPlayPermission(Map<String, dynamic> wantPlayParams) {
     methodChannel.invokeMethod('requestWantPlayPermission', wantPlayParams);
   }
+
+  Future<void> exitQueue() {
+    return methodChannel.invokeMethod('exitQueue', null);
+  }
 }

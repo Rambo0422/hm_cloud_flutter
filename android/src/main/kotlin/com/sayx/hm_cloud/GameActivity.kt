@@ -14,6 +14,7 @@ import android.text.TextUtils
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.KeyEvent
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
@@ -70,6 +71,7 @@ import com.sayx.hm_cloud.model.PCMouseEvent
 import com.sayx.hm_cloud.model.PartyPlayWantPlay
 import com.sayx.hm_cloud.model.PlayPartyRoomInfoEvent
 import com.sayx.hm_cloud.utils.AppSizeUtils
+import com.sayx.hm_cloud.utils.GameUtils
 import com.sayx.hm_cloud.widget.AddGamepadKey
 import com.sayx.hm_cloud.widget.AddKeyboardKey
 import com.sayx.hm_cloud.widget.ControllerEditLayout
@@ -139,6 +141,10 @@ class GameActivity : AppCompatActivity() {
 
     private fun initView() {
         GameManager.gameView?.let {
+            val parent = it.parent
+            if (parent != null && parent is ViewGroup) {
+                parent.removeView(it)
+            }
             dataBinding.gameController.addView(
                 it,
                 0,
@@ -232,6 +238,7 @@ class GameActivity : AppCompatActivity() {
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
+        LogUtils.d("${this}: onNewIntent")
         this.intent = intent
     }
 
@@ -908,9 +915,11 @@ class GameActivity : AppCompatActivity() {
         if (event.open) {
             dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
             gameSettings?.controllerType = AppVirtualOperateType.NONE
-            gameSettings?.updateMouseMode(false)
+            // PC模式，关闭鼠标操作
+            gameSettings?.setPCMouseMode(false)
         } else {
-            gameSettings?.updateMouseMode(true)
+            // 非PC模式，打开鼠标操作
+            gameSettings?.setPCMouseMode(true)
         }
     }
 
@@ -988,20 +997,52 @@ class GameActivity : AppCompatActivity() {
             .build().show()
     }
 
-    override fun onDestroy() {
-        try {
-            inputTimer?.cancel()
-            inputTimer?.purge()
-            inputTimer = null
-        } catch (e: Exception) {
-            LogUtils.e("exitCustom:${e.message}")
+    override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
+//        LogUtils.d("$this->dispatchTouchEvent:$event")
+        if (dataBinding.btnGameSettings.visibility == View.VISIBLE) {
+            dataBinding.gameController.controllerType = GameManager.lastControllerType
+            gameSettings?.controllerType = GameManager.lastControllerType
         }
-        EventBus.getDefault().unregister(this)
-        GameManager.gameView?.onDestroy()
-        if (GameManager.isPlaying) {
-            GameManager.exitGame(mapOf(Pair("action", "")))
+        return super.dispatchTouchEvent(event)
+    }
+
+    override fun dispatchGenericMotionEvent(event: MotionEvent?): Boolean {
+//        LogUtils.d("$this->dispatchGenericMotionEvent:$event")
+        event?.let {
+            if (GameUtils.isGamePadEvent(it)) {
+//                LogUtils.d("游戏手柄输入:$it")
+                dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
+                gameSettings?.controllerType = AppVirtualOperateType.NONE
+            } else if (GameUtils.isKeyBoardEvent(it)) {
+//                LogUtils.d("游戏键盘输入:$it")
+                dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
+                gameSettings?.controllerType = AppVirtualOperateType.NONE
+            } else if (GameUtils.isMouseEvent(it)) {
+//                LogUtils.d("游戏鼠标输入:$it")
+                dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
+                gameSettings?.controllerType = AppVirtualOperateType.NONE
+            }
         }
-        super.onDestroy()
+        return super.dispatchGenericMotionEvent(event)
+    }
+
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        event.let {
+            if (GameUtils.isGamePadEvent(it)) {
+                //                LogUtils.d("游戏手柄输入:$it")
+                dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
+                gameSettings?.controllerType = AppVirtualOperateType.NONE
+            } else if (GameUtils.isKeyBoardEvent(it)) {
+                //                LogUtils.d("游戏键盘输入:$it")
+                dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
+                gameSettings?.controllerType = AppVirtualOperateType.NONE
+            } else if (GameUtils.isMouseEvent(it)) {
+                //                LogUtils.d("游戏鼠标输入:$it")
+                dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
+                gameSettings?.controllerType = AppVirtualOperateType.NONE
+            }
+        }
+        return super.dispatchKeyEvent(event)
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
@@ -1020,8 +1061,20 @@ class GameActivity : AppCompatActivity() {
         return !(keyCode == KeyEvent.KEYCODE_VOLUME_DOWN || keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_MUTE)
     }
 
-    @Deprecated("Deprecated in Java")
-    override fun onBackPressed() {
+    override fun onDestroy() {
+        try {
+            inputTimer?.cancel()
+            inputTimer?.purge()
+            inputTimer = null
+        } catch (e: Exception) {
+            LogUtils.e("exitCustom:${e.message}")
+        }
+        EventBus.getDefault().unregister(this)
+//        GameManager.gameView?.onDestroy()
+//        if (GameManager.isPlaying) {
+//            GameManager.exitGame(mutableMapOf(Pair("action", "")))
+//        }
+        super.onDestroy()
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

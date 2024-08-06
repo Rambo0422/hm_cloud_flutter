@@ -25,7 +25,6 @@ data class GameParam(
     var mute: Boolean,
     var gameId: String,
     var accountInfo: Any?,
-    var mouseMode: Int,
     var isPeakChannel: Boolean,
     var isPartyGame: Boolean
 ) {
@@ -50,8 +49,7 @@ data class GameParam(
                 arguments["vipExpiredTime"] as Long? ?: 0L,
                 arguments["mute"] as Boolean? ?: false,
                 arguments["gameId"] as String? ?: "",
-                arguments["accountInfo"] ?: mapOf<String, Any>(),
-                arguments["mouseMode"] as Int? ?: 1,
+                arguments["accountInfo"],
                 arguments["isPeakChannel"] as Boolean? ?: false,
                 arguments["isPartyGame"] as Boolean? ?: false,
             )

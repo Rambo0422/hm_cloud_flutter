@@ -122,7 +122,6 @@
     <string name="save_at_least_two">请至少添加2个按键</string>
     <string name="play_time_available">可用高峰时长:</string>
     <string name="default_time" translatable="false">00:00</string>
-    <string name="touch_screen">触屏攻击</string>
     <string name="net_delay">延迟</string>
     <string name="net_lost_ratio">丢包率</string>
     <string name="mouse_config">鼠标设置</string>
