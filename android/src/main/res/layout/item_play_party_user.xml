@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="35dp"
+    android:layout_height="35dp">
+
+    <com.noober.background.view.BLFrameLayout
+        android:id="@+id/layout_center"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_gravity="center"
+        app:bl_shape="oval"
+        app:bl_solid_color="#40000000"
+        app:bl_stroke_color="#40000000"
+        app:bl_stroke_width="1dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/iv_avatar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <ImageView
+            android:id="@+id/iv_room_status"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_play_party_position_unlock" />
+
+    </com.noober.background.view.BLFrameLayout>
+
+    <ImageView
+        android:id="@+id/iv_permission_tag"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:src="@drawable/ic_play_party_permission_tag"
+        android:visibility="visible"
+        app:layout_constraintCircle="@id/layout_center"
+        app:layout_constraintCircleAngle="45"
+        app:layout_constraintCircleRadius="13dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

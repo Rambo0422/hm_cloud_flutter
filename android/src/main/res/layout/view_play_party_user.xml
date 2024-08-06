@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:gravity="center">
+
+    <com.sayx.hm_cloud.widget.PlayPartyUserAvatarItem
+        android:id="@+id/play_party_user_item1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <Space
+        android:layout_width="2dp"
+        android:layout_height="wrap_content" />
+
+    <com.sayx.hm_cloud.widget.PlayPartyUserAvatarItem
+        android:id="@+id/play_party_user_item2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <Space
+        android:layout_width="2dp"
+        android:layout_height="wrap_content" />
+
+    <com.sayx.hm_cloud.widget.PlayPartyUserAvatarItem
+        android:id="@+id/play_party_user_item3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <Space
+        android:layout_width="2dp"
+        android:layout_height="wrap_content" />
+
+    <com.sayx.hm_cloud.widget.PlayPartyUserAvatarItem
+        android:id="@+id/play_party_user_item4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

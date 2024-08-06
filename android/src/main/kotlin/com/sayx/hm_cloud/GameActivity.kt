@@ -80,6 +80,7 @@ import com.sayx.hm_cloud.widget.EditRouletteKey
 import com.sayx.hm_cloud.widget.GameSettings
 import com.sayx.hm_cloud.widget.PlayPartyGameView
 import com.sayx.hm_cloud.widget.PlayPartyPermissionView
+import com.sayx.hm_cloud.widget.PlayPartyUserAvatarView
 import me.jessyan.autosize.utils.AutoSizeUtils
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -224,6 +225,7 @@ class GameActivity : AppCompatActivity() {
     }
 
     private var playPartyGameView: PlayPartyGameView? = null
+    private var playPartyUser: PlayPartyUserAvatarView? = null
 
     private fun initPlayPartyView() {
         playPartyGameView = PlayPartyGameView(this)
@@ -234,6 +236,19 @@ class GameActivity : AppCompatActivity() {
             ViewGroup.LayoutParams.MATCH_PARENT
         )
         dataBinding.layoutGame.addView(playPartyGameView, layoutParams)
+
+        // 右上角派对吧用户头像
+        playPartyUser = PlayPartyUserAvatarView(this)
+        // 将设置面板控件加入主面板
+        playPartyUser?.layoutParams = FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        ).apply {
+            gravity = Gravity.END or Gravity.TOP
+            marginEnd = AutoSizeUtils.dp2px(this@GameActivity, 56f)
+            topMargin = AutoSizeUtils.dp2px(this@GameActivity, 6f)
+        }
+        dataBinding.layoutGame.addView(playPartyUser)
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -1095,6 +1110,8 @@ class GameActivity : AppCompatActivity() {
                 dataBinding.gameController.removeView(it)
             }
         }
+
+        playPartyUser?.setUserInfo(roomInfo, controlInfos)
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -1148,7 +1165,7 @@ class GameActivity : AppCompatActivity() {
 
         val imageView = ImageView(this).apply {
             val width = AutoSizeUtils.dp2px(this@GameActivity, 20f)
-            layoutParams = LinearLayout.LayoutParams(width, width)
+            layoutParams = LayoutParams(width, width)
             setImageResource(R.drawable.icon_play_party_want_play)
         }
         linearLayout.addView(imageView)
@@ -1157,9 +1174,9 @@ class GameActivity : AppCompatActivity() {
             text = "我要玩"
             setTextColor(Color.parseColor("#FF000000"))
             setTextSize(TypedValue.COMPLEX_UNIT_PX, AutoSizeUtils.sp2px(this@GameActivity, 13f).toFloat())
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
+            layoutParams = LayoutParams(
+                LayoutParams.WRAP_CONTENT,
+                LayoutParams.WRAP_CONTENT
             ).apply {
                 marginStart = AutoSizeUtils.dp2px(this@GameActivity, 5f)
             }
