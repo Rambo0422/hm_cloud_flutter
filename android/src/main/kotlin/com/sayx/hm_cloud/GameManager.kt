@@ -672,12 +672,13 @@ object GameManager : HmcpPlayerListener, OnContronListener {
     }
 
     override fun contronLost() {
-        LogUtils.d("contronLost")
-        channel.invokeMethod("contronLost", null)
+//        LogUtils.d("contronLost")
+//        channel.invokeMethod("contronLost", null)
     }
 
     override fun controlDistribute(success: Boolean, controlInfo: MutableList<ControlInfo>?, msg: String?) {
-        channel.invokeMethod("controlDistribute", controlInfo ?: emptyList<ControlInfo>())
+        val controlInfos = controlInfo ?: emptyList()
+        channel.invokeMethod("controlDistribute", gson.toJson(controlInfos))
     }
 
     override fun controlQuery(success: Boolean, controlInfos: MutableList<ControlInfo>?, msg: String?) {
