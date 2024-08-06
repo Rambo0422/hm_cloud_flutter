@@ -19,6 +19,12 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *topCos;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *rightCos;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *leftCos;
+@property (weak, nonatomic) IBOutlet UILabel *timeLab;
+@property (weak, nonatomic) IBOutlet UIView *operationView1;
+@property (weak, nonatomic) IBOutlet UIView *operationView2;
+@property (weak, nonatomic) IBOutlet UIView *operationView3;
+@property (weak, nonatomic) IBOutlet UIView *operationView4;
+@property (weak, nonatomic) IBOutlet UISlider *mouseSlider;
 
 @end
 
@@ -34,13 +40,20 @@
 
 - (void)configView {
 //    self.soundSwitch.transform = CGAffineTransformMakeScale(0.85, 0.85);
+    
+    [self.mouseSlider setThumbImage:k_BundleImage(@"set_mouse_slider_thumb") forState:UIControlStateNormal];
 
     [self.setBtn setImage:k_BundleImage(@"ic_4g_high") forState:UIControlStateNormal];
 
     self.rightCos.constant = -kScreenH;
     self.leftCos.constant = -kScreenH;
     self.topCos.constant = -50;
+    self.bgView.alpha = 0;
 
+    self.operationView1.layer.cornerRadius = 5;
+    self.operationView2.layer.cornerRadius = 5;
+    self.operationView3.layer.cornerRadius = 5;
+    self.operationView4.layer.cornerRadius = 5;
 
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideSetView)];
     [self.bgView addGestureRecognizer:tap];
@@ -55,7 +68,7 @@
         strongSelf.leftCos.constant = (strongSelf.leftCos.constant == 0) ? -kScreenH : 0;
         strongSelf.rightCos.constant = (strongSelf.rightCos.constant == 0) ? -kScreenH : 0;
 
-        strongSelf.bgView.alpha = (strongSelf.rightCos.constant == 0) ? 0.3 : 0;
+        strongSelf.bgView.alpha = (strongSelf.rightCos.constant == 0) ? 0.6 : 0;
 
         [self.view layoutIfNeeded];
     }];
@@ -70,6 +83,13 @@
     [self hideSetView];
 }
 
+- (IBAction)didTapTopup:(id)sender {
+    if (self.pushFlutter) {
+        self.pushFlutter();
+        [self dismissViewControllerAnimated:YES completion:nil];
+    }
+}
+
 - (UIRectEdge)preferredScreenEdgesDeferringSystemGestures {
     return UIRectEdgeAll;
 }
@@ -81,13 +101,6 @@
     }
 
     [self dismissViewControllerAnimated:YES completion:nil];
-}
-
-- (IBAction)didTapPushPage:(id)sender {
-    if (self.pushFlutter) {
-        self.pushFlutter();
-        [self dismissViewControllerAnimated:YES completion:nil];
-    }
 }
 
 - (void)dealloc {

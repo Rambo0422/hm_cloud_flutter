@@ -24,6 +24,8 @@ A new Flutter plugin project.
   s.dependency 'Masonry', '~> 1.1.0'
   s.dependency 'MJExtension', '~> 3.4.2'
   s.dependency 'AFNetworking', '~> 4.0'
+  s.dependency 'ReactiveObjC', '~> 3.1.1'
+  s.dependency 'SPButton', '~> 3.1.0'
   s.platform = :ios, '13.0'
 
   # Flutter.framework does not contain a i386 slice.

@@ -48,6 +48,8 @@
 }
 
 - (void)stop {
+    self.vc = nil;
+    self.gameVC = nil;
     [[HMCloudPlayer sharedCloudPlayer] stop];
 }
 
@@ -157,9 +159,8 @@
 
             self.vc.didDismiss = ^{
                 typeof(self) strongSelf = weakSelf;
-                strongSelf.vc = nil;
                 [strongSelf stop];
-                
+
                 if (strongSelf.delegate) {
                     [strongSelf.delegate sendToFlutter:ActionExitGame params:@{ @"action": @1 }];
                 }
@@ -178,17 +179,13 @@
     }
 
     if ([state isEqualToString:@"stopped"]) {
-//        NSString *reason = [info objectForKey:@"stop_reason"];
+        NSString *reason = [info objectForKey:@"stop_reason"];
 
-//            if ([reason isEqualToString:@"no_operation"] || [reason isEqualToString:@"url_timeout"]) {
-//                if (_delegate && [_delegate respondsToSelector:@selector(cloudPlayerStateChanged:)]) {
-//                    [_delegate cloudPlayerStateChanged:PlayerStateStopCanRetry];
-//                }
-//            } else {
-//                if (_delegate && [_delegate respondsToSelector:@selector(cloudPlayerStateChanged:)]) {
-//                    [_delegate cloudPlayerStateChanged:PlayerStateStop];
-//                }
-//            }
+        if ([reason isEqualToString:@"no_operation"]) {
+            // 长时间误操作 弹框
+        } else {
+            // 错误弹框
+        }
     }
 
     if ([state isEqualToString:@"playFailed"]) {
