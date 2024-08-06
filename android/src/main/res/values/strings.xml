@@ -128,7 +128,7 @@
     <string name="sensitivity">灵敏度</string>
     <string name="mouse_click">鼠标点击</string>
     <string name="touch_click">触控点击</string>
-    <string name="touch_attack">触屏攻击</string>
+    <string name="touch_attack">触屏不攻击</string>
     <string name="switch_text">开关</string>
     <string name="key_vibrate">按键震动</string>
     <string name="microphone">麦克风</string>

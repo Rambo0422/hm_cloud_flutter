@@ -18,9 +18,9 @@
             android:layout_width="wrap_content"
             android:layout_height="32dp"
             android:background="@drawable/img_game_off_notice_bg"
+            android:elevation="1.0dp"
             android:gravity="center_vertical"
             android:visibility="gone"
-            android:elevation="1.0dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -590,7 +590,7 @@
                 app:layout_constraintVertical_chainStyle="packed"
                 tools:visibility="visible" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <LinearLayout
                 android:id="@+id/layout_control_method"
                 android:layout_width="0dp"
                 android:layout_height="80dp"
@@ -607,8 +607,9 @@
 
                 <com.sayx.hm_cloud.widget.DrawableTextView
                     android:id="@+id/btn_gamepad"
-                    android:layout_width="50dp"
+                    android:layout_width="0dp"
                     android:layout_height="64dp"
+                    android:layout_weight="1"
                     android:drawablePadding="5dp"
                     android:gravity="center"
                     android:text="@string/gamepad_control"
@@ -616,16 +617,13 @@
                     android:textSize="10sp"
                     app:drawableSize="40dp"
                     app:drawableTop="@drawable/selector_gamepad"
-                    app:layout_constraintEnd_toStartOf="@id/btn_keyboard"
-                    app:layout_constraintHorizontal_chainStyle="spread_inside"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
                     tools:visibility="visible" />
 
                 <com.sayx.hm_cloud.widget.DrawableTextView
                     android:id="@+id/btn_keyboard"
-                    android:layout_width="50dp"
+                    android:layout_width="0dp"
                     android:layout_height="64dp"
+                    android:layout_weight="1"
                     android:drawablePadding="5dp"
                     android:gravity="center"
                     android:text="@string/keyboard_control"
@@ -633,36 +631,34 @@
                     android:textSize="10sp"
                     app:drawableSize="40dp"
                     app:drawableTop="@drawable/selector_keyboard"
-                    app:layout_constraintEnd_toStartOf="@id/btn_custom"
-                    app:layout_constraintStart_toEndOf="@id/btn_gamepad"
-                    app:layout_constraintTop_toTopOf="parent"
                     tools:visibility="visible" />
 
-                <com.sayx.hm_cloud.widget.DrawableTextView
-                    android:id="@+id/btn_custom"
-                    android:layout_width="50dp"
+                <FrameLayout
+                    android:layout_width="0dp"
                     android:layout_height="64dp"
-                    android:drawablePadding="5dp"
-                    android:gravity="center"
-                    android:text="@string/custom"
-                    android:textColor="#ADB5CD"
-                    android:textSize="10sp"
-                    app:drawableSize="40dp"
-                    app:drawableTop="@drawable/selector_custom"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/btn_keyboard"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:visibility="visible" />
+                    android:layout_weight="1">
 
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:layout_width="15dp"
-                    android:layout_height="15dp"
-                    android:layout_marginTop="-5dp"
-                    android:layout_marginEnd="-5dp"
-                    android:src="@drawable/icon_vip_sign"
-                    app:layout_constraintEnd_toEndOf="@id/btn_custom"
-                    app:layout_constraintTop_toTopOf="@id/btn_custom" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                    <com.sayx.hm_cloud.widget.DrawableTextView
+                        android:id="@+id/btn_custom"
+                        android:layout_width="match_parent"
+                        android:layout_height="64dp"
+                        android:drawablePadding="5dp"
+                        android:gravity="center"
+                        android:text="@string/custom"
+                        android:textColor="#ADB5CD"
+                        android:textSize="10sp"
+                        app:drawableSize="40dp"
+                        app:drawableTop="@drawable/selector_custom"
+                        tools:visibility="visible" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_gravity="end|top"
+                        android:layout_marginEnd="5dp"
+                        android:src="@drawable/icon_vip_sign" />
+                </FrameLayout>
+            </LinearLayout>
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/mouse_config"
@@ -705,54 +701,55 @@
                 app:layout_constraintStart_toStartOf="@id/mouse_config"
                 app:layout_constraintTop_toBottomOf="@id/mouse_config">
 
-                <com.sayx.hm_cloud.widget.DrawableTextView
-                    android:id="@+id/btn_mouse_click"
-                    android:layout_width="50dp"
-                    android:layout_height="64dp"
-                    android:drawablePadding="5dp"
-                    android:gravity="center"
-                    android:text="@string/mouse_click"
-                    android:textColor="#ADB5CD"
-                    android:textSize="10sp"
-                    app:drawableSize="40dp"
-                    app:drawableTop="@drawable/selector_mouse_click"
-                    app:layout_constraintEnd_toStartOf="@id/btn_touch_click"
-                    app:layout_constraintHorizontal_chainStyle="spread_inside"
+                <LinearLayout
+                    android:id="@+id/layout_mouse_click"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:visibility="visible" />
+                    app:layout_constraintTop_toTopOf="parent">
 
-                <com.sayx.hm_cloud.widget.DrawableTextView
-                    android:id="@+id/btn_touch_click"
-                    android:layout_width="50dp"
-                    android:layout_height="64dp"
-                    android:drawablePadding="5dp"
-                    android:gravity="center"
-                    android:text="@string/touch_click"
-                    android:textColor="#ADB5CD"
-                    android:textSize="10sp"
-                    app:drawableSize="40dp"
-                    app:drawableTop="@drawable/selector_touch_click"
-                    app:layout_constraintEnd_toStartOf="@id/btn_touch_attack"
-                    app:layout_constraintStart_toEndOf="@id/btn_mouse_click"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:visibility="visible" />
+                    <com.sayx.hm_cloud.widget.DrawableTextView
+                        android:id="@+id/btn_mouse_click"
+                        android:layout_width="0dp"
+                        android:layout_height="64dp"
+                        android:layout_weight="1"
+                        android:drawablePadding="5dp"
+                        android:gravity="center"
+                        android:text="@string/mouse_click"
+                        android:textColor="#ADB5CD"
+                        android:textSize="10sp"
+                        app:drawableSize="40dp"
+                        app:drawableTop="@drawable/selector_mouse_click"
+                        tools:visibility="visible" />
 
-                <com.sayx.hm_cloud.widget.DrawableTextView
-                    android:id="@+id/btn_touch_attack"
-                    android:layout_width="50dp"
-                    android:layout_height="64dp"
-                    android:drawablePadding="5dp"
-                    android:gravity="center"
-                    android:text="@string/touch_attack"
-                    android:textColor="#ADB5CD"
-                    android:textSize="10sp"
-                    app:drawableSize="40dp"
-                    app:drawableTop="@drawable/selector_touch_attack"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/btn_touch_click"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:visibility="visible" />
+                    <com.sayx.hm_cloud.widget.DrawableTextView
+                        android:id="@+id/btn_touch_click"
+                        android:layout_width="0dp"
+                        android:layout_height="64dp"
+                        android:layout_weight="1"
+                        android:drawablePadding="5dp"
+                        android:gravity="center"
+                        android:text="@string/touch_click"
+                        android:textColor="#ADB5CD"
+                        android:textSize="10sp"
+                        app:drawableSize="40dp"
+                        app:drawableTop="@drawable/selector_touch_click"
+                        tools:visibility="visible" />
+
+                    <com.sayx.hm_cloud.widget.DrawableTextView
+                        android:id="@+id/btn_touch_attack"
+                        android:layout_width="0dp"
+                        android:layout_height="64dp"
+                        android:layout_weight="1"
+                        android:drawablePadding="5dp"
+                        android:gravity="center"
+                        android:text="@string/touch_attack"
+                        android:textColor="#ADB5CD"
+                        android:textSize="10sp"
+                        app:drawableSize="40dp"
+                        app:drawableTop="@drawable/selector_touch_attack"
+                        tools:visibility="visible" />
+                </LinearLayout>
 
                 <androidx.appcompat.widget.AppCompatSeekBar
                     android:id="@+id/sb_sensitivity"
@@ -766,7 +763,7 @@
                     android:progressDrawable="@drawable/shape_progress"
                     android:thumb="@drawable/icon_sensitivity_thumb"
                     android:thumbOffset="0dp"
-                    app:layout_constraintTop_toBottomOf="@id/btn_mouse_click" />
+                    app:layout_constraintTop_toBottomOf="@id/layout_mouse_click" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="wrap_content"
