@@ -7,12 +7,13 @@ import android.util.Log
 import com.blankj.utilcode.util.ScreenUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.google.gson.reflect.TypeToken
-import com.sayx.hm_cloud.model.ControlInfo
 import com.sayx.hm_cloud.constants.AppVirtualOperateType
+import com.sayx.hm_cloud.model.ControlInfo
 import com.sayx.hm_cloud.model.ControllerChangeEvent
 import com.sayx.hm_cloud.model.ControllerConfigEvent
 import com.sayx.hm_cloud.model.ControllerEditEvent
 import com.sayx.hm_cloud.model.ControllerInfo
+import com.sayx.hm_cloud.model.ExitGameEvent
 import com.sayx.hm_cloud.model.GameParam
 import com.sayx.hm_cloud.model.PartyPlayWantPlay
 import com.sayx.hm_cloud.model.PlayPartyRoomInfo
@@ -184,6 +185,9 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
                 GameManager.exitQueue()
             }
 
+            "exitGame" -> {
+                EventBus.getDefault().post(ExitGameEvent())
+            }
 
             else -> {
                 callback.notImplemented()

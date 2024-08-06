@@ -11,8 +11,8 @@
         android:layout_gravity="center"
         app:bl_shape="oval"
         app:bl_solid_color="#40000000"
-        app:bl_stroke_color="#40000000"
-        app:bl_stroke_width="1dp"
+        app:bl_stroke_color="#40FFFFFF"
+        app:bl_stroke_width="3dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -20,8 +20,9 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/iv_avatar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_gravity="center" />
 
         <ImageView
             android:id="@+id/iv_room_status"

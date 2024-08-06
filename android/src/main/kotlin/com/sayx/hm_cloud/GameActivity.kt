@@ -65,6 +65,7 @@ import com.sayx.hm_cloud.dialog.GameErrorDialog
 import com.sayx.hm_cloud.model.ControllerChangeEvent
 import com.sayx.hm_cloud.model.ControllerConfigEvent
 import com.sayx.hm_cloud.model.ControllerEditEvent
+import com.sayx.hm_cloud.model.ExitGameEvent
 import com.sayx.hm_cloud.model.GameErrorEvent
 import com.sayx.hm_cloud.model.KeyInfo
 import com.sayx.hm_cloud.model.PCMouseEvent
@@ -1230,5 +1231,12 @@ class GameActivity : AppCompatActivity() {
 
     private fun stopUpdatePinCode() {
         pinCodeTimer?.cancel()
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onPlayPartyExitGame(event: ExitGameEvent) {
+        GameManager.releasePlayPartyGame()
+        gameSettings?.release()
+        finish()
     }
 }

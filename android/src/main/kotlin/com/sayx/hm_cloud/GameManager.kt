@@ -380,39 +380,47 @@ object GameManager : HmcpPlayerListener, OnContronListener {
                 Constants.STATUS_GET_CONTRON_ERROR,
                     // 42,接⼊⽅连接服务端结束游戏
                 Constants.STATUS_OPERATION_STATE_CHANGE_REASON -> {
-                    // 各类游戏中断状态下，获取errorCode,errorMsg展示
-                    val dataStr = data.getString(StatusCallbackUtil.DATA)
-                    LogUtils.d("errorInfo:$dataStr")
-                    var errorCode = ""
-                    var errorMsg = ""
-                    if (dataStr is String && !TextUtils.isEmpty(dataStr)) {
-                        val resultData = gson.fromJson(dataStr, Map::class.java)
-                        var errorCodeWithoutCid = ""
-                        try {
-                            errorCodeWithoutCid =
-                                if (resultData["errorCodeWithoutCid"].toString() == "null") "$status" else resultData["errorCodeWithoutCid"].toString()
-                        } catch (e: Exception) {
-                            LogUtils.e("${e.message}")
-                        }
-                        errorCode =
-                            if (TextUtils.isEmpty(errorCodeWithoutCid)) "$status" else errorCodeWithoutCid
-                        try {
-                            errorMsg =
-                                if (resultData["errorMessage"].toString() == "null") resultData["errorMsg"].toString() else resultData["errorMessage"].toString()
-                        } catch (e: Exception) {
-                            LogUtils.e("${e.message}")
-                        }
+                    if (!isPartyPlay || (isPartyPlay && isPartyPlayOwner)) {
+                        statusOperationStateChangeReason(data, status)
+                    } else {
+                        LogUtils.d("这里只有一种情况，当前是派对吧，但是是游客")
                     }
-                    EventBus.getDefault().post(GameErrorEvent(errorCode, errorMsg))
-                    channel.invokeMethod(
-                        "errorInfo",
-                        mapOf(Pair("errorCode", errorCode), Pair("errorMsg", errorMsg))
-                    )
                 }
 
                 else -> {}
             }
         }
+    }
+
+    fun statusOperationStateChangeReason(data: JSONObject, status: Int) {
+        // 各类游戏中断状态下，获取errorCode,errorMsg展示
+        val dataStr = data.getString(StatusCallbackUtil.DATA)
+        LogUtils.d("errorInfo:$dataStr")
+        var errorCode = ""
+        var errorMsg = ""
+        if (dataStr is String && !TextUtils.isEmpty(dataStr)) {
+            val resultData = gson.fromJson(dataStr, Map::class.java)
+            var errorCodeWithoutCid = ""
+            try {
+                errorCodeWithoutCid =
+                    if (resultData["errorCodeWithoutCid"].toString() == "null") "$status" else resultData["errorCodeWithoutCid"].toString()
+            } catch (e: Exception) {
+                LogUtils.e("${e.message}")
+            }
+            errorCode =
+                if (TextUtils.isEmpty(errorCodeWithoutCid)) "$status" else errorCodeWithoutCid
+            try {
+                errorMsg =
+                    if (resultData["errorMessage"].toString() == "null") resultData["errorMsg"].toString() else resultData["errorMessage"].toString()
+            } catch (e: Exception) {
+                LogUtils.e("${e.message}")
+            }
+        }
+        EventBus.getDefault().post(GameErrorEvent(errorCode, errorMsg))
+        channel.invokeMethod(
+            "errorInfo",
+            mapOf(Pair("errorCode", errorCode), Pair("errorMsg", errorMsg))
+        )
     }
 
     /// 游戏云游直播开关
@@ -655,6 +663,14 @@ object GameManager : HmcpPlayerListener, OnContronListener {
                 }
             }
         )
+    }
+
+    fun releasePlayPartyGame() {
+        gameView?.onDestroy()
+        gameView = null
+        isPlaying = false
+        inQueue = false
+        isVideoShowed = false
     }
 
     override fun pinCodeResult(success: Boolean, cid: String?, pinCode: String?, msg: String?) {

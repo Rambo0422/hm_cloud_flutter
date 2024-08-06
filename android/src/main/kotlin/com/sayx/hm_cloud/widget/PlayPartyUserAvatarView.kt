@@ -33,11 +33,19 @@ class PlayPartyUserAvatarView @JvmOverloads constructor(
                 val isLock = roomStatu.status == 2
                 playPartyUserItem.setRoomStatus(isLock)
             } else {
+                playPartyUserItem.setUserInfo(roomStatu)
+
                 // 该位置有人，判断是否有权限
                 val hasPermission = (controlInfos.firstOrNull() {
                     it.uid == roomStatuUid
                 }?.position ?: 0) > 0
-                playPartyUserItem.setUserInfo(hasPermission, roomStatu)
+                if (controlInfos.isEmpty()) {
+                    if (index == 0) {
+                        playPartyUserItem.setPermissionTag(true)
+                    }
+                } else {
+                    playPartyUserItem.setPermissionTag(hasPermission)
+                }
             }
         }
     }

@@ -82,4 +82,8 @@ class HmCloudController {
   Future<void> exitQueue() {
     return methodChannel.invokeMethod('exitQueue', null);
   }
+
+  void exitGame() {
+    methodChannel.invokeMethod('exitGame', null);
+  }
 }
