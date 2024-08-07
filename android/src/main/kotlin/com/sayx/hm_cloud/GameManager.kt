@@ -841,4 +841,12 @@ object GameManager : HmcpPlayerListener, OnContronListener {
     fun updatePlayPartyRoomInfo() {
         channel.invokeMethod("updatePlayPartyRoomInfo", null)
     }
+
+    fun changePositionStatus(position: Int, isLock: Boolean) {
+        val changePositionStatusData = JSONObject().apply {
+            put("position", position)
+            put("isLock", isLock)
+        }.toString()
+        channel.invokeMethod("changePositionStatus", changePositionStatusData)
+    }
 }
