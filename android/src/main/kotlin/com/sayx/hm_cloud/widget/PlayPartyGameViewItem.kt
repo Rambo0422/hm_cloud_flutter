@@ -322,7 +322,7 @@ class PlayPartyGameViewItem @JvmOverloads constructor(
     fun startCountDown() {
         if (countDownTimer == null) {
             tvWantPlayCountDown.visibility = View.VISIBLE
-            countDownTimer = object : CountDownTimer(60 * 1000, 1000) {
+            countDownTimer = object : CountDownTimer(30 * 1000, 1000) {
                 override fun onTick(millisUntilFinished: Long) {
                     val countDown = (millisUntilFinished / 1000).toString()
                     tvWantPlayCountDown.text = "我要玩(${countDown}s)"
