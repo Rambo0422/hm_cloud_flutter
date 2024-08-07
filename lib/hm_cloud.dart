@@ -86,4 +86,11 @@ class HmCloudController {
   void exitGame() {
     methodChannel.invokeMethod('exitGame', null);
   }
+
+  void updatePlayPartySoundAndMicrophoneState(Map<String, bool> params) {
+    methodChannel.invokeMethod(
+      'updatePlayPartySoundAndMicrophoneState',
+      params,
+    );
+  }
 }

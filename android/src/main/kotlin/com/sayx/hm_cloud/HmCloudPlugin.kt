@@ -18,6 +18,7 @@ import com.sayx.hm_cloud.model.GameParam
 import com.sayx.hm_cloud.model.PartyPlayWantPlay
 import com.sayx.hm_cloud.model.PlayPartyRoomInfo
 import com.sayx.hm_cloud.model.PlayPartyRoomInfoEvent
+import com.sayx.hm_cloud.model.PlayPartyRoomSoundAndMicrophoneStateEvent
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -187,6 +188,15 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
 
             "exitGame" -> {
                 EventBus.getDefault().post(ExitGameEvent())
+            }
+
+            "updatePlayPartySoundAndMicrophoneState" -> {
+                if (arguments is Map<*, *>) {
+                    val soundState = arguments["sound"] as Boolean
+                    val microphoneState = arguments["microphone"] as Boolean
+                    val event = PlayPartyRoomSoundAndMicrophoneStateEvent(soundState, microphoneState)
+                    EventBus.getDefault().post(event)
+                }
             }
 
             else -> {

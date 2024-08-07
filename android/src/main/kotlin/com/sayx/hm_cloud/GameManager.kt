@@ -849,4 +849,8 @@ object GameManager : HmcpPlayerListener, OnContronListener {
         }.toString()
         channel.invokeMethod("changePositionStatus", changePositionStatusData)
     }
+
+    fun setPlayPartySoundAndMicrophone(arguments: String) {
+        channel.invokeMethod("playPartySoundAndMicrophone", arguments)
+    }
 }

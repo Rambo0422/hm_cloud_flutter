@@ -71,6 +71,7 @@ import com.sayx.hm_cloud.model.KeyInfo
 import com.sayx.hm_cloud.model.PCMouseEvent
 import com.sayx.hm_cloud.model.PartyPlayWantPlay
 import com.sayx.hm_cloud.model.PlayPartyRoomInfoEvent
+import com.sayx.hm_cloud.model.PlayPartyRoomSoundAndMicrophoneStateEvent
 import com.sayx.hm_cloud.utils.AppSizeUtils
 import com.sayx.hm_cloud.utils.GameUtils
 import com.sayx.hm_cloud.widget.AddGamepadKey
@@ -1258,5 +1259,10 @@ class GameActivity : AppCompatActivity() {
         GameManager.releasePlayPartyGame()
         gameSettings?.release()
         finish()
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onPlayPartyRoomSoundAndMicrophoneStateEvent(event: PlayPartyRoomSoundAndMicrophoneStateEvent) {
+        playPartyGameView?.setSoundAndMicrophoneState(event.soundState, event.microphoneState)
     }
 }
