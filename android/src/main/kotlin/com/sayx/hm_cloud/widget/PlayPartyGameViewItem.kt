@@ -75,11 +75,18 @@ class PlayPartyGameViewItem @JvmOverloads constructor(
                 }
 
                 PlayPartyPlayStatus.POSITION_LOCK -> {
-
+                    val position = roomStatu?.index ?: -1
+                    if (position != -1) {
+                        GameManager.changePositionStatus(position, false)
+                    }
                 }
 
                 PlayPartyPlayStatus.POSITION_OPEN -> {
-
+                    // 打开位置
+                    val position = roomStatu?.index ?: -1
+                    if (position != -1) {
+                        GameManager.changePositionStatus(position, true)
+                    }
                 }
 
                 PlayPartyPlayStatus.LET_ME_PLAY -> {
