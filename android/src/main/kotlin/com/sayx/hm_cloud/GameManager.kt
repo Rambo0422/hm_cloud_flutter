@@ -853,4 +853,8 @@ object GameManager : HmcpPlayerListener, OnContronListener {
     fun setPlayPartySoundAndMicrophone(arguments: String) {
         channel.invokeMethod("playPartySoundAndMicrophone", arguments)
     }
+
+    fun kickOutUser(arguments: String) {
+        channel.invokeMethod("kickOutUser", arguments)
+    }
 }

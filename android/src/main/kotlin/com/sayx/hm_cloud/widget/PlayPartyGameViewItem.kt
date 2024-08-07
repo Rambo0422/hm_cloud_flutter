@@ -38,6 +38,7 @@ class PlayPartyGameViewItem @JvmOverloads constructor(
     private val btn_let_play: View
     private val layout_avatar: FrameLayout
     private val tvWantPlayCountDown: TextView
+    private val btnKickOut: TextView
 
     private var currentUid = ""
     private var isPartyPlayOwner = false
@@ -59,9 +60,14 @@ class PlayPartyGameViewItem @JvmOverloads constructor(
         btn_let_play = findViewById(R.id.btn_let_play)
         layout_avatar = findViewById(R.id.layout_avatar)
         tvWantPlayCountDown = findViewById(R.id.tv_want_play_count_down)
+        btnKickOut = findViewById(R.id.btn_kick_out)
 
         btn_let_play.setOnClickListener {
             GameManager.letPlay(roomStatu?.uid ?: "")
+        }
+
+        btnKickOut.setOnClickListener {
+            GameManager.kickOutUser(roomStatu?.uid ?: "")
         }
 
         btn_play_status.setOnClickListener {
