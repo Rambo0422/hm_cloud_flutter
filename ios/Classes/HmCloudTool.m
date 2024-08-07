@@ -8,9 +8,8 @@
 #import <MJExtension/MJExtension.h>
 #import "CloudPreViewController.h"
 #import "HmCloudTool.h"
+#import "SanA_Macro.h"
 #import "UIViewController+TopVc.h"
-
-#define SanA_Bundle [NSBundle bundleWithPath:[[NSBundle bundleForClass:self.class] pathForResource:@"SanA_Game" ofType:@"bundle"]]
 
 @interface HmCloudTool ()
 
@@ -95,6 +94,17 @@
     });
 }
 
+// MARK: 延迟信息
+- (void)cloudPlayerDelayInfoCallBack:(HMDelayInfoModel *)delayModel {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.vc) {
+            [self.vc refreshfps:delayModel.frameRateEglRender ms:delayModel.pingpongCostTime rate:(delayModel.bitRate / 8) packetLoss:delayModel.packetLostPercent];
+        }
+    });
+}
+
+// MARK: ---------------解析海马代理
+
 - (void)processSceneInitInfo:(NSDictionary *)info {
     if (!info || ![info isKindOfClass:[NSDictionary class]]) {
         return;
@@ -117,7 +127,6 @@
 
     if ([type isEqualToString:@"resolutions"]) {
         //设置清晰度切换按钮菜单
-        NSArray *resolutions = [info objectForKey:@"data"];
     }
 
     if ([type isEqualToString:@"message"]) {
@@ -152,7 +161,7 @@
         [[HMCloudPlayer sharedCloudPlayer] cloudSetTouchModel:HMCloudCoreTouchModeScreen];
 
         if (!self.vc) {
-            self.vc = [[CloudPreViewController alloc] initWithNibName:@"CloudPreViewController" bundle:SanA_Bundle];
+            self.vc = [[CloudPreViewController alloc] initWithNibName:@"CloudPreViewController" bundle:k_SanABundle];
             self.vc.gameVC = self.gameVC;
 
             __weak typeof(self) weakSelf = self;

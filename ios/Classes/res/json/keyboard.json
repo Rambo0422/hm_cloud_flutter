@@ -1,0 +1,504 @@
+
+[
+    [
+
+        {
+            "name":"Esc",
+            "inputOp": 27,
+            "type" : 0
+        },
+        {
+            "name":"F1",
+            "inputOp": 112,
+            "type" : 0
+        },
+        {
+            "name":"F2",
+            "inputOp": 113,
+            "type" : 0
+        },
+        {
+            "name":"F3",
+            "inputOp": 114,
+            "type" : 0
+        },
+        {
+            "name":"F4",
+            "inputOp": 115,
+            "type" : 0
+        },
+        {
+            "name":"F5",
+            "inputOp": 116,
+            "type" : 0
+        },
+        {
+            "name":"F6",
+            "inputOp": 117,
+            "type" : 0
+        },
+        {
+            "name":"F7",
+            "inputOp": 118,
+            "type" : 0
+        },
+        {
+            "name":"F8",
+            "inputOp": 119,
+            "type" : 0
+        },
+        {
+            "name":"F9",
+            "inputOp": 120,
+            "type" : 0
+        },
+        {
+            "name":"F10",
+            "inputOp": 121,
+            "type" : 0
+        },
+        {
+            "name":"F11",
+            "inputOp": 122,
+            "type" : 0
+        },
+        {
+            "name":"F12",
+            "inputOp": 123,
+            "type" : 0
+        },
+        {
+            "name":"Ins",
+            "inputOp": 45,
+            "type" : 0
+        },
+        {
+            "name":"Del",
+            "inputOp": 46,
+            "type" : 0
+        },
+        {
+            "name":"PgUp",
+            "inputOp": 33,
+            "type" : 0
+        },
+        {
+            "name":"PgDn",
+            "inputOp": 34,
+            "type" : 0
+        },
+        {
+            "name":"Home",
+            "inputOp": 36,
+            "type" : 0
+        }
+    ],
+    [
+        {
+            "name":"`",
+            "inputOp": 192,
+            "type" : 0
+        },
+        {
+            "name":"1",
+            "inputOp": 49,
+            "type" : 0
+        },
+        {
+            "name":"2",
+            "inputOp": 50,
+            "type" : 0
+        },
+        {
+            "name":"3",
+            "inputOp": 51,
+            "type" : 0
+        },
+        {
+            "name":"4",
+            "inputOp": 52,
+            "type" : 0
+        },
+        {
+            "name":"5",
+            "inputOp": 53,
+            "type" : 0
+        },
+        {
+            "name":"6",
+            "inputOp": 54,
+            "type" : 0
+        },
+        {
+            "name":"7",
+            "inputOp": 55,
+            "type" : 0
+        },
+        {
+            "name":"8",
+            "inputOp": 56,
+            "type" : 0
+        },
+        {
+            "name":"9",
+            "inputOp": 57,
+            "type" : 0
+        },
+        {
+            "name":"0",
+            "inputOp": 48,
+            "type" : 0
+        },
+        {
+            "name":"-",
+            "inputOp": 109,
+            "type" : 0
+        },
+        {
+            "name":"=",
+            "inputOp": 0,
+            "type" : 0
+        },
+        {
+            "name":"Back",
+            "inputOp": 8,
+            "type" : 1
+        },
+        {
+            "name":"/",
+            "inputOp": 111,
+            "type" : 0
+        },
+        {
+            "name":"*",
+            "inputOp": 106,
+            "type" : 0
+        },
+        {
+            "name":"-",
+            "inputOp": 109,
+            "type" : 0
+        }
+    ],
+    [
+        {
+            "name":"Tab",
+            "inputOp": 9,
+            "type" : 1
+        },
+        {
+            "name":"Q",
+            "inputOp": 81,
+            "type" : 0
+        },
+        {
+            "name":"W",
+            "inputOp": 87,
+            "type" : 0
+        },
+        {
+            "name":"E",
+            "inputOp": 69,
+            "type" : 0
+        },
+        {
+            "name":"R",
+            "inputOp": 82,
+            "type" : 0
+        },
+        {
+            "name":"T",
+            "inputOp": 84,
+            "type" : 0
+        },
+        {
+            "name":"Y",
+            "inputOp": 89,
+            "type" : 0
+        },
+        {
+            "name":"U",
+            "inputOp": 85,
+            "type" : 0
+        },
+        {
+            "name":"I",
+            "inputOp": 73,
+            "type" : 0
+        },
+        {
+            "name":"O",
+            "inputOp": 79,
+            "type" : 0
+        },
+        {
+            "name":"P",
+            "inputOp": 80,
+            "type" : 0
+        },
+        {
+            "name":"[",
+            "inputOp": 219,
+            "type" : 0
+        },
+        {
+            "name":"]",
+            "inputOp": 221,
+            "type" : 0
+        },
+        {
+            "name":"\\",
+            "inputOp": 220,
+            "type" : 0
+        },
+        {
+            "name":"1",
+            "inputOp": 97,
+            "type" : 0
+        },
+        {
+            "name":"2",
+            "inputOp": 98,
+            "type" : 0
+        },
+        {
+            "name":"3",
+            "inputOp": 99,
+            "type" : 0
+        }
+    ],
+    [
+        {
+            "name":"Caps",
+            "inputOp": 20,
+            "type" : 1
+        },
+        {
+            "name":"A",
+            "inputOp": 65,
+            "type" : 0
+        },
+        {
+            "name":"S",
+            "inputOp": 83,
+            "type" : 0
+        },
+        {
+            "name":"D",
+            "inputOp": 68,
+            "type" : 0
+        },
+        {
+            "name":"F",
+            "inputOp": 70,
+            "type" : 0
+        },
+        {
+            "name":"G",
+            "inputOp": 71,
+            "type" : 0
+        },
+        {
+            "name":"H",
+            "inputOp": 72,
+            "type" : 0
+        },
+        {
+            "name":"J",
+            "inputOp": 74,
+            "type" : 0
+        },
+        {
+            "name":"K",
+            "inputOp": 75,
+            "type" : 0
+        },
+        {
+            "name":"L",
+            "inputOp": 76,
+            "type" : 0
+        },
+        {
+            "name":";",
+            "inputOp": 186,
+            "type" : 0
+        },
+        {
+            "name":"'",
+            "inputOp": 222,
+            "type" : 0
+        },
+        {
+            "name":"Enter",
+            "inputOp": 13,
+            "type" : 1
+        },
+        {
+            "name":"4",
+            "inputOp": 100,
+            "type" : 0
+        },
+        {
+            "name":"5",
+            "inputOp": 101,
+            "type" : 0
+        },
+        {
+            "name":"6",
+            "inputOp": 102,
+            "type" : 0
+        }
+    ],
+    [
+        {
+            "name":"Shift",
+            "inputOp": 16,
+            "type" : 1
+        },
+        {
+            "name":"Z",
+            "inputOp": 90,
+            "type" : 0
+        },
+        {
+            "name":"X",
+            "inputOp": 88,
+            "type" : 0
+        },
+        {
+            "name":"C",
+            "inputOp": 67,
+            "type" : 0
+        },
+        {
+            "name":"V",
+            "inputOp": 86,
+            "type" : 0
+        },
+        {
+            "name":"B",
+            "inputOp": 66,
+            "type" : 0
+        },
+        {
+            "name":"N",
+            "inputOp": 78,
+            "type" : 0
+        },
+        {
+            "name":"M",
+            "inputOp": 77,
+            "type" : 0
+        },
+        {
+            "name":",",
+            "inputOp": 0,
+            "type" : 0
+        },
+        {
+            "name":".",
+            "inputOp": 110,
+            "type" : 0
+        },
+        {
+            "name":"/",
+            "inputOp": 111,
+            "type" : 0
+        },
+        {
+            "name":"Shift",
+            "inputOp": 16,
+            "type" : 1
+        },
+        {
+            "name":"↑",
+            "inputOp": 38,
+            "type" : 0
+        },
+        {
+            "name":"7",
+            "inputOp": 103,
+            "type" : 0
+        },
+        {
+            "name":"8",
+            "inputOp": 104,
+            "type" : 0
+        },
+        {
+            "name":"9",
+            "inputOp": 105,
+            "type" : 0
+        }
+    ],
+    [
+        {
+            "name":"Ctrl",
+            "inputOp": 17,
+            "type" : 1
+        },
+        {
+            "name":"Alt",
+            "inputOp": 18,
+            "type" : 1
+        },
+        {
+            "name":"Space",
+            "inputOp": 32,
+            "type" : 2
+        },
+        {
+            "name":"Ctrl",
+            "inputOp": 17,
+            "type" : 1
+        },
+        {
+            "name":"Alt",
+            "inputOp": 18,
+            "type" : 1
+        },
+        {
+            "name":"←",
+            "inputOp": 37,
+            "type" : 0
+        },
+        {
+            "name":"↓",
+            "inputOp": 40,
+            "type" : 0
+        },
+        {
+            "name":"→",
+            "inputOp": 39,
+            "type" : 0
+        },
+        {
+            "name":"0",
+            "inputOp": 96,
+            "type" : 0
+        },
+        {
+            "name":".",
+            "inputOp": 110,
+            "type" : 0
+        }
+    ],
+    [
+        {
+            "name":"End",
+            "inputOp": 35,
+            "type" : 0
+        },
+        {
+            "name":"+",
+            "inputOp": 107,
+            "type" : 3
+        },
+        {
+            "name":"Enter",
+            "inputOp": 108,
+            "type" : 4
+        }
+    ]
+
+]
