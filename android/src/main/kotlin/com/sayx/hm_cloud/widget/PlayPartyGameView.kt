@@ -10,6 +10,8 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import com.blankj.utilcode.constant.PermissionConstants
+import com.blankj.utilcode.util.PermissionUtils
 import com.blankj.utilcode.util.ScreenUtils
 import com.sayx.hm_cloud.GameManager
 import com.sayx.hm_cloud.R
@@ -50,11 +52,18 @@ class PlayPartyGameView @JvmOverloads constructor(
         }
 
         findViewById<View>(R.id.btn_play_party_microphone).setOnClickListener {
-            val arguments = JSONObject().apply {
-                put("sound", soundState)
-                put("microphone", !microphoneState)
-            }.toString()
-            GameManager.setPlayPartySoundAndMicrophone(arguments)
+            // 申请麦克风权限
+            PermissionUtils.permission(PermissionConstants.MICROPHONE)
+                .callback { isAllGranted, _, _, _ ->
+                    if (isAllGranted) {
+                        val arguments = JSONObject().apply {
+                            put("sound", soundState)
+                            put("microphone", !microphoneState)
+                        }.toString()
+                        GameManager.setPlayPartySoundAndMicrophone(arguments)
+                    }
+                }
+                .request()
         }
 
         controlInfoViewList.add(findViewById(R.id.play_party_item_1))
