@@ -5,11 +5,11 @@
 //  Created by a水 on 2024/7/31.
 //
 
-#import <MJExtension/MJExtension.h>
+
 #import "CloudPreViewController.h"
 #import "HmCloudTool.h"
 #import "SanA_Macro.h"
-#import "UIViewController+TopVc.h"
+
 
 @interface HmCloudTool ()
 
@@ -22,11 +22,13 @@
 @implementation HmCloudTool
 
 + (instancetype)share {
-    static id cloudTool;
+    static HmCloudTool *cloudTool;
     static dispatch_once_t token;
 
     dispatch_once(&token, ^{
         cloudTool = [[self alloc] init];
+        cloudTool.isVibration = YES;
+        cloudTool.touchMode = HMCloudCoreTouchModeMouse;
     });
 
     return cloudTool;
@@ -40,8 +42,6 @@
     self.delegate = delegate;
     NSLog(@" =============== SDK_VERSION : %@", CLOUDGAME_SDK_VERSION);
 
-
-
     [[HMCloudPlayer sharedCloudPlayer] setDelegate:self];
     [[HMCloudPlayer sharedCloudPlayer] registCloudPlayer:self.accessKeyId channelId:self.channelName options:nil];
 }
@@ -49,7 +49,7 @@
 - (void)stop {
     self.vc = nil;
     self.gameVC = nil;
-    [[HMCloudPlayer sharedCloudPlayer] stop];
+    [[HMCloudPlayer sharedCloudPlayer] stop:10 withReason:HMCloudAppStopReasonNormal];
 }
 
 - (void)restart {
@@ -101,6 +101,41 @@
             [self.vc refreshfps:delayModel.frameRateEglRender ms:delayModel.pingpongCostTime rate:(delayModel.bitRate / 8) packetLoss:delayModel.packetLostPercent];
         }
     });
+}
+
+// MARK: 发送指令消息到海马
+- (void)sendCustomKey:(NSArray<NSDictionary *> *)dictList {
+    NSLog(@"sendCustomKey = %@", dictList);
+
+    NSArray *opList = [dictList mapUsingBlock:^id _Nullable (NSDictionary *_Nonnull obj, NSUInteger idx) {
+        return [HMOneInputOPData mj_objectWithKeyValues:obj];
+    }];
+
+    HMInputOpData *data = [[HMInputOpData alloc] init];
+
+    data.opListArray = opList.mutableCopy;
+
+    [[HMCloudPlayer sharedCloudPlayer] sendCustomKeycode:data];
+}
+
+// MARK: 更新鼠标模式
+- (void)updateTouchMode:(HMCloudCoreTouchMode)touchMode {
+    self.touchMode = touchMode;
+    [[HMCloudPlayer sharedCloudPlayer] cloudSetTouchModel:self.touchMode];
+}
+
+// MARK: 获取鼠标灵敏度
+- (float)sensitivity {
+    return [[HMCloudPlayer sharedCloudPlayer] getMouseSensitivity];
+}
+
+- (NSString *)cloudId {
+    return [HMCloudPlayer sharedCloudPlayer].cloudId;
+}
+
+// MARK: 更新鼠标灵敏度
+- (void)updateMouseSensitivity:(float)sensitivity {
+    [[HMCloudPlayer sharedCloudPlayer] setMouseSensitivity:sensitivity];
 }
 
 // MARK: ---------------解析海马代理
@@ -158,7 +193,7 @@
     }
 
     if ([state isEqualToString:@"videoVisible"]) {
-        [[HMCloudPlayer sharedCloudPlayer] cloudSetTouchModel:HMCloudCoreTouchModeScreen];
+        [[HMCloudPlayer sharedCloudPlayer] cloudSetTouchModel:self.touchMode];
 
         if (!self.vc) {
             self.vc = [[CloudPreViewController alloc] initWithNibName:@"CloudPreViewController" bundle:k_SanABundle];

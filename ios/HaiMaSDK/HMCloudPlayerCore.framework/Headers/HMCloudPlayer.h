@@ -110,13 +110,13 @@ typedef NS_ENUM(NSInteger, CloudPlayerFileUploadResponseStatus) {
 
 typedef void (^HMReservedIncetanceCallback)(NSArray <HMCloudPlayerReservedSingleIncetance*>*);
 
-typedef void (^HMCloudFileDownloadProgressBlock)(double downloadProgress,HMFile *file);
+typedef void (^HMCloudFileDownloadProgressBlock)(double downloadProgress, HMFile *file);
 
-typedef void (^HMCloudFileDownloadResponseBlock)(BOOL result, CloudPlayerDownloadResponseStatus status,NSString *errorMsg, HMFile *file);
+typedef void (^HMCloudFileDownloadResponseBlock)(BOOL result, CloudPlayerDownloadResponseStatus status, NSString *errorMsg, HMFile *file);
 
 typedef void (^HMCloudFileDownloadComplete)(void);
 
-typedef void (^HMCloudFileCancelDownloadResponseBlock)(BOOL result, CloudPlayerCancelDownloadResponseStatus status,HMFile *file);
+typedef void (^HMCloudFileCancelDownloadResponseBlock)(BOOL result, CloudPlayerCancelDownloadResponseStatus status, HMFile *file);
 
 typedef void (^HMCloudFileCancelDownloadComplete)(void);
 
@@ -160,6 +160,7 @@ const extern NSString *CloudGameOptionKeyUserDeviceInfo;    //设备信息
 const extern NSString *CloudGameOptionKeyLanguage;          //设置语言
 const extern NSString *CloudGameOptionKeyRichData;          //透传到SAAS的字段
 const extern NSString *CloudGameOptionKeyResolutionId;      //起播分辨率
+const extern NSString *CloudGameOptionKeyLargeBitrate;      //高帧率开关
 
 @interface HMCloudPlayer : HMCloudCorePlayer
 
@@ -542,6 +543,15 @@ typedef void (^HMAssignControlCallback)(NSArray<HMCloudPlayerControlInfo *>*);
  取消上传图片
  */
 - (void)cancelUploadFileAllTask;
+
+/**
+ 开启/关闭 高帧率模式
+ @param enabled 是否开启
+ @param success 开启成功回调
+ @param fail 开启失败回调
+ @return 是否调用成功
+ */
+- (BOOL) enlargeBitrate:(BOOL)enabled success:(void (^)(BOOL enabled))success fail:(void (^)(NSString *errorCode))fail;
 
 @end
 

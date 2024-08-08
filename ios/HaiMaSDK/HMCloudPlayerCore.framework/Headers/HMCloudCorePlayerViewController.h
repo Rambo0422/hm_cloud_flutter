@@ -159,6 +159,16 @@ typedef void (^CloudCorePlayerScreenshotBlock)(BOOL result,NSData *data,CloudCor
 @optional
 
 /**
+ 重置stoken次数
+ */
+- (void) resetRefreshStokenTimes;
+
+/**
+ 超出重连最大次数
+ */
+- (void) beyondReconnectPlayerTimes;
+
+/**
  播放器出错
  @param isPlay  告知是否需要继续播流
  */
@@ -291,6 +301,13 @@ typedef void (^CloudCorePlayerScreenshotBlock)(BOOL result,NSData *data,CloudCor
 @property (nonatomic, assign) BOOL isInputConnectSuccess;
 @property (nonatomic, assign) BOOL isScreenConnectSuccess;
 @property (nonatomic, assign) BOOL stretching;
+@property (nonatomic, assign) BOOL signalConnectSuccess;
+@property (nonatomic, assign) BOOL receivedOffer;
+@property (nonatomic, assign) BOOL sendAnswer;
+@property (nonatomic, assign) BOOL sendCandidate;
+@property (nonatomic, assign) BOOL receivedCandidate;
+@property (nonatomic, assign) BOOL webrtcConnected;
+@property (nonatomic, assign) BOOL isWebrtcConnectTimeout;
 
 
 /**
@@ -511,9 +528,9 @@ openCameraPermissionCheckByServer:(BOOL)openCameraPermissionCheckByServer
 - (void)disconnectScreenUrl;
 
 /**
- 刷新stoken,取消第一帧超时，rtc连接超时计时器
+取消第一帧超时，rtc连接超时计时器
  */
-- (void)cancelTimerWithRereshStoken;
+- (void)cancelFirstArriveTimer;
 
 /**
  获取webrtc版本号
@@ -678,7 +695,15 @@ openCameraPermissionCheckByServer:(BOOL)openCameraPermissionCheckByServer
  */
 - (BOOL)convertToPcMouseModel:(BOOL)model;
 
-
+/**
+ 拉伸画面
+ @param stretch true 拉伸 false 还原
+ */
 - (void)setStretch:(BOOL)stretch;
+
+/**
+ 重置player,input,screen重连次数
+ */
+- (void)resetRetryPlayerTimes;
 
 @end

@@ -7,19 +7,11 @@
 
 
 #import "CrossView.h"
+#import "GameButton.h"
 #import "GameKeyView.h"
+#import "HmCloudTool.h"
 #import "JoystickView.h"
 #import "SanA_Macro.h"
-
-@interface GameButton : UIButton
-
-@property (nonatomic, strong) KeyModel *m;
-
-@end
-
-@implementation GameButton
-
-@end
 
 @implementation GameKeyView
 
@@ -53,6 +45,18 @@
                 joy.bgImg = k_BundleImage(@"key_xbox_rock");
                 joy.thumbImg = k_BundleImage(@"key_xbox_rock_thumb_l");
                 joy.callback = ^(CGPoint point) {
+                    NSDictionary *xDict = @{
+                            @"inputState": @1,
+                            @"inputOp": @(1027),
+                            @"value": @((int)roundf(point.x * 32767))
+                    };
+
+                    NSDictionary *yDict = @{
+                            @"inputState": @1,
+                            @"inputOp": @(1028),
+                            @"value": @((int)roundf(-point.y * 32767))
+                    };
+                    [[HmCloudTool share] sendCustomKey:@[xDict, yDict]];
                 };
                 [self addSubview:joy];
 
@@ -69,6 +73,19 @@
                 joy.bgImg = k_BundleImage(@"key_xbox_rock");
                 joy.thumbImg = k_BundleImage(@"key_xbox_rock_thumb_r");
                 joy.callback = ^(CGPoint point) {
+                    NSDictionary *xDict = @{
+                            @"inputState": @1,
+                            @"inputOp": @(1029),
+                            @"value": @((int)roundf(point.x * 32767))
+                    };
+
+                    NSDictionary *yDict = @{
+                            @"inputState": @1,
+                            @"inputOp": @(1030),
+                            @"value": @((int)roundf(-point.y * 32767))
+                    };
+
+                    [[HmCloudTool share] sendCustomKey:@[xDict, yDict]];
                 };
                 [self addSubview:joy];
 
@@ -83,6 +100,12 @@
             case KEY_kb_xobx_cross:{
                 CrossView *cross = [[CrossView alloc] init];
                 cross.callback = ^(NSNumber *_Nonnull op) {
+                    NSDictionary *crossDict = @{
+                            @"inputState": @1,
+                            @"inputOp": @(1024),
+                            @"value": op,
+                    };
+                    [[HmCloudTool share] sendCustomKey:@[crossDict]];
                 };
                 [self addSubview:cross];
                 [cross mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -109,13 +132,14 @@
     GameButton *btn = [GameButton buttonWithType:UIButtonTypeCustom];
 
     btn.m = m;
-    [btn setBackgroundImage:k_BundleImage([self getImg:m isHigh:NO]) forState:UIControlStateNormal];
 
-    [btn setBackgroundImage:k_BundleImage([self getImg:m isHigh:YES]) forState:UIControlStateHighlighted];
+    btn.upCallback = ^(NSArray<NSDictionary *> *keyList) {
+        [[HmCloudTool share] sendCustomKey:keyList];
+    };
 
-    [btn setTitle:m.text forState:UIControlStateNormal];
-    [btn setTitleColor:[kColor(0xFFFFFF) colorWithAlphaComponent:0.6] forState:UIControlStateNormal];
-    btn.titleLabel.font = [UIFont systemFontOfSize:9];
+    btn.downCallback = ^(NSArray<NSDictionary *> *keyList) {
+        [[HmCloudTool share] sendCustomKey:keyList];
+    };
 
     [self addSubview:btn];
 
@@ -124,57 +148,6 @@
         make.left.equalTo(@(m.left));
         make.size.mas_equalTo(CGSizeMake(m.width, m.height));
     }];
-}
-
-- (NSString *)getImg:(KeyModel *)model isHigh:(BOOL)isHigh {
-    switch (model.key_type) {
-        case KEY_mouse_left:
-
-            return isHigh ? @"key_ms_left_h" : @"key_ms_left_n";
-
-        case KEY_mouse_right:
-
-            return isHigh ? @"key_ms_right_h" : @"key_ms_right_n";
-
-        case KEY_mouse_wheel_center:
-
-            return isHigh ? @"key_ms_center_h" : @"key_ms_center_n";
-
-        case KEY_mouse_wheel_up:
-
-            return isHigh ? @"key_ms_up_h" : @"key_ms_up_n";
-
-        case KEY_mouse_wheel_down:
-
-            return isHigh ? @"key_ms_down_h" : @"key_ms_down_n";
-
-        case KEY_kb_round:
-
-            return isHigh ? @"key_kb_round_h" : @"key_kb_round_n";
-
-        case KEY_kb_xobx_square:
-
-            return isHigh ? @"key_kb_square_h" : @"key_kb_square_n";
-
-        case KEY_kb_xobx_round_medium:
-
-            return isHigh ? @"key_kb_round_h" : @"key_kb_round_n";
-
-        case KEY_kb_xobx_round_small:
-
-            return isHigh ? @"key_kb_round_h" : @"key_kb_round_n";
-
-        case KEY_kb_xobx_elliptic:
-
-            if (model.inputOp == 16) {
-                return isHigh ? @"key_xbox_set_h" : @"key_xbox_set_n";
-            } else {
-                return isHigh ? @"key_xbox_menu_h" : @"key_xbox_menu_n";
-            }
-
-        default:
-            return @"";
-    }
 }
 
 - (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {

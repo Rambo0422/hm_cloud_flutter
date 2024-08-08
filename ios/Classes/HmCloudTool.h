@@ -73,6 +73,16 @@ static NSString *ActionClosePage = @"closePage";
 /// 当前服务器时间
 @property (nonatomic, strong)   NSNumber *realTime;
 
+/// 按键震动
+@property (nonatomic, assign)   BOOL isVibration;
+
+/// 鼠标模式
+@property (nonatomic, assign)   HMCloudCoreTouchMode touchMode;
+
+/// 鼠标灵敏度
+@property (nonatomic, assign)   float sensitivity;
+
+@property (nonatomic, copy)             NSString *cloudId;
 
 @property (nonatomic, weak) id<HmCloudToolDelegate> delegate;
 
@@ -83,6 +93,24 @@ static NSString *ActionClosePage = @"closePage";
 - (void)stop;
 /// 推出flutter 页面后，回到游戏页面的方法
 - (void)restart;
+
+
+/// 发送指令到海马
+/// - Parameter dictList: HMOneInputOPData json的集合
+- (void)sendCustomKey:(NSArray<NSDictionary *> *)dictList;
+
+
+/// 更新鼠标模式
+/// - Parameter touchMode: [HMCloudCoreTouchMode]
+- (void)updateTouchMode:(HMCloudCoreTouchMode)touchMode;
+
+
+/**
+   sensitivity 0-1 0 鼠标无法移动 1 鼠标正常移动
+ */
+- (void)updateMouseSensitivity:(float)sensitivity;
+
+
 
 @end
 

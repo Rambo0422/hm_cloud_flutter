@@ -6,31 +6,13 @@
 //
 
 #import "CloudPreViewController.h"
+#import "CustomSlider.h"
+#import "GameDetailsModel.h"
 #import "GameKeyView.h"
 #import "GameKeyView.h"
 #import "HmCloudTool.h"
 #import "RequestTool.h"
 
-
-@interface CustomSlider : UISlider
-
-@end
-
-
-@implementation CustomSlider
-
-// 重写 trackRect(forBounds:) 方法
-- (CGRect)trackRectForBounds:(CGRect)bounds {
-    // 调用父类的实现来获取默认的轨道 rect
-    CGRect defaultRect = [super trackRectForBounds:bounds];
-
-    // 修改轨道的高度
-    CGRect customRect = CGRectMake(defaultRect.origin.x, (bounds.size.height - 10) / 2, defaultRect.size.width, 10); // 10 是自定义的高度
-
-    return customRect;
-}
-
-@end
 
 @interface CloudPreViewController ()
 
@@ -44,12 +26,31 @@
 @property (weak, nonatomic) IBOutlet UIView *operationView2;
 @property (weak, nonatomic) IBOutlet UIView *operationView3;
 @property (weak, nonatomic) IBOutlet UIView *operationView4;
+@property (weak, nonatomic) IBOutlet UIButton *fuzhiBtn;
+
+// 鼠标灵敏度
 @property (weak, nonatomic) IBOutlet UISlider *mouseSlider;
+
 @property (weak, nonatomic) IBOutlet UIView *sliderBgView1;
 @property (weak, nonatomic) IBOutlet UIView *sliderBgView2;
 @property (weak, nonatomic) IBOutlet UILabel *msLab;
 @property (weak, nonatomic) IBOutlet UILabel *packetLossLab;
 @property (weak, nonatomic) IBOutlet UIImageView *netImgView;
+
+
+@property (weak, nonatomic) IBOutlet SPButton *joystickBtn;
+@property (weak, nonatomic) IBOutlet SPButton *keyboardBtn;
+@property (weak, nonatomic) IBOutlet SPButton *vibrationBtn;
+
+// 鼠标设置开关
+@property (weak, nonatomic) IBOutlet UISwitch *modeSwitch;
+// 鼠标点击
+@property (weak, nonatomic) IBOutlet SPButton *modeMouseBtn;
+// 触控点击
+@property (weak, nonatomic) IBOutlet SPButton *modeScreenBtn;
+// 触屏攻击
+@property (weak, nonatomic) IBOutlet SPButton *modeSwipeBtn;
+
 
 @property (nonatomic, strong) CustomSlider *lightSlider;
 @property (nonatomic, strong) CustomSlider *soundSlider;
@@ -62,6 +63,12 @@
 @property (nonatomic, strong) NSArray<KeyModel *> *joystickList;
 
 @property (nonatomic, strong) GameKeyView *keyView;
+
+@property (nonatomic, strong) GameDetailsModel *gameDetails;
+
+/// 当前选中的操作模式（1 = 按键 ； 2 = 手柄）
+@property (nonatomic, assign) NSInteger currentOperation;
+
 
 @end
 
@@ -136,12 +143,132 @@
 
 
     [[self.lightSlider rac_signalForControlEvents:UIControlEventValueChanged] subscribeNext:^(__kindof UIControl *_Nullable x) {
+        @strongify(self);
         [UIScreen mainScreen].brightness = self.lightSlider.value;
+    }];
+
+    [RACObserve(self, gameDetails) subscribeNext:^(id _Nullable x) {
+        @strongify(self);
+        self.joystickBtn.enabled = self.gameDetails.support == 2 || self.gameDetails.support == 3;
+        self.keyboardBtn.enabled = self.gameDetails.support == 1 || self.gameDetails.support == 3;
+    }];
+
+    [RACObserve(self, currentOperation) subscribeNext:^(id _Nullable x) {
+        @strongify(self);
+
+        self.joystickBtn.selected = self.currentOperation == 2;
+        self.keyboardBtn.selected = self.currentOperation == 1;
+    }];
+
+
+    [[self.joystickBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
+        @strongify(self);
+
+        if (!self.joystickBtn.isSelected) {
+            self.currentOperation = 2;
+            [self getJoystickAndSet:YES];
+        }
+    }];
+
+    [[self.keyboardBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
+        @strongify(self);
+
+        if (!self.keyboardBtn.isSelected) {
+            self.currentOperation = 1;
+            [self getKeyboardAndSet:YES];
+        }
+    }];
+
+    HmCloudTool *tool = [HmCloudTool share];
+
+    @weakify(tool);
+    [[self.vibrationBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
+        @strongify(tool);
+        tool.isVibration = !tool.isVibration;
+    }];
+
+    RAC(self.vibrationBtn, selected) = RACObserve([HmCloudTool share], isVibration);
+
+    [[self.modeSwitch rac_signalForControlEvents:UIControlEventValueChanged] subscribeNext:^(__kindof UIControl *_Nullable x) {
+        @strongify(self);
+        @strongify(tool);
+
+        [tool updateTouchMode:(self.modeSwitch.on ? HMCloudCoreTouchModeMouse : HMCloudCoreTouchModeNone)];
+    }];
+
+    [RACObserve(tool, touchMode) subscribeNext:^(id _Nullable x) {
+        @strongify(tool);
+        @strongify(self);
+        switch (tool.touchMode) {
+            case HMCloudCoreTouchModeNone:{
+                self.modeMouseBtn.enabled = NO;
+                self.modeScreenBtn.enabled = NO;
+                self.modeSwipeBtn.enabled = NO;
+            }
+            break;
+
+            case HMCloudCoreTouchModeMouse:
+            case HMCloudCoreTouchModeScreen:
+            case HMCloudCoreTouchSwipe:{
+                self.modeMouseBtn.enabled = YES;
+                self.modeScreenBtn.enabled = YES;
+                self.modeSwipeBtn.enabled = YES;
+
+                self.modeMouseBtn.selected = (tool.touchMode == HMCloudCoreTouchModeMouse);
+                self.modeScreenBtn.selected = (tool.touchMode == HMCloudCoreTouchModeScreen);
+                self.modeSwipeBtn.selected = (tool.touchMode == HMCloudCoreTouchSwipe);
+            }
+
+            break;
+
+            default:
+                break;
+        }
+    }];
+
+    [[self.modeMouseBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
+        @strongify(tool);
+        [tool updateTouchMode:HMCloudCoreTouchModeMouse];
+    }];
+
+    [[self.modeScreenBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
+        @strongify(tool);
+        [tool updateTouchMode:HMCloudCoreTouchModeScreen];
+    }];
+
+    [[self.modeSwipeBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
+        @strongify(tool);
+        [tool updateTouchMode:HMCloudCoreTouchSwipe];
+    }];
+
+    [[self.mouseSlider rac_signalForControlEvents:UIControlEventValueChanged] subscribeNext:^(__kindof UIControl *_Nullable x) {
+        @strongify(self);
+        @strongify(tool);
+
+        if (self.mouseSlider.value < 0.1) {
+            [tool updateMouseSensitivity:0.1];
+        } else {
+            [tool updateMouseSensitivity:self.mouseSlider.value];
+        }
+    }];
+
+    [[self.fuzhiBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
+        @strongify(tool);
+        NSString *textToCopy = [NSString stringWithFormat:@"cid:%@ , uid:%@", tool.cloudId, tool.userId];
+        UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+        pasteboard.string = textToCopy;
+        [SVProgressHUD showSuccessWithStatus:@"复制成功~"];
     }];
 }
 
 - (void)configView {
-//    self.soundSwitch.transform = CGAffineTransformMakeScale(0.85, 0.85);
+    self.modeSwitch.transform = CGAffineTransformMakeScale(0.85, 0.85);
+
+    self.vibrationBtn.selected = [HmCloudTool share].isVibration;
+
+    self.mouseSlider.value = [HmCloudTool share].sensitivity;
+
+    self.fuzhiBtn.layer.cornerRadius = 3.0;
 
     self.keyView = [[GameKeyView alloc] init];
     [self.view insertSubview:self.keyView atIndex:0];
@@ -195,27 +322,59 @@
 }
 
 - (void)request {
-    NSString *path = [k_SanABundle pathForResource:@"joystick"
-                                            ofType:@"json"];
-    NSData *data = [NSData dataWithContentsOfFile:path];
-    NSError *error;
-    NSArray *arr = [NSJSONSerialization JSONObjectWithData:data
-                                                   options:kNilOptions
-                                                     error:&error];
+    [[RequestTool share] requestUrl:k_api_get_game_detail
+                         methodType:Request_GET
+                             params:@{ @"game_id": [HmCloudTool share].gameId }
+                      faildCallBack:nil
+                    successCallBack:^(id _Nonnull obj) {
+        self.gameDetails = [GameDetailsModel mj_objectWithKeyValues:obj[@"data"]];
 
-    if (!error) {
-        self.joystickList = [KeyModel mj_objectArrayWithKeyValuesArray:arr];
-        self.keyView.keyList = self.joystickList;
-    }
+        if (self.gameDetails.support == 1) {
+            self.currentOperation = 1;
+            [self getKeyboardAndSet:YES];
+        } else if (self.gameDetails.support == 2) {
+            self.currentOperation = 2;
+            [self getJoystickAndSet:YES];
+        } else {
+            self.currentOperation = 2;
+            [self getJoystickAndSet:YES];
+            [self getKeyboardAndSet:NO];
+        }
+    }];
+}
 
+- (void)getJoystickAndSet:(BOOL)set {
+    // 获取手柄配置，如果获取失败 则取本地的默认配置
     [[RequestTool share] requestUrl:k_api_getKeyboard
                          methodType:Request_GET
                              params:@{ @"type": @"1", @"game_id": [HmCloudTool share].gameId }
-                      faildCallBack:nil
-                    successCallBack:^(id _Nonnull obj) {
-//        self.joystickList = [KeyModel mj_objectArrayWithKeyValuesArray:obj[@"data"][@"keyboard"]];
-    }];
+                      faildCallBack:^{
+        NSString *path = [k_SanABundle pathForResource:@"joystick"
+                                                ofType:@"json"];
+        NSData *data = [NSData dataWithContentsOfFile:path];
+        NSError *error;
+        NSArray *arr = [NSJSONSerialization JSONObjectWithData:data
+                                                       options:kNilOptions
+                                                         error:&error];
 
+        if (!error) {
+            self.joystickList = [KeyModel mj_objectArrayWithKeyValuesArray:arr];
+
+            if (set) {
+                self.keyView.keyList = self.joystickList;
+            }
+        }
+    }
+                    successCallBack:^(id _Nonnull obj) {
+        self.joystickList = [KeyModel mj_objectArrayWithKeyValuesArray:obj[@"data"][@"keyboard"]];
+
+        if (set) {
+            self.keyView.keyList = self.joystickList;
+        }
+    }];
+}
+
+- (void)getKeyboardAndSet:(BOOL)set {
     [[RequestTool share] requestUrl:k_api_getKeyboard
                          methodType:Request_GET
                              params:@{ @"type": @"2", @"game_id": [HmCloudTool share].gameId }
@@ -223,7 +382,9 @@
                     successCallBack:^(id _Nonnull obj) {
         self.keyboardList = [KeyModel mj_objectArrayWithKeyValuesArray:obj[@"data"][@"keyboard"]];
 
-//        self.keyView.keyList = self.keyboardList;
+        if (set) {
+            self.keyView.keyList = self.keyboardList;
+        }
     }];
 }
 

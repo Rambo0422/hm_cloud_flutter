@@ -69,11 +69,15 @@
                   "------------  Success  ------------\n", host, [param mj_JSONString], [responseObject mj_JSONString]);
 #endif
 
-            if (successCallBack) {
-                NSNumber *code = responseObject[@"code"];
+            NSNumber *code = responseObject[@"code"];
 
-                if (code.intValue == 0) {
+            if (code.intValue == 0) {
+                if (successCallBack) {
                     successCallBack(responseObject);
+                }
+            } else {
+                if (faildCallBack) {
+                    faildCallBack();
                 }
             }
         }
@@ -104,11 +108,15 @@
                   "------------  Success  ------------\n", host, [param mj_JSONString], [responseObject mj_JSONString]);
 #endif
 
-            if (successCallBack) {
-                NSNumber *code = responseObject[@"code"];
+            NSNumber *code = responseObject[@"code"];
 
-                if (code.intValue == 0) {
+            if (code.intValue == 0) {
+                if (successCallBack) {
                     successCallBack(responseObject);
+                }
+            } else {
+                if (faildCallBack) {
+                    faildCallBack();
                 }
             }
         }

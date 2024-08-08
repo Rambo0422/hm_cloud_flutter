@@ -9,26 +9,32 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-#define k_api_host           @"https://api-cgfc.3ayx.net"
+#define k_api_host            @"https://api-cgfc.3ayx.net"
 
 /// 获取云游戏虚拟键盘
 /// params：
 /// type 1手柄，2键盘
 /// game_id 游戏id
-#define k_api_getKeyboard    @"/api/cloudgame/keyboard/get"
+#define k_api_getKeyboard     @"/api/cloudgame/keyboard/get"
 
 /// 更新云游戏虚拟键盘
 /// params：
 /// type 1手柄，2键盘
 /// game_id 游戏id
 /// keyboard 虚拟键盘集合
-#define k_api_updateKeyboard @"/api/cloudgame/keyboard/update"
+#define k_api_updateKeyboard  @"/api/cloudgame/keyboard/update"
 
 /// 还原云游戏虚拟键盘
 /// params：
 /// type 1手柄，2键盘
 /// game_id 游戏id
-#define k_api_resetKeyboard  @"/api/cloudgame/keyboard/reset"
+#define k_api_resetKeyboard   @"/api/cloudgame/keyboard/reset"
+
+/// 获取游戏详情
+///  params:
+///  game_id 游戏id
+#define k_api_get_game_detail @"/api/game/details/get"
+
 
 typedef enum : NSUInteger {
     Request_POST,
