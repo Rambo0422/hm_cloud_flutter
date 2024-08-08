@@ -13,6 +13,7 @@ import android.widget.TextView
 import com.blankj.utilcode.constant.PermissionConstants
 import com.blankj.utilcode.util.PermissionUtils
 import com.blankj.utilcode.util.ScreenUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.sayx.hm_cloud.GameManager
 import com.sayx.hm_cloud.R
 import com.sayx.hm_cloud.model.ControlInfo
@@ -61,6 +62,8 @@ class PlayPartyGameView @JvmOverloads constructor(
                             put("microphone", !microphoneState)
                         }.toString()
                         GameManager.setPlayPartySoundAndMicrophone(arguments)
+                    }else{
+                        ToastUtils.showShort("麦克风权限获取失败,请前往设置页面开启麦克风权限")
                     }
                 }
                 .request()
