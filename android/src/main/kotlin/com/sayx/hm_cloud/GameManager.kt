@@ -609,6 +609,7 @@ object GameManager : HmcpPlayerListener, OnContronListener {
                 "exitGame",
                 mapOf(Pair("action", finish), Pair("needReattach", needReattach))
             )
+            needReattach = false
         }
         val cloudId = HmcpManager.getInstance().cloudId
         if (TextUtils.isEmpty(cloudId)) {
