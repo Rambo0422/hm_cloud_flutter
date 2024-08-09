@@ -1,30 +1,28 @@
 //
-//  JoystickView.m
+//  JoystickArrowView.m
 //  hm_cloud
 //
-//  Created by a水 on 2024/8/7.
+//  Created by a水 on 2024/8/9.
 //
 
-#import "JoystickView.h"
-#import "SanA_Macro.h"
+#import "JoystickArrowView.h"
+#import <Masonry/Masonry.h>
+#import <ReactiveObjC/ReactiveObjC.h>
 
-@interface JoystickView ()
+@interface JoystickArrowView ()
 
 @property (nonatomic, strong) UIImageView *bgImgView;
 @property (nonatomic, strong) UIImageView *thumbImgView;
 
-
 @end
 
-@implementation JoystickView
-
+@implementation JoystickArrowView
 
 - (instancetype)init
 {
     self = [super init];
 
     if (self) {
-
         self.bgImgView = [[UIImageView alloc] initWithFrame:CGRectZero];
         [self addSubview:self.bgImgView];
         [self.bgImgView mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -67,7 +65,7 @@
                      animations:^{
         @strongify(self);
         self.thumbImgView.center = CGPointMake(CGRectGetMidX(self.bounds), CGRectGetMidY(self.bounds));
-        self.callback(CGPointMake(0, 0));
+//        self.callback(CGPointMake(0, 0));
     }];
 }
 
@@ -77,7 +75,7 @@
                      animations:^{
         @strongify(self);
         self.thumbImgView.center = CGPointMake(CGRectGetMidX(self.bounds), CGRectGetMidY(self.bounds));
-        self.callback(CGPointMake(0, 0));
+//        self.callback(CGPointMake(0, 0));
     }];
 }
 
@@ -93,7 +91,7 @@
                          animations:^{
             @strongify(self);
             self.thumbImgView.center = CGPointMake(CGRectGetMidX(self.bounds), CGRectGetMidY(self.bounds));
-            self.callback(CGPointMake(0, 0));
+//            self.callback(CGPointMake(0, 0));
         }];
     }
 }
@@ -122,9 +120,9 @@
 
     self.thumbImgView.center = movePoint;
 
-    if (self.callback) {
-        self.callback(CGPointMake((movePoint.x - radius) / radius, (movePoint.y - radius) / radius));
-    }
+//    if (self.callback) {
+//        self.callback(CGPointMake((movePoint.x - radius) / radius, (movePoint.y - radius) / radius));
+//    }
 }
 
 @end
