@@ -5,14 +5,16 @@
 //  Created by a水 on 2024/8/9.
 //
 
-#import "JoystickArrowView.h"
 #import <Masonry/Masonry.h>
 #import <ReactiveObjC/ReactiveObjC.h>
+#import "JoystickArrowView.h"
 
 @interface JoystickArrowView ()
 
 @property (nonatomic, strong) UIImageView *bgImgView;
 @property (nonatomic, strong) UIImageView *thumbImgView;
+
+@property (nonatomic, assign) Direction _d;
 
 @end
 
@@ -40,6 +42,8 @@
         self.bgImgView.userInteractionEnabled = YES;
         UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
         [self.bgImgView addGestureRecognizer:pan];
+
+        self._d = DirectionNormal;
     }
 
     return self;
@@ -65,8 +69,16 @@
                      animations:^{
         @strongify(self);
         self.thumbImgView.center = CGPointMake(CGRectGetMidX(self.bounds), CGRectGetMidY(self.bounds));
-//        self.callback(CGPointMake(0, 0));
+
+        [self reset];
     }];
+}
+
+- (void)reset {
+    if (self.callback) {
+        self.callback(self._d, DirectionNormal);
+        self._d = DirectionNormal;
+    }
 }
 
 - (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
@@ -75,7 +87,8 @@
                      animations:^{
         @strongify(self);
         self.thumbImgView.center = CGPointMake(CGRectGetMidX(self.bounds), CGRectGetMidY(self.bounds));
-//        self.callback(CGPointMake(0, 0));
+
+        [self reset];
     }];
 }
 
@@ -91,7 +104,8 @@
                          animations:^{
             @strongify(self);
             self.thumbImgView.center = CGPointMake(CGRectGetMidX(self.bounds), CGRectGetMidY(self.bounds));
-//            self.callback(CGPointMake(0, 0));
+
+            [self reset];
         }];
     }
 }
@@ -120,9 +134,23 @@
 
     self.thumbImgView.center = movePoint;
 
-//    if (self.callback) {
-//        self.callback(CGPointMake((movePoint.x - radius) / radius, (movePoint.y - radius) / radius));
-//    }
+    // Calculate the angle of the touch point
+    CGFloat dx = movePoint.x - circleCenter.x;
+    CGFloat dy = movePoint.y - circleCenter.y;
+    CGFloat angle = atan2(dy, dx) + M_PI; // atan2 returns value between -π and π, so we add π to make it between 0 and 2π
+
+    // Determine which segment the angle falls into
+    CGFloat segmentAngle = 2 * M_PI / 8; // 8 equal segments
+
+    NSInteger segmentIndex = (NSInteger)floor(angle / segmentAngle);
+
+    if (self._d != (Direction)segmentIndex) {
+        if (self.callback) {
+            self.callback(self._d, (Direction)segmentIndex);
+        }
+
+        self._d = (Direction)segmentIndex;
+    }
 }
 
 @end

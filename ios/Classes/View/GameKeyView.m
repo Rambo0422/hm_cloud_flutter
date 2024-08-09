@@ -10,6 +10,7 @@
 #import "GameButton.h"
 #import "GameKeyView.h"
 #import "HmCloudTool.h"
+#import "JoystickArrowView.h"
 #import "JoystickView.h"
 #import "SanA_Macro.h"
 
@@ -33,10 +34,41 @@
     for (KeyModel *m in keyList) {
         switch (m.key_type) {
             case KEY_kb_rock_letter:{
+                JoystickArrowView *joy = [[JoystickArrowView alloc] init];
+                joy.bgImg = k_BundleImage(@"key_joy_wasd");
+                joy.thumbImg = k_BundleImage(@"key_joy_thumb_normal");
+                joy.callback = ^(Direction oldD, Direction newD) {
+                    NSLog(@"%lu, %lu", (unsigned long)oldD, (unsigned long)newD);
+
+
+                    [self configCustomKeyList:oldD new:newD isArrow:NO];
+                };
+                [self addSubview:joy];
+
+                [joy mas_makeConstraints:^(MASConstraintMaker *make) {
+                    make.top.equalTo(@(m.top));
+                    make.left.equalTo(@(m.left));
+                    make.size.mas_equalTo(CGSizeMake(m.width, m.height));
+                }];
             }
             break;
 
             case KEY_kb_rock_arrow:{
+                JoystickArrowView *joy = [[JoystickArrowView alloc] init];
+                joy.bgImg = k_BundleImage(@"key_joy_arrow");
+                joy.thumbImg = k_BundleImage(@"key_joy_thumb_normal");
+
+                joy.callback = ^(Direction oldD, Direction newD) {
+                    [self configCustomKeyList:oldD new:newD isArrow:YES];
+                };
+
+                [self addSubview:joy];
+
+                [joy mas_makeConstraints:^(MASConstraintMaker *make) {
+                    make.top.equalTo(@(m.top));
+                    make.left.equalTo(@(m.left));
+                    make.size.mas_equalTo(CGSizeMake(m.width, m.height));
+                }];
             }
             break;
 
@@ -148,6 +180,254 @@
         make.left.equalTo(@(m.left));
         make.size.mas_equalTo(CGSizeMake(m.width, m.height));
     }];
+}
+
+- (void)configCustomKeyList:(Direction)oldD new:(Direction)newD isArrow:(BOOL)isArrow {
+    //                    NSDictionary *xDict = @{
+    //                            @"inputState": @1,
+    //                            @"inputOp": @(1027),
+    //                            @"value": @((int)roundf(point.x * 32767))
+    //                    };
+
+    // w = 87, a = 65, s = 83, d = 68
+    // ↑ = 38, ← = 37, ↓ = 40, → = 39
+
+    NSInteger top = isArrow ? 38 : 87;
+    NSInteger left = isArrow ? 37 : 65;
+    NSInteger bottom = isArrow ? 40 : 83;
+    NSInteger right = isArrow ? 39 : 68;
+
+    NSMutableArray<NSDictionary *> *dictArr = [NSMutableArray array];
+
+    if (oldD != DirectionNormal) {
+        /// 如果old不是默认值，则要发一个old的抬起
+        /// w，a，s，d，wa，wd，sa，sd
+        /// ↑，↓，←，→，↖，↗，↙，↘
+        switch (oldD) {
+            case DirectionTop:{
+                [dictArr addObject:@{
+                     @"inputState": @3,
+                     @"inputOp": @(top),
+                     @"value": @(0)
+                }];
+            }
+
+
+
+            break;
+
+            case DirectionTopRight:{
+                [dictArr addObject:@{
+                     @"inputState": @3,
+                     @"inputOp": @(top),
+                     @"value": @(0)
+                }];
+
+                [dictArr addObject:@{
+                     @"inputState": @3,
+                     @"inputOp": @(right),
+                     @"value": @(0)
+                }];
+            }
+
+            break;
+
+            case DirectionRight:{
+                [dictArr addObject:@{
+                     @"inputState": @3,
+                     @"inputOp": @(right),
+                     @"value": @(0)
+                }];
+            }
+
+            break;
+
+            case DirectionBottomRight:{
+                [dictArr addObject:@{
+                     @"inputState": @3,
+                     @"inputOp": @(right),
+                     @"value": @(0)
+                }];
+
+                [dictArr addObject:@{
+                     @"inputState": @3,
+                     @"inputOp": @(bottom),
+                     @"value": @(0)
+                }];
+            }
+
+            break;
+
+            case DirectionBottom:{
+                [dictArr addObject:@{
+                     @"inputState": @3,
+                     @"inputOp": @(bottom),
+                     @"value": @(0)
+                }];
+            }
+
+            break;
+
+            case DirectionBottomLeft:{
+                [dictArr addObject:@{
+                     @"inputState": @3,
+                     @"inputOp": @(bottom),
+                     @"value": @(0)
+                }];
+                [dictArr addObject:@{
+                     @"inputState": @3,
+                     @"inputOp": @(left),
+                     @"value": @(0)
+                }];
+            }
+
+            break;
+
+            case DirectionLeft:{
+                [dictArr addObject:@{
+                     @"inputState": @3,
+                     @"inputOp": @(left),
+                     @"value": @(0)
+                }];
+            }
+
+            break;
+
+            case DirectionTopLeft:{
+                [dictArr addObject:@{
+                     @"inputState": @3,
+                     @"inputOp": @(left),
+                     @"value": @(0)
+                }];
+                [dictArr addObject:@{
+                     @"inputState": @3,
+                     @"inputOp": @(top),
+                     @"value": @(0)
+                }];
+            }
+
+            break;
+
+            default:
+                break;
+        }
+    }
+
+    if (newD != DirectionNormal) {
+        /// 如果old不是默认值，则要发一个old的抬起
+        /// w，a，s，d，wa，wd，sa，sd
+        /// ↑，↓，←，→，↖，↗，↙，↘
+        switch (newD) {
+            case DirectionTop:{
+                [dictArr addObject:@{
+                     @"inputState": @2,
+                     @"inputOp": @(top),
+                     @"value": @(0)
+                }];
+            }
+
+
+
+            break;
+
+            case DirectionTopRight:{
+                [dictArr addObject:@{
+                     @"inputState": @2,
+                     @"inputOp": @(top),
+                     @"value": @(0)
+                }];
+
+                [dictArr addObject:@{
+                     @"inputState": @2,
+                     @"inputOp": @(right),
+                     @"value": @(0)
+                }];
+            }
+
+            break;
+
+            case DirectionRight:{
+                [dictArr addObject:@{
+                     @"inputState": @2,
+                     @"inputOp": @(right),
+                     @"value": @(0)
+                }];
+            }
+
+            break;
+
+            case DirectionBottomRight:{
+                [dictArr addObject:@{
+                     @"inputState": @2,
+                     @"inputOp": @(right),
+                     @"value": @(0)
+                }];
+
+                [dictArr addObject:@{
+                     @"inputState": @2,
+                     @"inputOp": @(bottom),
+                     @"value": @(0)
+                }];
+            }
+
+            break;
+
+            case DirectionBottom:{
+                [dictArr addObject:@{
+                     @"inputState": @2,
+                     @"inputOp": @(bottom),
+                     @"value": @(0)
+                }];
+            }
+
+            break;
+
+            case DirectionBottomLeft:{
+                [dictArr addObject:@{
+                     @"inputState": @2,
+                     @"inputOp": @(bottom),
+                     @"value": @(0)
+                }];
+                [dictArr addObject:@{
+                     @"inputState": @2,
+                     @"inputOp": @(left),
+                     @"value": @(0)
+                }];
+            }
+
+            break;
+
+            case DirectionLeft:{
+                [dictArr addObject:@{
+                     @"inputState": @2,
+                     @"inputOp": @(left),
+                     @"value": @(0)
+                }];
+            }
+
+            break;
+
+            case DirectionTopLeft:{
+                [dictArr addObject:@{
+                     @"inputState": @2,
+                     @"inputOp": @(left),
+                     @"value": @(0)
+                }];
+                [dictArr addObject:@{
+                     @"inputState": @2,
+                     @"inputOp": @(top),
+                     @"value": @(0)
+                }];
+            }
+
+            break;
+
+            default:
+                break;
+        }
+    }
+
+    [[HmCloudTool share] sendCustomKey:dictArr];
 }
 
 - (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {

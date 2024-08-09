@@ -9,10 +9,25 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef enum : NSUInteger {
+    DirectionLeft,
+    DirectionTopLeft,
+    DirectionTop,
+    DirectionTopRight,
+    DirectionRight,
+    DirectionBottomRight,
+    DirectionBottom,
+    DirectionBottomLeft,
+    DirectionNormal,
+} Direction;
+
+typedef void (^DirectionCallback)(Direction oldD, Direction newD);
+
 @interface JoystickArrowView : UIView
 
 @property (nonatomic, strong) UIImage *bgImg;
 @property (nonatomic, strong) UIImage *thumbImg;
+@property (nonatomic, strong) DirectionCallback callback;
 
 @end
 
