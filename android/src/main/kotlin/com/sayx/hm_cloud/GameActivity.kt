@@ -105,6 +105,8 @@ class GameActivity : AppCompatActivity() {
     private var inputTimer: Timer? = null
     private var pinCodeTimer: Timer? = null
 
+    private var live = false
+
     // 声音控制
     private val audioManager: AudioManager by lazy {
         getSystemService(Context.AUDIO_SERVICE) as AudioManager
@@ -388,19 +390,25 @@ class GameActivity : AppCompatActivity() {
                 LogUtils.d("onLiveInteractionChange:$status")
                 val cloudId = HmcpManager.getInstance().cloudId
                 if (status) {
-                    // 开启直播
-                    val liveUrl = "rtmp://push-cg.3ayx.net/live/$cloudId"
-                    GameManager.gameView
-                        ?.startLiving(cloudId, liveUrl, object : OnLivingListener {
-                            override fun start(success: Boolean, msg: String?) {
-                                LogUtils.d("startLiving:$success, $msg, url:$liveUrl")
-                                GameManager.openInteraction(cloudId, true)
-                            }
+                    if (live) {
+                        GameManager.openInteraction(cloudId, true)
+                    } else {
+                        // 开启直播
+                        val liveUrl = "rtmp://push-cg.3ayx.net/live/$cloudId"
+                        GameManager.gameView
+                            ?.startLiving(cloudId, liveUrl, object : OnLivingListener {
+                                override fun start(success: Boolean, msg: String?) {
+                                    LogUtils.d("startLiving:$success, $msg, url:$liveUrl")
+                                    live = true
+                                    GameManager.openInteraction(cloudId, true)
+                                }
 
-                            override fun stop(success: Boolean, msg: String?) {
-                                LogUtils.d("startLiving:$success, $msg")
-                            }
-                        })
+                                override fun stop(success: Boolean, msg: String?) {
+                                    live = false
+                                    LogUtils.d("startLiving:$success, $msg")
+                                }
+                            })
+                    }
                 } else {
                     // 停止直播
                     GameManager.openInteraction(cloudId, false)
