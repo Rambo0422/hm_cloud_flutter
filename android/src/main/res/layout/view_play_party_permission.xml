@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:gravity="center">
+
+    <LinearLayout
+        android:layout_width="335dp"
+        android:layout_height="32dp"
+        android:background="@drawable/img_game_off_notice_bg"
+        android:gravity="center">
+
+        <Space
+            android:layout_width="25dp"
+            android:layout_height="wrap_content" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/iv_user_avatar"
+            android:layout_width="20dp"
+            android:layout_height="20dp" />
+
+        <TextView
+            android:id="@+id/tv_nick_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:text="@string/app_name"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tv_message"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_weight="1"
+            android:text="申请游戏控制权(60s)"
+            android:textColor="#C6EC4B"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <com.noober.background.view.BLTextView
+            android:id="@+id/btn_agree"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="9dp"
+            android:paddingVertical="2dp"
+            android:text="同意"
+            android:textColor="#C6EC4B"
+            android:textSize="12sp"
+            app:bl_corners_radius="10.5dp"
+            app:bl_stroke_color="#58652B"
+            app:bl_stroke_width="1dp" />
+
+        <Space
+            android:layout_width="25dp"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <Space
+        android:layout_width="16dp"
+        android:layout_height="wrap_content" />
+
+    <ImageView
+        android:id="@+id/btn_close"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:src="@drawable/img_play_party_permission_close" />
+</LinearLayout>

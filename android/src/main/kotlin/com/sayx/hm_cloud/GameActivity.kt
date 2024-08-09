@@ -20,8 +20,11 @@ import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
 import android.view.animation.ScaleAnimation
 import android.widget.FrameLayout
+import android.widget.LinearLayout.LayoutParams
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.databinding.DataBindingUtil
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.SPUtils
@@ -56,9 +59,13 @@ import com.sayx.hm_cloud.dialog.GameErrorDialog
 import com.sayx.hm_cloud.model.ControllerChangeEvent
 import com.sayx.hm_cloud.model.ControllerConfigEvent
 import com.sayx.hm_cloud.model.ControllerEditEvent
+import com.sayx.hm_cloud.model.ExitGameEvent
 import com.sayx.hm_cloud.model.GameErrorEvent
 import com.sayx.hm_cloud.model.KeyInfo
 import com.sayx.hm_cloud.model.PCMouseEvent
+import com.sayx.hm_cloud.model.PartyPlayWantPlay
+import com.sayx.hm_cloud.model.PlayPartyRoomInfoEvent
+import com.sayx.hm_cloud.model.PlayPartyRoomSoundAndMicrophoneStateEvent
 import com.sayx.hm_cloud.utils.AppSizeUtils
 import com.sayx.hm_cloud.utils.GameUtils
 import com.sayx.hm_cloud.widget.AddGamepadKey
@@ -67,6 +74,11 @@ import com.sayx.hm_cloud.widget.ControllerEditLayout
 import com.sayx.hm_cloud.widget.EditCombineKey
 import com.sayx.hm_cloud.widget.EditRouletteKey
 import com.sayx.hm_cloud.widget.GameSettings
+import com.sayx.hm_cloud.widget.PlayPartyGameView
+import com.sayx.hm_cloud.widget.PlayPartyPermissionView
+import com.sayx.hm_cloud.widget.PlayPartyUserAvatarView
+import com.sayx.hm_cloud.widget.PlayPartyWantPlayView
+import me.jessyan.autosize.utils.AutoSizeUtils
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -91,6 +103,9 @@ class GameActivity : AppCompatActivity() {
 
     // 编辑状态无响应处理
     private var inputTimer: Timer? = null
+    private var pinCodeTimer: Timer? = null
+
+    private var live = false
 
     // 声音控制
     private val audioManager: AudioManager by lazy {
@@ -205,6 +220,42 @@ class GameActivity : AppCompatActivity() {
 
         // 初始化设置面板
         initGameSettings()
+
+        if (GameManager.isPartyPlay) {
+            if (GameManager.isPartyPlayOwner) {
+                startUpdatePinCode()
+                GameManager.queryControlUsers()
+            }
+            GameManager.sendCurrentCid()
+            initPlayPartyView()
+        }
+    }
+
+    private var playPartyGameView: PlayPartyGameView? = null
+    private var playPartyUser: PlayPartyUserAvatarView? = null
+
+    private fun initPlayPartyView() {
+        playPartyGameView = PlayPartyGameView(this)
+        playPartyGameView?.visibility = View.GONE
+        // 将设置面板控件加入主面板
+        val layoutParams = FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+        dataBinding.layoutGame.addView(playPartyGameView, layoutParams)
+
+        // 右上角派对吧用户头像
+        playPartyUser = PlayPartyUserAvatarView(this)
+        // 将设置面板控件加入主面板
+        playPartyUser?.layoutParams = FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        ).apply {
+            gravity = Gravity.END or Gravity.TOP
+            marginEnd = AutoSizeUtils.dp2px(this@GameActivity, 56f)
+            topMargin = AutoSizeUtils.dp2px(this@GameActivity, 6f)
+        }
+        dataBinding.layoutGame.addView(playPartyUser)
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -291,8 +342,12 @@ class GameActivity : AppCompatActivity() {
         dataBinding.layoutGame.post {
             dataBinding.layoutGame.addView(gameSettings, layoutParams)
         }
+
         // 页面初始化完成，获取数据根据数据进行同步处理
         GameManager.getGameData()
+        if (GameManager.isPartyPlay) {
+            GameManager.updatePlayPartyRoomInfo()
+        }
     }
 
     private fun configSettingCallback() {
@@ -335,19 +390,25 @@ class GameActivity : AppCompatActivity() {
                 LogUtils.d("onLiveInteractionChange:$status")
                 val cloudId = HmcpManager.getInstance().cloudId
                 if (status) {
-                    // 开启直播
-                    val liveUrl = "rtmp://push-cg.3ayx.net/live/$cloudId"
-                    GameManager.gameView
-                        ?.startLiving(cloudId, liveUrl, object : OnLivingListener {
-                            override fun start(success: Boolean, msg: String?) {
-                                LogUtils.d("startLiving:$success, $msg, url:$liveUrl")
-                                GameManager.openInteraction(cloudId, true)
-                            }
+                    if (live) {
+                        GameManager.openInteraction(cloudId, true)
+                    } else {
+                        // 开启直播
+                        val liveUrl = "rtmp://push-cg.3ayx.net/live/$cloudId"
+                        GameManager.gameView
+                            ?.startLiving(cloudId, liveUrl, object : OnLivingListener {
+                                override fun start(success: Boolean, msg: String?) {
+                                    LogUtils.d("startLiving:$success, $msg, url:$liveUrl")
+                                    live = true
+                                    GameManager.openInteraction(cloudId, true)
+                                }
 
-                            override fun stop(success: Boolean, msg: String?) {
-                                LogUtils.d("startLiving:$success, $msg")
-                            }
-                        })
+                                override fun stop(success: Boolean, msg: String?) {
+                                    live = false
+                                    LogUtils.d("startLiving:$success, $msg")
+                                }
+                            })
+                    }
                 } else {
                     // 停止直播
                     GameManager.openInteraction(cloudId, false)
@@ -398,6 +459,10 @@ class GameActivity : AppCompatActivity() {
 
             override fun updateNetSignal(icon: Int) {
                 dataBinding.btnGameSettings.setImageResource(icon)
+            }
+
+            override fun onShowPlayParty() {
+                playPartyGameView?.show()
             }
         }
     }
@@ -961,35 +1026,55 @@ class GameActivity : AppCompatActivity() {
     }
 
     override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
-//        LogUtils.d("$this->dispatchTouchEvent:$event")
-        if (dataBinding.btnGameSettings.visibility == View.VISIBLE) {
-            dataBinding.gameController.controllerType = GameManager.lastControllerType
-            gameSettings?.controllerType = GameManager.lastControllerType
+        LogUtils.d("$this->dispatchTouchEvent:$event")
+        event?.let {
+            if (GameUtils.isGamePadEvent(it)) {
+                LogUtils.d("游戏手柄输入:$it")
+                dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
+                gameSettings?.controllerType = AppVirtualOperateType.NONE
+            } else if (GameUtils.isKeyBoardEvent(it)) {
+                LogUtils.d("游戏键盘输入:$it")
+                dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
+                gameSettings?.controllerType = AppVirtualOperateType.NONE
+            } else if (GameUtils.isMouseEvent(it)) {
+                LogUtils.d("游戏鼠标输入:$it")
+                dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
+                gameSettings?.controllerType = AppVirtualOperateType.NONE
+            } else {
+                LogUtils.d("其他输入:$it")
+                if (dataBinding.btnGameSettings.visibility == View.VISIBLE) {
+                    dataBinding.gameController.controllerType = GameManager.lastControllerType
+                    gameSettings?.controllerType = GameManager.lastControllerType
+                }
+            }
         }
         return super.dispatchTouchEvent(event)
     }
 
     override fun dispatchGenericMotionEvent(event: MotionEvent?): Boolean {
-//        LogUtils.d("$this->dispatchGenericMotionEvent:$event")
+        LogUtils.d("$this->dispatchGenericMotionEvent:$event")
         event?.let {
             if (GameUtils.isGamePadEvent(it)) {
-//                LogUtils.d("游戏手柄输入:$it")
+                LogUtils.d("游戏手柄输入:$it")
                 dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
                 gameSettings?.controllerType = AppVirtualOperateType.NONE
             } else if (GameUtils.isKeyBoardEvent(it)) {
-//                LogUtils.d("游戏键盘输入:$it")
+                LogUtils.d("游戏键盘输入:$it")
                 dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
                 gameSettings?.controllerType = AppVirtualOperateType.NONE
             } else if (GameUtils.isMouseEvent(it)) {
-//                LogUtils.d("游戏鼠标输入:$it")
+                LogUtils.d("游戏鼠标输入:$it")
                 dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
                 gameSettings?.controllerType = AppVirtualOperateType.NONE
+            } else {
+                LogUtils.d("其他输入:$it")
             }
         }
         return super.dispatchGenericMotionEvent(event)
     }
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+//        LogUtils.d("$this->dispatchKeyEvent:$event")
         event.let {
             if (GameUtils.isGamePadEvent(it)) {
                 //                LogUtils.d("游戏手柄输入:$it")
@@ -1032,11 +1117,103 @@ class GameActivity : AppCompatActivity() {
         } catch (e: Exception) {
             LogUtils.e("exitCustom:${e.message}")
         }
+
+        stopUpdatePinCode()
+
         EventBus.getDefault().unregister(this)
 //        GameManager.gameView?.onDestroy()
 //        if (GameManager.isPlaying) {
 //            GameManager.exitGame(mutableMapOf(Pair("action", "")))
 //        }
         super.onDestroy()
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onPlayPartyRoomInfoEvent(event: PlayPartyRoomInfoEvent) {
+        val roomInfo = event.roomInfo
+        val controlInfos = event.controlInfos
+        playPartyGameView?.onPlayPartyRoomInfoEvent(roomInfo, controlInfos)
+
+        // 判断我自己是否有权限，如果没权限，就显示，有权限就隐藏
+        val position = controlInfos.find {
+            it.uid == GameManager.userId
+        }?.position ?: 0
+        if (position == 0) {
+            initWantPlayView()
+        } else {
+            // 如果有权限，则需要removeView
+            dataBinding.gameController.findViewById<View>(wantPlayViewId)?.let {
+                dataBinding.gameController.removeView(it)
+            }
+        }
+
+        playPartyUser?.setUserInfo(roomInfo, controlInfos)
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onPartyPlayWantPlay(partyPlayWantPlay: PartyPlayWantPlay) {
+        showPlayPartyPermissionView(partyPlayWantPlay)
+        // 同时派对吧游戏页面去申请权限
+        playPartyGameView?.onPartyPlayWantPlay(partyPlayWantPlay)
+    }
+
+    private val wantPlayViewId = View.generateViewId()
+
+    private fun initWantPlayView() {
+        // 校验是否已经拥有
+        val view = dataBinding.gameController.findViewById<View>(wantPlayViewId)
+        if (view != null) {
+            return
+        }
+
+        val partyWantPlayView = PlayPartyWantPlayView(this)
+        partyWantPlayView.id = wantPlayViewId
+        // 将 textView 添加到 ConstraintLayout
+        dataBinding.gameController.addView(partyWantPlayView)
+    }
+
+    private fun showPlayPartyPermissionView(partyPlayWantPlay: PartyPlayWantPlay) {
+        val permissionView = PlayPartyPermissionView(partyPlayWantPlay, this).apply {
+            layoutParams = ConstraintLayout.LayoutParams(
+                LayoutParams.WRAP_CONTENT,
+                LayoutParams.WRAP_CONTENT
+            ).apply {
+                endToEnd = ConstraintSet.PARENT_ID
+                topToTop = ConstraintSet.PARENT_ID
+                startToStart = ConstraintSet.PARENT_ID
+            }
+        }
+
+        dataBinding.gameController.addView(permissionView)
+        permissionView.show()
+    }
+
+    // 一分钟更新一次pinCode
+    private fun startUpdatePinCode() {
+        if (pinCodeTimer == null) {
+            pinCodeTimer = Timer()
+            val task = object : TimerTask() {
+                override fun run() {
+                    GameManager.getPinCode()
+                }
+            }
+            pinCodeTimer?.schedule(task, 0, 60000)
+        }
+    }
+
+    private fun stopUpdatePinCode() {
+        pinCodeTimer?.cancel()
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onPlayPartyExitGame(event: ExitGameEvent) {
+        GameManager.releasePlayPartyGame()
+        gameSettings?.release()
+        finish()
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onPlayPartyRoomSoundAndMicrophoneStateEvent(event: PlayPartyRoomSoundAndMicrophoneStateEvent) {
+        playPartyGameView?.setSoundAndMicrophoneState(event.soundState, event.microphoneState)
     }
 }

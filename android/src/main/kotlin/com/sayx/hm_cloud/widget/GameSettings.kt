@@ -160,6 +160,10 @@ class GameSettings @JvmOverloads constructor(
                 gameSettingChangeListener?.onShowVipDialog()
             }
         }
+        dataBinding.btnPlayParty.setOnClickListener {
+            hideLayout()
+            gameSettingChangeListener?.onShowPlayParty()
+        }
         // 鼠标点击
         dataBinding.btnMouseClick.setOnClickListener {
             if (!mouseModeEditable) {
@@ -251,12 +255,24 @@ class GameSettings @JvmOverloads constructor(
                 gameSettingChangeListener?.onImageQualityChange(list.first())
             }
         }
+
         // 时间处理
         this.playTime = userPeakTime
         updateAvailableTime(userPeakTime)
         this.currentPlayTime = gamePlayTime / 1000L
         LogUtils.d("playTime=$userPeakTime, currentPlayTime=$currentPlayTime")
-        startCountTime()
+        // 如果是派对吧，且如果是游客，则不显示游戏倒计时
+
+        if (GameManager.isPartyPlay) {
+            if (GameManager.isPartyPlayOwner) {
+                startCountTime()
+            }
+            dataBinding.btnPlayParty.visibility = View.VISIBLE
+        } else {
+            startCountTime()
+            // 当前不是派对吧的情况下，隐藏派对吧条目
+            dataBinding.btnPlayParty.visibility = View.GONE
+        }
         initStatusListener()
     }
 

@@ -25,7 +25,8 @@ data class GameParam(
     var mute: Boolean,
     var gameId: String,
     var accountInfo: Any?,
-    var isPeakChannel: Boolean
+    var isPeakChannel: Boolean,
+    var isPartyGame: Boolean
 ) {
     fun isVip(): Boolean {
         return vipExpiredTime > realTime
@@ -50,6 +51,7 @@ data class GameParam(
                 arguments["gameId"] as String? ?: "",
                 arguments["accountInfo"],
                 arguments["isPeakChannel"] as Boolean? ?: false,
+                arguments["isPartyGame"] as Boolean? ?: false,
             )
         }
 

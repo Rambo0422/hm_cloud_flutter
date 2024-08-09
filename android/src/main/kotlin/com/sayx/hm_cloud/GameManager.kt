@@ -2,7 +2,6 @@ package com.sayx.hm_cloud
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
@@ -13,6 +12,8 @@ import com.google.gson.JsonObject
 import com.haima.hmcp.Constants
 import com.haima.hmcp.HmcpManager
 import com.haima.hmcp.beans.CheckCloudServiceResult
+import com.haima.hmcp.beans.Control
+import com.haima.hmcp.beans.ControlInfo
 import com.haima.hmcp.beans.IntentExtraData
 import com.haima.hmcp.beans.PlayNotification
 import com.haima.hmcp.beans.UserInfo
@@ -22,6 +23,7 @@ import com.haima.hmcp.enums.ErrorType
 import com.haima.hmcp.enums.NetWorkState
 import com.haima.hmcp.enums.ScreenOrientation
 import com.haima.hmcp.listeners.HmcpPlayerListener
+import com.haima.hmcp.listeners.OnContronListener
 import com.haima.hmcp.listeners.OnGameIsAliveListener
 import com.haima.hmcp.listeners.OnInitCallBackListener
 import com.haima.hmcp.listeners.OnSaveGameCallBackListener
@@ -38,10 +40,11 @@ import com.sayx.hm_cloud.utils.GameUtils
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import org.greenrobot.eventbus.EventBus
+import org.json.JSONArray
 import org.json.JSONObject
 
 @SuppressLint("StaticFieldLeak")
-object GameManager : HmcpPlayerListener {
+object GameManager : HmcpPlayerListener, OnContronListener {
 
     private lateinit var channel: MethodChannel
 
@@ -74,6 +77,9 @@ object GameManager : HmcpPlayerListener {
 
     var needReattach = false
 
+    // 是否是派对吧
+    var isPartyPlay = false
+    var isPartyPlayOwner = false
     fun init(channel: MethodChannel, context: Activity) {
         this.channel = channel
         this.activity = context
@@ -100,6 +106,12 @@ object GameManager : HmcpPlayerListener {
             Constants.IS_DEBUG = false
             Constants.IS_ERROR = false
             Constants.IS_INFO = false
+
+            this.isPartyPlay = gameParam?.isPartyGame ?: false
+            this.isPartyPlayOwner = isPartyPlay
+            this.roomIndex = 0
+            this.userId = gameParam?.userId ?: ""
+
 //            Log.e("CloudGame", "init haiMaSDK:${gameParam?.accessKeyId}")
             LogUtils.d("init haiMaSDK:${gameParam?.accessKeyId}")
             HmcpManager.getInstance().init(config, activity, object : OnInitCallBackListener {
@@ -130,7 +142,6 @@ object GameManager : HmcpPlayerListener {
                     Pair("cid", HmcpManager.getInstance().cloudId),
                 )
             )
-
         }
     }
 
@@ -369,39 +380,47 @@ object GameManager : HmcpPlayerListener {
                 Constants.STATUS_GET_CONTRON_ERROR,
                     // 42,接⼊⽅连接服务端结束游戏
                 Constants.STATUS_OPERATION_STATE_CHANGE_REASON -> {
-                    // 各类游戏中断状态下，获取errorCode,errorMsg展示
-                    val dataStr = data.getString(StatusCallbackUtil.DATA)
-                    LogUtils.d("errorInfo:$dataStr")
-                    var errorCode = ""
-                    var errorMsg = ""
-                    if (dataStr is String && !TextUtils.isEmpty(dataStr)) {
-                        val resultData = gson.fromJson(dataStr, Map::class.java)
-                        var errorCodeWithoutCid = ""
-                        try {
-                            errorCodeWithoutCid =
-                                if (resultData["errorCodeWithoutCid"].toString() == "null") "$status" else resultData["errorCodeWithoutCid"].toString()
-                        } catch (e: Exception) {
-                            LogUtils.e("${e.message}")
-                        }
-                        errorCode =
-                            if (TextUtils.isEmpty(errorCodeWithoutCid)) "$status" else errorCodeWithoutCid
-                        try {
-                            errorMsg =
-                                if (resultData["errorMessage"].toString() == "null") resultData["errorMsg"].toString() else resultData["errorMessage"].toString()
-                        } catch (e: Exception) {
-                            LogUtils.e("${e.message}")
-                        }
+                    if (!isPartyPlay || (isPartyPlay && isPartyPlayOwner)) {
+                        statusOperationStateChangeReason(data, status)
+                    } else {
+                        LogUtils.d("这里只有一种情况，当前是派对吧，但是是游客")
                     }
-                    EventBus.getDefault().post(GameErrorEvent(errorCode, errorMsg))
-                    channel.invokeMethod(
-                        "errorInfo",
-                        mapOf(Pair("errorCode", errorCode), Pair("errorMsg", errorMsg))
-                    )
                 }
 
                 else -> {}
             }
         }
+    }
+
+    fun statusOperationStateChangeReason(data: JSONObject, status: Int) {
+        // 各类游戏中断状态下，获取errorCode,errorMsg展示
+        val dataStr = data.getString(StatusCallbackUtil.DATA)
+        LogUtils.d("errorInfo:$dataStr")
+        var errorCode = ""
+        var errorMsg = ""
+        if (dataStr is String && !TextUtils.isEmpty(dataStr)) {
+            val resultData = gson.fromJson(dataStr, Map::class.java)
+            var errorCodeWithoutCid = ""
+            try {
+                errorCodeWithoutCid =
+                    if (resultData["errorCodeWithoutCid"].toString() == "null") "$status" else resultData["errorCodeWithoutCid"].toString()
+            } catch (e: Exception) {
+                LogUtils.e("${e.message}")
+            }
+            errorCode =
+                if (TextUtils.isEmpty(errorCodeWithoutCid)) "$status" else errorCodeWithoutCid
+            try {
+                errorMsg =
+                    if (resultData["errorMessage"].toString() == "null") resultData["errorMsg"].toString() else resultData["errorMessage"].toString()
+            } catch (e: Exception) {
+                LogUtils.e("${e.message}")
+            }
+        }
+        EventBus.getDefault().post(GameErrorEvent(errorCode, errorMsg))
+        channel.invokeMethod(
+            "errorInfo",
+            mapOf(Pair("errorCode", errorCode), Pair("errorMsg", errorMsg))
+        )
     }
 
     /// 游戏云游直播开关
@@ -644,5 +663,198 @@ object GameManager : HmcpPlayerListener {
                 }
             }
         )
+    }
+
+    fun releasePlayPartyGame() {
+        gameView?.onDestroy()
+        gameView = null
+        isPlaying = false
+        inQueue = false
+        isVideoShowed = false
+    }
+
+    override fun pinCodeResult(success: Boolean, cid: String?, pinCode: String?, msg: String?) {
+        if (success && !TextUtils.isEmpty(pinCode) && !TextUtils.isEmpty(cid)) {
+            val map = hashMapOf<String, String>()
+            map["pinCode"] = pinCode ?: ""
+            map["cid"] = cid ?: ""
+            channel.invokeMethod("pinCodeResult", map)
+        }
+    }
+
+    override fun contronResult(success: Boolean, msg: String?) {
+        LogUtils.d("contronResult success: $success msg: $msg")
+//        channel.invokeMethod("contronResult", msg)
+    }
+
+    override fun contronLost() {
+//        LogUtils.d("contronLost")
+//        channel.invokeMethod("contronLost", null)
+    }
+
+    override fun controlDistribute(success: Boolean, controlInfo: MutableList<ControlInfo>?, msg: String?) {
+        val controlInfos = controlInfo ?: emptyList()
+        channel.invokeMethod("controlDistribute", gson.toJson(controlInfos))
+    }
+
+    override fun controlQuery(success: Boolean, controlInfos: MutableList<ControlInfo>?, msg: String?) {
+        if (success) {
+            val jsonArray = JSONArray()
+            controlInfos?.forEach { controlInfo ->
+                val jsonObject = JSONObject()
+                jsonObject.put("position", controlInfo.position)
+                jsonObject.put("cid", controlInfo.cid.toString())
+                jsonArray.put(jsonObject)
+            }
+            channel.invokeMethod("controlInfos", jsonArray.toString())
+        }
+    }
+
+    /**
+     * 获取授权码
+     */
+    fun getPinCode() {
+        gameView?.getPinCode(this)
+    }
+
+    /**
+     * 查询当前房间内的⽤户
+     */
+    fun queryControlUsers() {
+        gameView?.queryControlPermitUsers(this)
+    }
+
+    var initState = false
+    var roomIndex = -1
+    var userId = ""
+
+    /**
+     * 派对吧情况下才会用的到
+     * 主要提供给游客，因为游客初始之前是并没有初始化的
+     */
+    fun initHmcpSdk(arguments: Map<*, *>) {
+        isPartyPlay = true
+        isPartyPlayOwner = false
+
+        val accessKeyId = arguments["accessKeyId"]?.toString() ?: ""
+        val channel = arguments["channel"]?.toString() ?: "android"
+        val cid = arguments["cid"]?.toString() ?: ""
+        val pinCode = arguments["pinCode"]?.toString() ?: ""
+        val userId = arguments["userId"]?.toString() ?: ""
+        val userToken = arguments["userToken"]?.toString() ?: ""
+        val roomIndex = (arguments["roomIndex"] as? Int) ?: -1
+
+        this.userId = userId
+        this.roomIndex = roomIndex
+
+        if (initState) {
+            controlPlay(cid, pinCode, accessKeyId, userId, userToken)
+        } else {
+            val config = Bundle().apply {
+                putString(HmcpManager.ACCESS_KEY_ID, accessKeyId)
+                putString(HmcpManager.CHANNEL_ID, "app_cloud_game")
+            }
+            HmcpManager.getInstance().init(config, activity, object : OnInitCallBackListener {
+                override fun success() {
+                    initState = true
+                    controlPlay(cid, pinCode, accessKeyId, userId, userToken)
+                }
+
+                override fun fail(msg: String?) {
+                    initState = false
+                }
+            }, true)
+        }
+    }
+
+    fun controlPlay(cid: String, pinCode: String, accessKeyID: String, userId: String, userToken: String) {
+        val userInfo = UserInfo()
+        userInfo.userId = userId
+        userInfo.userToken = userToken
+        initHmcpView(userInfo)
+
+        // 选择流类型。 0：表示RTMP  1：表示WEBRTC
+        val streamType = 1
+
+        // 获取控制权参数对象
+        val control = Control()
+        control.cid = cid
+        control.pinCode = pinCode
+        control.accessKeyID = accessKeyID
+        control.isIPV6 = false
+        control.orientation = ScreenOrientation.LANDSCAPE
+
+        gameView?.contronPlay(streamType, control, this)
+    }
+
+    private fun initHmcpView(userInfo: UserInfo) {
+        gameView = HmcpVideoView(activity)
+        gameView?.setUserInfo(userInfo)
+
+        gameView?.hmcpPlayerListener = this
+        gameView?.virtualDeviceType = VirtualOperateType.NONE
+        // 默认静音启动，隐藏云端操作
+        gameView?.setAudioMute(true)
+    }
+
+    fun sendCurrentCid() {
+        val cloudId = HmcpManager.getInstance().cloudId
+        val cidArr = JSONObject().apply {
+            put("index", roomIndex)
+            put("uid", userId)
+            put("cid", cloudId)
+        }
+        channel.invokeMethod("cidArr", cidArr.toString())
+    }
+
+    /**
+     * 设置派对吧每个用户的操作权限
+     */
+    fun distributeControlPermit(arguments: JSONArray) {
+        val list = arrayListOf<ControlInfo>()
+        for (i in 0 until arguments.length()) {
+            val jsonObject = arguments.getJSONObject(i)
+            val controlInfo = ControlInfo().apply {
+                cid = jsonObject.getString("cid").toLong()
+                position = jsonObject.getInt("position")
+            }
+            list.add(controlInfo)
+        }
+
+        if (list.isNotEmpty()) {
+            gameView?.distributeControlPermit(list, this)
+        }
+    }
+
+    fun wantPlay(uid: String) {
+        channel.invokeMethod("wantPlay", uid)
+    }
+
+    fun closeUserPlay(uid: String) {
+        channel.invokeMethod("closeUserPlay", uid)
+    }
+
+    fun letPlay(uid: String) {
+        channel.invokeMethod("letPlay", uid)
+    }
+
+    fun updatePlayPartyRoomInfo() {
+        channel.invokeMethod("updatePlayPartyRoomInfo", null)
+    }
+
+    fun changePositionStatus(position: Int, isLock: Boolean) {
+        val changePositionStatusData = JSONObject().apply {
+            put("position", position)
+            put("isLock", isLock)
+        }.toString()
+        channel.invokeMethod("changePositionStatus", changePositionStatusData)
+    }
+
+    fun setPlayPartySoundAndMicrophone(arguments: String) {
+        channel.invokeMethod("playPartySoundAndMicrophone", arguments)
+    }
+
+    fun kickOutUser(arguments: String) {
+        channel.invokeMethod("kickOutUser", arguments)
     }
 }

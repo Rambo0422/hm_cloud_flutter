@@ -46,6 +46,10 @@ class HmCloudController {
     methodChannel.invokeMethod("controllerEditFail");
   }
 
+  void controlPlay(params) {
+    methodChannel.invokeMethod("controlPlay", params);
+  }
+
   void closePage() {
     methodChannel.invokeMethod("closePage");
   }
@@ -58,7 +62,35 @@ class HmCloudController {
     return methodChannel.invokeMethod('queryControlUsers', null);
   }
 
+  void distributeControl(String controlInfos) {
+    methodChannel.invokeMethod('distributeControl', controlInfos);
+  }
+
+  void testPage() {
+    methodChannel.invokeMethod('test', null);
+  }
+
+  void sendPlaypartyInfo(Map<String, dynamic> params) {
+    methodChannel.invokeMethod('playPartyInfo', params);
+  }
+
+  /// 游客向房主申请游玩权限
+  void requestWantPlayPermission(Map<String, dynamic> wantPlayParams) {
+    methodChannel.invokeMethod('requestWantPlayPermission', wantPlayParams);
+  }
+
   Future<void> exitQueue() {
     return methodChannel.invokeMethod('exitQueue', null);
+  }
+
+  void exitGame() {
+    methodChannel.invokeMethod('exitGame', null);
+  }
+
+  void updatePlayPartySoundAndMicrophoneState(Map<String, bool> params) {
+    methodChannel.invokeMethod(
+      'updatePlayPartySoundAndMicrophoneState',
+      params,
+    );
   }
 }
