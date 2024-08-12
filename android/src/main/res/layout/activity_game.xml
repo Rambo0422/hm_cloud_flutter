@@ -23,8 +23,8 @@
         <!-- 水印 -->
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/iv_watermark"
-            android:layout_width="80dp"
-            android:layout_height="20dp"
+            android:layout_width="83dp"
+            android:layout_height="18.5dp"
             android:layout_marginStart="21.5dp"
             android:layout_marginTop="10dp"
             android:alpha="0.3"
