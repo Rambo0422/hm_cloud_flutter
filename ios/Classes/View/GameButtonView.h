@@ -6,16 +6,15 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "KeyModel.h"
+#import "BaseKeyView.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 typedef void (^TouchUpCallback)(NSArray<NSDictionary *> *keyList);
 typedef void (^TouchDownCallback)(NSArray<NSDictionary *> *keyList);
 
-@interface GameButton : UIButton
+@interface GameButtonView : BaseKeyView
 
-@property (nonatomic, strong) KeyModel *m;
 @property (nonatomic, strong) TouchUpCallback upCallback;
 @property (nonatomic, strong) TouchDownCallback downCallback;
 

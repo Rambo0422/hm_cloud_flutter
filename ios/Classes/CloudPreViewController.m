@@ -6,13 +6,14 @@
 //
 
 #import "CloudPreViewController.h"
+#import "CustomKeyViewController.h"
+#import "CustomSelectViewController.h"
 #import "CustomSlider.h"
 #import "GameDetailsModel.h"
 #import "GameKeyView.h"
 #import "GameKeyView.h"
 #import "HmCloudTool.h"
 #import "RequestTool.h"
-
 
 @interface CloudPreViewController ()
 
@@ -41,6 +42,7 @@
 @property (weak, nonatomic) IBOutlet SPButton *joystickBtn;
 @property (weak, nonatomic) IBOutlet SPButton *keyboardBtn;
 @property (weak, nonatomic) IBOutlet SPButton *vibrationBtn;
+@property (weak, nonatomic) IBOutlet SPButton *customBtn;
 
 // 鼠标设置开关
 @property (weak, nonatomic) IBOutlet UISwitch *modeSwitch;
@@ -160,6 +162,13 @@
         self.keyboardBtn.selected = self.currentOperation == 1;
     }];
 
+    [[self.customBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
+        @strongify(self);
+
+        [self hideSetView];
+
+        [self pushCustomKeyController];
+    }];
 
     [[self.joystickBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
         @strongify(self);
@@ -270,7 +279,7 @@
 
     self.fuzhiBtn.layer.cornerRadius = 3.0;
 
-    self.keyView = [[GameKeyView alloc] init];
+    self.keyView = [[GameKeyView alloc] initWithEdit:NO];
     [self.view insertSubview:self.keyView atIndex:0];
 
     [self.keyView mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -403,6 +412,35 @@
     }];
 }
 
+- (void)pushCustomKeyController {
+    CustomSelectViewController *vc = [[CustomSelectViewController alloc] initWithNibName:@"CustomSelectViewController"
+                                                                                  bundle:k_SanABundle];
+
+    vc.modalPresentationStyle = UIModalPresentationCustom;
+    vc.transitioningDelegate = self;
+    @weakify(self);
+    vc.selectCallback = ^(CustomType type) {
+        @strongify(self);
+        CustomKeyViewController *vc = [[CustomKeyViewController alloc] initWithNibName:@"CustomKeyViewController"
+                                                                                bundle:k_SanABundle];
+        vc.modalPresentationStyle = UIModalPresentationCustom;
+        vc.transitioningDelegate = self;
+        vc.type = type;
+        vc.dismissCallback = ^(BOOL isSave) {
+            self.keyView.hidden = NO;
+        };
+        [self presentViewController:vc
+                           animated:YES
+                         completion:nil];
+
+        self.keyView.hidden = YES;
+    };
+
+    [self presentViewController:vc
+                       animated:YES
+                     completion:nil];
+}
+
 - (IBAction)didTapSet:(id)sender {
     [self hideSetView];
 }
@@ -426,19 +464,6 @@
 - (void)refreshfps:(NSInteger)fps ms:(NSInteger)ms rate:(float)rate packetLoss:(float)packetLoss {
     self.ms = ms;
     self.packetLoss = packetLoss;
-}
-
-- (UIRectEdge)preferredScreenEdgesDeferringSystemGestures {
-    return UIRectEdgeAll;
-}
-
-- (BOOL)shouldAutorotate {
-    return YES;
-}
-
-- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-    // 如果该界面需要支持横竖屏切换
-    return UIInterfaceOrientationMaskLandscapeRight;
 }
 
 - (void)dealloc {

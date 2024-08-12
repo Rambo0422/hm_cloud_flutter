@@ -6,6 +6,7 @@
 //
 
 #import "CrossView.h"
+#import "HmCloudTool.h"
 #import "SanA_Macro.h"
 
 @interface CrossView ()
@@ -18,14 +19,13 @@
 
 @implementation CrossView
 
-- (instancetype)init
-{
-    self = [super init];
+- (instancetype)initWithEidt:(BOOL)isEdit {
+    self = [super initWithEidt:isEdit];
 
     if (self) {
         self.imageView = [[UIImageView alloc] initWithFrame:CGRectZero];
         self.imageView.image = k_BundleImage(@"key_cross_normal");
-        [self addSubview:self.imageView];
+        [self.contentView addSubview:self.imageView];
 
         [self.imageView mas_makeConstraints:^(MASConstraintMaker *make) {
             make.edges.equalTo(@0);
@@ -44,30 +44,88 @@
         ];
 
         self.opList = @[@4, @5, @1, @9, @8, @10, @2, @6];
+
+        UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
+        [self addGestureRecognizer:pan];
+
+        if (!self.isEdit) {
+            UILongPressGestureRecognizer *longGe = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLong:)];
+            longGe.minimumPressDuration = 0; // 设置为 0，立即触发
+            [self addGestureRecognizer:longGe];
+        }
     }
 
     return self;
 }
 
-- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    UITouch *touch = [touches anyObject];
-    CGPoint point = [touch locationInView:self];
+- (void)handleLong:(UILongPressGestureRecognizer *)longGe {
+    if (longGe.state == UIGestureRecognizerStateBegan) {
+        // 触发中等震动
+        if ([HmCloudTool share].isVibration) {
+            UIImpactFeedbackGenerator *mediumImpact = [[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleMedium];
+            [mediumImpact impactOccurred];
+        }
 
-    [self updateImg:point];
+        CGPoint location = [longGe locationInView:self];
+
+        [self updateImg:location];
+    } else if (longGe.state == UIGestureRecognizerStateEnded || longGe.state == UIGestureRecognizerStateCancelled) {
+        // 在手势结束时将中心视图移回圆心
+
+        self.imageView.image = k_BundleImage(@"key_cross_normal");
+        self.callback(@0);
+    }
 }
 
-- (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    UITouch *touch = [touches anyObject];
-    CGPoint point = [touch locationInView:self];
+- (void)handlePan:(UIPanGestureRecognizer *)gestureRecognizer {
+    if (self.isEdit) {
+        // 获取拖拽的位移
+        CGPoint translation = [gestureRecognizer translationInView:self.superview];
 
-    [self updateImg:point];
+        // 根据拖拽的位移更新视图的位置
+        self.center = CGPointMake(self.center.x + translation.x, self.center.y + translation.y);
+
+        // 重置拖拽手势的累积位移
+        [gestureRecognizer setTranslation:CGPointZero inView:self.superview];
+
+        // 如果手势已经结束，可能需要处理其他逻辑
+        if (gestureRecognizer.state == UIGestureRecognizerStateEnded) {
+            // 可以在这里添加手势结束后的处理逻辑，例如检测视图是否拖出了屏幕
+            // 或者实现回弹动画等
+        }
+    } else {
+        CGPoint location = [gestureRecognizer locationInView:self];
+
+
+        [self updateImg:location];
+
+        // 在手势结束时将中心视图移回圆心
+        if (gestureRecognizer.state == UIGestureRecognizerStateEnded) {
+            self.imageView.image = k_BundleImage(@"key_cross_normal");
+            self.callback(@0);
+        }
+    }
 }
 
-- (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    self.imageView.image = k_BundleImage(@"key_cross_normal");
-    self.callback(@0);
-}
-
+//- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+//    UITouch *touch = [touches anyObject];
+//    CGPoint point = [touch locationInView:self];
+//
+//    [self updateImg:point];
+//}
+//
+//- (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+//    UITouch *touch = [touches anyObject];
+//    CGPoint point = [touch locationInView:self];
+//
+//    [self updateImg:point];
+//}
+//
+//- (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+//    self.imageView.image = k_BundleImage(@"key_cross_normal");
+//    self.callback(@0);
+//}
+//
 - (void)updateImg:(CGPoint)location {
     // Get the center of the circular view
     CGPoint center = CGPointMake(CGRectGetMidX(self.bounds), CGRectGetMidY(self.bounds));

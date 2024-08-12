@@ -5,14 +5,12 @@
 //  Created by 周智水 on 2023/1/6.
 //
 
-#import <Flutter/Flutter.h>
-#import <UIKit/UIKit.h>
-#import "SanA_Macro.h"
+#import "HM_BaseViewController.h"
 NS_ASSUME_NONNULL_BEGIN
 
 
 
-@interface CloudPreViewController : UIViewController
+@interface CloudPreViewController : HM_BaseViewController
 
 @property (nonatomic, strong) UIViewController *gameVC;
 

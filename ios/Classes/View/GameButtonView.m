@@ -5,38 +5,90 @@
 //  Created by a水 on 2024/8/8.
 //
 
-#import "GameButton.h"
+#import "GameButtonView.h"
 #import "HmCloudTool.h"
 #import "SanA_Macro.h"
 
-@implementation GameButton
+@interface GameButtonView ()
 
-- (void)setM:(KeyModel *)m {
-    _m = m;
-    [self setBackgroundImage:k_BundleImage([self getImg:m isHigh:NO]) forState:UIControlStateNormal];
+@property (nonatomic, strong) UIButton *btn;
 
-    [self setBackgroundImage:k_BundleImage([self getImg:m isHigh:YES]) forState:UIControlStateHighlighted];
+@end
 
-    [self setBackgroundImage:k_BundleImage([self getImg:m isHigh:YES]) forState:UIControlStateSelected];
+@implementation GameButtonView
 
-    [self setTitle:m.text forState:UIControlStateNormal];
-    [self setTitleColor:[kColor(0xFFFFFF) colorWithAlphaComponent:0.6] forState:UIControlStateNormal];
-    self.titleLabel.font = [UIFont systemFontOfSize:9];
+- (instancetype)initWithEidt:(BOOL)isEdit {
+    self = [super initWithEidt:isEdit];
 
-    [self addTarget:self action:@selector(didTapTouchUp) forControlEvents:UIControlEventTouchUpInside];
-    [self addTarget:self action:@selector(didTapTouchDown) forControlEvents:UIControlEventTouchDown];
+    if (self) {
+        self.btn = [UIButton buttonWithType:UIButtonTypeCustom];
+        self.btn.frame = self.bounds;
+        self.btn.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        self.isEdit = isEdit;
+        [self.contentView addSubview:self.btn];
+    }
+
+    return self;
+}
+
+- (void)setModel:(KeyModel *)m {
+    [super setModel:m];
+    [self.btn setBackgroundImage:k_BundleImage([self getImg:m isHigh:NO]) forState:UIControlStateNormal];
+
+    [self.btn setBackgroundImage:k_BundleImage([self getImg:m isHigh:YES]) forState:UIControlStateHighlighted];
+
+    [self.btn setBackgroundImage:k_BundleImage([self getImg:m isHigh:YES]) forState:UIControlStateSelected];
+
+    @weakify(self);
+    [RACObserve(m, text) subscribeNext:^(id _Nullable x) {
+        @strongify(self);
+
+        [self.btn setTitle:m.text
+                  forState:UIControlStateNormal];
+    }];
+
+
+    [self.btn setTitleColor:[kColor(0xFFFFFF) colorWithAlphaComponent:0.6] forState:UIControlStateNormal];
+    self.btn.titleLabel.font = [UIFont systemFontOfSize:9];
+
+    if (self.isEdit) {
+        UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
+        [self addGestureRecognizer:pan];
+    } else {
+        [self.btn addTarget:self action:@selector(didTapTouchUp) forControlEvents:UIControlEventTouchUpInside];
+        [self.btn addTarget:self action:@selector(didTapTouchDown) forControlEvents:UIControlEventTouchDown];
+    }
+}
+
+- (void)handlePan:(UIPanGestureRecognizer *)gestureRecognizer {
+    // 获取拖拽的位移
+    CGPoint translation = [gestureRecognizer translationInView:self.superview];
+
+    // 根据拖拽的位移更新视图的位置
+    self.center = CGPointMake(self.center.x + translation.x, self.center.y + translation.y);
+
+    // 重置拖拽手势的累积位移
+    [gestureRecognizer setTranslation:CGPointZero inView:self.superview];
+
+    // 如果手势已经结束，可能需要处理其他逻辑
+    if (gestureRecognizer.state == UIGestureRecognizerStateEnded) {
+        // 可以在这里添加手势结束后的处理逻辑，例如检测视图是否拖出了屏幕
+        // 或者实现回弹动画等
+    }
+
+    return;
 }
 
 /// MARK: 手指抬起
 - (void)didTapTouchUp {
-    if (self.m.click == 1) {
-        if (self.isSelected) {
+    if (self.model.click == 1) {
+        if (self.btn.isSelected) {
             [self touchUp];
         } else {
             [self touchDown];
         }
 
-        self.selected = !self.selected;
+        self.btn.selected = !self.btn.selected;
     } else {
         [self touchUp];
     }
@@ -44,7 +96,7 @@
 
 /// MARK: 手指按下
 - (void)didTapTouchDown {
-    if (self.m.click == 1) {
+    if (self.model.click == 1) {
         return;
     }
 
@@ -54,13 +106,13 @@
 - (void)touchUp {
     NSDictionary *dict;
 
-    if ([self.m.type containsString:@"xbox-"]) {
+    if ([self.model.type containsString:@"xbox-"]) {
         // xbox 按键
-        if (self.m.inputOp == 1025 || self.m.inputOp == 1026) {
+        if (self.model.inputOp == 1025 || self.model.inputOp == 1026) {
             // LT RT 特殊按键
             dict = @{
                     @"inputState": @1,
-                    @"inputOp": @(self.m.inputOp),
+                    @"inputOp": @(self.model.inputOp),
                     @"value": @0
             };
         } else {
@@ -71,14 +123,14 @@
                     @"value": @(0)
             };
         }
-    } else if ([self.m.type containsString:@"kb-mouse"]) {
+    } else if ([self.model.type containsString:@"kb-mouse"]) {
         // 鼠标 按键
 
-        if (self.m.key_type == KEY_mouse_wheel_up || self.m.key_type == KEY_mouse_wheel_down) {
+        if (self.model.key_type == KEY_mouse_wheel_up || self.model.key_type == KEY_mouse_wheel_down) {
             // 滚轮滚动
             dict = @{
                     @"inputState": @1,
-                    @"inputOp": @(self.m.inputOp),
+                    @"inputOp": @(self.model.inputOp),
                     @"value": @0
             };
         } else {
@@ -86,14 +138,14 @@
 
             dict = @{
                     @"inputState": @3,
-                    @"inputOp": @(self.m.inputOp),
+                    @"inputOp": @(self.model.inputOp),
                     @"value": @0
             };
         }
     } else {
         dict = @{
                 @"inputState": @3,
-                @"inputOp": @(self.m.inputOp),
+                @"inputOp": @(self.model.inputOp),
                 @"value": @0
         };
     }
@@ -112,13 +164,13 @@
 
     NSDictionary *dict;
 
-    if ([self.m.type containsString:@"xbox-"]) {
+    if ([self.model.type containsString:@"xbox-"]) {
         // xbox 按键
-        if (self.m.inputOp == 1025 || self.m.inputOp == 1026) {
+        if (self.model.inputOp == 1025 || self.model.inputOp == 1026) {
             // LT RT 特殊按键
             dict = @{
                     @"inputState": @1,
-                    @"inputOp": @(self.m.inputOp),
+                    @"inputOp": @(self.model.inputOp),
                     @"value": @255
             };
         } else {
@@ -126,32 +178,32 @@
             dict = @{
                     @"inputState": @1,
                     @"inputOp": @1024,
-                    @"value": @(self.m.inputOp)
+                    @"value": @(self.model.inputOp)
             };
         }
-    } else if ([self.m.type containsString:@"kb-mouse"]) {
+    } else if ([self.model.type containsString:@"kb-mouse"]) {
         // 鼠标 按键
 
-        if (self.m.key_type == KEY_mouse_wheel_up || self.m.key_type == KEY_mouse_wheel_down) {
+        if (self.model.key_type == KEY_mouse_wheel_up || self.model.key_type == KEY_mouse_wheel_down) {
             // 滚轮滚动
             dict = @{
                     @"inputState": @1,
-                    @"inputOp": @(self.m.inputOp),
-                    @"value": (self.m.key_type == KEY_mouse_wheel_up) ? @1 : @-1
+                    @"inputOp": @(self.model.inputOp),
+                    @"value": (self.model.key_type == KEY_mouse_wheel_up) ? @1 : @-1
             };
         } else {
             // 左键 右键 中键
 
             dict = @{
                     @"inputState": @2,
-                    @"inputOp": @(self.m.inputOp),
+                    @"inputOp": @(self.model.inputOp),
                     @"value": @0
             };
         }
     } else {
         dict = @{
                 @"inputState": @2,
-                @"inputOp": @(self.m.inputOp),
+                @"inputOp": @(self.model.inputOp),
                 @"value": @0
         };
     }

@@ -6,12 +6,12 @@
 //
 
 #import <UIKit/UIKit.h>
-
+#import "BaseKeyView.h"
 NS_ASSUME_NONNULL_BEGIN
 
 typedef void (^CrossCallback)(NSNumber *op);
 
-@interface CrossView : UIView
+@interface CrossView : BaseKeyView
 
 @property (nonatomic, strong) CrossCallback callback;
 

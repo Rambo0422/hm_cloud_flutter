@@ -7,22 +7,35 @@
 
 
 #import "CrossView.h"
-#import "GameButton.h"
+#import "GameButtonView.h"
 #import "GameKeyView.h"
 #import "HmCloudTool.h"
 #import "JoystickArrowView.h"
 #import "JoystickView.h"
 #import "SanA_Macro.h"
 
+@interface GameKeyView () {
+    BOOL _isEdit;
+}
+
+@end
+
 @implementation GameKeyView
 
-/*
-   // Only override drawRect: if you perform custom drawing.
-   // An empty implementation adversely affects performance during animation.
-   - (void)drawRect:(CGRect)rect {
-    // Drawing code
-   }
- */
+- (instancetype)initWithEdit:(BOOL)isEdit
+{
+    self = [super init];
+
+    if (self) {
+        _isEdit = isEdit;
+    }
+
+    return self;
+}
+
+- (void)clear {
+    while (self.subviews.count > 0) [self.subviews.lastObject removeFromSuperview];
+}
 
 - (void)setKeyList:(NSArray<KeyModel *> *)keyList {
     _keyList = keyList;
@@ -34,15 +47,14 @@
     for (KeyModel *m in keyList) {
         switch (m.key_type) {
             case KEY_kb_rock_letter:{
-                JoystickArrowView *joy = [[JoystickArrowView alloc] init];
+                JoystickArrowView *joy = [[JoystickArrowView alloc] initWithEidt:_isEdit];
                 joy.bgImg = k_BundleImage(@"key_joy_wasd");
                 joy.thumbImg = k_BundleImage(@"key_joy_thumb_normal");
                 joy.callback = ^(Direction oldD, Direction newD) {
-                    NSLog(@"%lu, %lu", (unsigned long)oldD, (unsigned long)newD);
-
-
                     [self configCustomKeyList:oldD new:newD isArrow:NO];
                 };
+                joy.model = m;
+                joy.tapCallback = self.tapCallback;
                 [self addSubview:joy];
 
                 [joy mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -54,14 +66,14 @@
             break;
 
             case KEY_kb_rock_arrow:{
-                JoystickArrowView *joy = [[JoystickArrowView alloc] init];
+                JoystickArrowView *joy = [[JoystickArrowView alloc] initWithEidt:_isEdit];
                 joy.bgImg = k_BundleImage(@"key_joy_arrow");
                 joy.thumbImg = k_BundleImage(@"key_joy_thumb_normal");
-
+                joy.model = m;
                 joy.callback = ^(Direction oldD, Direction newD) {
                     [self configCustomKeyList:oldD new:newD isArrow:YES];
                 };
-
+                joy.tapCallback = self.tapCallback;
                 [self addSubview:joy];
 
                 [joy mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -73,9 +85,10 @@
             break;
 
             case KEY_kb_xobx_rock_lt:{
-                JoystickView *joy = [[JoystickView alloc] init];
+                JoystickView *joy = [[JoystickView alloc] initWithEidt:_isEdit];
                 joy.bgImg = k_BundleImage(@"key_xbox_rock");
                 joy.thumbImg = k_BundleImage(@"key_xbox_rock_thumb_l");
+                joy.model = m;
                 joy.callback = ^(CGPoint point) {
                     NSDictionary *xDict = @{
                             @"inputState": @1,
@@ -90,6 +103,7 @@
                     };
                     [[HmCloudTool share] sendCustomKey:@[xDict, yDict]];
                 };
+                joy.tapCallback = self.tapCallback;
                 [self addSubview:joy];
 
                 [joy mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -101,9 +115,10 @@
             break;
 
             case KEY_kb_xobx_rock_rt:{
-                JoystickView *joy = [[JoystickView alloc] init];
+                JoystickView *joy = [[JoystickView alloc] initWithEidt:_isEdit];
                 joy.bgImg = k_BundleImage(@"key_xbox_rock");
                 joy.thumbImg = k_BundleImage(@"key_xbox_rock_thumb_r");
+                joy.model = m;
                 joy.callback = ^(CGPoint point) {
                     NSDictionary *xDict = @{
                             @"inputState": @1,
@@ -119,6 +134,7 @@
 
                     [[HmCloudTool share] sendCustomKey:@[xDict, yDict]];
                 };
+                joy.tapCallback = self.tapCallback;
                 [self addSubview:joy];
 
                 [joy mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -130,7 +146,8 @@
             break;
 
             case KEY_kb_xobx_cross:{
-                CrossView *cross = [[CrossView alloc] init];
+                CrossView *cross = [[CrossView alloc] initWithEidt:_isEdit];
+                cross.model = m;
                 cross.callback = ^(NSNumber *_Nonnull op) {
                     NSDictionary *crossDict = @{
                             @"inputState": @1,
@@ -139,6 +156,7 @@
                     };
                     [[HmCloudTool share] sendCustomKey:@[crossDict]];
                 };
+                cross.tapCallback = self.tapCallback;
                 [self addSubview:cross];
                 [cross mas_makeConstraints:^(MASConstraintMaker *make) {
                     make.top.equalTo(@(m.top));
@@ -161,9 +179,11 @@
 }
 
 - (void)initKey:(KeyModel *)m {
-    GameButton *btn = [GameButton buttonWithType:UIButtonTypeCustom];
+    GameButtonView *btn = [[GameButtonView alloc] initWithEidt:_isEdit];
 
-    btn.m = m;
+    btn.model = m;
+
+    btn.tapCallback = self.tapCallback;
 
     btn.upCallback = ^(NSArray<NSDictionary *> *keyList) {
         [[HmCloudTool share] sendCustomKey:keyList];
@@ -183,12 +203,6 @@
 }
 
 - (void)configCustomKeyList:(Direction)oldD new:(Direction)newD isArrow:(BOOL)isArrow {
-    //                    NSDictionary *xDict = @{
-    //                            @"inputState": @1,
-    //                            @"inputOp": @(1027),
-    //                            @"value": @((int)roundf(point.x * 32767))
-    //                    };
-
     // w = 87, a = 65, s = 83, d = 68
     // ↑ = 38, ← = 37, ↓ = 40, → = 39
 
@@ -314,7 +328,7 @@
     }
 
     if (newD != DirectionNormal) {
-        /// 如果old不是默认值，则要发一个old的抬起
+        /// 如果new不是默认值，则要发一个new的按下
         /// w，a，s，d，wa，wd，sa，sd
         /// ↑，↓，←，→，↖，↗，↙，↘
         switch (newD) {

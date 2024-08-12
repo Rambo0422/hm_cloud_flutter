@@ -12,7 +12,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface GameKeyView : UIView
 
+- (instancetype)initWithEdit:(BOOL)isEdit;
+
+- (void)clear;
+
 @property (nonatomic, strong) NSArray<KeyModel *> *keyList;
+
+@property (nonatomic, strong) void (^ tapCallback)(KeyModel *m);
 
 @end
 

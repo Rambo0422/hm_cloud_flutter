@@ -15,7 +15,10 @@
 #import <ReactiveObjC/ReactiveObjC.h>
 #import <SPButton/SPButton.h>
 #import <SVProgressHUD/SVProgressHUD.h>
+#import "HmCloudTool.h"
+#import "HM_BaseViewController.h"
 #import "NSArray+Category.h"
+#import "RequestTool.h"
 #import "UIViewController+TopVc.h"
 
 #define k_changeSound       @"changeSound"
@@ -39,5 +42,11 @@
 #define kScreenH            [UIScreen mainScreen].bounds.size.height
 
 #define kColor(RGB)         [UIColor colorWithRed:((RGB >> 16) & 0x00FF) / 255. green:((RGB >> 8) & 0x00FF) / 255. blue:((RGB >> 0) & 0x00FF) / 255. alpha:1]
+
+
+typedef enum : NSUInteger {
+    Custom_keyboard,
+    Custom_joystick,
+} CustomType;
 
 #endif /* SanA_Macro_h */

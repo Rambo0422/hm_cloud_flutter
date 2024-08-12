@@ -6,7 +6,7 @@
 //
 
 #import <UIKit/UIKit.h>
-
+#import "BaseKeyView.h"
 NS_ASSUME_NONNULL_BEGIN
 
 typedef enum : NSUInteger {
@@ -23,7 +23,7 @@ typedef enum : NSUInteger {
 
 typedef void (^DirectionCallback)(Direction oldD, Direction newD);
 
-@interface JoystickArrowView : UIView
+@interface JoystickArrowView : BaseKeyView
 
 @property (nonatomic, strong) UIImage *bgImg;
 @property (nonatomic, strong) UIImage *thumbImg;

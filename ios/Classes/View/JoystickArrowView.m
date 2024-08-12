@@ -20,28 +20,26 @@
 
 @implementation JoystickArrowView
 
-- (instancetype)init
-{
-    self = [super init];
+- (instancetype)initWithEidt:(BOOL)isEdit {
+    self = [super initWithEidt:isEdit];
 
     if (self) {
         self.bgImgView = [[UIImageView alloc] initWithFrame:CGRectZero];
-        [self addSubview:self.bgImgView];
+        [self.contentView addSubview:self.bgImgView];
         [self.bgImgView mas_makeConstraints:^(MASConstraintMaker *make) {
             make.edges.equalTo(@0);
         }];
 
         self.thumbImgView = [[UIImageView alloc] initWithFrame:CGRectZero];
-        [self addSubview:self.thumbImgView];
+        [self.contentView addSubview:self.thumbImgView];
         [self.thumbImgView mas_makeConstraints:^(MASConstraintMaker *make) {
             make.centerX.equalTo(@0);
             make.centerY.equalTo(@0);
         }];
 
         // 添加拖动手势识别器
-        self.bgImgView.userInteractionEnabled = YES;
         UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
-        [self.bgImgView addGestureRecognizer:pan];
+        [self addGestureRecognizer:pan];
 
         self._d = DirectionNormal;
     }
@@ -57,23 +55,6 @@
     self.thumbImgView.image = thumbImg;
 }
 
-- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    CGPoint location = [[touches anyObject] locationInView:self];
-
-    [self updateCenterViewPositionWithLocation:location];
-}
-
-- (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    @weakify(self);
-    [UIView animateWithDuration:0.1
-                     animations:^{
-        @strongify(self);
-        self.thumbImgView.center = CGPointMake(CGRectGetMidX(self.bounds), CGRectGetMidY(self.bounds));
-
-        [self reset];
-    }];
-}
-
 - (void)reset {
     if (self.callback) {
         self.callback(self._d, DirectionNormal);
@@ -81,32 +62,38 @@
     }
 }
 
-- (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    @weakify(self);
-    [UIView animateWithDuration:0.1
-                     animations:^{
-        @strongify(self);
-        self.thumbImgView.center = CGPointMake(CGRectGetMidX(self.bounds), CGRectGetMidY(self.bounds));
-
-        [self reset];
-    }];
-}
-
 - (void)handlePan:(UIPanGestureRecognizer *)gestureRecognizer {
-    CGPoint location = [gestureRecognizer locationInView:self];
+    if (self.isEdit) {
+        // 获取拖拽的位移
+        CGPoint translation = [gestureRecognizer translationInView:self.superview];
 
-    @weakify(self);
-    [self updateCenterViewPositionWithLocation:location];
+        // 根据拖拽的位移更新视图的位置
+        self.center = CGPointMake(self.center.x + translation.x, self.center.y + translation.y);
 
-    // 在手势结束时将中心视图移回圆心
-    if (gestureRecognizer.state == UIGestureRecognizerStateEnded) {
-        [UIView animateWithDuration:0.1
-                         animations:^{
-            @strongify(self);
-            self.thumbImgView.center = CGPointMake(CGRectGetMidX(self.bounds), CGRectGetMidY(self.bounds));
+        // 重置拖拽手势的累积位移
+        [gestureRecognizer setTranslation:CGPointZero inView:self.superview];
 
-            [self reset];
-        }];
+        // 如果手势已经结束，可能需要处理其他逻辑
+        if (gestureRecognizer.state == UIGestureRecognizerStateEnded) {
+            // 可以在这里添加手势结束后的处理逻辑，例如检测视图是否拖出了屏幕
+            // 或者实现回弹动画等
+        }
+    } else {
+        CGPoint location = [gestureRecognizer locationInView:self];
+
+        @weakify(self);
+        [self updateCenterViewPositionWithLocation:location];
+
+        // 在手势结束时将中心视图移回圆心
+        if (gestureRecognizer.state == UIGestureRecognizerStateEnded) {
+            [UIView animateWithDuration:0.1
+                             animations:^{
+                @strongify(self);
+                self.thumbImgView.center = CGPointMake(CGRectGetMidX(self.bounds), CGRectGetMidY(self.bounds));
+
+                [self reset];
+            }];
+        }
     }
 }
 

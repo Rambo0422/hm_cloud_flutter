@@ -60,6 +60,34 @@
     }
 }
 
+- (void)pushPreView {
+    if (!self.vc) {
+        self.vc = [[CloudPreViewController alloc] initWithNibName:@"CloudPreViewController" bundle:k_SanABundle];
+        self.vc.gameVC = self.gameVC;
+
+        __weak typeof(self) weakSelf = self;
+
+        self.vc.didDismiss = ^{
+            typeof(self) strongSelf = weakSelf;
+            [strongSelf stop];
+
+            if (strongSelf.delegate) {
+                [strongSelf.delegate sendToFlutter:ActionExitGame params:@{ @"action": @1 }];
+            }
+        };
+
+        self.vc.pushFlutter = ^{
+            typeof(self) strongSelf = weakSelf;
+            [strongSelf.delegate sendToFlutter:ActionOpenPage
+                                        params:@{ @"arguments": @{ @"type": @"rechargeTime",
+                                                                   @"from": @"native" },
+                                                  @"route": @"/rechargeCenter" }];
+        };
+
+        [[UIViewController topViewController] presentViewController:self.vc animated:YES completion:nil];
+    }
+}
+
 #pragma mark - CloudPlayer Delegate Function
 - (void)cloudPlayerSceneChangedCallback:(NSDictionary *)dict {
     if (!dict || ![dict isKindOfClass:[NSDictionary class]]) {
@@ -194,32 +222,7 @@
 
     if ([state isEqualToString:@"videoVisible"]) {
         [[HMCloudPlayer sharedCloudPlayer] cloudSetTouchModel:self.touchMode];
-
-        if (!self.vc) {
-            self.vc = [[CloudPreViewController alloc] initWithNibName:@"CloudPreViewController" bundle:k_SanABundle];
-            self.vc.gameVC = self.gameVC;
-
-            __weak typeof(self) weakSelf = self;
-
-            self.vc.didDismiss = ^{
-                typeof(self) strongSelf = weakSelf;
-                [strongSelf stop];
-
-                if (strongSelf.delegate) {
-                    [strongSelf.delegate sendToFlutter:ActionExitGame params:@{ @"action": @1 }];
-                }
-            };
-
-            self.vc.pushFlutter = ^{
-                typeof(self) strongSelf = weakSelf;
-                [strongSelf.delegate sendToFlutter:ActionOpenPage
-                                            params:@{ @"arguments": @{ @"type": @"rechargeTime",
-                                                                       @"from": @"native" },
-                                                      @"route": @"/rechargeCenter" }];
-            };
-
-            [[UIViewController topViewController] presentViewController:self.vc animated:YES completion:nil];
-        }
+//        [self pushPreView];
     }
 
     if ([state isEqualToString:@"stopped"]) {
@@ -337,6 +340,9 @@
 
 // MARK: 初始化gameVC
 - (void)initGameVC {
+    [self pushPreView];
+    return;
+
     dispatch_async(dispatch_get_main_queue(), ^{
         NSDictionary *dict = @{
                 @"uid": self.userId,
