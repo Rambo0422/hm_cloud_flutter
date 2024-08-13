@@ -16,6 +16,7 @@ import com.sayx.hm_cloud.callback.OnPositionChangeListener
 import com.sayx.hm_cloud.constants.ControllerStatus
 import com.sayx.hm_cloud.constants.controllerStatus
 import com.sayx.hm_cloud.databinding.ViewCombineKeyBinding
+import com.sayx.hm_cloud.utils.AppSizeUtils
 import com.sayx.hm_cloud.utils.AppVibrateUtils
 import kotlin.math.sqrt
 
@@ -98,9 +99,9 @@ class CombineKeyView @JvmOverloads constructor(
                 MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> {
                     isPressed = false
                     if (controllerStatus == ControllerStatus.Edit) {
-                        val location = IntArray(2)
-                        getLocationOnScreen(location)
-                        positionListener?.onPositionChange(location[0], location[1])
+                        val position = IntArray(4)
+                        val location = AppSizeUtils.getLocationOnScreen(this, position)
+                        positionListener?.onPositionChange(location[0], location[1], location[2],  location[3])
                         if (!isDrag) {
                             performClick()
                         }

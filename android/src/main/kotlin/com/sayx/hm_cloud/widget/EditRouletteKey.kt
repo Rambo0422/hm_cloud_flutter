@@ -190,8 +190,10 @@ class EditRouletteKey @JvmOverloads constructor(
             addKeyListener?.onAddKey(
                 KeyInfo(
                     UUID.randomUUID(),
-                    AppSizeUtils.designHeight / 2 - 40,
-                    AppSizeUtils.designWidth / 2 - 50,
+                    AppSizeUtils.DESIGN_WIDTH / 2 - 50,
+                    AppSizeUtils.DESIGN_HEIGHT / 2 - 40,
+                    0,
+                    0,
                     100,
                     60,
                     context.getString(R.string.roulette_key),

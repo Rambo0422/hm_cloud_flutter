@@ -2,7 +2,7 @@ package com.sayx.hm_cloud.widget
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +11,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.core.view.get
+import androidx.core.view.marginLeft
 import androidx.databinding.DataBindingUtil
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.SizeUtils
@@ -343,13 +344,15 @@ class GameController @JvmOverloads constructor(
                 }
             })
         rockerView.positionChangeListener = object : OnPositionChangeListener {
-            override fun onPositionChange(left: Int, top: Int) {
+            override fun onPositionChange(left: Int, top: Int, right: Int, bottom: Int) {
                 if (controllerStatus == ControllerStatus.Edit) {
                     currentKey = keyInfo
                     currentKey?.let { info ->
                         info.changePosition(
-                            AppSizeUtils.reconvertLeftSize(left),
-                            AppSizeUtils.reconvertTopSize(top)
+                            AppSizeUtils.reconvertWidthSize(left),
+                            AppSizeUtils.reconvertHeightSize(top),
+                            AppSizeUtils.reconvertWidthSize(right),
+                            AppSizeUtils.reconvertHeightSize(bottom),
                         )
                         listener?.onEditKeyClick(info)
                     }
@@ -360,8 +363,8 @@ class GameController @JvmOverloads constructor(
         rockerView.tag = keyInfo.id
         rockerView.alpha = keyInfo.opacity / 100f
         val layoutParams = FrameLayout.LayoutParams(
-            SizeUtils.dp2px(keyInfo.getWidth()),
-            SizeUtils.dp2px(keyInfo.getHeight())
+            AppSizeUtils.convertHeightSize(keyInfo.getWidth().toInt()),
+            AppSizeUtils.convertHeightSize(keyInfo.getHeight().toInt())
         )
         if (controllerType == AppVirtualOperateType.APP_STICK_XBOX) {
             gamepadViews.add(rockerView)
@@ -370,8 +373,19 @@ class GameController @JvmOverloads constructor(
         }
         addView(rockerView, layoutParams)
         rockerView.post {
-            rockerView.x = AppSizeUtils.convertLeftSize(keyInfo.left)
-            rockerView.y = AppSizeUtils.convertTopSize(keyInfo.top)
+            val x = if (keyInfo.left < keyInfo.right || keyInfo.right == 0) {
+                keyInfo.left
+            } else {
+                0
+            }
+            val y = if (keyInfo.top < keyInfo.bottom || keyInfo.bottom == 0) {
+                keyInfo.top
+            } else {
+                0
+            }
+            LogUtils.d("left:${keyInfo.left}, right:${keyInfo.right}, x:$x, y:$y")
+            rockerView.x = AppSizeUtils.convertWidthSize(x).toFloat()
+            rockerView.y = AppSizeUtils.convertHeightSize(y).toFloat()
         }
         return rockerView
     }
@@ -515,13 +529,15 @@ class GameController @JvmOverloads constructor(
             }
         }
         rockerView.positionChangeListener = object : OnPositionChangeListener {
-            override fun onPositionChange(left: Int, top: Int) {
+            override fun onPositionChange(left: Int, top: Int, right: Int, bottom: Int) {
                 if (controllerStatus == ControllerStatus.Edit) {
                     currentKey = keyInfo
                     currentKey?.let { info ->
                         info.changePosition(
-                            AppSizeUtils.reconvertLeftSize(left),
-                            AppSizeUtils.reconvertTopSize(top)
+                            AppSizeUtils.reconvertWidthSize(left),
+                            AppSizeUtils.reconvertHeightSize(top),
+                            AppSizeUtils.reconvertWidthSize(right),
+                            AppSizeUtils.reconvertHeightSize(bottom),
                         )
                         listener?.onEditKeyClick(info)
                     }
@@ -532,8 +548,8 @@ class GameController @JvmOverloads constructor(
         rockerView.tag = keyInfo.id
         rockerView.alpha = keyInfo.opacity / 100f
         val layoutParams = FrameLayout.LayoutParams(
-            SizeUtils.dp2px(keyInfo.getWidth()),
-            SizeUtils.dp2px(keyInfo.getHeight())
+            AppSizeUtils.convertHeightSize(keyInfo.getWidth().toInt()),
+            AppSizeUtils.convertHeightSize(keyInfo.getHeight().toInt())
         )
         if (controllerType == AppVirtualOperateType.APP_STICK_XBOX) {
             gamepadViews.add(rockerView)
@@ -542,8 +558,19 @@ class GameController @JvmOverloads constructor(
         }
         addView(rockerView, layoutParams)
         rockerView.post {
-            rockerView.x = AppSizeUtils.convertLeftSize(keyInfo.left)
-            rockerView.y = AppSizeUtils.convertTopSize(keyInfo.top)
+            val x = if (keyInfo.left < keyInfo.right || keyInfo.right == 0) {
+                keyInfo.left
+            } else {
+                0
+            }
+            val y = if (keyInfo.top < keyInfo.bottom || keyInfo.bottom == 0) {
+                keyInfo.top
+            } else {
+                0
+            }
+            LogUtils.d("left:${keyInfo.left}, right:${keyInfo.right}, x:$x, y:$y")
+            rockerView.x = AppSizeUtils.convertWidthSize(x).toFloat()
+            rockerView.y = AppSizeUtils.convertHeightSize(y).toFloat()
         }
         return rockerView
     }
@@ -552,7 +579,7 @@ class GameController @JvmOverloads constructor(
      * 创建并添加按键控件到操作面板
      */
     private fun addKeyButton(keyInfo: KeyInfo): KeyView {
-//        LogUtils.d("addKeyButton:$keyInfo")
+        LogUtils.d("addKeyButton:$keyInfo")
         val keyView = KeyView(context)
         keyView.setKeyInfo(keyInfo)
         keyView.isClickable = true
@@ -584,13 +611,15 @@ class GameController @JvmOverloads constructor(
             }
         }
         keyView.positionListener = object : OnPositionChangeListener {
-            override fun onPositionChange(left: Int, top: Int) {
+            override fun onPositionChange(left: Int, top: Int, right: Int, bottom: Int) {
                 if (controllerStatus == ControllerStatus.Edit) {
                     currentKey = keyInfo
                     currentKey?.let { info ->
                         info.changePosition(
-                            AppSizeUtils.reconvertLeftSize(left),
-                            AppSizeUtils.reconvertTopSize(top)
+                            AppSizeUtils.reconvertWidthSize(left),
+                            AppSizeUtils.reconvertHeightSize(top),
+                            AppSizeUtils.reconvertWidthSize(right),
+                            AppSizeUtils.reconvertHeightSize(bottom),
                         )
                         listener?.onEditKeyClick(info)
                     }
@@ -601,8 +630,8 @@ class GameController @JvmOverloads constructor(
         keyView.tag = keyInfo.id
         keyView.alpha = keyInfo.opacity / 100f
         val layoutParams = FrameLayout.LayoutParams(
-            SizeUtils.dp2px(keyInfo.getWidth()),
-            SizeUtils.dp2px(keyInfo.getHeight())
+            AppSizeUtils.convertHeightSize(keyInfo.getWidth().toInt()),
+            AppSizeUtils.convertHeightSize(keyInfo.getHeight().toInt())
         )
         if (controllerType == AppVirtualOperateType.APP_STICK_XBOX) {
             gamepadViews.add(keyView)
@@ -611,8 +640,19 @@ class GameController @JvmOverloads constructor(
         }
         addView(keyView, layoutParams)
         keyView.post {
-            keyView.x = AppSizeUtils.convertLeftSize(keyInfo.left)
-            keyView.y = AppSizeUtils.convertTopSize(keyInfo.top)
+            val x = if (keyInfo.left < keyInfo.right || keyInfo.right == 0) {
+                keyInfo.left
+            } else {
+                0
+            }
+            val y = if (keyInfo.top < keyInfo.bottom || keyInfo.bottom == 0) {
+                keyInfo.top
+            } else {
+                0
+            }
+            LogUtils.d("left:${keyInfo.left}, right:${keyInfo.right}, x:$x, y:$y")
+            keyView.x = AppSizeUtils.convertWidthSize(x).toFloat()
+            keyView.y = AppSizeUtils.convertHeightSize(y).toFloat()
         }
         return keyView
     }
@@ -641,13 +681,15 @@ class GameController @JvmOverloads constructor(
             }
         }
         keyView.positionListener = object : OnPositionChangeListener {
-            override fun onPositionChange(left: Int, top: Int) {
+            override fun onPositionChange(left: Int, top: Int, right: Int, bottom: Int) {
                 if (controllerStatus == ControllerStatus.Edit) {
                     currentKey = keyInfo
                     currentKey?.let { info ->
                         info.changePosition(
-                            AppSizeUtils.reconvertLeftSize(left),
-                            AppSizeUtils.reconvertTopSize(top)
+                            AppSizeUtils.reconvertWidthSize(left),
+                            AppSizeUtils.reconvertHeightSize(top),
+                            AppSizeUtils.reconvertWidthSize(right),
+                            AppSizeUtils.reconvertHeightSize(bottom),
                         )
                         listener?.onEditKeyClick(info)
                     }
@@ -657,8 +699,8 @@ class GameController @JvmOverloads constructor(
         keyView.tag = keyInfo.id
         keyView.alpha = keyInfo.opacity / 100f
         val layoutParams = FrameLayout.LayoutParams(
-            SizeUtils.dp2px(keyInfo.getWidth()),
-            SizeUtils.dp2px(keyInfo.getHeight())
+            AppSizeUtils.convertHeightSize(keyInfo.getWidth().toInt()),
+            AppSizeUtils.convertHeightSize(keyInfo.getHeight().toInt())
         )
         if (controllerType == AppVirtualOperateType.APP_STICK_XBOX) {
             gamepadViews.add(keyView)
@@ -667,8 +709,19 @@ class GameController @JvmOverloads constructor(
         }
         addView(keyView, layoutParams)
         keyView.post {
-            keyView.x = AppSizeUtils.convertLeftSize(keyInfo.left)
-            keyView.y = AppSizeUtils.convertTopSize(keyInfo.top)
+            val x = if (keyInfo.left < keyInfo.right || keyInfo.right == 0) {
+                keyInfo.left
+            } else {
+                0
+            }
+            val y = if (keyInfo.top < keyInfo.bottom || keyInfo.bottom == 0) {
+                keyInfo.top
+            } else {
+                0
+            }
+            LogUtils.d("left:${keyInfo.left}, right:${keyInfo.right}, x:$x, y:$y")
+            keyView.x = AppSizeUtils.convertWidthSize(x).toFloat()
+            keyView.y = AppSizeUtils.convertHeightSize(y).toFloat()
         }
         return keyView
     }
@@ -682,13 +735,15 @@ class GameController @JvmOverloads constructor(
         keyView.setKeyInfo(keyInfo)
         keyView.onKeyEventListener = keyEventListener
         keyView.positionListener = object : OnPositionChangeListener {
-            override fun onPositionChange(left: Int, top: Int) {
+            override fun onPositionChange(left: Int, top: Int, right: Int, bottom: Int) {
                 if (controllerStatus == ControllerStatus.Edit) {
                     currentKey = keyInfo
                     currentKey?.let { info ->
                         info.changePosition(
-                            AppSizeUtils.reconvertLeftSize(left),
-                            AppSizeUtils.reconvertTopSize(top)
+                            AppSizeUtils.reconvertWidthSize(left),
+                            AppSizeUtils.reconvertHeightSize(top),
+                            AppSizeUtils.reconvertWidthSize(right),
+                            AppSizeUtils.reconvertHeightSize(bottom),
                         )
                         listener?.onEditKeyClick(info)
                     }
@@ -698,8 +753,8 @@ class GameController @JvmOverloads constructor(
         keyView.tag = keyInfo.id
         keyView.alpha = keyInfo.opacity / 100f
         val layoutParams = FrameLayout.LayoutParams(
-            SizeUtils.dp2px(keyInfo.getWidth()),
-            SizeUtils.dp2px(keyInfo.getHeight())
+            AppSizeUtils.convertHeightSize(keyInfo.getWidth().toInt()),
+            AppSizeUtils.convertHeightSize(keyInfo.getHeight().toInt())
         )
         if (controllerType == AppVirtualOperateType.APP_STICK_XBOX) {
             gamepadViews.add(keyView)
@@ -707,10 +762,22 @@ class GameController @JvmOverloads constructor(
         if (controllerType == AppVirtualOperateType.APP_KEYBOARD) {
             keyboardViews.add(keyView)
         }
-        addView(keyView, layoutParams)
+        keyView.layoutParams = layoutParams
+        addView(keyView)
         keyView.post {
-            keyView.x = AppSizeUtils.convertLeftSize(keyInfo.left)
-            keyView.y = AppSizeUtils.convertTopSize(keyInfo.top)
+            val x = if (keyInfo.left < keyInfo.right || keyInfo.right == 0) {
+                keyInfo.left
+            } else {
+                0
+            }
+            val y = if (keyInfo.top < keyInfo.bottom || keyInfo.bottom == 0) {
+                keyInfo.top
+            } else {
+                0
+            }
+            LogUtils.d("left:${keyInfo.left}, right:${keyInfo.right}, x:$x, y:$y")
+            keyView.x = AppSizeUtils.convertWidthSize(x).toFloat()
+            keyView.y = AppSizeUtils.convertHeightSize(y).toFloat()
         }
         return keyView
     }

@@ -198,8 +198,7 @@ object GameManager : HmcpPlayerListener, OnContronListener {
 //                it.putString(HmcpVideoView.EXTRA_ID, AppConstants.extraId)
                 // 是否存档
 //                it.putBoolean(HmcpVideoView.ARCHIVED, true)
-                // 业务参数（调试版不传扣费数据）
-//                if (!BuildConfig.DEBUG) {
+                // 业务参数
                 it.putString(
                     HmcpVideoView.PAY_PROTO_DATA,
                     GameUtils.getProtoData(
@@ -209,7 +208,6 @@ object GameManager : HmcpPlayerListener, OnContronListener {
                         gameParam?.priority ?: 0
                     )
                 )
-//                }
                 // 码率
 //                it.putInt(HmcpVideoView.INTERNET_SPEED, 300)
                 // 清晰度挡位，会员默认超清，非会员默认流畅
@@ -282,7 +280,7 @@ object GameManager : HmcpPlayerListener, OnContronListener {
             gameView?.virtualDeviceType = VirtualOperateType.NONE
             gameView?.play(bundle)
             // 默认静音启动，隐藏虚拟操作按钮
-            gameView?.setAudioMute(true)
+//            gameView?.setAudioMute(true)
             gameView?.virtualDeviceType = VirtualOperateType.NONE
         }
     }
@@ -693,12 +691,20 @@ object GameManager : HmcpPlayerListener, OnContronListener {
 //        channel.invokeMethod("contronLost", null)
     }
 
-    override fun controlDistribute(success: Boolean, controlInfo: MutableList<ControlInfo>?, msg: String?) {
+    override fun controlDistribute(
+        success: Boolean,
+        controlInfo: MutableList<ControlInfo>?,
+        msg: String?
+    ) {
         val controlInfos = controlInfo ?: emptyList()
         channel.invokeMethod("controlDistribute", gson.toJson(controlInfos))
     }
 
-    override fun controlQuery(success: Boolean, controlInfos: MutableList<ControlInfo>?, msg: String?) {
+    override fun controlQuery(
+        success: Boolean,
+        controlInfos: MutableList<ControlInfo>?,
+        msg: String?
+    ) {
         if (success) {
             val jsonArray = JSONArray()
             controlInfos?.forEach { controlInfo ->
@@ -768,7 +774,13 @@ object GameManager : HmcpPlayerListener, OnContronListener {
         }
     }
 
-    fun controlPlay(cid: String, pinCode: String, accessKeyID: String, userId: String, userToken: String) {
+    fun controlPlay(
+        cid: String,
+        pinCode: String,
+        accessKeyID: String,
+        userId: String,
+        userToken: String
+    ) {
         val userInfo = UserInfo()
         userInfo.userId = userId
         userInfo.userToken = userToken
@@ -795,7 +807,7 @@ object GameManager : HmcpPlayerListener, OnContronListener {
         gameView?.hmcpPlayerListener = this
         gameView?.virtualDeviceType = VirtualOperateType.NONE
         // 默认静音启动，隐藏云端操作
-        gameView?.setAudioMute(true)
+//        gameView?.setAudioMute(true)
     }
 
     fun sendCurrentCid() {

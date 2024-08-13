@@ -28,7 +28,12 @@ class AddGamepadKey @JvmOverloads constructor(
 
     var showRocker: Boolean = true
 
-    private var dataBinding: ViewAddGamepadKeyBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.view_add_gamepad_key, this, true)
+    private var dataBinding: ViewAddGamepadKeyBinding = DataBindingUtil.inflate(
+        LayoutInflater.from(context),
+        R.layout.view_add_gamepad_key,
+        this,
+        true
+    )
 
     var isShow = false
 
@@ -69,7 +74,12 @@ class AddGamepadKey @JvmOverloads constructor(
 
     fun showBoard() {
         isShow = true
-        val animator = ObjectAnimator.ofFloat(dataBinding.root, "translationY", dataBinding.root.height.toFloat(), 0.0f)
+        val animator = ObjectAnimator.ofFloat(
+            dataBinding.root,
+            "translationY",
+            dataBinding.root.height.toFloat(),
+            0.0f
+        )
         animator.duration = 500L
         animator.interpolator = AccelerateInterpolator()
         animator.addListener(object : AnimatorListenerImp() {
@@ -87,7 +97,12 @@ class AddGamepadKey @JvmOverloads constructor(
 
     fun hideBoard(listenerImp: AnimatorListenerImp?) {
         isShow = false
-        val animator = ObjectAnimator.ofFloat(dataBinding.root, "translationY", 0.0f, dataBinding.root.height.toFloat())
+        val animator = ObjectAnimator.ofFloat(
+            dataBinding.root,
+            "translationY",
+            0.0f,
+            dataBinding.root.height.toFloat()
+        )
         animator.duration = 500L
         animator.interpolator = AccelerateInterpolator()
         listenerImp?.let {
@@ -104,8 +119,8 @@ class AddGamepadKey @JvmOverloads constructor(
     }
 
     override fun onClick(v: View?) {
-        val left = AppSizeUtils.designWidth / 2
-        val top = AppSizeUtils.designHeight / 2
+        val left = AppSizeUtils.DESIGN_WIDTH / 2
+        val top = AppSizeUtils.DESIGN_HEIGHT / 2
         var width = 0
         var zoom = 0
         var text: String? = null
@@ -138,7 +153,8 @@ class AddGamepadKey @JvmOverloads constructor(
                 zoom = 60
                 text = "LT"
                 type = KeyType.GAMEPAD_SQUARE
-                inputOp = HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpXinputLeftTrigger.value
+                inputOp =
+                    HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpXinputLeftTrigger.value
             }
 
             R.id.btn_key_edit_rs -> {
@@ -165,7 +181,8 @@ class AddGamepadKey @JvmOverloads constructor(
                 zoom = 60
                 text = "RT"
                 type = KeyType.GAMEPAD_SQUARE
-                inputOp = HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpXinputRightTrigger.value
+                inputOp =
+                    HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpXinputRightTrigger.value
             }
 
             R.id.btn_edit_rocker_l -> {
@@ -241,6 +258,22 @@ class AddGamepadKey @JvmOverloads constructor(
                 inputOp = GameConstants.gamepadButtonYValue
             }
         }
-        listener?.onAddKey(KeyInfo(UUID.randomUUID(), top - height / 2, left - width / 2, width, zoom, text, type, optical, 0, inputOp, height))
+        listener?.onAddKey(
+            KeyInfo(
+                UUID.randomUUID(),
+                left - width / 2,
+                top - height / 2,
+                0,
+                0,
+                width,
+                zoom,
+                text,
+                type,
+                optical,
+                0,
+                inputOp,
+                height
+            )
+        )
     }
 }

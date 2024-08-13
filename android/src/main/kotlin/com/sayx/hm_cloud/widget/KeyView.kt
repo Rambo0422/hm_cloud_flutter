@@ -22,6 +22,7 @@ import com.sayx.hm_cloud.constants.ControllerStatus
 import com.sayx.hm_cloud.constants.GameConstants
 import com.sayx.hm_cloud.constants.KeyConstants
 import com.sayx.hm_cloud.constants.controllerStatus
+import com.sayx.hm_cloud.utils.AppSizeUtils
 import com.sayx.hm_cloud.utils.AppVibrateUtils
 
 class KeyView @JvmOverloads constructor(
@@ -135,7 +136,7 @@ class KeyView @JvmOverloads constructor(
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         event?.let {
-            LogUtils.v("onTouchEvent:$event")
+//            LogUtils.v("onTouchEvent:$event")
             when (it.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
                     isPressed = true
@@ -180,9 +181,9 @@ class KeyView @JvmOverloads constructor(
                 MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> {
                     isPressed = false
                     if (controllerStatus == ControllerStatus.Edit) {
-                        val location = IntArray(2)
-                        getLocationOnScreen(location)
-                        positionListener?.onPositionChange(location[0], location[1])
+                        val position = IntArray(4)
+                        val location = AppSizeUtils.getLocationOnScreen(this, position)
+                        positionListener?.onPositionChange(location[0], location[1], location[2],  location[3])
                         if (!isDrag) {
                             performClick()
                         }

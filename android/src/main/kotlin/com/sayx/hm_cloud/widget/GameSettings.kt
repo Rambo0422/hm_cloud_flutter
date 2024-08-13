@@ -405,7 +405,7 @@ class GameSettings @JvmOverloads constructor(
 
     // 切换控制方法
     private fun updateControlType(type: AppVirtualOperateType) {
-        LogUtils.d("updateControlType->type=$type")
+//        LogUtils.d("updateControlType->type=$type")
         dataBinding.btnGamepad.isSelected = type == AppVirtualOperateType.APP_STICK_XBOX
         dataBinding.btnKeyboard.isSelected = type == AppVirtualOperateType.APP_KEYBOARD
     }
@@ -414,7 +414,7 @@ class GameSettings @JvmOverloads constructor(
     private fun updateVoice(maxValue: Int, value: Int) {
         dataBinding.sbVoice.max = maxValue
         dataBinding.sbVoice.progress = value
-        val volumeSwitch = SPUtils.getInstance().getBoolean(GameConstants.volumeSwitch)
+        val volumeSwitch = SPUtils.getInstance().getBoolean(GameConstants.volumeSwitch, true)
         LogUtils.d("updateVoice->maxValue=$maxValue, value=$value, volumeSwitch=$volumeSwitch")
         dataBinding.btnMute.isSelected = volumeSwitch
         gameView?.setAudioMute(!volumeSwitch)

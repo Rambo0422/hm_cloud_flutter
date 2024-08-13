@@ -25,6 +25,7 @@ import com.sayx.hm_cloud.constants.controllerStatus
 import com.sayx.hm_cloud.model.CallBackMode
 import com.sayx.hm_cloud.model.Direction
 import com.sayx.hm_cloud.model.DirectionMode
+import com.sayx.hm_cloud.utils.AppSizeUtils
 import com.sayx.hm_cloud.utils.AppVibrateUtils
 import kotlin.math.acos
 import kotlin.math.cos
@@ -305,9 +306,9 @@ class RockerView @JvmOverloads constructor(
                     isPressed = false
                     // 回调 结束
                     if (controllerStatus == ControllerStatus.Edit) {
-                        val location = IntArray(2)
-                        getLocationOnScreen(location)
-                        positionChangeListener?.onPositionChange(location[0], location[1])
+                        val position = IntArray(4)
+                        val location = AppSizeUtils.getLocationOnScreen(this, position)
+                        positionChangeListener?.onPositionChange(location[0], location[1], location[2],  location[3])
                         if (!isDrag) {
                             performClick()
                         }

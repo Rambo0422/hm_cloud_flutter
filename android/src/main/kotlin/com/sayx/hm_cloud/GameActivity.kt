@@ -1026,22 +1026,22 @@ class GameActivity : AppCompatActivity() {
     }
 
     override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
-        LogUtils.d("$this->dispatchTouchEvent:$event")
+//        LogUtils.d("$this->dispatchTouchEvent:$event")
         event?.let {
             if (GameUtils.isGamePadEvent(it)) {
-                LogUtils.d("游戏手柄输入:$it")
+//                LogUtils.d("游戏手柄输入:$it")
                 dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
                 gameSettings?.controllerType = AppVirtualOperateType.NONE
             } else if (GameUtils.isKeyBoardEvent(it)) {
-                LogUtils.d("游戏键盘输入:$it")
+//                LogUtils.d("游戏键盘输入:$it")
                 dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
                 gameSettings?.controllerType = AppVirtualOperateType.NONE
             } else if (GameUtils.isMouseEvent(it)) {
-                LogUtils.d("游戏鼠标输入:$it")
+//                LogUtils.d("游戏鼠标输入:$it")
                 dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
                 gameSettings?.controllerType = AppVirtualOperateType.NONE
             } else {
-                LogUtils.d("其他输入:$it")
+//                LogUtils.d("其他输入:$it")
                 if (dataBinding.btnGameSettings.visibility == View.VISIBLE) {
                     dataBinding.gameController.controllerType = GameManager.lastControllerType
                     gameSettings?.controllerType = GameManager.lastControllerType
@@ -1052,22 +1052,22 @@ class GameActivity : AppCompatActivity() {
     }
 
     override fun dispatchGenericMotionEvent(event: MotionEvent?): Boolean {
-        LogUtils.d("$this->dispatchGenericMotionEvent:$event")
+//        LogUtils.d("$this->dispatchGenericMotionEvent:$event")
         event?.let {
             if (GameUtils.isGamePadEvent(it)) {
-                LogUtils.d("游戏手柄输入:$it")
+//                LogUtils.d("游戏手柄输入:$it")
                 dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
                 gameSettings?.controllerType = AppVirtualOperateType.NONE
             } else if (GameUtils.isKeyBoardEvent(it)) {
-                LogUtils.d("游戏键盘输入:$it")
+//                LogUtils.d("游戏键盘输入:$it")
                 dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
                 gameSettings?.controllerType = AppVirtualOperateType.NONE
             } else if (GameUtils.isMouseEvent(it)) {
-                LogUtils.d("游戏鼠标输入:$it")
+//                LogUtils.d("游戏鼠标输入:$it")
                 dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
                 gameSettings?.controllerType = AppVirtualOperateType.NONE
             } else {
-                LogUtils.d("其他输入:$it")
+//                LogUtils.d("其他输入:$it")
             }
         }
         return super.dispatchGenericMotionEvent(event)
@@ -1077,15 +1077,15 @@ class GameActivity : AppCompatActivity() {
 //        LogUtils.d("$this->dispatchKeyEvent:$event")
         event.let {
             if (GameUtils.isGamePadEvent(it)) {
-                //                LogUtils.d("游戏手柄输入:$it")
+ //                LogUtils.d("游戏手柄输入:$it")
                 dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
                 gameSettings?.controllerType = AppVirtualOperateType.NONE
             } else if (GameUtils.isKeyBoardEvent(it)) {
-                //                LogUtils.d("游戏键盘输入:$it")
+//                LogUtils.d("游戏键盘输入:$it")
                 dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
                 gameSettings?.controllerType = AppVirtualOperateType.NONE
             } else if (GameUtils.isMouseEvent(it)) {
-                //                LogUtils.d("游戏鼠标输入:$it")
+//                LogUtils.d("游戏鼠标输入:$it")
                 dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
                 gameSettings?.controllerType = AppVirtualOperateType.NONE
             }

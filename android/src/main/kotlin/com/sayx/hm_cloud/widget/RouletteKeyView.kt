@@ -25,6 +25,7 @@ import com.sayx.hm_cloud.callback.OnPositionChangeListener
 import com.sayx.hm_cloud.constants.ControllerStatus
 import com.sayx.hm_cloud.constants.controllerStatus
 import com.sayx.hm_cloud.model.RoulettePart
+import com.sayx.hm_cloud.utils.AppSizeUtils
 import com.sayx.hm_cloud.utils.AppVibrateUtils
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -255,9 +256,9 @@ class RouletteKeyView @JvmOverloads constructor(
                 MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> {
                     if (controllerStatus == ControllerStatus.Edit) {
                         isPressed = false
-                        val location = IntArray(2)
-                        getLocationOnScreen(location)
-                        positionListener?.onPositionChange(location[0], location[1])
+                        val position = IntArray(4)
+                        val location = AppSizeUtils.getLocationOnScreen(this, position)
+                        positionListener?.onPositionChange(location[0], location[1], location[2],  location[3])
                         if (!isDrag) {
                             performClick()
                         }

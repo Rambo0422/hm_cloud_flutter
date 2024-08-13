@@ -1,12 +1,15 @@
 package com.sayx.hm_cloud.model
 
+import com.sayx.hm_cloud.GameManager
 import java.io.Serializable
 import java.util.UUID
 
 class KeyInfo(
     var id: UUID?,
-    var top: Int,
     var left: Int,
+    var top: Int,
+    var right: Int,
+    var bottom: Int,
     val width: Int,
     var zoom: Int,
     var text: String?,
@@ -44,9 +47,11 @@ class KeyInfo(
         opacityChange = true
     }
 
-    fun changePosition(left: Int, top: Int) {
+    fun changePosition(left: Int, top: Int, right: Int, bottom: Int) {
         this.left = left
         this.top = top
+        this.right = right
+        this.bottom = bottom
     }
 
     fun changeText(text: String?) {
@@ -69,8 +74,10 @@ class KeyInfo(
     fun copy(): KeyInfo {
         return KeyInfo(
             this.id,
-            this.top,
             this.left,
+            this.top,
+            this.right,
+            this.bottom,
             this.width,
             this.zoom,
             this.text,
@@ -81,5 +88,9 @@ class KeyInfo(
             this.height,
             this.composeArr
         )
+    }
+
+    override fun toString(): String {
+        return GameManager.gson.toJson(this)
     }
 }
