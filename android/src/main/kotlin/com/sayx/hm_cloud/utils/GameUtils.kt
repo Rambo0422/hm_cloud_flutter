@@ -17,9 +17,9 @@ object GameUtils {
             return false
         }
         // 非外接
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && !inputDevice.isExternal) {
-//            return false
-//        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && !inputDevice.isExternal) {
+            return false
+        }
         return (inputDevice.sources and InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD &&
                 (inputDevice.sources and InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK
     }
@@ -31,9 +31,9 @@ object GameUtils {
             return false
         }
         // 非外接
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && !inputDevice.isExternal) {
-//            return false
-//        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && !inputDevice.isExternal) {
+            return false
+        }
         return (inputDevice.sources and InputDevice.SOURCE_KEYBOARD) == InputDevice.SOURCE_KEYBOARD &&
                 inputDevice.keyboardType == InputDevice.KEYBOARD_TYPE_ALPHABETIC
     }
@@ -45,9 +45,9 @@ object GameUtils {
             return false
         }
         // 非外接
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && !inputDevice.isExternal) {
-//            return false
-//        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && !inputDevice.isExternal) {
+            return false
+        }
         return (inputDevice.sources and InputDevice.SOURCE_MOUSE) == InputDevice.SOURCE_MOUSE &&
                 (inputDevice.sources and (InputDevice.SOURCE_KEYBOARD or InputDevice.SOURCE_JOYSTICK)) == 0
     }
