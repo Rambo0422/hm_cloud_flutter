@@ -11,7 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface BaseKeyView : UIView
 
-- (instancetype)initWithEidt:(BOOL)isEdit;
+- (instancetype)initWithEidt:(BOOL)isEdit model:(KeyModel *)model;
 
 @property (nonatomic, strong) KeyModel *model;
 

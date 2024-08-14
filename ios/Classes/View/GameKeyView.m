@@ -37,151 +37,138 @@
     while (self.subviews.count > 0) [self.subviews.lastObject removeFromSuperview];
 }
 
-- (void)setKeyList:(NSArray<KeyModel *> *)keyList {
+- (void)removeKey:(KeyModel *)model {
+    if ([self.keyList containsObject:model]) {
+        [self.keyList removeObject:model];
+
+        [self reloadView];
+    }
+}
+
+- (void)addKey:(KeyModel *)m {
+    [self.keyList addObject:m];
+    [self addViewWithModel:m];
+}
+
+- (void)setKeyList:(NSMutableArray<KeyModel *> *)keyList {
     _keyList = keyList;
 
-    if (keyList.count) {
+    [self reloadView];
+}
+
+- (void)reloadView {
+    if (self.keyList.count) {
         while (self.subviews.count > 0) [self.subviews.lastObject removeFromSuperview];
     }
 
-    for (KeyModel *m in keyList) {
-        switch (m.key_type) {
-            case KEY_kb_rock_letter:{
-                JoystickArrowView *joy = [[JoystickArrowView alloc] initWithEidt:_isEdit];
-                joy.bgImg = k_BundleImage(@"key_joy_wasd");
-                joy.thumbImg = k_BundleImage(@"key_joy_thumb_normal");
-                joy.callback = ^(Direction oldD, Direction newD) {
-                    [self configCustomKeyList:oldD new:newD isArrow:NO];
-                };
-                joy.model = m;
-                joy.tapCallback = self.tapCallback;
-                [self addSubview:joy];
+    for (KeyModel *m in self.keyList) {
+        [self addViewWithModel:m];
+    }
+}
 
-                [joy mas_makeConstraints:^(MASConstraintMaker *make) {
-                    make.top.equalTo(@(m.top));
-                    make.left.equalTo(@(m.left));
-                    make.size.mas_equalTo(CGSizeMake(m.width, m.height));
-                }];
-            }
-            break;
-
-            case KEY_kb_rock_arrow:{
-                JoystickArrowView *joy = [[JoystickArrowView alloc] initWithEidt:_isEdit];
-                joy.bgImg = k_BundleImage(@"key_joy_arrow");
-                joy.thumbImg = k_BundleImage(@"key_joy_thumb_normal");
-                joy.model = m;
-                joy.callback = ^(Direction oldD, Direction newD) {
-                    [self configCustomKeyList:oldD new:newD isArrow:YES];
-                };
-                joy.tapCallback = self.tapCallback;
-                [self addSubview:joy];
-
-                [joy mas_makeConstraints:^(MASConstraintMaker *make) {
-                    make.top.equalTo(@(m.top));
-                    make.left.equalTo(@(m.left));
-                    make.size.mas_equalTo(CGSizeMake(m.width, m.height));
-                }];
-            }
-            break;
-
-            case KEY_kb_xobx_rock_lt:{
-                JoystickView *joy = [[JoystickView alloc] initWithEidt:_isEdit];
-                joy.bgImg = k_BundleImage(@"key_xbox_rock");
-                joy.thumbImg = k_BundleImage(@"key_xbox_rock_thumb_l");
-                joy.model = m;
-                joy.callback = ^(CGPoint point) {
-                    NSDictionary *xDict = @{
-                            @"inputState": @1,
-                            @"inputOp": @(1027),
-                            @"value": @((int)roundf(point.x * 32767))
-                    };
-
-                    NSDictionary *yDict = @{
-                            @"inputState": @1,
-                            @"inputOp": @(1028),
-                            @"value": @((int)roundf(-point.y * 32767))
-                    };
-                    [[HmCloudTool share] sendCustomKey:@[xDict, yDict]];
-                };
-                joy.tapCallback = self.tapCallback;
-                [self addSubview:joy];
-
-                [joy mas_makeConstraints:^(MASConstraintMaker *make) {
-                    make.top.equalTo(@(m.top));
-                    make.left.equalTo(@(m.left));
-                    make.size.mas_equalTo(CGSizeMake(m.width, m.height));
-                }];
-            }
-            break;
-
-            case KEY_kb_xobx_rock_rt:{
-                JoystickView *joy = [[JoystickView alloc] initWithEidt:_isEdit];
-                joy.bgImg = k_BundleImage(@"key_xbox_rock");
-                joy.thumbImg = k_BundleImage(@"key_xbox_rock_thumb_r");
-                joy.model = m;
-                joy.callback = ^(CGPoint point) {
-                    NSDictionary *xDict = @{
-                            @"inputState": @1,
-                            @"inputOp": @(1029),
-                            @"value": @((int)roundf(point.x * 32767))
-                    };
-
-                    NSDictionary *yDict = @{
-                            @"inputState": @1,
-                            @"inputOp": @(1030),
-                            @"value": @((int)roundf(-point.y * 32767))
-                    };
-
-                    [[HmCloudTool share] sendCustomKey:@[xDict, yDict]];
-                };
-                joy.tapCallback = self.tapCallback;
-                [self addSubview:joy];
-
-                [joy mas_makeConstraints:^(MASConstraintMaker *make) {
-                    make.top.equalTo(@(m.top));
-                    make.left.equalTo(@(m.left));
-                    make.size.mas_equalTo(CGSizeMake(m.width, m.height));
-                }];
-            }
-            break;
-
-            case KEY_kb_xobx_cross:{
-                CrossView *cross = [[CrossView alloc] initWithEidt:_isEdit];
-                cross.model = m;
-                cross.callback = ^(NSNumber *_Nonnull op) {
-                    NSDictionary *crossDict = @{
-                            @"inputState": @1,
-                            @"inputOp": @(1024),
-                            @"value": op,
-                    };
-                    [[HmCloudTool share] sendCustomKey:@[crossDict]];
-                };
-                cross.tapCallback = self.tapCallback;
-                [self addSubview:cross];
-                [cross mas_makeConstraints:^(MASConstraintMaker *make) {
-                    make.top.equalTo(@(m.top));
-                    make.left.equalTo(@(m.left));
-                    make.size.mas_equalTo(CGSizeMake(m.width, m.height));
-                }];
-            }
-            break;
-
-            case KEY_unknown:{
-            }
-            break;
-
-            default:{
-                [self initKey:m];
-            }
-            break;
+- (void)addViewWithModel:(KeyModel *)m {
+    switch (m.key_type) {
+        case KEY_kb_rock_letter:{
+            JoystickArrowView *joy = [[JoystickArrowView alloc] initWithEidt:_isEdit model:m];
+            joy.bgImg = k_BundleImage(@"key_joy_wasd");
+            joy.thumbImg = k_BundleImage(@"key_joy_thumb_normal");
+            joy.callback = ^(Direction oldD, Direction newD) {
+                [self configCustomKeyList:oldD new:newD isArrow:NO];
+            };
+            joy.tapCallback = self.tapCallback;
+            [self addSubview:joy];
         }
+        break;
+
+        case KEY_kb_rock_arrow:{
+            JoystickArrowView *joy = [[JoystickArrowView alloc] initWithEidt:_isEdit model:m];
+            joy.bgImg = k_BundleImage(@"key_joy_arrow");
+            joy.thumbImg = k_BundleImage(@"key_joy_thumb_normal");
+            joy.callback = ^(Direction oldD, Direction newD) {
+                [self configCustomKeyList:oldD new:newD isArrow:YES];
+            };
+            joy.tapCallback = self.tapCallback;
+            [self addSubview:joy];
+        }
+        break;
+
+        case KEY_kb_xobx_rock_lt:{
+            JoystickView *joy = [[JoystickView alloc] initWithEidt:_isEdit model:m];
+            joy.bgImg = k_BundleImage(@"key_xbox_rock");
+            joy.thumbImg = k_BundleImage(@"key_xbox_rock_thumb_l");
+            joy.callback = ^(CGPoint point) {
+                NSDictionary *xDict = @{
+                        @"inputState": @1,
+                        @"inputOp": @(1027),
+                        @"value": @((int)roundf(point.x * 32767))
+                };
+
+                NSDictionary *yDict = @{
+                        @"inputState": @1,
+                        @"inputOp": @(1028),
+                        @"value": @((int)roundf(-point.y * 32767))
+                };
+                [[HmCloudTool share] sendCustomKey:@[xDict, yDict]];
+            };
+            joy.tapCallback = self.tapCallback;
+            [self addSubview:joy];
+        }
+        break;
+
+        case KEY_kb_xobx_rock_rt:{
+            JoystickView *joy = [[JoystickView alloc] initWithEidt:_isEdit model:m];
+            joy.bgImg = k_BundleImage(@"key_xbox_rock");
+            joy.thumbImg = k_BundleImage(@"key_xbox_rock_thumb_r");
+
+            joy.callback = ^(CGPoint point) {
+                NSDictionary *xDict = @{
+                        @"inputState": @1,
+                        @"inputOp": @(1029),
+                        @"value": @((int)roundf(point.x * 32767))
+                };
+
+                NSDictionary *yDict = @{
+                        @"inputState": @1,
+                        @"inputOp": @(1030),
+                        @"value": @((int)roundf(-point.y * 32767))
+                };
+
+                [[HmCloudTool share] sendCustomKey:@[xDict, yDict]];
+            };
+            joy.tapCallback = self.tapCallback;
+            [self addSubview:joy];
+        }
+        break;
+
+        case KEY_kb_xobx_cross:{
+            CrossView *cross = [[CrossView alloc] initWithEidt:_isEdit model:m];
+            cross.callback = ^(NSNumber *_Nonnull op) {
+                NSDictionary *crossDict = @{
+                        @"inputState": @1,
+                        @"inputOp": @(1024),
+                        @"value": op,
+                };
+                [[HmCloudTool share] sendCustomKey:@[crossDict]];
+            };
+            cross.tapCallback = self.tapCallback;
+            [self addSubview:cross];
+        }
+        break;
+
+        case KEY_unknown:{
+        }
+        break;
+
+        default:{
+            [self initKey:m];
+        }
+        break;
     }
 }
 
 - (void)initKey:(KeyModel *)m {
-    GameButtonView *btn = [[GameButtonView alloc] initWithEidt:_isEdit];
+    GameButtonView *btn = [[GameButtonView alloc] initWithEidt:_isEdit model:m];
 
-    btn.model = m;
 
     btn.tapCallback = self.tapCallback;
 
@@ -194,12 +181,6 @@
     };
 
     [self addSubview:btn];
-
-    [btn mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(@(m.top));
-        make.left.equalTo(@(m.left));
-        make.size.mas_equalTo(CGSizeMake(m.width, m.height));
-    }];
 }
 
 - (void)configCustomKeyList:(Direction)oldD new:(Direction)newD isArrow:(BOOL)isArrow {

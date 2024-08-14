@@ -10,9 +10,8 @@
 NS_ASSUME_NONNULL_BEGIN
 
 typedef enum : NSUInteger {
-    
     KEY_unknown,
-    
+
     /// 鼠标 （左键，右键，滚轮点击，滚轮↑，滚轮↓）
     KEY_mouse_left,         // "kb-mouse-lt"
     KEY_mouse_right,        // "kb-mouse-rt"
@@ -86,6 +85,8 @@ typedef enum : NSUInteger {
 @property (nonatomic, strong)  NSString *type;
 
 @property (nonatomic, assign)  KeyType key_type;
+
+- (NSDictionary *)toJson;
 
 @end
 

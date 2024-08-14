@@ -19,8 +19,8 @@
 
 @implementation CrossView
 
-- (instancetype)initWithEidt:(BOOL)isEdit {
-    self = [super initWithEidt:isEdit];
+- (instancetype)initWithEidt:(BOOL)isEdit model:(nonnull KeyModel *)model {
+    self = [super initWithEidt:isEdit model:model];
 
     if (self) {
         self.imageView = [[UIImageView alloc] initWithFrame:CGRectZero];
@@ -107,25 +107,6 @@
     }
 }
 
-//- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-//    UITouch *touch = [touches anyObject];
-//    CGPoint point = [touch locationInView:self];
-//
-//    [self updateImg:point];
-//}
-//
-//- (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-//    UITouch *touch = [touches anyObject];
-//    CGPoint point = [touch locationInView:self];
-//
-//    [self updateImg:point];
-//}
-//
-//- (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-//    self.imageView.image = k_BundleImage(@"key_cross_normal");
-//    self.callback(@0);
-//}
-//
 - (void)updateImg:(CGPoint)location {
     // Get the center of the circular view
     CGPoint center = CGPointMake(CGRectGetMidX(self.bounds), CGRectGetMidY(self.bounds));

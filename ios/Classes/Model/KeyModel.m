@@ -48,6 +48,21 @@ KeyType KeyTypeFromString(NSString *string) {
     self.key_type = KeyTypeFromString(type);
 }
 
+- (NSDictionary *)toJson {
+    return @{
+        @"top": @(_top),
+        @"left": @(_left),
+        @"type": _type,
+        @"zoom": @(_zoom),
+        @"opacity": @(_opacity),
+        @"click": @(_click),
+        @"inputOp": @(_inputOp),
+        @"width": @(_width),
+        @"height": @(_height),
+        @"text": _text ? : @"",
+    };
+}
+
 - (NSInteger)top {
     return (NSInteger)(_top * (kScreenH / 375.0));
 }

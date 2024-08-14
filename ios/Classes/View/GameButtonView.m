@@ -17,66 +17,84 @@
 
 @implementation GameButtonView
 
-- (instancetype)initWithEidt:(BOOL)isEdit {
-    self = [super initWithEidt:isEdit];
+- (instancetype)initWithEidt:(BOOL)isEdit model:(nonnull KeyModel *)model {
+    self = [super initWithEidt:isEdit model:model];
 
     if (self) {
         self.btn = [UIButton buttonWithType:UIButtonTypeCustom];
         self.btn.frame = self.bounds;
         self.btn.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        self.isEdit = isEdit;
         [self.contentView addSubview:self.btn];
+
+        [self.btn setBackgroundImage:k_BundleImage([self getImg:model isHigh:NO]) forState:UIControlStateNormal];
+
+        [self.btn setBackgroundImage:k_BundleImage([self getImg:model isHigh:YES]) forState:UIControlStateHighlighted];
+
+        [self.btn setBackgroundImage:k_BundleImage([self getImg:model isHigh:YES]) forState:UIControlStateSelected];
+
+        @weakify(self);
+        [RACObserve(model, text) subscribeNext:^(id _Nullable x) {
+            @strongify(self);
+
+            [self.btn setTitle:model.text
+                      forState:UIControlStateNormal];
+        }];
+
+
+        [self.btn setTitleColor:[kColor(0xFFFFFF) colorWithAlphaComponent:0.6] forState:UIControlStateNormal];
+        self.btn.titleLabel.font = [UIFont systemFontOfSize:9];
+
+        if (self.isEdit) {
+            UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
+            [self addGestureRecognizer:pan];
+        } else {
+            [self.btn addTarget:self action:@selector(didTapTouchUp) forControlEvents:UIControlEventTouchUpInside];
+            [self.btn addTarget:self action:@selector(didTapTouchDown) forControlEvents:UIControlEventTouchDown];
+        }
     }
 
     return self;
 }
 
-- (void)setModel:(KeyModel *)m {
-    [super setModel:m];
-    [self.btn setBackgroundImage:k_BundleImage([self getImg:m isHigh:NO]) forState:UIControlStateNormal];
-
-    [self.btn setBackgroundImage:k_BundleImage([self getImg:m isHigh:YES]) forState:UIControlStateHighlighted];
-
-    [self.btn setBackgroundImage:k_BundleImage([self getImg:m isHigh:YES]) forState:UIControlStateSelected];
-
-    @weakify(self);
-    [RACObserve(m, text) subscribeNext:^(id _Nullable x) {
-        @strongify(self);
-
-        [self.btn setTitle:m.text
-                  forState:UIControlStateNormal];
-    }];
-
-
-    [self.btn setTitleColor:[kColor(0xFFFFFF) colorWithAlphaComponent:0.6] forState:UIControlStateNormal];
-    self.btn.titleLabel.font = [UIFont systemFontOfSize:9];
-
-    if (self.isEdit) {
-        UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
-        [self addGestureRecognizer:pan];
-    } else {
-        [self.btn addTarget:self action:@selector(didTapTouchUp) forControlEvents:UIControlEventTouchUpInside];
-        [self.btn addTarget:self action:@selector(didTapTouchDown) forControlEvents:UIControlEventTouchDown];
-    }
-}
-
 - (void)handlePan:(UIPanGestureRecognizer *)gestureRecognizer {
+    UIView *draggedView = gestureRecognizer.view;
+
     // 获取拖拽的位移
-    CGPoint translation = [gestureRecognizer translationInView:self.superview];
+    CGPoint translation = [gestureRecognizer translationInView:draggedView.superview];
 
     // 根据拖拽的位移更新视图的位置
-    self.center = CGPointMake(self.center.x + translation.x, self.center.y + translation.y);
+    CGPoint newCenter = CGPointMake(draggedView.center.x + translation.x, draggedView.center.y + translation.y);
+
+    // 获取屏幕边界
+    CGFloat halfWidth = CGRectGetWidth(draggedView.bounds) / 2.0;
+    CGFloat halfHeight = CGRectGetHeight(draggedView.bounds) / 2.0;
+    CGFloat screenWidth = CGRectGetWidth(draggedView.superview.bounds);
+    CGFloat screenHeight = CGRectGetHeight(draggedView.superview.bounds);
+
+    // 确保新中心点不会超出屏幕边界
+    newCenter.x = MAX(halfWidth, MIN(screenWidth - halfWidth, newCenter.x));
+    newCenter.y = MAX(halfHeight, MIN(screenHeight - halfHeight, newCenter.y));
+
+    // 更新视图的位置
+    draggedView.center = newCenter;
+
+
+    NSInteger top = (NSInteger)CGRectGetMinY(draggedView.frame);
+    NSInteger left = (NSInteger)CGRectGetMinX(draggedView.frame);
+
+//    (_top * (kScreenH / 375.0)) = top;
+//    (_left * (kScreenW / 667.0)) = left;
+
+    self.model.top = top / (kScreenH / 375.0);
+    self.model.left = left / (kScreenW / 667.0);
+
 
     // 重置拖拽手势的累积位移
     [gestureRecognizer setTranslation:CGPointZero inView:self.superview];
 
-    // 如果手势已经结束，可能需要处理其他逻辑
-    if (gestureRecognizer.state == UIGestureRecognizerStateEnded) {
-        // 可以在这里添加手势结束后的处理逻辑，例如检测视图是否拖出了屏幕
-        // 或者实现回弹动画等
+    if (self.tapCallback) {
+        self.tapCallback(self.model);
     }
-
-    return;
 }
 
 /// MARK: 手指抬起

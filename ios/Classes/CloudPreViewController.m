@@ -61,8 +61,8 @@
 @property (nonatomic, assign) float packetLoss;
 @property (nonatomic, assign) BOOL isWifi;
 
-@property (nonatomic, strong) NSArray<KeyModel *> *keyboardList;
-@property (nonatomic, strong) NSArray<KeyModel *> *joystickList;
+@property (nonatomic, strong) NSMutableArray<KeyModel *> *keyboardList;
+@property (nonatomic, strong) NSMutableArray<KeyModel *> *joystickList;
 
 @property (nonatomic, strong) GameKeyView *keyView;
 
@@ -367,7 +367,7 @@
                                                          error:&error];
 
         if (!error) {
-            self.joystickList = [KeyModel mj_objectArrayWithKeyValuesArray:arr];
+            self.joystickList = [[KeyModel mj_objectArrayWithKeyValuesArray:arr] mutableCopy];
 
             if (set) {
                 self.keyView.keyList = self.joystickList;
@@ -375,7 +375,7 @@
         }
     }
                     successCallBack:^(id _Nonnull obj) {
-        self.joystickList = [KeyModel mj_objectArrayWithKeyValuesArray:obj[@"data"][@"keyboard"]];
+        self.joystickList = [[KeyModel mj_objectArrayWithKeyValuesArray:obj[@"data"][@"keyboard"]] mutableCopy];
 
         if (set) {
             self.keyView.keyList = self.joystickList;
@@ -389,7 +389,7 @@
                              params:@{ @"type": @"2", @"game_id": [HmCloudTool share].gameId }
                       faildCallBack:nil
                     successCallBack:^(id _Nonnull obj) {
-        self.keyboardList = [KeyModel mj_objectArrayWithKeyValuesArray:obj[@"data"][@"keyboard"]];
+        self.keyboardList = [[KeyModel mj_objectArrayWithKeyValuesArray:obj[@"data"][@"keyboard"]] mutableCopy];
 
         if (set) {
             self.keyView.keyList = self.keyboardList;
@@ -428,6 +428,10 @@
         vc.type = type;
         vc.dismissCallback = ^(BOOL isSave) {
             self.keyView.hidden = NO;
+
+            if (isSave) {
+                [self request];
+            }
         };
         [self presentViewController:vc
                            animated:YES
