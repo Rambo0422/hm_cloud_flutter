@@ -196,8 +196,8 @@ object GameManager : HmcpPlayerListener, OnContronListener {
                 // token
                 it.putString(HmcpVideoView.C_TOKEN, gameParam?.cToken)
 //                it.putString(HmcpVideoView.EXTRA_ID, AppConstants.extraId)
-                // 是否存档
-//                it.putBoolean(HmcpVideoView.ARCHIVED, true)
+                // 是否使用存档
+                it.putBoolean(HmcpVideoView.ARCHIVED, true)
                 // 业务参数
                 it.putString(
                     HmcpVideoView.PAY_PROTO_DATA,
@@ -691,20 +691,12 @@ object GameManager : HmcpPlayerListener, OnContronListener {
 //        channel.invokeMethod("contronLost", null)
     }
 
-    override fun controlDistribute(
-        success: Boolean,
-        controlInfo: MutableList<ControlInfo>?,
-        msg: String?
-    ) {
+    override fun controlDistribute(success: Boolean, controlInfo: MutableList<ControlInfo>?, msg: String?) {
         val controlInfos = controlInfo ?: emptyList()
         channel.invokeMethod("controlDistribute", gson.toJson(controlInfos))
     }
 
-    override fun controlQuery(
-        success: Boolean,
-        controlInfos: MutableList<ControlInfo>?,
-        msg: String?
-    ) {
+    override fun controlQuery(success: Boolean, controlInfos: MutableList<ControlInfo>?, msg: String?) {
         if (success) {
             val jsonArray = JSONArray()
             controlInfos?.forEach { controlInfo ->
@@ -774,13 +766,7 @@ object GameManager : HmcpPlayerListener, OnContronListener {
         }
     }
 
-    fun controlPlay(
-        cid: String,
-        pinCode: String,
-        accessKeyID: String,
-        userId: String,
-        userToken: String
-    ) {
+    fun controlPlay(cid: String, pinCode: String, accessKeyID: String, userId: String, userToken: String) {
         val userInfo = UserInfo()
         userInfo.userId = userId
         userInfo.userToken = userToken
