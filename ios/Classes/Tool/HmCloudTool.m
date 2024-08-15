@@ -49,6 +49,11 @@
 - (void)stop {
     self.vc = nil;
     self.gameVC = nil;
+
+    if (self.delegate) {
+        [self.delegate sendToFlutter:ActionExitGame params:@{ @"action": @1 }];
+    }
+
     [[HMCloudPlayer sharedCloudPlayer] stop:10 withReason:HMCloudAppStopReasonNormal];
 }
 
@@ -65,26 +70,43 @@
         self.vc = [[CloudPreViewController alloc] initWithNibName:@"CloudPreViewController" bundle:k_SanABundle];
         self.vc.gameVC = self.gameVC;
 
-        __weak typeof(self) weakSelf = self;
+
+        @weakify(self);
 
         self.vc.didDismiss = ^{
-            typeof(self) strongSelf = weakSelf;
-            [strongSelf stop];
+            @strongify(self);
+            [self stop];
+        };
 
-            if (strongSelf.delegate) {
-                [strongSelf.delegate sendToFlutter:ActionExitGame params:@{ @"action": @1 }];
+        self.vc.pushFlutter = ^(FlutterPageType pageType) {
+            @strongify(self);
+
+            if (pageType == Flutter_rechartTime) {
+                [self.delegate sendToFlutter:ActionOpenPage
+                                      params:@{ @"arguments": @{ @"type": @"rechargeTime",
+                                                                 @"from": @"native" },
+                                                @"route": @"/rechargeCenter" }];
+            }
+
+            if (pageType == Flutter_rechartVip) {
+                [self.delegate sendToFlutter:ActionOpenPage
+                                      params:@{ @"arguments": @{ @"type": @"rechargeVip",
+                                                                 @"from": @"native" },
+                                                @"route": @"/rechargeCenter" }];
             }
         };
 
-        self.vc.pushFlutter = ^{
-            typeof(self) strongSelf = weakSelf;
-            [strongSelf.delegate sendToFlutter:ActionOpenPage
-                                        params:@{ @"arguments": @{ @"type": @"rechargeTime",
-                                                                   @"from": @"native" },
-                                                  @"route": @"/rechargeCenter" }];
-        };
+
 
         [[UIViewController topViewController] presentViewController:self.vc animated:YES completion:nil];
+    }
+}
+
+- (BOOL)isVip {
+    if (self.vipExpiredTime.integerValue > self.realTime.integerValue) {
+        return YES;
+    } else {
+        return NO;
     }
 }
 
@@ -222,7 +244,7 @@
 
     if ([state isEqualToString:@"videoVisible"]) {
         [[HMCloudPlayer sharedCloudPlayer] cloudSetTouchModel:self.touchMode];
-//        [self pushPreView];
+        [self pushPreView];
     }
 
     if ([state isEqualToString:@"stopped"]) {
@@ -230,8 +252,32 @@
 
         if ([reason isEqualToString:@"no_operation"]) {
             // 长时间误操作 弹框
+
+            [ErrorAlertView showAlertWithCid:[HMCloudPlayer sharedCloudPlayer].cloudId
+                                         uid:self.userId
+                                   errorCode:reason
+                                       title:@"长时间未操作，请重新连接游戏"
+                                     content:nil
+                            dissMissCallback:^{
+                [self stop];
+                [[UIViewController topViewController] dismissViewControllerAnimated:YES
+                                                                         completion:^{
+                }];
+            }];
         } else {
             // 错误弹框
+
+            [ErrorAlertView showAlertWithCid:[HMCloudPlayer sharedCloudPlayer].cloudId
+                                         uid:self.userId
+                                   errorCode:reason
+                                       title:nil
+                                     content:nil
+                            dissMissCallback:^{
+                [self stop];
+                [[UIViewController topViewController] dismissViewControllerAnimated:YES
+                                                                         completion:^{
+                }];
+            }];
         }
     }
 
@@ -340,8 +386,8 @@
 
 // MARK: 初始化gameVC
 - (void)initGameVC {
-    [self pushPreView];
-    return;
+//    [self pushPreView];
+//    return;
 
     dispatch_async(dispatch_get_main_queue(), ^{
         NSDictionary *dict = @{

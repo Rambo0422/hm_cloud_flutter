@@ -9,6 +9,7 @@
 #import "CustomKeyViewController.h"
 #import "CustomSelectViewController.h"
 #import "CustomSlider.h"
+#import "ErrorAlertView.h"
 #import "GameDetailsModel.h"
 #import "GameKeyView.h"
 #import "GameKeyView.h"
@@ -79,9 +80,10 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
+    @weakify(self);
     [[AFNetworkReachabilityManager sharedManager] setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
         // 一共有四种状态
+        @strongify(self);
         switch (status) {
             case AFNetworkReachabilityStatusNotReachable:
                 break;
@@ -116,6 +118,8 @@
 
 - (void)configRac {
     @weakify(self);
+    HmCloudTool *tool = [HmCloudTool share];
+    @weakify(tool);
     [RACObserve(self, ms) subscribeNext:^(id _Nullable x) {
         @strongify(self);
 
@@ -164,10 +168,21 @@
 
     [[self.customBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
         @strongify(self);
+        @strongify(tool);
 
-        [self hideSetView];
-
-        [self pushCustomKeyController];
+        if ([tool isVip]) {
+            [self hideSetView];
+            [self pushCustomKeyController];
+        } else {
+            [NormalAlertView showAlertWithTitle:nil
+                                        content:nil
+                                   confirmTitle:nil
+                                    cancelTitle:nil
+                                confirmCallback:^{
+                [self pushToFlutterPage:Flutter_rechartVip];
+            }
+                                 cancelCallback:nil];
+        }
     }];
 
     [[self.joystickBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
@@ -188,15 +203,15 @@
         }
     }];
 
-    HmCloudTool *tool = [HmCloudTool share];
 
-    @weakify(tool);
+
+
     [[self.vibrationBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
         @strongify(tool);
         tool.isVibration = !tool.isVibration;
     }];
 
-    RAC(self.vibrationBtn, selected) = RACObserve([HmCloudTool share], isVibration);
+    RAC(self.vibrationBtn, selected) = RACObserve(tool, isVibration);
 
     [[self.modeSwitch rac_signalForControlEvents:UIControlEventValueChanged] subscribeNext:^(__kindof UIControl *_Nullable x) {
         @strongify(self);
@@ -412,6 +427,13 @@
     }];
 }
 
+- (void)pushToFlutterPage:(FlutterPageType)pagetype {
+    if (self.pushFlutter) {
+        self.pushFlutter(pagetype);
+        [self dismissViewControllerAnimated:YES completion:nil];
+    }
+}
+
 - (void)pushCustomKeyController {
     CustomSelectViewController *vc = [[CustomSelectViewController alloc] initWithNibName:@"CustomSelectViewController"
                                                                                   bundle:k_SanABundle];
@@ -450,10 +472,7 @@
 }
 
 - (IBAction)didTapTopup:(id)sender {
-    if (self.pushFlutter) {
-        self.pushFlutter();
-        [self dismissViewControllerAnimated:YES completion:nil];
-    }
+    [self pushToFlutterPage:Flutter_rechartTime];
 }
 
 - (IBAction)didTapDismiss:(id)sender {

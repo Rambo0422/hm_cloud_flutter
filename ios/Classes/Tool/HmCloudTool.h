@@ -90,6 +90,9 @@ static NSString *ActionClosePage = @"closePage";
 - (void)configWithParams:(NSDictionary *)params;
 - (void)registWithDelegate:(id<HmCloudToolDelegate>)delegate;
 
+// 是否是vip
+- (BOOL)isVip;
+
 - (void)stop;
 /// 推出flutter 页面后，回到游戏页面的方法
 - (void)restart;

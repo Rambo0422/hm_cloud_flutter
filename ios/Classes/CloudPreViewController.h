@@ -9,13 +9,18 @@
 NS_ASSUME_NONNULL_BEGIN
 
 
+typedef enum : NSUInteger {
+    Flutter_rechartTime,
+    Flutter_rechartVip
+} FlutterPageType;
+
 
 @interface CloudPreViewController : HM_BaseViewController
 
 @property (nonatomic, strong) UIViewController *gameVC;
 
 @property (nonatomic, strong) void (^ didDismiss)(void);
-@property (nonatomic, strong) void (^ pushFlutter)(void);
+@property (nonatomic, strong) void (^ pushFlutter)(FlutterPageType pageType);
 
 
 

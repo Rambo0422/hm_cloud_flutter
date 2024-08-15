@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="gHU-ul-BCd" customClass="NormalAlertView">
+            <rect key="frame" x="0.0" y="0.0" width="300" height="180"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <subviews>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="此功能需要开通VIP才能使用" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1sE-bL-mHn">
+                    <rect key="frame" x="39.333333333333329" y="30" width="221.33333333333337" height="20.333333333333329"/>
+                    <fontDescription key="fontDescription" type="system" weight="medium" pointSize="17"/>
+                    <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="前往开通VIP权限" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cue-Ig-ekD">
+                    <rect key="frame" x="106" y="60.333333333333336" width="88" height="13.333333333333336"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                    <color key="textColor" red="0.75686274509999996" green="0.75686274509999996" blue="0.75686274509999996" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <stackView opaque="NO" contentMode="scaleToFill" distribution="fillProportionally" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="pO9-GI-VXI">
+                    <rect key="frame" x="20" y="103.66666666666667" width="260" height="40.000000000000014"/>
+                    <subviews>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pdt-KD-bSL">
+                            <rect key="frame" x="0.0" y="0.0" width="120" height="40"/>
+                            <color key="backgroundColor" red="0.18503022190000001" green="0.2186060548" blue="0.27059498430000001" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="40" id="VOG-MM-7ow"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" weight="medium" pointSize="13"/>
+                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                            <state key="normal" title="知道了">
+                                <color key="titleColor" red="0.78525918719999999" green="0.84183937310000001" blue="0.91373568770000002" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                            </state>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                    <integer key="value" value="20"/>
+                                </userDefinedRuntimeAttribute>
+                            </userDefinedRuntimeAttributes>
+                            <connections>
+                                <action selector="didTapCancel:" destination="gHU-ul-BCd" eventType="touchUpInside" id="Ggk-Kh-8Yd"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dBR-et-SZc">
+                            <rect key="frame" x="140" y="0.0" width="120" height="40"/>
+                            <color key="backgroundColor" red="0.80599969630000001" green="0.9233255386" blue="0.40379226210000002" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="40" id="rlz-AH-cTN"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" weight="medium" pointSize="13"/>
+                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                            <state key="normal" title="开通VIP">
+                                <color key="titleColor" systemColor="labelColor"/>
+                            </state>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                    <integer key="value" value="20"/>
+                                </userDefinedRuntimeAttribute>
+                            </userDefinedRuntimeAttributes>
+                            <connections>
+                                <action selector="didTapConfirm:" destination="gHU-ul-BCd" eventType="touchUpInside" id="pB1-7D-h5e"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <constraints>
+                        <constraint firstItem="pdt-KD-bSL" firstAttribute="width" secondItem="dBR-et-SZc" secondAttribute="width" id="DY4-o3-Mob"/>
+                    </constraints>
+                </stackView>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="U6F-Oo-Kfw"/>
+            <color key="backgroundColor" red="0.1418845654" green="0.1715240777" blue="0.2235359848" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+            <constraints>
+                <constraint firstItem="1sE-bL-mHn" firstAttribute="centerX" secondItem="U6F-Oo-Kfw" secondAttribute="centerX" id="Dgx-Nu-Bnh"/>
+                <constraint firstItem="pO9-GI-VXI" firstAttribute="top" secondItem="cue-Ig-ekD" secondAttribute="bottom" constant="30" id="HBd-0g-0Px"/>
+                <constraint firstItem="1sE-bL-mHn" firstAttribute="top" secondItem="gHU-ul-BCd" secondAttribute="top" constant="30" id="IEl-XW-fM3"/>
+                <constraint firstItem="cue-Ig-ekD" firstAttribute="top" secondItem="1sE-bL-mHn" secondAttribute="bottom" constant="10" id="IZ3-b3-G6b"/>
+                <constraint firstItem="cue-Ig-ekD" firstAttribute="centerX" secondItem="1sE-bL-mHn" secondAttribute="centerX" id="UTB-Je-hX5"/>
+                <constraint firstItem="pO9-GI-VXI" firstAttribute="centerX" secondItem="U6F-Oo-Kfw" secondAttribute="centerX" id="a5s-UN-bes"/>
+                <constraint firstItem="U6F-Oo-Kfw" firstAttribute="trailing" secondItem="pO9-GI-VXI" secondAttribute="trailing" constant="20" id="aSU-58-Ahk"/>
+                <constraint firstItem="pO9-GI-VXI" firstAttribute="leading" secondItem="U6F-Oo-Kfw" secondAttribute="leading" constant="20" id="rvk-7w-yAp"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <userDefinedRuntimeAttributes>
+                <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                    <integer key="value" value="15"/>
+                </userDefinedRuntimeAttribute>
+            </userDefinedRuntimeAttributes>
+            <connections>
+                <outlet property="cancelBtn" destination="pdt-KD-bSL" id="sDE-om-ITI"/>
+            </connections>
+            <point key="canvasLocation" x="-785" y="-6"/>
+        </view>
+    </objects>
+    <resources>
+        <systemColor name="labelColor">
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>
