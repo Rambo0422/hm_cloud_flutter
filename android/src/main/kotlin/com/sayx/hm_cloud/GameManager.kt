@@ -197,7 +197,7 @@ object GameManager : HmcpPlayerListener, OnContronListener {
                 it.putString(HmcpVideoView.C_TOKEN, gameParam?.cToken)
 //                it.putString(HmcpVideoView.EXTRA_ID, AppConstants.extraId)
                 // 是否存档
-//                it.putBoolean(HmcpVideoView.ARCHIVED, true)
+                it.putBoolean(HmcpVideoView.ARCHIVED, true)
                 // 业务参数（调试版不传扣费数据）
 //                if (!BuildConfig.DEBUG) {
                 it.putString(
