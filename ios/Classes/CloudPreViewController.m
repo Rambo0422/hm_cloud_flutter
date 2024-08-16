@@ -207,7 +207,11 @@
         @strongify(tool);
 
         if ([tool isVip]) {
-            [tool stopLiving];
+            if (tool.isLiving) {
+                [tool stopLiving];
+            } else {
+                [tool startLiving];
+            }
         } else {
             [NormalAlertView showAlertWithTitle:nil
                                         content:nil

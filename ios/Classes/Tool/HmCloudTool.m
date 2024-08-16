@@ -117,22 +117,34 @@
 }
 
 - (void)startLiving {
-    HMCloudPlayer *player = [HMCloudPlayer sharedCloudPlayer];
-    ELivingCapabilityStatus liveStatus = [player getLivingCapabilityStatus];
+    if (self.liveRoomId.length) {
+        [self stopLiving];
+    } else {
+        HMCloudPlayer *player = [HMCloudPlayer sharedCloudPlayer];
+        ELivingCapabilityStatus liveStatus = [player getLivingCapabilityStatus];
 
-    if (liveStatus == LivingSupported) {
-        NSString *pushUrl = [NSString stringWithFormat:@"rtmp://push-cg.3ayx.net/live/%@", self.cloudId];
+        if (liveStatus == LivingSupported) {
+            NSString *pushUrl = [NSString stringWithFormat:@"rtmp://push-cg.3ayx.net/live/%@", self.cloudId];
 
 
-        [[HMCloudPlayer sharedCloudPlayer] startLivingWithLivingId:self.cloudId
-                                                     pushStreamUrl:pushUrl
-                                                           success:nil
-                                                              fail:nil];
+            [[HMCloudPlayer sharedCloudPlayer] startLivingWithLivingId:self.cloudId
+                                                         pushStreamUrl:pushUrl
+                                                               success:nil
+                                                                  fail:nil];
+        }
     }
 }
 
 - (void)stopLiving {
-    self.isLiving = NO;
+    if (self.liveRoomId) {
+        [[RequestTool share] requestUrl:k_api_update_liveRoom
+                             methodType:Request_POST
+                                 params:@{ @"id": self.liveRoomId, @"hide": self.isLiving ? @2 : @1 }
+                          faildCallBack:nil
+                        successCallBack: ^(id _Nonnull obj) {
+            self.isLiving = !self.isLiving;
+        }];
+    }
 }
 
 #pragma mark - CloudPlayer Delegate Function
@@ -274,7 +286,7 @@
 
         NSLog(@"cloudid = %@", self.cloudId);
 
-        if (!self.isVip && !self.isLiving) {
+        if (!self.isVip && !self.liveRoomId.length) {
             [self startLiving];
         }
 
@@ -431,9 +443,6 @@
     NSString *state = [info objectForKey:@"state"];
 
     if ([state isEqualToString:@"startSuccess"]) {
-        [SVProgressHUD showImage:[UIImage imageNamed:@""] status:@"云游互动开启成功~"];
-        self.isLiving = YES;
-
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [[RequestTool share] requestUrl:k_api_create_liveRoom
                                  methodType:Request_POST
@@ -441,6 +450,14 @@
                               faildCallBack:^{
             }
                             successCallBack:^(id _Nonnull obj) {
+                self.isLiving = YES;
+                [SVProgressHUD showImage:[UIImage imageNamed:@""]
+                                  status:@"云游互动开启成功~"];
+                NSString *roomId = obj[@"room_id"];
+
+                if (roomId) {
+                    self.liveRoomId = roomId;
+                }
             }];
         });
     }
