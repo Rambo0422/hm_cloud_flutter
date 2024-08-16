@@ -35,6 +35,18 @@ NS_ASSUME_NONNULL_BEGIN
 ///  game_id 游戏id
 #define k_api_get_game_detail @"/api/game/details/get"
 
+/// 创建直播间
+///  params:
+///  cid 海马cid
+///  hide 1=隐藏，2=不隐藏
+#define k_api_create_liveRoom @"/api/room/playroom/create"
+
+/// 修改直播间
+///  params:
+///  cid 海马cid
+///  hide 1=隐藏，2=不隐藏
+#define k_api_update_liveRoom @"/api/room/playroom/update"
+
 
 typedef enum : NSUInteger {
     Request_POST,

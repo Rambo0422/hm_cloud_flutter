@@ -63,10 +63,11 @@
                   " url = %@ \n"
                   " \n \n"
                   " param = %@ \n"
+                  " token = %@ \n"
                   " \n \n"
                   " response = %@ \n"
                   " \n \n"
-                  "------------  Success  ------------\n", host, [param mj_JSONString], [responseObject mj_JSONString]);
+                  "------------  Success  ------------\n", host, [param mj_JSONString], token, [responseObject mj_JSONString]);
 #endif
 
             NSNumber *code = responseObject[@"code"];

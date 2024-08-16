@@ -18,6 +18,7 @@
                 <outlet property="joystickBtn" destination="Cpz-fK-yJS" id="GBM-2E-WW9"/>
                 <outlet property="keyboardBtn" destination="rzU-eS-nbZ" id="sgS-CL-5uh"/>
                 <outlet property="leftCos" destination="oRh-vF-pbq" id="sgB-GM-a37"/>
+                <outlet property="liveBtn" destination="9L1-fI-BVt" id="Ja3-qI-bHQ"/>
                 <outlet property="modeMouseBtn" destination="Yza-Y6-DtA" id="f2H-oZ-HZM"/>
                 <outlet property="modeScreenBtn" destination="7ze-BY-4J4" id="gFg-P0-mhI"/>
                 <outlet property="modeSwipeBtn" destination="EMy-F6-vw4" id="VYs-fG-Cr9"/>

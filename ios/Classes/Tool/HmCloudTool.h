@@ -76,13 +76,18 @@ static NSString *ActionClosePage = @"closePage";
 /// 按键震动
 @property (nonatomic, assign)   BOOL isVibration;
 
+/// 云游互动
+@property (nonatomic, assign)   BOOL isLiving;
+
 /// 鼠标模式
 @property (nonatomic, assign)   HMCloudCoreTouchMode touchMode;
 
 /// 鼠标灵敏度
 @property (nonatomic, assign)   float sensitivity;
 
-@property (nonatomic, copy)             NSString *cloudId;
+@property (nonatomic, strong)             NSString *cloudId;
+@property (nonatomic, strong)             NSString *liveRoomId;
+
 
 @property (nonatomic, weak) id<HmCloudToolDelegate> delegate;
 
@@ -97,6 +102,8 @@ static NSString *ActionClosePage = @"closePage";
 /// 推出flutter 页面后，回到游戏页面的方法
 - (void)restart;
 
+- (void)startLiving;
+- (void)stopLiving;
 
 /// 发送指令到海马
 /// - Parameter dictList: HMOneInputOPData json的集合

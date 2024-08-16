@@ -29,6 +29,12 @@
         cloudTool = [[self alloc] init];
         cloudTool.isVibration = YES;
         cloudTool.touchMode = HMCloudCoreTouchModeMouse;
+
+        [SVProgressHUD setFont:[UIFont systemFontOfSize:12]];
+        [SVProgressHUD setMinimumSize:CGSizeMake(130, 50)];
+        [SVProgressHUD setBackgroundColor:kColor(0x202125)];
+        [SVProgressHUD setImageViewSize:CGSizeMake(1, 1)];
+        [SVProgressHUD setForegroundColor:[UIColor whiteColor]];
     });
 
     return cloudTool;
@@ -110,6 +116,25 @@
     }
 }
 
+- (void)startLiving {
+    HMCloudPlayer *player = [HMCloudPlayer sharedCloudPlayer];
+    ELivingCapabilityStatus liveStatus = [player getLivingCapabilityStatus];
+
+    if (liveStatus == LivingSupported) {
+        NSString *pushUrl = [NSString stringWithFormat:@"rtmp://push-cg.3ayx.net/live/%@", self.cloudId];
+
+
+        [[HMCloudPlayer sharedCloudPlayer] startLivingWithLivingId:self.cloudId
+                                                     pushStreamUrl:pushUrl
+                                                           success:nil
+                                                              fail:nil];
+    }
+}
+
+- (void)stopLiving {
+    self.isLiving = NO;
+}
+
 #pragma mark - CloudPlayer Delegate Function
 - (void)cloudPlayerSceneChangedCallback:(NSDictionary *)dict {
     if (!dict || ![dict isKindOfClass:[NSDictionary class]]) {
@@ -140,6 +165,8 @@
             [self processStasticInfo:extraInfo];
         } else if ([scene isEqualToString:@"maintance"]) {
             [self processMaintanceInfo:extraInfo];
+        } else if ([scene isEqualToString:@"living"]) {
+            [self processLivingInfo:extraInfo];
         }
     });
 }
@@ -244,6 +271,13 @@
 
     if ([state isEqualToString:@"videoVisible"]) {
         [[HMCloudPlayer sharedCloudPlayer] cloudSetTouchModel:self.touchMode];
+
+        NSLog(@"cloudid = %@", self.cloudId);
+
+        if (!self.isVip && !self.isLiving) {
+            [self startLiving];
+        }
+
         [self pushPreView];
     }
 
@@ -266,6 +300,11 @@
             }];
         } else {
             // 错误弹框
+            NSString *errorCode = [info objectForKey:@"errorCode"];
+
+            if (errorCode) {
+                reason = [reason stringByAppendingFormat:@"--%@", errorCode];
+            }
 
             [ErrorAlertView showAlertWithCid:[HMCloudPlayer sharedCloudPlayer].cloudId
                                          uid:self.userId
@@ -384,6 +423,39 @@
     }
 }
 
+- (void)processLivingInfo:(NSDictionary *)info {
+    if (!info || ![info isKindOfClass:[NSDictionary class]]) {
+        return;
+    }
+
+    NSString *state = [info objectForKey:@"state"];
+
+    if ([state isEqualToString:@"startSuccess"]) {
+        [SVProgressHUD showImage:[UIImage imageNamed:@""] status:@"云游互动开启成功~"];
+        self.isLiving = YES;
+
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [[RequestTool share] requestUrl:k_api_create_liveRoom
+                                 methodType:Request_POST
+                                     params:@{ @"cid": [HmCloudTool share].cloudId, @"hide": @1 }
+                              faildCallBack:^{
+            }
+                            successCallBack:^(id _Nonnull obj) {
+            }];
+        });
+    }
+
+    if ([state isEqualToString:@"startFailed"]) {
+        [SVProgressHUD showImage:[UIImage imageNamed:@""] status:@"云游互动开启失败!"];
+    }
+
+    if ([state isEqualToString:@"stopSuccess"]) {
+    }
+
+    if ([state isEqualToString:@"stopFailed"]) {
+    }
+}
+
 // MARK: 初始化gameVC
 - (void)initGameVC {
 //    [self pushPreView];
@@ -402,6 +474,10 @@
         NSString *jsonStr = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
 
 
+        NSData *data = [jsonStr dataUsingEncoding:NSUTF8StringEncoding];
+        NSString *base64String = [data base64EncodedStringWithOptions:0];
+
+
         NSDictionary *gameOptions = @{
                 CloudGameOptionKeyId: self.gamePkName,
                 CloudGameOptionKeyOrientation: @(0),
@@ -412,7 +488,7 @@
                 CloudGameOptionKeyPlayingTime: self.playTime,
                 CloudGameOptionKeyExtraId: @"",
                 CloudGameOptionKeyArchive: @(0),
-                CloudGameOptionKeyProtoData: jsonStr,
+                CloudGameOptionKeyProtoData: base64String,
                 CloudGameOptionKeyAppChannel: self.channelName,
                 CloudGameOptionKeyStreamType: @(CloudCoreStreamingTypeRTC),
                 CloudGameOptionKeyPriority: self.priority

@@ -9,7 +9,6 @@
 #import "CustomKeyViewController.h"
 #import "CustomSelectViewController.h"
 #import "CustomSlider.h"
-#import "ErrorAlertView.h"
 #import "GameDetailsModel.h"
 #import "GameKeyView.h"
 #import "GameKeyView.h"
@@ -44,6 +43,7 @@
 @property (weak, nonatomic) IBOutlet SPButton *keyboardBtn;
 @property (weak, nonatomic) IBOutlet SPButton *vibrationBtn;
 @property (weak, nonatomic) IBOutlet SPButton *customBtn;
+@property (weak, nonatomic) IBOutlet SPButton *liveBtn;
 
 // 鼠标设置开关
 @property (weak, nonatomic) IBOutlet UISwitch *modeSwitch;
@@ -203,7 +203,24 @@
         }
     }];
 
+    [[self.liveBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
+        @strongify(tool);
 
+        if ([tool isVip]) {
+            [tool stopLiving];
+        } else {
+            [NormalAlertView showAlertWithTitle:nil
+                                        content:nil
+                                   confirmTitle:nil
+                                    cancelTitle:nil
+                                confirmCallback:^{
+                [self pushToFlutterPage:Flutter_rechartVip];
+            }
+                                 cancelCallback:nil];
+        }
+    }];
+
+    RAC(self.liveBtn, selected) = RACObserve(tool, isLiving);
 
 
     [[self.vibrationBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
