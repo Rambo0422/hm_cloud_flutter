@@ -263,8 +263,6 @@ class AddGamepadKey @JvmOverloads constructor(
                 UUID.randomUUID(),
                 left - width / 2,
                 top - height / 2,
-                0,
-                0,
                 width,
                 zoom,
                 text,

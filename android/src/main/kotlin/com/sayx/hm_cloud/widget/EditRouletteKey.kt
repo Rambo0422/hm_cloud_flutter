@@ -192,8 +192,6 @@ class EditRouletteKey @JvmOverloads constructor(
                     UUID.randomUUID(),
                     AppSizeUtils.DESIGN_WIDTH / 2 - 50,
                     AppSizeUtils.DESIGN_HEIGHT / 2 - 40,
-                    0,
-                    0,
                     100,
                     60,
                     context.getString(R.string.roulette_key),

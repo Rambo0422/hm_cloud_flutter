@@ -44,7 +44,7 @@
             android:background="@drawable/shape_key_label_bg"
             android:textColor="#FFC6EC4B"
             android:lines="1"
-            android:textSize="9sp"
+            android:textSize="8sp"
             android:gravity="center"
             android:visibility="gone"
             tools:text="Space"

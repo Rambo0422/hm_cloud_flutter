@@ -195,8 +195,6 @@ class EditCombineKey @JvmOverloads constructor(
                     UUID.randomUUID(),
                     AppSizeUtils.DESIGN_WIDTH / 2 - 20,
                     AppSizeUtils.DESIGN_HEIGHT / 2 - 20,
-                    0,
-                    0,
                     40,
                     60,
                     context.getString(R.string.combine_key),

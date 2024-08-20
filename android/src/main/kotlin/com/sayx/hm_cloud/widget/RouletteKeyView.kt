@@ -18,6 +18,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
 import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.SizeUtils
 import com.sayx.hm_cloud.R
 import com.sayx.hm_cloud.model.KeyInfo
 import com.sayx.hm_cloud.callback.OnKeyEventListener
@@ -76,12 +77,20 @@ class RouletteKeyView @JvmOverloads constructor(
     init {
         arcPaint.style = Paint.Style.FILL_AND_STROKE
         arcPaint.isDither = true
-        arcPaint.strokeWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2f, context.resources.displayMetrics)
+        arcPaint.strokeWidth = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            2f,
+            context.resources.displayMetrics
+        )
         arcPaint.color = Color.parseColor("#4D000000")
 
         textPaint.textAlign = Paint.Align.CENTER
         textPaint.isDither = true
-        textPaint.textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 10f, context.resources.displayMetrics)
+        textPaint.textSize = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_SP,
+            10f,
+            context.resources.displayMetrics
+        )
 
         thumbDrawable = ContextCompat.getDrawable(context, R.drawable.img_roulette_key)
 
@@ -92,14 +101,25 @@ class RouletteKeyView @JvmOverloads constructor(
         setBackgroundColor(Color.TRANSPARENT)
     }
 
+    init {
+        setWillNotDraw(false)
+        val padding = SizeUtils.dp2px(2f)
+        setPadding(padding, padding, padding, padding)
+    }
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val width = MeasureSpec.getSize(widthMeasureSpec)
         val height = MeasureSpec.getSize(heightMeasureSpec)
         val size = width.coerceAtMost(height)
         // 整体圆角
-        radius = (size - paddingLeft * 2) / 2f
+        radius = (size - paddingLeft * 2f) / 2f
         // 整体矩形
-        rouletteRectF.set(paddingLeft.toFloat(), paddingLeft.toFloat(), (size - paddingLeft).toFloat(), (size - paddingLeft).toFloat())
+        rouletteRectF.set(
+            paddingLeft.toFloat(),
+            paddingTop.toFloat(),
+            (size - paddingLeft).toFloat(),
+            (size - paddingLeft).toFloat()
+        )
         // thumb矩形
         thumbSize = width / 3f
         thumbRect.set(
@@ -111,14 +131,23 @@ class RouletteKeyView @JvmOverloads constructor(
         setMeasuredDimension(size, size)
     }
 
+    private val bgPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.parseColor("#3CFFFFFF")
+        style = Paint.Style.FILL
+    }
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+        if (controllerStatus == ControllerStatus.Edit || controllerStatus == ControllerStatus.Combine) {
+            canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), bgPaint)
+        }
         rouletteParts?.let {
             try {
                 if (showRoulette) {
                     it.forEach { part ->
                         // 绘制圆弧
-                        arcPaint.color = if (part.selected) Color.parseColor("#73C6EC4B") else Color.parseColor("#4D000000")
+                        arcPaint.color =
+                            if (part.selected) Color.parseColor("#73C6EC4B") else Color.parseColor("#4D000000")
                         canvas.drawArc(rouletteRectF, part.startAngle, part.angle, true, arcPaint)
                         // 绘制圆弧文本
                         drawRouletteName(canvas, part)
@@ -197,6 +226,9 @@ class RouletteKeyView @JvmOverloads constructor(
                         }
                         lastX = it.x
                         lastY = it.y
+                        if (parent is GameController) {
+                            (parent as GameController).checkAlignment(this)
+                        }
                     } else if (controllerStatus == ControllerStatus.Normal) {
                         // 按压中部展示轮盘
                         val thumbTouch = isThumbTouch(event.x, event.y)
@@ -228,6 +260,9 @@ class RouletteKeyView @JvmOverloads constructor(
                             moveY = if (moveY < minY) minY else if (moveY > maxY) maxY else moveY
                             x = moveX
                             y = moveY
+                            if (parent is GameController) {
+                                (parent as GameController).checkAlignment(this)
+                            }
                         }
                     } else if (controllerStatus == ControllerStatus.Normal) {
                         if (rouletteRectF.contains(event.x, event.y)) {
@@ -237,7 +272,10 @@ class RouletteKeyView @JvmOverloads constructor(
                                 if (position != currentIndex && position >= 0 && position < list.size) {
                                     // 上一个按键抬起
                                     if (currentIndex in list.indices) {
-                                        onKeyEventListener?.onButtonPress(list[currentIndex].keyInfo, false)
+                                        onKeyEventListener?.onButtonPress(
+                                            list[currentIndex].keyInfo,
+                                            false
+                                        )
                                     }
                                     // 当前键按下
                                     onKeyEventListener?.onButtonPress(list[position].keyInfo, true)
@@ -258,7 +296,15 @@ class RouletteKeyView @JvmOverloads constructor(
                         isPressed = false
                         val position = IntArray(4)
                         val location = AppSizeUtils.getLocationOnScreen(this, position)
-                        positionListener?.onPositionChange(location[0], location[1], location[2],  location[3])
+                        positionListener?.onPositionChange(
+                            location[0],
+                            location[1],
+                            location[2],
+                            location[3]
+                        )
+                        if (parent is GameController) {
+                            (parent as GameController).clearLine()
+                        }
                         if (!isDrag) {
                             performClick()
                         }
@@ -286,7 +332,16 @@ class RouletteKeyView @JvmOverloads constructor(
 
     private fun computePosition(x: Float, y: Float): Int {
         rouletteParts?.forEachIndexed { index, part ->
-            if (isPointInSector(x, y, rouletteRectF.centerX(), rouletteRectF.centerY(), radius, part.startAngle, part.angle)) {
+            if (isPointInSector(
+                    x,
+                    y,
+                    rouletteRectF.centerX(),
+                    rouletteRectF.centerY(),
+                    radius,
+                    part.startAngle,
+                    part.angle
+                )
+            ) {
                 return index
             }
         }

@@ -3,6 +3,8 @@ package com.sayx.hm_cloud.utils
 import android.view.View
 import androidx.annotation.Size
 import com.blankj.utilcode.util.ScreenUtils
+import com.blankj.utilcode.util.LogUtils
+import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.min
 
@@ -21,31 +23,43 @@ object AppSizeUtils {
 
     // size ：667 -> result:ScreenWidth
     fun convertWidthSize(size: Int): Int {
-        val width = max(screenWidth, screenHeight) - navigationBarHeight
-        val multiple = width / DESIGN_WIDTH
-//        LogUtils.d("screenWidth=$screenWidth, screenHeight=$screenHeight, multiple=$multiple")
-        return size * multiple
+//        val width = max(screenWidth, screenHeight) - navigationBarHeight
+        val width = max(screenWidth, screenHeight)
+        val multiple: Double = width.toDouble() / DESIGN_WIDTH
+//        LogUtils.d("screenWidth=$screenWidth, screenHeight=$screenHeight, widthMultiple=$multiple, navigationBarHeight:$navigationBarHeight")
+        return ceil(size * multiple).toInt()
     }
 
     // size：ScreenWidth -> result:667
     fun reconvertWidthSize(size: Int): Int {
-        val width = max(screenWidth, screenHeight) - navigationBarHeight
-        val multiple = width / DESIGN_WIDTH
-        return size / multiple
+//        val width = max(screenWidth, screenHeight) - navigationBarHeight
+        val width = max(screenWidth, screenHeight)
+        val multiple: Double = width.toDouble() / DESIGN_WIDTH
+//        LogUtils.d("screenWidth=$screenWidth, screenHeight=$screenHeight, widthMultiple=$multiple, navigationBarHeight:$navigationBarHeight")
+        return ceil(size / multiple).toInt()
     }
 
     // size ：375 -> result:ScreenHeight
     fun convertHeightSize(size: Int): Int {
         val height = min(screenWidth, screenHeight)
-        val multiple = height / DESIGN_HEIGHT
-        return size * multiple
+        val multiple: Double = height.toDouble() / DESIGN_HEIGHT
+//        LogUtils.d("screenWidth=$screenWidth, screenHeight=$screenHeight, heightMultiple=$multiple")
+        return ceil(size * multiple).toInt()
     }
 
     // size：ScreenHeight -> result:375
     fun reconvertHeightSize(size: Int): Int {
         val height = min(screenWidth, screenHeight)
-        val multiple = height / DESIGN_HEIGHT
-        return size / multiple
+        val multiple: Double = height.toDouble() / DESIGN_HEIGHT
+        return ceil(size / multiple).toInt()
+    }
+
+    fun convertViewSize(size: Int): Int {
+        return if (screenWidth > screenHeight) {
+            convertHeightSize(size)
+        } else {
+            convertWidthSize(size)
+        }
     }
 
     fun getLocationOnScreen(view: View, @Size(4) location: IntArray): IntArray {

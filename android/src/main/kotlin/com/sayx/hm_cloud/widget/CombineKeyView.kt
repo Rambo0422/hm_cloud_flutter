@@ -2,6 +2,9 @@ package com.sayx.hm_cloud.widget
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -43,6 +46,10 @@ class CombineKeyView @JvmOverloads constructor(
 
     private var firstTouchId = 0
 
+    init {
+        setWillNotDraw(false)
+    }
+
     fun setKeyInfo(keyInfo: KeyInfo) {
         updateText(keyInfo.text)
     }
@@ -50,6 +57,18 @@ class CombineKeyView @JvmOverloads constructor(
     fun updateText(text: String?) {
         dataBinding.tvName.text = text
         LogUtils.d("updateText:$text")
+    }
+
+    private val bgPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.parseColor("#3CFFFFFF")
+        style = Paint.Style.FILL
+    }
+
+    override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+        if (controllerStatus == ControllerStatus.Edit || controllerStatus == ControllerStatus.Combine) {
+            canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), bgPaint)
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -66,6 +85,9 @@ class CombineKeyView @JvmOverloads constructor(
                         }
                         lastX = it.x
                         lastY = it.y
+                        if (parent is GameController) {
+                            (parent as GameController).checkAlignment(this)
+                        }
                     } else if (controllerStatus == ControllerStatus.Normal) {
                         firstTouchId = it.getPointerId(it.actionIndex)
                         AppVibrateUtils.vibrate()
@@ -92,6 +114,9 @@ class CombineKeyView @JvmOverloads constructor(
                             moveY = if (moveY < minY) minY else if (moveY > maxY) maxY else moveY
                             x = moveX
                             y = moveY
+                            if (parent is GameController) {
+                                (parent as GameController).checkAlignment(this)
+                            }
                         }
                     }
                 }
@@ -102,6 +127,9 @@ class CombineKeyView @JvmOverloads constructor(
                         val position = IntArray(4)
                         val location = AppSizeUtils.getLocationOnScreen(this, position)
                         positionListener?.onPositionChange(location[0], location[1], location[2],  location[3])
+                        if (parent is GameController) {
+                            (parent as GameController).clearLine()
+                        }
                         if (!isDrag) {
                             performClick()
                         }

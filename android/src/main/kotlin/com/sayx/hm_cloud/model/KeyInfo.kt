@@ -3,13 +3,12 @@ package com.sayx.hm_cloud.model
 import com.sayx.hm_cloud.GameManager
 import java.io.Serializable
 import java.util.UUID
+import kotlin.math.ceil
 
 class KeyInfo(
     var id: UUID?,
     var left: Int,
     var top: Int,
-    var right: Int,
-    var bottom: Int,
     val width: Int,
     var zoom: Int,
     var text: String?,
@@ -29,12 +28,12 @@ class KeyInfo(
         id = UUID.randomUUID()
     }
 
-    fun getWidth(): Float {
-        return width * (zoom / 100f * 2.25f)
+    fun getKeyWidth(): Int {
+        return ceil(width * (zoom / 100f * 2f)).toInt()
     }
 
-    fun getHeight(): Float {
-        return height * (zoom / 100f * 2.25f)
+    fun getKeyHeight(): Int {
+        return ceil(height * (zoom / 100f * 2f)).toInt()
     }
 
     fun changeZoom(zoom: Int) {
@@ -47,11 +46,9 @@ class KeyInfo(
         opacityChange = true
     }
 
-    fun changePosition(left: Int, top: Int, right: Int, bottom: Int) {
+    fun changePosition(left: Int, top: Int) {
         this.left = left
         this.top = top
-        this.right = right
-        this.bottom = bottom
     }
 
     fun changeText(text: String?) {
@@ -76,8 +73,6 @@ class KeyInfo(
             this.id,
             this.left,
             this.top,
-            this.right,
-            this.bottom,
             this.width,
             this.zoom,
             this.text,

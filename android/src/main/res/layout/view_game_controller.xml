@@ -10,7 +10,7 @@
         android:layout_height="match_parent"
         android:background="@android:color/transparent">
 
-        <FrameLayout
+        <com.sayx.hm_cloud.widget.AlignOverlayLayout
             android:id="@+id/layout_mask"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
@@ -93,6 +94,10 @@ object GameManager : HmcpPlayerListener, OnContronListener {
         this.gameParam = gameParam
         // 手游与端游对应的sdk配置不同，所以每次启动游戏都执行初始化
         initGameSdk()
+//        Intent().apply {
+//            setClass(activity, GameActivity::class.java)
+//            activity.startActivityForResult(this, 200)
+//        }
     }
 
     private fun initGameSdk() {
@@ -113,7 +118,8 @@ object GameManager : HmcpPlayerListener, OnContronListener {
             this.userId = gameParam?.userId ?: ""
 
 //            Log.e("CloudGame", "init haiMaSDK:${gameParam?.accessKeyId}")
-            LogUtils.d("init haiMaSDK:${gameParam?.accessKeyId}")
+            LogUtils.d("init haiMaSDK:${config}")
+            HmcpManager.getInstance().releaseRequestManager()
             HmcpManager.getInstance().init(config, activity, object : OnInitCallBackListener {
                 override fun success() {
                     LogUtils.d("haiMaSDK success:${HmcpManager.getInstance().sdkVersion}")
@@ -123,12 +129,30 @@ object GameManager : HmcpPlayerListener, OnContronListener {
 
                 override fun fail(msg: String?) {
                     LogUtils.e("haiMaSDK fail:$msg")
+                    var errorCode = GameError.gameInitErrorCode
+                    var errorMsg = GameError.gameInitErrorMsg
+                    if (msg is String && !TextUtils.isEmpty(msg)) {
+                        val resultData = gson.fromJson(msg, Map::class.java)
+                        var errorCodeWithoutCid = ""
+                        try {
+                            errorCodeWithoutCid =
+                                if (resultData["errorCodeWithoutCid"].toString() == "null") GameError.gameInitErrorCode else resultData["errorCodeWithoutCid"].toString()
+                        } catch (e: Exception) {
+                            LogUtils.e("${e.message}")
+                        }
+                        errorCode =
+                            if (TextUtils.isEmpty(errorCodeWithoutCid)) GameError.gameInitErrorCode else errorCodeWithoutCid
+                        try {
+                            errorMsg =
+                                if (resultData["errorMessage"].toString() == "null") resultData["errorMsg"].toString() else resultData["errorMessage"].toString()
+                        } catch (e: Exception) {
+                            LogUtils.e("${e.message}")
+                        }
+                    }
+                    EventBus.getDefault().post(GameErrorEvent(errorCode, errorMsg))
                     channel.invokeMethod(
                         "errorInfo",
-                        mapOf(
-                            Pair("errorCode", GameError.gameInitErrorCode),
-                            Pair("cid", HmcpManager.getInstance().cloudId),
-                        )
+                        mapOf(Pair("errorCode", errorCode), Pair("errorMsg", errorMsg))
                     )
                 }
             }, true)
