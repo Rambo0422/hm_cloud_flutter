@@ -18,6 +18,9 @@ class KeyInfo(
     val inputOp: Int,
     val height: Int,
     var composeArr: List<KeyInfo>? = null,
+    var rouArr: List<KeyInfo>? = null,
+    var editIndex: Int? = 0,
+    var isRou: Boolean = false,
     var zoomChange: Boolean = false,
     var opacityChange: Boolean = false,
     var textChange: Boolean = false,
@@ -61,6 +64,11 @@ class KeyInfo(
         listChange = true
     }
 
+    fun updateRouList(rouArr: List<KeyInfo>) {
+        this.rouArr = rouArr
+        listChange = true
+    }
+
     fun updateChange(boolean: Boolean) {
         textChange = boolean
         zoomChange = boolean
@@ -81,7 +89,10 @@ class KeyInfo(
             this.click,
             this.inputOp,
             this.height,
-            this.composeArr
+            this.composeArr,
+            this.rouArr,
+            this.editIndex,
+            this.isRou,
         )
     }
 

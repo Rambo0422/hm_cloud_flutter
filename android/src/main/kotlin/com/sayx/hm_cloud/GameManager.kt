@@ -93,11 +93,11 @@ object GameManager : HmcpPlayerListener, OnContronListener {
     fun startGame(gameParam: GameParam) {
         this.gameParam = gameParam
         // 手游与端游对应的sdk配置不同，所以每次启动游戏都执行初始化
-        initGameSdk()
-//        Intent().apply {
-//            setClass(activity, GameActivity::class.java)
-//            activity.startActivityForResult(this, 200)
-//        }
+//        initGameSdk()
+        Intent().apply {
+            setClass(activity, GameActivity::class.java)
+            activity.startActivityForResult(this, 200)
+        }
     }
 
     private fun initGameSdk() {

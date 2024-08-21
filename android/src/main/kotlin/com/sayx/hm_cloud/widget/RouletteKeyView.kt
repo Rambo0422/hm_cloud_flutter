@@ -180,8 +180,8 @@ class RouletteKeyView @JvmOverloads constructor(
         val path = Path()
         path.addArc(rouletteRectF, roulettePart.startAngle, roulettePart.angle)
         val midAngle: Float = roulettePart.startAngle + roulettePart.angle / 2
-        val x = rouletteRectF.centerX() + radius * cos(Math.toRadians(midAngle.toDouble())) * 0.75f
-        val y = rouletteRectF.centerY() + radius * sin(Math.toRadians(midAngle.toDouble())) * 0.75f
+        val x = rouletteRectF.centerX() + radius * cos(Math.toRadians(midAngle.toDouble())) * 0.6f
+        val y = rouletteRectF.centerY() + radius * sin(Math.toRadians(midAngle.toDouble())) * 0.6f
         textPaint.color = Color.WHITE
         val fontMetrics = textPaint.fontMetrics
         val distance = (fontMetrics.bottom - fontMetrics.top) / 2 - fontMetrics.bottom
@@ -191,13 +191,13 @@ class RouletteKeyView @JvmOverloads constructor(
 
     fun setKeyInfo(keyInfo: KeyInfo) {
 //        LogUtils.d("setKeyInfo:$keyInfo")
-        if (keyInfo.composeArr.isNullOrEmpty()) {
+        if (keyInfo.rouArr.isNullOrEmpty()) {
             return
         }
         thumbText = keyInfo.text
-        keyInfo.composeArr?.let {
+        keyInfo.rouArr?.let {
             rouletteParts = mutableListOf()
-            var startAngel = 0f
+            var startAngel = -90f
             // 360度-轮盘区域数量 * 间隔宽度
             val totalAngel = 360f
             it.forEach { info ->
@@ -357,33 +357,24 @@ class RouletteKeyView @JvmOverloads constructor(
         startAngle: Float,
         sweepAngle: Float
     ): Boolean {
-
         // 计算点相对于扇形中心的角度
-        var angle = atan2((pointY - centerY).toDouble(), (pointX - centerX).toDouble())
-        if (angle < 0) {
-            angle += 2 * Math.PI
-        }
-        // 转换角度至0-360度
-        var angleDegrees = angle * (180.0 / Math.PI)
-
-        // 将角度限制在0-360度范围内
-        if (angleDegrees < 0) {
-            angleDegrees += 360.0
-        }
+        var angle =
+            Math.toDegrees(atan2((pointY - centerY).toDouble(), (pointX - centerX).toDouble()))
 
         // 判断点是否在扇形起始角度之后
-        if (angleDegrees < startAngle) {
-            angleDegrees += 360.0
+        if (angle < startAngle) {
+            angle += 360.0
         }
+        LogUtils.d("currentAngle:$angle")
 
         // 计算扇形起始角度和终止角度
         val endAngle = startAngle + sweepAngle
 
         // 检查点是否在扇形的范围内
-        return angleDegrees >= startAngle && angleDegrees < endAngle && hypot(
+        return angle >= startAngle && angle < endAngle && (hypot(
             (pointX - centerX).toDouble(),
             (pointY - centerY).toDouble()
-        ) <= radius
+        ) <= radius)
     }
 
     private fun isThumbTouch(x: Float, y: Float): Boolean {

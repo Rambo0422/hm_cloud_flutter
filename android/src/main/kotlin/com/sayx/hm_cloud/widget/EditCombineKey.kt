@@ -193,21 +193,22 @@ class EditCombineKey @JvmOverloads constructor(
             addKeyListener?.onAddKey(
                 KeyInfo(
                     UUID.randomUUID(),
-                    AppSizeUtils.DESIGN_WIDTH / 2 - 20,
-                    AppSizeUtils.DESIGN_HEIGHT / 2 - 20,
-                    40,
+                    AppSizeUtils.DESIGN_WIDTH / 2 - 15,
+                    AppSizeUtils.DESIGN_HEIGHT / 2 - 15,
+                    30,
                     60,
                     context.getString(R.string.combine_key),
                     KeyType.KEY_COMBINE,
                     60,
                     0,
                     0,
-                    40,
-                    keyInfoList
+                    30,
+                    composeArr = keyInfoList
                 )
             )
         } else {
-            keyInfo?.composeArr = keyInfoList
+            keyInfo?.changeList(composeArr = keyInfoList)
+            addKeyListener?.onUpdateKey()
         }
         hideLayout()
     }

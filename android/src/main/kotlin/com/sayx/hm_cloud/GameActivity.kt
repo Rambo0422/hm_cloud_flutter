@@ -155,6 +155,7 @@ class GameActivity : AppCompatActivity() {
                 )
             )
         }
+        dataBinding.tvCloudId.text = HmcpManager.getInstance().cloudId
         GameManager.gameView?.setAttachContext(this)
         GameManager.gameView?.virtualDeviceType = VirtualOperateType.NONE
         // 游戏设置
@@ -178,8 +179,13 @@ class GameActivity : AppCompatActivity() {
         }
         dataBinding.gameController.listener = object : OnEditClickListener {
             override fun onEditKeyClick(keyInfo: KeyInfo) {
-                // 自定义按钮编辑状态点击
-                controllerEditLayout?.setKeyInfo(keyInfo)
+                LogUtils.d("onEditKeyClick->status:$controllerStatus, keyInfo:$keyInfo")
+                if (controllerStatus == ControllerStatus.Edit) {
+                    // 自定义按钮编辑状态点击
+                    controllerEditLayout?.setKeyInfo(keyInfo)
+                } else if (controllerStatus == ControllerStatus.Roulette) {
+                    addCombineKey(keyInfo)
+                }
             }
         }
         // 游戏控制器数据反馈
@@ -681,7 +687,7 @@ class GameActivity : AppCompatActivity() {
             editRouletteKey?.setRouletteKeyInfo(keyInfo)
             editRouletteKey?.showBoard()
         }
-        showKeyBoard(false)
+//        showKeyBoard(false)
     }
 
     private fun showExitCustomDialog() {
@@ -725,7 +731,7 @@ class GameActivity : AppCompatActivity() {
             addKeyboardKey?.listener = object : AddKeyListenerImp() {
                 override fun onAddKey(keyInfo: KeyInfo) {
                     if (controllerStatus == ControllerStatus.Edit) {
-                        LogUtils.d("onEditKeyClick:$keyInfo")
+                        LogUtils.d("onAddKey:$keyInfo")
                         when (keyInfo.type) {
                             KeyType.KEYBOARD_KEY, KeyType.KEYBOARD_MOUSE_UP, KeyType.KEYBOARD_MOUSE_DOWN, KeyType.KEYBOARD_MOUSE_LEFT, KeyType.KEYBOARD_MOUSE_RIGHT, KeyType.KEYBOARD_MOUSE_MIDDLE -> {
                                 dataBinding.gameController.addKeyButton(
@@ -777,7 +783,7 @@ class GameActivity : AppCompatActivity() {
             addGamepadKey?.listener = object : AddKeyListenerImp() {
                 override fun onAddKey(keyInfo: KeyInfo) {
                     if (controllerStatus == ControllerStatus.Edit) {
-                        LogUtils.d("onEditKeyClick:$keyInfo")
+                        LogUtils.d("onAddKey:$keyInfo")
                         when (keyInfo.type) {
                             KeyType.GAMEPAD_SQUARE, KeyType.GAMEPAD_ELLIPTIC, KeyType.GAMEPAD_ROUND_MEDIUM, KeyType.GAMEPAD_ROUND_SMALL -> {
                                 dataBinding.gameController.addKeyButton(

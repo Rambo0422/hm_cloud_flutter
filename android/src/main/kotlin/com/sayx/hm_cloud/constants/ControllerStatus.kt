@@ -12,8 +12,11 @@ enum class ControllerStatus {
     // 编辑状态，可点击进行编辑按键大小，透明度，触发效果，名称，可移动换位置
     Edit,
 
-    // 组合状态，点击添加组合/轮盘
-    Combine
+    // 组合状态，点击添加组合按键
+    Combine,
+
+    // 轮盘状态，点击添加轮盘按键
+    Roulette
 }
 
 object KeyType {

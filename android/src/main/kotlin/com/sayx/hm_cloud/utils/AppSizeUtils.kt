@@ -55,7 +55,11 @@ object AppSizeUtils {
     }
 
     fun convertViewSize(size: Int): Int {
-        return if (screenWidth > screenHeight) {
+        val width = max(screenWidth, screenHeight)
+        val height = min(screenWidth, screenHeight)
+        val widthRatio = width / DESIGN_WIDTH
+        val heightRatio = height / DESIGN_HEIGHT
+        return if (widthRatio > heightRatio) {
             convertHeightSize(size)
         } else {
             convertWidthSize(size)

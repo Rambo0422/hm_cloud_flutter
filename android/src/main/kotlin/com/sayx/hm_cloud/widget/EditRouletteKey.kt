@@ -119,7 +119,7 @@ class EditRouletteKey @JvmOverloads constructor(
         animator.addListener(object : AnimatorListenerImp() {
             override fun onAnimationStart(animation: Animator) {
                 visibility = VISIBLE
-                controllerStatus = ControllerStatus.Combine
+                controllerStatus = ControllerStatus.Roulette
             }
         })
         animator.start()
@@ -190,21 +190,21 @@ class EditRouletteKey @JvmOverloads constructor(
             addKeyListener?.onAddKey(
                 KeyInfo(
                     UUID.randomUUID(),
-                    AppSizeUtils.DESIGN_WIDTH / 2 - 50,
-                    AppSizeUtils.DESIGN_HEIGHT / 2 - 40,
-                    100,
-                    60,
-                    context.getString(R.string.roulette_key),
+                    AppSizeUtils.DESIGN_WIDTH / 2 - 45,
+                    AppSizeUtils.DESIGN_HEIGHT / 2 - 45,
+                    90,
+                    50,
+                    "轮盘",
                     KeyType.KEY_ROULETTE,
                     60,
                     0,
                     0,
-                    100,
-                    keyInfoList
+                    90,
+                    rouArr = keyInfoList
                 )
             )
         } else {
-            keyInfo?.changeList(keyInfoList)
+            keyInfo?.updateRouList(keyInfoList)
             addKeyListener?.onUpdateKey()
         }
         hideLayout()
@@ -213,7 +213,7 @@ class EditRouletteKey @JvmOverloads constructor(
     fun setRouletteKeyInfo(keyInfo: KeyInfo?) {
         this.keyInfo = keyInfo
         keyInfo?.let {
-            val keyInfoList = it.composeArr
+            val keyInfoList = it.rouArr
             if (!keyInfoList.isNullOrEmpty()) {
                 for (index in keyInfoList.indices) {
                     val info = keyInfoList[index]

@@ -88,6 +88,7 @@ class AlignOverlayLayout @JvmOverloads constructor(
                         height.toFloat(),
                         0f
                     )
+                    return
                 }
                 if (abs((view.y + view.height / 2f) - (it.y + it.height / 2f)) <= SizeUtils.dp2px(4f)) {
                     // 中心点横顺向对齐
@@ -99,6 +100,7 @@ class AlignOverlayLayout @JvmOverloads constructor(
                         view.y + view.height / 2f,
                         0f
                     )
+                    return
                 }
                 if (abs(ViewUtils.getViewLeft(view) - ViewUtils.getViewLeft(it)) <= SizeUtils.dp2px(
                         4f
@@ -259,6 +261,7 @@ class AlignOverlayLayout @JvmOverloads constructor(
                     ) {
                         // 中心点竖向对齐
                         it.x = view.x + view.width / 2 - it.width / 2
+                        return
                     }
                     if (abs((view.y + view.height / 2f) - (it.y + it.height / 2f)) <= SizeUtils.dp2px(
                             4f
@@ -266,6 +269,7 @@ class AlignOverlayLayout @JvmOverloads constructor(
                     ) {
                         // 中心点横顺向对齐
                         it.y = view.y + view.height / 2 - it.height / 2
+                        return
                     }
                     if (abs(ViewUtils.getViewLeft(view) - ViewUtils.getViewLeft(it)) <= SizeUtils.dp2px(
                             4f

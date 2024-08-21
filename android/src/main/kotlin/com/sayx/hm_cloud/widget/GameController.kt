@@ -270,6 +270,9 @@ class GameController @JvmOverloads constructor(
         editGamepadKeys.clear()
         removeAllViews(gamepadViews)
         for (item in keyInfoList) {
+            if (item.isRou) {
+                continue
+            }
             val keyInfo = item.copy()
             editGamepadKeys.add(keyInfo)
             when (keyInfo.type) {
@@ -306,6 +309,9 @@ class GameController @JvmOverloads constructor(
         editKeyboardKeys.clear()
         removeAllViews(keyboardViews)
         for (item in keyInfoList) {
+            if (item.isRou) {
+                continue
+            }
             val keyInfo = item.copy()
             editKeyboardKeys.add(keyInfo)
             when (keyInfo.type) {
@@ -687,6 +693,8 @@ class GameController @JvmOverloads constructor(
                 currentKey?.let { info ->
                     listener?.onEditKeyClick(info)
                 }
+            } else if (controllerStatus == ControllerStatus.Roulette) {
+                listener?.onEditKeyClick(keyInfo)
             }
         }
         keyView.onKeyTouchListener = object : OnKeyTouchListener {
@@ -764,6 +772,8 @@ class GameController @JvmOverloads constructor(
                 currentKey?.let { info ->
                     listener?.onEditKeyClick(info)
                 }
+            } else if (controllerStatus == ControllerStatus.Roulette) {
+                listener?.onEditKeyClick(keyInfo)
             }
         }
         keyView.onKeyTouchListener = object : OnKeyTouchListener {
@@ -997,7 +1007,7 @@ class GameController @JvmOverloads constructor(
                     if (view is RouletteKeyView) {
                         view.setKeyInfo(it)
                     }
-                    LogUtils.d("listChange:${it.composeArr}")
+                    LogUtils.d("listChange:${it.rouArr}")
                 }
                 it.updateChange(false)
             } ?: LogUtils.e("updateKey: View not found")
