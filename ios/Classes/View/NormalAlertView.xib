@@ -96,6 +96,9 @@
             </userDefinedRuntimeAttributes>
             <connections>
                 <outlet property="cancelBtn" destination="pdt-KD-bSL" id="sDE-om-ITI"/>
+                <outlet property="confirmBtn" destination="dBR-et-SZc" id="n6Y-pi-mUi"/>
+                <outlet property="contengLab" destination="cue-Ig-ekD" id="L7C-vT-8ae"/>
+                <outlet property="titleLab" destination="1sE-bL-mHn" id="s1q-5g-vWZ"/>
             </connections>
             <point key="canvasLocation" x="-785" y="-6"/>
         </view>

@@ -12,6 +12,7 @@
 #import "HmCloudTool.h"
 #import "JoystickArrowView.h"
 #import "JoystickView.h"
+#import "RouletteView.h"
 #import "SanA_Macro.h"
 
 @interface GameKeyView () {
@@ -92,7 +93,7 @@
         }
         break;
 
-        case KEY_kb_xobx_rock_lt:{
+        case KEY_kb_xbox_rock_lt:{
             JoystickView *joy = [[JoystickView alloc] initWithEidt:_isEdit model:m];
             joy.bgImg = k_BundleImage(@"key_xbox_rock");
             joy.thumbImg = k_BundleImage(@"key_xbox_rock_thumb_l");
@@ -115,7 +116,7 @@
         }
         break;
 
-        case KEY_kb_xobx_rock_rt:{
+        case KEY_kb_xbox_rock_rt:{
             JoystickView *joy = [[JoystickView alloc] initWithEidt:_isEdit model:m];
             joy.bgImg = k_BundleImage(@"key_xbox_rock");
             joy.thumbImg = k_BundleImage(@"key_xbox_rock_thumb_r");
@@ -140,7 +141,7 @@
         }
         break;
 
-        case KEY_kb_xobx_cross:{
+        case KEY_kb_xbox_cross:{
             CrossView *cross = [[CrossView alloc] initWithEidt:_isEdit model:m];
             cross.callback = ^(NSNumber *_Nonnull op) {
                 NSDictionary *crossDict = @{
@@ -155,10 +156,28 @@
         }
         break;
 
+        case KEY_kb_roulette:{
+            RouletteView *roulette = [[RouletteView alloc] initWithEidt:_isEdit model:m];
+            roulette.tapCallback = self.tapCallback;
+
+            roulette.upCallback = ^(NSArray<NSDictionary *> *keyList) {
+                [[HmCloudTool share] sendCustomKey:keyList];
+            };
+
+            roulette.downCallback = ^(NSArray<NSDictionary *> *keyList) {
+                [[HmCloudTool share] sendCustomKey:keyList];
+            };
+
+            [self insertSubview:roulette atIndex:0];
+        }
+        break;
+
         case KEY_unknown:{
         }
         break;
 
+        case KEY_xbox_combination:
+        case KEY_kb_combination:
         default:{
             [self initKey:m];
         }

@@ -117,8 +117,9 @@
 }
 
 - (void)configRac {
-    @weakify(self);
     HmCloudTool *tool = [HmCloudTool share];
+
+    @weakify(self);
     @weakify(tool);
     [RACObserve(self, ms) subscribeNext:^(id _Nullable x) {
         @strongify(self);
@@ -204,6 +205,7 @@
     }];
 
     [[self.liveBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
+        @strongify(self);
         @strongify(tool);
 
         if ([tool isVip]) {
@@ -469,7 +471,9 @@
         vc.modalPresentationStyle = UIModalPresentationCustom;
         vc.transitioningDelegate = self;
         vc.type = type;
+        @weakify(self);
         vc.dismissCallback = ^(BOOL isSave) {
+            @strongify(self);
             self.keyView.hidden = NO;
 
             if (isSave) {
@@ -497,12 +501,20 @@
 }
 
 - (IBAction)didTapDismiss:(id)sender {
-    if (self.didDismiss) {
-        [self.view.subviews.firstObject removeFromSuperview];
-        self.didDismiss();
-    }
+    [NormalAlertView showAlertWithTitle:@"是否结束游戏？"
+                                content:@""
+                           confirmTitle:@"结束"
+                            cancelTitle:@"继续游玩"
+                        confirmCallback:^{
+        if (self.didDismiss) {
+            [self.view.subviews.firstObject removeFromSuperview];
+            self.didDismiss();
+        }
 
-    [self dismissViewControllerAnimated:YES completion:nil];
+        [self dismissViewControllerAnimated:YES
+                                 completion:nil];
+    }
+                         cancelCallback:nil];
 }
 
 - (void)refreshfps:(NSInteger)fps ms:(NSInteger)ms rate:(float)rate packetLoss:(float)packetLoss {

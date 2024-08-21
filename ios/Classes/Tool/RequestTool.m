@@ -59,14 +59,14 @@
         {
 #ifdef DEBUG
             NSLog(@"\n------------  Success  ------------\n"
-                  " \n \n"
+                  " \n"
                   " url = %@ \n"
-                  " \n \n"
+                  " \n"
                   " param = %@ \n"
                   " token = %@ \n"
-                  " \n \n"
+                  " \n"
                   " response = %@ \n"
-                  " \n \n"
+                  " \n"
                   "------------  Success  ------------\n", host, [param mj_JSONString], token, [responseObject mj_JSONString]);
 #endif
 
@@ -99,14 +99,15 @@
         {
 #ifdef DEBUG
             NSLog(@"\n------------  Success  ------------\n"
-                  " \n \n"
+                  " \n "
                   " url = %@ \n"
-                  " \n \n"
+                  " \n "
                   " param = %@ \n"
-                  " \n \n"
+                  " token = %@ \n"
+                  " \n "
                   " response = %@ \n"
-                  " \n \n"
-                  "------------  Success  ------------\n", host, [param mj_JSONString], [responseObject mj_JSONString]);
+                  " \n "
+                  "------------  Success  ------------\n", host, [param mj_JSONString], token, [responseObject mj_JSONString]);
 #endif
 
             NSNumber *code = responseObject[@"code"];

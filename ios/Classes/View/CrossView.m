@@ -79,19 +79,43 @@
 
 - (void)handlePan:(UIPanGestureRecognizer *)gestureRecognizer {
     if (self.isEdit) {
+        UIView *draggedView = gestureRecognizer.view;
+
         // 获取拖拽的位移
-        CGPoint translation = [gestureRecognizer translationInView:self.superview];
+        CGPoint translation = [gestureRecognizer translationInView:draggedView.superview];
 
         // 根据拖拽的位移更新视图的位置
-        self.center = CGPointMake(self.center.x + translation.x, self.center.y + translation.y);
+        CGPoint newCenter = CGPointMake(draggedView.center.x + translation.x, draggedView.center.y + translation.y);
+
+        // 获取屏幕边界
+        CGFloat halfWidth = CGRectGetWidth(draggedView.bounds) / 2.0;
+        CGFloat halfHeight = CGRectGetHeight(draggedView.bounds) / 2.0;
+        CGFloat screenWidth = CGRectGetWidth(draggedView.superview.bounds);
+        CGFloat screenHeight = CGRectGetHeight(draggedView.superview.bounds);
+
+        // 确保新中心点不会超出屏幕边界
+        newCenter.x = MAX(halfWidth, MIN(screenWidth - halfWidth, newCenter.x));
+        newCenter.y = MAX(halfHeight, MIN(screenHeight - halfHeight, newCenter.y));
+
+        // 更新视图的位置
+        draggedView.center = newCenter;
+
+
+        NSInteger top = (NSInteger)CGRectGetMinY(draggedView.frame);
+        NSInteger left = (NSInteger)CGRectGetMinX(draggedView.frame);
+
+        //    (_top * (kScreenH / 375.0)) = top;
+        //    (_left * (kScreenW / 667.0)) = left;
+
+        self.model.top = top / (kScreenH / 375.0);
+        self.model.left = left / (kScreenW / 667.0);
+
 
         // 重置拖拽手势的累积位移
         [gestureRecognizer setTranslation:CGPointZero inView:self.superview];
 
-        // 如果手势已经结束，可能需要处理其他逻辑
-        if (gestureRecognizer.state == UIGestureRecognizerStateEnded) {
-            // 可以在这里添加手势结束后的处理逻辑，例如检测视图是否拖出了屏幕
-            // 或者实现回弹动画等
+        if (self.tapCallback) {
+            self.tapCallback(self.model);
         }
     } else {
         CGPoint location = [gestureRecognizer locationInView:self];

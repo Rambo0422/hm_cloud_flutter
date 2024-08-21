@@ -296,20 +296,13 @@
     if ([state isEqualToString:@"stopped"]) {
         NSString *reason = [info objectForKey:@"stop_reason"];
 
+        NSString *title = @"";
+
         if ([reason isEqualToString:@"no_operation"]) {
             // 长时间误操作 弹框
-
-            [ErrorAlertView showAlertWithCid:[HMCloudPlayer sharedCloudPlayer].cloudId
-                                         uid:self.userId
-                                   errorCode:reason
-                                       title:@"长时间未操作，请重新连接游戏"
-                                     content:nil
-                            dissMissCallback:^{
-                [self stop];
-                [[UIViewController topViewController] dismissViewControllerAnimated:YES
-                                                                         completion:^{
-                }];
-            }];
+            title = @"长时间未操作，请重新连接游戏";
+        } else if ([reason isEqualToString:@"time_limit"]) {
+            title = @"游戏时长已结束";
         } else {
             // 错误弹框
             NSString *errorCode = [info objectForKey:@"errorCode"];
@@ -318,18 +311,20 @@
                 reason = [reason stringByAppendingFormat:@"--%@", errorCode];
             }
 
-            [ErrorAlertView showAlertWithCid:[HMCloudPlayer sharedCloudPlayer].cloudId
-                                         uid:self.userId
-                                   errorCode:reason
-                                       title:nil
-                                     content:nil
-                            dissMissCallback:^{
-                [self stop];
-                [[UIViewController topViewController] dismissViewControllerAnimated:YES
-                                                                         completion:^{
-                }];
-            }];
+            title = @"哎呀，出现故障了！";
         }
+
+        [ErrorAlertView showAlertWithCid:[HMCloudPlayer sharedCloudPlayer].cloudId
+                                     uid:self.userId
+                               errorCode:reason
+                                   title:title
+                                 content:nil
+                        dissMissCallback:^{
+            [self stop];
+            [[UIViewController topViewController] dismissViewControllerAnimated:YES
+                                                                     completion:^{
+            }];
+        }];
     }
 
     if ([state isEqualToString:@"playFailed"]) {

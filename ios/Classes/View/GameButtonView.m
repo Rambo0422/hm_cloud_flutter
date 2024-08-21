@@ -82,8 +82,8 @@
     NSInteger top = (NSInteger)CGRectGetMinY(draggedView.frame);
     NSInteger left = (NSInteger)CGRectGetMinX(draggedView.frame);
 
-//    (_top * (kScreenH / 375.0)) = top;
-//    (_left * (kScreenW / 667.0)) = left;
+    //    (_top * (kScreenH / 375.0)) = top;
+    //    (_left * (kScreenW / 667.0)) = left;
 
     self.model.top = top / (kScreenH / 375.0);
     self.model.left = left / (kScreenW / 667.0);
@@ -112,6 +112,56 @@
     }
 }
 
+- (void)touchUp {
+    if (self.model.key_type == KEY_xbox_combination) {
+        NSMutableArray *arr = [NSMutableArray array];
+
+        for (KeyModel *m in self.model.composeArr) {
+            [arr addObject:[self xboxKeyUp:m]];
+        }
+
+        if (self.downCallback) {
+            self.downCallback(arr);
+        }
+
+        return;
+    }
+
+    if (self.model.key_type == KEY_kb_combination) {
+        NSMutableArray *arr = [NSMutableArray array];
+
+        for (KeyModel *m in self.model.composeArr) {
+            if ([m.type containsString:@"kb-mouse"]) {
+                [arr addObject:[self mouseKeyUp:m]];
+            } else {
+                [arr addObject:[self keyboardKeyUp:m]];
+            }
+        }
+
+        if (self.downCallback) {
+            self.downCallback(arr);
+        }
+
+        return;
+    }
+
+    NSDictionary *dict;
+
+    if ([self.model.type containsString:@"xbox-"]) {
+        dict = [self xboxKeyUp:self.model];
+    } else if ([self.model.type containsString:@"kb-mouse"]) {
+        // 鼠标 按键
+
+        dict = [self mouseKeyUp:self.model];
+    } else {
+        dict = [self keyboardKeyUp:self.model];
+    }
+
+    if (self.upCallback) {
+        self.upCallback(@[dict]);
+    }
+}
+
 /// MARK: 手指按下
 - (void)didTapTouchDown {
     if (self.model.click == 1) {
@@ -121,58 +171,6 @@
     [self touchDown];
 }
 
-- (void)touchUp {
-    NSDictionary *dict;
-
-    if ([self.model.type containsString:@"xbox-"]) {
-        // xbox 按键
-        if (self.model.inputOp == 1025 || self.model.inputOp == 1026) {
-            // LT RT 特殊按键
-            dict = @{
-                    @"inputState": @1,
-                    @"inputOp": @(self.model.inputOp),
-                    @"value": @0
-            };
-        } else {
-            // 普通按键
-            dict = @{
-                    @"inputState": @1,
-                    @"inputOp": @1024,
-                    @"value": @(0)
-            };
-        }
-    } else if ([self.model.type containsString:@"kb-mouse"]) {
-        // 鼠标 按键
-
-        if (self.model.key_type == KEY_mouse_wheel_up || self.model.key_type == KEY_mouse_wheel_down) {
-            // 滚轮滚动
-            dict = @{
-                    @"inputState": @1,
-                    @"inputOp": @(self.model.inputOp),
-                    @"value": @0
-            };
-        } else {
-            // 左键 右键 中键
-
-            dict = @{
-                    @"inputState": @3,
-                    @"inputOp": @(self.model.inputOp),
-                    @"value": @0
-            };
-        }
-    } else {
-        dict = @{
-                @"inputState": @3,
-                @"inputOp": @(self.model.inputOp),
-                @"value": @0
-        };
-    }
-
-    if (self.upCallback) {
-        self.upCallback(@[dict]);
-    }
-}
-
 - (void)touchDown {
     // 触发中等震动
     if ([HmCloudTool share].isVibration) {
@@ -180,50 +178,46 @@
         [mediumImpact impactOccurred];
     }
 
+    if (self.model.key_type == KEY_xbox_combination) {
+        NSMutableArray *arr = [NSMutableArray array];
+
+        for (KeyModel *m in self.model.composeArr) {
+            [arr addObject:[self xboxKeyDown:m]];
+        }
+
+        if (self.downCallback) {
+            self.downCallback(arr);
+        }
+
+        return;
+    }
+
+    if (self.model.key_type == KEY_kb_combination) {
+        NSMutableArray *arr = [NSMutableArray array];
+
+        for (KeyModel *m in self.model.composeArr) {
+            if ([m.type containsString:@"kb-mouse"]) {
+                [arr addObject:[self mouseKeyDown:m]];
+            } else {
+                [arr addObject:[self keyboardKeyDown:m]];
+            }
+        }
+
+        if (self.downCallback) {
+            self.downCallback(arr);
+        }
+
+        return;
+    }
+
     NSDictionary *dict;
 
     if ([self.model.type containsString:@"xbox-"]) {
-        // xbox 按键
-        if (self.model.inputOp == 1025 || self.model.inputOp == 1026) {
-            // LT RT 特殊按键
-            dict = @{
-                    @"inputState": @1,
-                    @"inputOp": @(self.model.inputOp),
-                    @"value": @255
-            };
-        } else {
-            // 普通按键
-            dict = @{
-                    @"inputState": @1,
-                    @"inputOp": @1024,
-                    @"value": @(self.model.inputOp)
-            };
-        }
+        dict = [self xboxKeyDown:self.model];
     } else if ([self.model.type containsString:@"kb-mouse"]) {
-        // 鼠标 按键
-
-        if (self.model.key_type == KEY_mouse_wheel_up || self.model.key_type == KEY_mouse_wheel_down) {
-            // 滚轮滚动
-            dict = @{
-                    @"inputState": @1,
-                    @"inputOp": @(self.model.inputOp),
-                    @"value": (self.model.key_type == KEY_mouse_wheel_up) ? @1 : @-1
-            };
-        } else {
-            // 左键 右键 中键
-
-            dict = @{
-                    @"inputState": @2,
-                    @"inputOp": @(self.model.inputOp),
-                    @"value": @0
-            };
-        }
+        dict = [self mouseKeyDown:self.model];
     } else {
-        dict = @{
-                @"inputState": @2,
-                @"inputOp": @(self.model.inputOp),
-                @"value": @0
-        };
+        dict = [self keyboardKeyDown:self.model];
     }
 
     if (self.downCallback) {
@@ -254,22 +248,24 @@
             return isHigh ? @"key_ms_down_h" : @"key_ms_down_n";
 
         case KEY_kb_round:
+        case KEY_kb_combination:
+        case KEY_xbox_combination:
 
             return isHigh ? @"key_kb_round_h" : @"key_kb_round_n";
 
-        case KEY_kb_xobx_square:
+        case KEY_kb_xbox_square:
 
             return isHigh ? @"key_kb_square_h" : @"key_kb_square_n";
 
-        case KEY_kb_xobx_round_medium:
+        case KEY_kb_xbox_round_medium:
 
             return isHigh ? @"key_kb_round_h" : @"key_kb_round_n";
 
-        case KEY_kb_xobx_round_small:
+        case KEY_kb_xbox_round_small:
 
             return isHigh ? @"key_kb_round_h" : @"key_kb_round_n";
 
-        case KEY_kb_xobx_elliptic:
+        case KEY_kb_xbox_elliptic:
 
             if (model.inputOp == 16) {
                 return isHigh ? @"key_xbox_set_h" : @"key_xbox_set_n";

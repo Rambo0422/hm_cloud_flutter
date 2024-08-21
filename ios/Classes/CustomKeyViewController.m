@@ -245,12 +245,19 @@
 
 /// MARK: 关闭
 - (IBAction)didTapDismiss:(id)sender {
-    [self dismissViewControllerAnimated:YES
-                             completion:^{
-        if (self.dismissCallback) {
-            self.dismissCallback(NO);
-        }
-    }];
+    [NormalAlertView showAlertWithTitle:@"退出编辑？"
+                                content:@"会丢失当前所有改动！"
+                           confirmTitle:@"退出"
+                            cancelTitle:@"取消"
+                        confirmCallback:^{
+        [self dismissViewControllerAnimated:YES
+                                 completion:^{
+            if (self.dismissCallback) {
+                self.dismissCallback(NO);
+            }
+        }];
+    }
+                         cancelCallback:nil];
 }
 
 /// MARK: 保存
@@ -312,8 +319,15 @@
 
 /// MARK: 还原按钮设置
 - (IBAction)didTapReset:(id)sender {
-    self.currentM = nil;
-    [self resetKeyList];
+    [NormalAlertView showAlertWithTitle:@"还原默认？"
+                                content:@"会重置当前所有改动！"
+                           confirmTitle:@"还原"
+                            cancelTitle:@"取消"
+                        confirmCallback:^{
+        self.currentM = nil;
+        [self resetKeyList];
+    }
+                         cancelCallback:nil];
 }
 
 /// MARK: 显示隐藏顶部菜单

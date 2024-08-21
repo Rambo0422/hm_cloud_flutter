@@ -24,11 +24,14 @@
         [self addSubview:self.contentView];
 
 
+        self.hidden = self.model.isRou;
         self.frame = CGRectMake(self.model.left, self.model.top, self.model.width, self.model.height);
 
         if (self.isEdit) {
             self.contentView.userInteractionEnabled = NO;
             UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
+            tap.delaysTouchesBegan = YES;
+            tap.delaysTouchesEnded = YES;
             [self addGestureRecognizer:tap];
         }
 
@@ -51,6 +54,126 @@
     if (self.tapCallback) {
         self.tapCallback(self.model);
     }
+}
+
+// MARK: xbox 抬起
+- (NSDictionary *)xboxKeyUp:(KeyModel *)m {
+    NSDictionary *dict;
+
+    // xbox 按键
+    if (m.inputOp == 1025 || m.inputOp == 1026) {
+        // LT RT 特殊按键
+        dict = @{
+                @"inputState": @1,
+                @"inputOp": @(m.inputOp),
+                @"value": @0
+        };
+    } else {
+        // 普通按键
+        dict = @{
+                @"inputState": @1,
+                @"inputOp": @1024,
+                @"value": @(0)
+        };
+    }
+
+    return dict;
+}
+
+// MARK: 鼠标 抬起
+- (NSDictionary *)mouseKeyUp:(KeyModel *)m {
+    NSDictionary *dict;
+
+    // 鼠标 按键
+    if (m.key_type == KEY_mouse_wheel_up || m.key_type == KEY_mouse_wheel_down) {
+        // 滚轮滚动
+        dict = @{
+                @"inputState": @1,
+                @"inputOp": @(m.inputOp),
+                @"value": @0
+        };
+    } else {
+        // 左键 右键 中键
+
+        dict = @{
+                @"inputState": @3,
+                @"inputOp": @(m.inputOp),
+                @"value": @0
+        };
+    }
+
+    return dict;
+}
+
+// MARK: 键盘 抬起
+- (NSDictionary *)keyboardKeyUp:(KeyModel *)m {
+    NSDictionary *dict = @{
+            @"inputState": @3,
+            @"inputOp": @(m.inputOp),
+            @"value": @0
+    };
+
+    return dict;
+}
+
+// MARK: xbox 按下
+- (NSDictionary *)xboxKeyDown:(KeyModel *)m {
+    NSDictionary *dict;
+
+    // xbox 按键
+    if (m.inputOp == 1025 || m.inputOp == 1026) {
+        // LT RT 特殊按键
+        dict = @{
+                @"inputState": @1,
+                @"inputOp": @(m.inputOp),
+                @"value": @255
+        };
+    } else {
+        // 普通按键
+        dict = @{
+                @"inputState": @1,
+                @"inputOp": @1024,
+                @"value": @(m.inputOp)
+        };
+    }
+
+    return dict;
+}
+
+// MARK: 鼠标 按下
+- (NSDictionary *)mouseKeyDown:(KeyModel *)m {
+    NSDictionary *dict;
+
+    // 鼠标 按键
+    if (m.key_type == KEY_mouse_wheel_up || m.key_type == KEY_mouse_wheel_down) {
+        // 滚轮滚动
+        dict = @{
+                @"inputState": @1,
+                @"inputOp": @(m.inputOp),
+                @"value": (m.key_type == KEY_mouse_wheel_up) ? @1 : @-1
+        };
+    } else {
+        // 左键 右键 中键
+
+        dict = @{
+                @"inputState": @2,
+                @"inputOp": @(m.inputOp),
+                @"value": @0
+        };
+    }
+
+    return dict;
+}
+
+// MARK: 键盘 按下
+- (NSDictionary *)keyboardKeyDown:(KeyModel *)m {
+    NSDictionary *dict = @{
+            @"inputState": @2,
+            @"inputOp": @(m.inputOp),
+            @"value": @0
+    };
+
+    return dict;
 }
 
 @end

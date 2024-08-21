@@ -9,14 +9,6 @@
 
 @implementation JoystickAddKeyView
 
-//[KEY_kb_xobx_square] = @"xbox-square",
-//[KEY_kb_xobx_round_medium] = @"xbox-round-medium",
-//[KEY_kb_xobx_round_small] = @"xbox-round-small",
-//[KEY_kb_xobx_elliptic] = @"xbox-elliptic",
-//[KEY_kb_xobx_rock_lt] = @"xbox-rock-lt",
-//[KEY_kb_xobx_rock_rt] = @"xbox-rock-rt",
-//[KEY_kb_xobx_cross] = @"xbox-cross",
-
 - (IBAction)didTapKey:(UIButton *)sender {
     KeyModel *m = [[KeyModel alloc] init];
 

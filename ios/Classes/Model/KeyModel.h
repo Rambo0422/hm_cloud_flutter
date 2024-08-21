@@ -37,36 +37,48 @@ typedef enum : NSUInteger {
     /// xbox
     /// 方形按键 eg. LT(L1) RT(R1) LB(L2) RB(L2)
     /// "xbox-square"
-    KEY_kb_xobx_square,
+    KEY_kb_xbox_square,
 
 
     /// 中等圆形按钮 eg. A B X Y
     /// "xbox-round-medium"
-    KEY_kb_xobx_round_medium,
+    KEY_kb_xbox_round_medium,
 
 
     /// 小圆形按钮 eg. rs ls
     /// "xbox-round-small"
-    KEY_kb_xobx_round_small,
+    KEY_kb_xbox_round_small,
 
 
     /// 椭圆按钮 eg. 菜单 设置
     ///xbox-elliptic
-    KEY_kb_xobx_elliptic,
+    KEY_kb_xbox_elliptic,
 
 
     /// 左摇杆
     ///"xbox-rock-lt"
-    KEY_kb_xobx_rock_lt,
+    KEY_kb_xbox_rock_lt,
 
 
     /// 右摇杆
     ///"xbox-rock-rt"
-    KEY_kb_xobx_rock_rt,
+    KEY_kb_xbox_rock_rt,
 
     /// 十字键
     /// "xbox-cross"
-    KEY_kb_xobx_cross,
+    KEY_kb_xbox_cross,
+
+    /// kb组合键
+    /// "kb-combination"
+    KEY_kb_combination,
+
+    /// xbox组合键
+    /// "xbox-combination"
+    KEY_xbox_combination,
+
+    /// 轮盘键
+    /// "kb-roulette"
+    KEY_kb_roulette,
 } KeyType;
 
 
@@ -83,6 +95,10 @@ typedef enum : NSUInteger {
 @property (nonatomic, assign)  NSInteger inputOp;
 @property (nonatomic, strong)  NSString *text;
 @property (nonatomic, strong)  NSString *type;
+@property (nonatomic, assign)  BOOL isRou;
+@property (nonatomic, assign)  NSInteger editIndex;
+@property (nonatomic, strong)  NSArray<KeyModel *> *composeArr;
+@property (nonatomic, strong)  NSArray<KeyModel *> *rouArr;
 
 @property (nonatomic, assign)  KeyType key_type;
 
