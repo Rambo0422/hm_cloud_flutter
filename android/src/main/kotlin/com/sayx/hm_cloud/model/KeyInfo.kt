@@ -1,12 +1,14 @@
 package com.sayx.hm_cloud.model
 
+import com.sayx.hm_cloud.GameManager
 import java.io.Serializable
 import java.util.UUID
+import kotlin.math.ceil
 
 class KeyInfo(
     var id: UUID?,
-    var top: Int,
     var left: Int,
+    var top: Int,
     val width: Int,
     var zoom: Int,
     var text: String?,
@@ -16,6 +18,9 @@ class KeyInfo(
     val inputOp: Int,
     val height: Int,
     var composeArr: List<KeyInfo>? = null,
+    var rouArr: List<KeyInfo>? = null,
+    var editIndex: Int = 0,
+    var isRou: Boolean = false,
     var zoomChange: Boolean = false,
     var opacityChange: Boolean = false,
     var textChange: Boolean = false,
@@ -26,12 +31,12 @@ class KeyInfo(
         id = UUID.randomUUID()
     }
 
-    fun getWidth(): Float {
-        return width * (zoom / 100f * 2.25f)
+    fun getKeyWidth(): Int {
+        return ceil(width * (zoom / 100f * 2f)).toInt()
     }
 
-    fun getHeight(): Float {
-        return height * (zoom / 100f * 2.25f)
+    fun getKeyHeight(): Int {
+        return ceil(height * (zoom / 100f * 2f)).toInt()
     }
 
     fun changeZoom(zoom: Int) {
@@ -59,6 +64,11 @@ class KeyInfo(
         listChange = true
     }
 
+    fun updateRouList(rouArr: List<KeyInfo>) {
+        this.rouArr = rouArr
+        listChange = true
+    }
+
     fun updateChange(boolean: Boolean) {
         textChange = boolean
         zoomChange = boolean
@@ -69,8 +79,8 @@ class KeyInfo(
     fun copy(): KeyInfo {
         return KeyInfo(
             this.id,
-            this.top,
             this.left,
+            this.top,
             this.width,
             this.zoom,
             this.text,
@@ -79,7 +89,14 @@ class KeyInfo(
             this.click,
             this.inputOp,
             this.height,
-            this.composeArr
+            this.composeArr,
+            this.rouArr,
+            this.editIndex,
+            this.isRou,
         )
+    }
+
+    override fun toString(): String {
+        return GameManager.gson.toJson(this)
     }
 }

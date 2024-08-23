@@ -35,8 +35,8 @@
                 android:layout_marginTop="10dp"
                 android:alpha="0.3"
                 android:src="@drawable/img_watermark"
-                android:visibility="gone"
-                tools:visibility="visible"/>
+                android:visibility="visible"
+                tools:visibility="visible" />
 
             <!-- 呼出键盘 -->
             <androidx.appcompat.widget.AppCompatImageView
@@ -48,7 +48,7 @@
                 android:padding="8dp"
                 android:src="@drawable/icon_virtual_keyboard"
                 android:visibility="visible"
-                tools:visibility="visible"/>
+                tools:visibility="visible" />
         </FrameLayout>
 
         <!-- 引导层 -->
@@ -96,5 +96,15 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:visibility="visible" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_cloud_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:alpha="0.2"
+            android:textColor="@android:color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

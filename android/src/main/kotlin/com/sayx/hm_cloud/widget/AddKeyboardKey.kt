@@ -27,7 +27,9 @@ class AddKeyboardKey @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyleAttr), View.OnClickListener {
 
-    private var dataBinding: ViewAddKeyboardKeyBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.view_add_keyboard_key, this, true)
+    private var dataBinding: ViewAddKeyboardKeyBinding = DataBindingUtil.inflate(
+        LayoutInflater.from(context), R.layout.view_add_keyboard_key, this, true
+    )
 
     var isShow = false
 
@@ -183,7 +185,9 @@ class AddKeyboardKey @JvmOverloads constructor(
 
     fun showBoard() {
         isShow = true
-        val animator = ObjectAnimator.ofFloat(dataBinding.root, "translationY", dataBinding.root.height.toFloat(), 0.0f)
+        val animator = ObjectAnimator.ofFloat(
+            dataBinding.root, "translationY", dataBinding.root.height.toFloat(), 0.0f
+        )
         animator.duration = 500L
         animator.interpolator = AccelerateInterpolator()
         animator.addListener(object : AnimatorListenerImp() {
@@ -201,7 +205,9 @@ class AddKeyboardKey @JvmOverloads constructor(
 
     fun hideBoard(listenerImp: AnimatorListenerImp?) {
         isShow = false
-        val animator = ObjectAnimator.ofFloat(dataBinding.root, "translationY", 0.0f, dataBinding.root.height.toFloat())
+        val animator = ObjectAnimator.ofFloat(
+            dataBinding.root, "translationY", 0.0f, dataBinding.root.height.toFloat()
+        )
         animator.duration = 500L
         animator.interpolator = AccelerateInterpolator()
         listenerImp?.let {
@@ -218,8 +224,8 @@ class AddKeyboardKey @JvmOverloads constructor(
     }
 
     override fun onClick(v: View?) {
-        val left = AppSizeUtils.designWidth / 2
-        val top = AppSizeUtils.designHeight / 2
+        val left = AppSizeUtils.DESIGN_WIDTH / 2
+        val top = AppSizeUtils.DESIGN_HEIGHT / 2
         var width = 30
         var zoom = 60
         val text: String? = if (v is TextView) v.text?.toString() else null
@@ -431,35 +437,40 @@ class AddKeyboardKey @JvmOverloads constructor(
             R.id.btn_edit_mouse_left -> {
                 width = 40
                 height = 40
-                inputOp = HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpMouseButtonLeft.value
+                inputOp =
+                    HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpMouseButtonLeft.value
                 type = KeyType.KEYBOARD_MOUSE_LEFT
             }
 
             R.id.btn_edit_mouse_right -> {
                 width = 40
                 height = 40
-                inputOp = HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpMouseButtonRight.value
+                inputOp =
+                    HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpMouseButtonRight.value
                 type = KeyType.KEYBOARD_MOUSE_RIGHT
             }
 
             R.id.btn_edit_mouse_middle -> {
                 width = 40
                 height = 40
-                inputOp = HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpMouseButtonMiddle.value
+                inputOp =
+                    HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpMouseButtonMiddle.value
                 type = KeyType.KEYBOARD_MOUSE_MIDDLE
             }
 
             R.id.btn_edit_pulley_up -> {
                 width = 40
                 height = 40
-                inputOp = HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpMouseWheel.value
+                inputOp =
+                    HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpMouseWheel.value
                 type = KeyType.KEYBOARD_MOUSE_UP
             }
 
             R.id.btn_edit_pulley_down -> {
                 width = 40
                 height = 40
-                inputOp = HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpMouseWheel.value
+                inputOp =
+                    HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpMouseWheel.value
                 type = KeyType.KEYBOARD_MOUSE_DOWN
             }
 
@@ -479,7 +490,21 @@ class AddKeyboardKey @JvmOverloads constructor(
                 type = KeyType.ROCKER_LETTER
             }
         }
-        listener?.onAddKey(KeyInfo(UUID.randomUUID(), top - height / 2, left - width / 2, width, zoom, text, type, optical, 0, inputOp, height))
+        listener?.onAddKey(
+            KeyInfo(
+                UUID.randomUUID(),
+                left - width / 2,
+                top - height / 2,
+                width,
+                zoom,
+                text,
+                type,
+                optical,
+                0,
+                inputOp,
+                height
+            )
+        )
     }
 
     private fun getKey(keyMap: HashMap<Int, String>, text: String?): Int {

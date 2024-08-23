@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Point
 import android.graphics.Rect
@@ -25,6 +26,7 @@ import com.sayx.hm_cloud.constants.controllerStatus
 import com.sayx.hm_cloud.model.CallBackMode
 import com.sayx.hm_cloud.model.Direction
 import com.sayx.hm_cloud.model.DirectionMode
+import com.sayx.hm_cloud.utils.AppSizeUtils
 import com.sayx.hm_cloud.utils.AppVibrateUtils
 import kotlin.math.acos
 import kotlin.math.cos
@@ -93,6 +95,8 @@ class RockerView @JvmOverloads constructor(
     private var firstTouchId = 0
 
     init {
+        setWillNotDraw(false)
+
         // 获取自定义属性
         initAttribute(context, attrs)
 
@@ -176,8 +180,16 @@ class RockerView @JvmOverloads constructor(
         setMeasuredDimension(measureWidth, measureHeight)
     }
 
+    private val bgPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.parseColor("#3CFFFFFF")
+        style = Paint.Style.FILL
+    }
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+        if (controllerStatus == ControllerStatus.Edit) {
+            canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), bgPaint)
+        }
         val cx = measuredWidth / 2
         val cy = measuredHeight / 2
         // 中心点
@@ -264,6 +276,9 @@ class RockerView @JvmOverloads constructor(
                         }
                         lastX = it.x
                         lastY = it.y
+                        if (parent is GameController) {
+                            (parent as GameController).checkAlignment(this)
+                        }
                     } else if (controllerStatus == ControllerStatus.Normal) {
 //                        LogUtils.d("onTouchEventDOWN:${it.getPointerId(it.actionIndex)}, $firstTouchId")
                         firstTouchId = it.getPointerId(it.actionIndex)
@@ -292,6 +307,9 @@ class RockerView @JvmOverloads constructor(
                             moveY = if (moveY < minY) minY else if (moveY > maxY) maxY else moveY
                             x = moveX
                             y = moveY
+                            if (parent is GameController) {
+                                (parent as GameController).checkAlignment(this)
+                            }
                         }
                     } else if (controllerStatus == ControllerStatus.Normal) {
 //                    LogUtils.d("onTouchEventMOVE:${it.getPointerId(it.actionIndex)}, $firstTouchId")
@@ -305,9 +323,12 @@ class RockerView @JvmOverloads constructor(
                     isPressed = false
                     // 回调 结束
                     if (controllerStatus == ControllerStatus.Edit) {
-                        val location = IntArray(2)
-                        getLocationOnScreen(location)
-                        positionChangeListener?.onPositionChange(location[0], location[1])
+                        val position = IntArray(4)
+                        val location = AppSizeUtils.getLocationOnScreen(this, position)
+                        positionChangeListener?.onPositionChange(location[0], location[1], location[2],  location[3])
+                        if (parent is GameController) {
+                            (parent as GameController).clearLine()
+                        }
                         if (!isDrag) {
                             performClick()
                         }

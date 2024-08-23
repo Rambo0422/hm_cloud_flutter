@@ -18,6 +18,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
 import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.SizeUtils
 import com.sayx.hm_cloud.R
 import com.sayx.hm_cloud.model.KeyInfo
 import com.sayx.hm_cloud.callback.OnKeyEventListener
@@ -25,6 +26,7 @@ import com.sayx.hm_cloud.callback.OnPositionChangeListener
 import com.sayx.hm_cloud.constants.ControllerStatus
 import com.sayx.hm_cloud.constants.controllerStatus
 import com.sayx.hm_cloud.model.RoulettePart
+import com.sayx.hm_cloud.utils.AppSizeUtils
 import com.sayx.hm_cloud.utils.AppVibrateUtils
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -75,12 +77,20 @@ class RouletteKeyView @JvmOverloads constructor(
     init {
         arcPaint.style = Paint.Style.FILL_AND_STROKE
         arcPaint.isDither = true
-        arcPaint.strokeWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2f, context.resources.displayMetrics)
+        arcPaint.strokeWidth = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            2f,
+            context.resources.displayMetrics
+        )
         arcPaint.color = Color.parseColor("#4D000000")
 
         textPaint.textAlign = Paint.Align.CENTER
         textPaint.isDither = true
-        textPaint.textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 10f, context.resources.displayMetrics)
+        textPaint.textSize = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_SP,
+            10f,
+            context.resources.displayMetrics
+        )
 
         thumbDrawable = ContextCompat.getDrawable(context, R.drawable.img_roulette_key)
 
@@ -91,14 +101,25 @@ class RouletteKeyView @JvmOverloads constructor(
         setBackgroundColor(Color.TRANSPARENT)
     }
 
+    init {
+        setWillNotDraw(false)
+        val padding = SizeUtils.dp2px(2f)
+        setPadding(padding, padding, padding, padding)
+    }
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val width = MeasureSpec.getSize(widthMeasureSpec)
         val height = MeasureSpec.getSize(heightMeasureSpec)
         val size = width.coerceAtMost(height)
         // 整体圆角
-        radius = (size - paddingLeft * 2) / 2f
+        radius = (size - paddingLeft * 2f) / 2f
         // 整体矩形
-        rouletteRectF.set(paddingLeft.toFloat(), paddingLeft.toFloat(), (size - paddingLeft).toFloat(), (size - paddingLeft).toFloat())
+        rouletteRectF.set(
+            paddingLeft.toFloat(),
+            paddingTop.toFloat(),
+            (size - paddingLeft).toFloat(),
+            (size - paddingLeft).toFloat()
+        )
         // thumb矩形
         thumbSize = width / 3f
         thumbRect.set(
@@ -110,14 +131,23 @@ class RouletteKeyView @JvmOverloads constructor(
         setMeasuredDimension(size, size)
     }
 
+    private val bgPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.parseColor("#3CFFFFFF")
+        style = Paint.Style.FILL
+    }
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+        if (controllerStatus == ControllerStatus.Edit || controllerStatus == ControllerStatus.Roulette) {
+            canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), bgPaint)
+        }
         rouletteParts?.let {
             try {
                 if (showRoulette) {
                     it.forEach { part ->
                         // 绘制圆弧
-                        arcPaint.color = if (part.selected) Color.parseColor("#73C6EC4B") else Color.parseColor("#4D000000")
+                        arcPaint.color =
+                            if (part.selected) Color.parseColor("#73C6EC4B") else Color.parseColor("#4D000000")
                         canvas.drawArc(rouletteRectF, part.startAngle, part.angle, true, arcPaint)
                         // 绘制圆弧文本
                         drawRouletteName(canvas, part)
@@ -150,8 +180,8 @@ class RouletteKeyView @JvmOverloads constructor(
         val path = Path()
         path.addArc(rouletteRectF, roulettePart.startAngle, roulettePart.angle)
         val midAngle: Float = roulettePart.startAngle + roulettePart.angle / 2
-        val x = rouletteRectF.centerX() + radius * cos(Math.toRadians(midAngle.toDouble())) * 0.75f
-        val y = rouletteRectF.centerY() + radius * sin(Math.toRadians(midAngle.toDouble())) * 0.75f
+        val x = rouletteRectF.centerX() + radius * cos(Math.toRadians(midAngle.toDouble())) * 0.6f
+        val y = rouletteRectF.centerY() + radius * sin(Math.toRadians(midAngle.toDouble())) * 0.6f
         textPaint.color = Color.WHITE
         val fontMetrics = textPaint.fontMetrics
         val distance = (fontMetrics.bottom - fontMetrics.top) / 2 - fontMetrics.bottom
@@ -161,13 +191,13 @@ class RouletteKeyView @JvmOverloads constructor(
 
     fun setKeyInfo(keyInfo: KeyInfo) {
 //        LogUtils.d("setKeyInfo:$keyInfo")
-        if (keyInfo.composeArr.isNullOrEmpty()) {
+        if (keyInfo.rouArr.isNullOrEmpty()) {
             return
         }
         thumbText = keyInfo.text
-        keyInfo.composeArr?.let {
+        keyInfo.rouArr?.let {
             rouletteParts = mutableListOf()
-            var startAngel = 0f
+            var startAngel = -90f
             // 360度-轮盘区域数量 * 间隔宽度
             val totalAngel = 360f
             it.forEach { info ->
@@ -196,6 +226,9 @@ class RouletteKeyView @JvmOverloads constructor(
                         }
                         lastX = it.x
                         lastY = it.y
+                        if (parent is GameController) {
+                            (parent as GameController).checkAlignment(this)
+                        }
                     } else if (controllerStatus == ControllerStatus.Normal) {
                         // 按压中部展示轮盘
                         val thumbTouch = isThumbTouch(event.x, event.y)
@@ -227,16 +260,22 @@ class RouletteKeyView @JvmOverloads constructor(
                             moveY = if (moveY < minY) minY else if (moveY > maxY) maxY else moveY
                             x = moveX
                             y = moveY
+                            if (parent is GameController) {
+                                (parent as GameController).checkAlignment(this)
+                            }
                         }
                     } else if (controllerStatus == ControllerStatus.Normal) {
                         if (rouletteRectF.contains(event.x, event.y)) {
                             rouletteParts?.let { list ->
                                 val position = computePosition(event.x, event.y)
-//                                LogUtils.d("computePosition result:$position")
+//                                LogUtils.d("computePosition result.json:$position")
                                 if (position != currentIndex && position >= 0 && position < list.size) {
                                     // 上一个按键抬起
                                     if (currentIndex in list.indices) {
-                                        onKeyEventListener?.onButtonPress(list[currentIndex].keyInfo, false)
+                                        onKeyEventListener?.onButtonPress(
+                                            list[currentIndex].keyInfo,
+                                            false
+                                        )
                                     }
                                     // 当前键按下
                                     onKeyEventListener?.onButtonPress(list[position].keyInfo, true)
@@ -255,9 +294,17 @@ class RouletteKeyView @JvmOverloads constructor(
                 MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> {
                     if (controllerStatus == ControllerStatus.Edit) {
                         isPressed = false
-                        val location = IntArray(2)
-                        getLocationOnScreen(location)
-                        positionListener?.onPositionChange(location[0], location[1])
+                        val position = IntArray(4)
+                        val location = AppSizeUtils.getLocationOnScreen(this, position)
+                        positionListener?.onPositionChange(
+                            location[0],
+                            location[1],
+                            location[2],
+                            location[3]
+                        )
+                        if (parent is GameController) {
+                            (parent as GameController).clearLine()
+                        }
                         if (!isDrag) {
                             performClick()
                         }
@@ -285,7 +332,16 @@ class RouletteKeyView @JvmOverloads constructor(
 
     private fun computePosition(x: Float, y: Float): Int {
         rouletteParts?.forEachIndexed { index, part ->
-            if (isPointInSector(x, y, rouletteRectF.centerX(), rouletteRectF.centerY(), radius, part.startAngle, part.angle)) {
+            if (isPointInSector(
+                    x,
+                    y,
+                    rouletteRectF.centerX(),
+                    rouletteRectF.centerY(),
+                    radius,
+                    part.startAngle,
+                    part.angle
+                )
+            ) {
                 return index
             }
         }
@@ -301,33 +357,24 @@ class RouletteKeyView @JvmOverloads constructor(
         startAngle: Float,
         sweepAngle: Float
     ): Boolean {
-
         // 计算点相对于扇形中心的角度
-        var angle = atan2((pointY - centerY).toDouble(), (pointX - centerX).toDouble())
-        if (angle < 0) {
-            angle += 2 * Math.PI
-        }
-        // 转换角度至0-360度
-        var angleDegrees = angle * (180.0 / Math.PI)
-
-        // 将角度限制在0-360度范围内
-        if (angleDegrees < 0) {
-            angleDegrees += 360.0
-        }
+        var angle =
+            Math.toDegrees(atan2((pointY - centerY).toDouble(), (pointX - centerX).toDouble()))
 
         // 判断点是否在扇形起始角度之后
-        if (angleDegrees < startAngle) {
-            angleDegrees += 360.0
+        if (angle < startAngle) {
+            angle += 360.0
         }
+        LogUtils.d("currentAngle:$angle")
 
         // 计算扇形起始角度和终止角度
         val endAngle = startAngle + sweepAngle
 
         // 检查点是否在扇形的范围内
-        return angleDegrees >= startAngle && angleDegrees < endAngle && hypot(
+        return angle >= startAngle && angle < endAngle && (hypot(
             (pointX - centerX).toDouble(),
             (pointY - centerY).toDouble()
-        ) <= radius
+        ) <= radius)
     }
 
     private fun isThumbTouch(x: Float, y: Float): Boolean {

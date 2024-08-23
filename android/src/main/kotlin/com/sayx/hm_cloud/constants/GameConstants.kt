@@ -906,7 +906,7 @@ abstract class OnKeyEventListenerImp() : OnKeyEventListener {
                 }
                 GameManager.gameView?.sendCustomKeycode(inputOp)
 //                val result = GameManager.gameView?.sendCustomKeycode(inputOp)
-//                LogUtils.d("key:${keyInfo.text}, inputOpList:[$text], result:$result")
+//                LogUtils.d("key:${keyInfo.text.json}, inputOpList:[$text.json], result:$result")
             }
             // 组合键(手柄)
             KeyType.GAMEPAD_COMBINE -> {
@@ -946,7 +946,7 @@ abstract class OnKeyEventListenerImp() : OnKeyEventListener {
                 }
                 GameManager.gameView?.sendCustomKeycode(inputOp)
 //                val result = GameManager.gameView?.sendCustomKeycode(inputOp)
-//                LogUtils.d("key:${keyInfo.text}, inputOpList:[$text], result:$result")
+//                LogUtils.d("key:${keyInfo.text.json}, inputOpList:[$text.json], result:$result")
             }
 
             else -> {

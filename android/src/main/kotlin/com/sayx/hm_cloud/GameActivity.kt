@@ -66,6 +66,7 @@ import com.sayx.hm_cloud.model.PCMouseEvent
 import com.sayx.hm_cloud.model.PartyPlayWantPlay
 import com.sayx.hm_cloud.model.PlayPartyRoomInfoEvent
 import com.sayx.hm_cloud.model.PlayPartyRoomSoundAndMicrophoneStateEvent
+import com.sayx.hm_cloud.model.TimeUpdateEvent
 import com.sayx.hm_cloud.utils.AppSizeUtils
 import com.sayx.hm_cloud.utils.GameUtils
 import com.sayx.hm_cloud.widget.AddGamepadKey
@@ -155,6 +156,9 @@ class GameActivity : AppCompatActivity() {
                 )
             )
         }
+        if (BuildConfig.DEBUG) {
+            dataBinding.tvCloudId.text = HmcpManager.getInstance().cloudId
+        }
         GameManager.gameView?.setAttachContext(this)
         GameManager.gameView?.virtualDeviceType = VirtualOperateType.NONE
         // 游戏设置
@@ -178,8 +182,13 @@ class GameActivity : AppCompatActivity() {
         }
         dataBinding.gameController.listener = object : OnEditClickListener {
             override fun onEditKeyClick(keyInfo: KeyInfo) {
-                // 自定义按钮编辑状态点击
-                controllerEditLayout?.setKeyInfo(keyInfo)
+                LogUtils.d("onEditKeyClick->status:$controllerStatus, keyInfo:$keyInfo")
+                if (controllerStatus == ControllerStatus.Edit) {
+                    // 自定义按钮编辑状态点击
+                    controllerEditLayout?.setKeyInfo(keyInfo)
+                } else if (controllerStatus == ControllerStatus.Roulette) {
+                    addCombineKey(keyInfo)
+                }
             }
         }
         // 游戏控制器数据反馈
@@ -451,9 +460,13 @@ class GameActivity : AppCompatActivity() {
                 dataBinding.btnVirtualKeyboard.visibility = View.VISIBLE
             }
 
-            override fun onPlayTimeLack() {
+            override fun onPlayTimeLack(lack:Boolean) {
                 runOnUiThread {
-                    gameSettings?.showGameOffNotice()
+                    if (lack) {
+                        gameSettings?.showGameOffNotice()
+                    } else {
+                        gameSettings?.hideGameOffNotice()
+                    }
                 }
             }
 
@@ -504,6 +517,7 @@ class GameActivity : AppCompatActivity() {
             dataBinding.btnVirtualKeyboard.visibility = View.INVISIBLE
             // 展示自定义控制面板，让游戏画面无法触摸操作
             dataBinding.gameController.controllerType = type
+            controllerStatus = ControllerStatus.Edit
             dataBinding.gameController.maskEnable = true
             // 进入编辑模式，防止操作过久，游戏出现无操作退出，每5分钟重置无操作时间，后台设置无操作下线时间为10分钟
             updateInputTimer()
@@ -680,7 +694,7 @@ class GameActivity : AppCompatActivity() {
             editRouletteKey?.setRouletteKeyInfo(keyInfo)
             editRouletteKey?.showBoard()
         }
-        showKeyBoard(false)
+//        showKeyBoard(false)
     }
 
     private fun showExitCustomDialog() {
@@ -724,7 +738,7 @@ class GameActivity : AppCompatActivity() {
             addKeyboardKey?.listener = object : AddKeyListenerImp() {
                 override fun onAddKey(keyInfo: KeyInfo) {
                     if (controllerStatus == ControllerStatus.Edit) {
-                        LogUtils.d("onEditKeyClick:$keyInfo")
+                        LogUtils.d("onAddKey:$keyInfo")
                         when (keyInfo.type) {
                             KeyType.KEYBOARD_KEY, KeyType.KEYBOARD_MOUSE_UP, KeyType.KEYBOARD_MOUSE_DOWN, KeyType.KEYBOARD_MOUSE_LEFT, KeyType.KEYBOARD_MOUSE_RIGHT, KeyType.KEYBOARD_MOUSE_MIDDLE -> {
                                 dataBinding.gameController.addKeyButton(
@@ -776,7 +790,7 @@ class GameActivity : AppCompatActivity() {
             addGamepadKey?.listener = object : AddKeyListenerImp() {
                 override fun onAddKey(keyInfo: KeyInfo) {
                     if (controllerStatus == ControllerStatus.Edit) {
-                        LogUtils.d("onEditKeyClick:$keyInfo")
+                        LogUtils.d("onAddKey:$keyInfo")
                         when (keyInfo.type) {
                             KeyType.GAMEPAD_SQUARE, KeyType.GAMEPAD_ELLIPTIC, KeyType.GAMEPAD_ROUND_MEDIUM, KeyType.GAMEPAD_ROUND_SMALL -> {
                                 dataBinding.gameController.addKeyButton(
@@ -1026,48 +1040,42 @@ class GameActivity : AppCompatActivity() {
     }
 
     override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
-        LogUtils.d("$this->dispatchTouchEvent:$event")
+//        LogUtils.d("$this->dispatchTouchEvent:$event")
         event?.let {
-            if (GameUtils.isGamePadEvent(it)) {
-                LogUtils.d("游戏手柄输入:$it")
-                dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
-                gameSettings?.controllerType = AppVirtualOperateType.NONE
-            } else if (GameUtils.isKeyBoardEvent(it)) {
-                LogUtils.d("游戏键盘输入:$it")
-                dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
-                gameSettings?.controllerType = AppVirtualOperateType.NONE
-            } else if (GameUtils.isMouseEvent(it)) {
-                LogUtils.d("游戏鼠标输入:$it")
-                dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
-                gameSettings?.controllerType = AppVirtualOperateType.NONE
-            } else {
-                LogUtils.d("其他输入:$it")
-                if (dataBinding.btnGameSettings.visibility == View.VISIBLE) {
-                    dataBinding.gameController.controllerType = GameManager.lastControllerType
-                    gameSettings?.controllerType = GameManager.lastControllerType
+            if (GameUtils.isGamePadEvent(it) || GameUtils.isKeyBoardEvent(it) || GameUtils.isMouseEvent(
+                    it
+                )
+            ) {
+//                LogUtils.d("外设输入:$it")
+                if (dataBinding.gameController.controllerType != AppVirtualOperateType.NONE) {
+                    dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
+                    gameSettings?.controllerType = AppVirtualOperateType.NONE
                 }
+            } else {
+//                LogUtils.d("其他输入:$it")
+//                if (dataBinding.btnGameSettings.visibility == View.VISIBLE && dataBinding.gameController.controllerType != GameManager.lastControllerType) {
+//                    dataBinding.gameController.controllerType = GameManager.lastControllerType
+//                    gameSettings?.controllerType = GameManager.lastControllerType
+//                }
             }
         }
         return super.dispatchTouchEvent(event)
     }
 
     override fun dispatchGenericMotionEvent(event: MotionEvent?): Boolean {
-        LogUtils.d("$this->dispatchGenericMotionEvent:$event")
+//        LogUtils.d("$this->dispatchGenericMotionEvent:$event")
         event?.let {
-            if (GameUtils.isGamePadEvent(it)) {
-                LogUtils.d("游戏手柄输入:$it")
-                dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
-                gameSettings?.controllerType = AppVirtualOperateType.NONE
-            } else if (GameUtils.isKeyBoardEvent(it)) {
-                LogUtils.d("游戏键盘输入:$it")
-                dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
-                gameSettings?.controllerType = AppVirtualOperateType.NONE
-            } else if (GameUtils.isMouseEvent(it)) {
-                LogUtils.d("游戏鼠标输入:$it")
-                dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
-                gameSettings?.controllerType = AppVirtualOperateType.NONE
+            if (GameUtils.isGamePadEvent(it) || GameUtils.isKeyBoardEvent(it) || GameUtils.isMouseEvent(
+                    it
+                )
+            ) {
+//                LogUtils.d("外设输入:$it")
+                if (dataBinding.gameController.controllerType != AppVirtualOperateType.NONE) {
+                    dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
+                    gameSettings?.controllerType = AppVirtualOperateType.NONE
+                }
             } else {
-                LogUtils.d("其他输入:$it")
+//                LogUtils.d("其他输入:$it")
             }
         }
         return super.dispatchGenericMotionEvent(event)
@@ -1076,18 +1084,15 @@ class GameActivity : AppCompatActivity() {
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
 //        LogUtils.d("$this->dispatchKeyEvent:$event")
         event.let {
-            if (GameUtils.isGamePadEvent(it)) {
-                //                LogUtils.d("游戏手柄输入:$it")
-                dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
-                gameSettings?.controllerType = AppVirtualOperateType.NONE
-            } else if (GameUtils.isKeyBoardEvent(it)) {
-                //                LogUtils.d("游戏键盘输入:$it")
-                dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
-                gameSettings?.controllerType = AppVirtualOperateType.NONE
-            } else if (GameUtils.isMouseEvent(it)) {
-                //                LogUtils.d("游戏鼠标输入:$it")
-                dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
-                gameSettings?.controllerType = AppVirtualOperateType.NONE
+            if (GameUtils.isGamePadEvent(it) || GameUtils.isKeyBoardEvent(it) || GameUtils.isMouseEvent(
+                    it
+                )
+            ) {
+                //                LogUtils.d("外设输入:$it")
+                if (dataBinding.gameController.controllerType != AppVirtualOperateType.NONE) {
+                    dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
+                    gameSettings?.controllerType = AppVirtualOperateType.NONE
+                }
             }
         }
         return super.dispatchKeyEvent(event)
@@ -1126,6 +1131,11 @@ class GameActivity : AppCompatActivity() {
 //            GameManager.exitGame(mutableMapOf(Pair("action", "")))
 //        }
         super.onDestroy()
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onTimeUpdateEvent(event: TimeUpdateEvent) {
+        gameSettings?.updatePlayTime(event.time)
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

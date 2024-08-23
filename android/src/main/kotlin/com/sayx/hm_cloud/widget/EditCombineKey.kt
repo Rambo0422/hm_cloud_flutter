@@ -34,7 +34,12 @@ class EditCombineKey @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
-    private var dataBinding: ViewEditCombineKeyBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.view_edit_combine_key, this, true)
+    private var dataBinding: ViewEditCombineKeyBinding = DataBindingUtil.inflate(
+        LayoutInflater.from(context),
+        R.layout.view_edit_combine_key,
+        this,
+        true
+    )
 
     private var keyList: HashMap<Int, KeyInfo?> = hashMapOf()
 
@@ -84,7 +89,10 @@ class EditCombineKey @JvmOverloads constructor(
                 }
             }
             val layoutParams = if (index % 2 == 0) {
-                FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
             } else {
                 FrameLayout.LayoutParams(SizeUtils.dp2px(25f), SizeUtils.dp2px(25f))
             }
@@ -101,7 +109,12 @@ class EditCombineKey @JvmOverloads constructor(
 
     fun showBoard() {
         isShow = true
-        val animator = ObjectAnimator.ofFloat(dataBinding.root, "translationY", -dataBinding.root.height.toFloat(), 0.0f)
+        val animator = ObjectAnimator.ofFloat(
+            dataBinding.root,
+            "translationY",
+            -dataBinding.root.height.toFloat(),
+            0.0f
+        )
         animator.duration = 500L
         animator.interpolator = AccelerateInterpolator()
         animator.addListener(object : AnimatorListenerImp() {
@@ -115,7 +128,12 @@ class EditCombineKey @JvmOverloads constructor(
 
     private fun hideLayout() {
         isShow = false
-        val animator = ObjectAnimator.ofFloat(dataBinding.root, "translationY", 0.0f, -dataBinding.root.height.toFloat())
+        val animator = ObjectAnimator.ofFloat(
+            dataBinding.root,
+            "translationY",
+            0.0f,
+            -dataBinding.root.height.toFloat()
+        )
         animator.duration = 500L
         animator.interpolator = AccelerateInterpolator()
         animator.addListener(object : AnimatorListenerImp() {
@@ -174,12 +192,23 @@ class EditCombineKey @JvmOverloads constructor(
         if (keyInfo == null) {
             addKeyListener?.onAddKey(
                 KeyInfo(
-                    UUID.randomUUID(), AppSizeUtils.designHeight / 2 - 20, AppSizeUtils.designWidth / 2 - 20,
-                    40, 60, context.getString(R.string.combine_key), KeyType.KEY_COMBINE, 60, 0, 0, 40, keyInfoList
+                    UUID.randomUUID(),
+                    AppSizeUtils.DESIGN_WIDTH / 2 - 15,
+                    AppSizeUtils.DESIGN_HEIGHT / 2 - 15,
+                    30,
+                    60,
+                    context.getString(R.string.combine_key),
+                    KeyType.KEY_COMBINE,
+                    60,
+                    0,
+                    0,
+                    30,
+                    composeArr = keyInfoList
                 )
             )
         } else {
-            keyInfo?.composeArr = keyInfoList
+            keyInfo?.changeList(composeArr = keyInfoList)
+            addKeyListener?.onUpdateKey()
         }
         hideLayout()
     }

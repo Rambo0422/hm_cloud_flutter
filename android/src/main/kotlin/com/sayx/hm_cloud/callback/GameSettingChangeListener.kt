@@ -27,7 +27,7 @@ interface GameSettingChangeListener {
 
     fun onHideLayout()
 
-    fun onPlayTimeLack()
+    fun onPlayTimeLack(lack: Boolean)
 
     fun updateNetSignal(icon: Int)
 

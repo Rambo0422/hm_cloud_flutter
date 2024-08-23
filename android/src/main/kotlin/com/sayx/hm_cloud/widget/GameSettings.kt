@@ -239,11 +239,11 @@ class GameSettings @JvmOverloads constructor(
         initSensitivity()
         // 鼠标模式
         initMouseMode()
+        // 默认开启云游互动
+        dataBinding.btnInteraction.isSelected = true
+        gameSettingChangeListener?.onLiveInteractionChange(true)
         // 非VIP用户，无法自定义控制方法，切换清晰度，关闭云互动
-        if (GameManager.getGameParam()?.isVip() != true) {
-            dataBinding.btnInteraction.isSelected = true
-            gameSettingChangeListener?.onLiveInteractionChange(true)
-        }
+        // 非VIP用户默认使用标清，VIP用户默认蓝光
         if (GameManager.getGameParam()?.isVip() != true) {
             dataBinding.tvQuality.text = context.getString(R.string.standard_quality)
             gameView?.resolutionList?.let { list ->
@@ -405,7 +405,7 @@ class GameSettings @JvmOverloads constructor(
 
     // 切换控制方法
     private fun updateControlType(type: AppVirtualOperateType) {
-        LogUtils.d("updateControlType->type=$type")
+//        LogUtils.d("updateControlType->type=$type")
         dataBinding.btnGamepad.isSelected = type == AppVirtualOperateType.APP_STICK_XBOX
         dataBinding.btnKeyboard.isSelected = type == AppVirtualOperateType.APP_KEYBOARD
     }
@@ -414,7 +414,7 @@ class GameSettings @JvmOverloads constructor(
     private fun updateVoice(maxValue: Int, value: Int) {
         dataBinding.sbVoice.max = maxValue
         dataBinding.sbVoice.progress = value
-        val volumeSwitch = SPUtils.getInstance().getBoolean(GameConstants.volumeSwitch)
+        val volumeSwitch = SPUtils.getInstance().getBoolean(GameConstants.volumeSwitch, true)
         LogUtils.d("updateVoice->maxValue=$maxValue, value=$value, volumeSwitch=$volumeSwitch")
         dataBinding.btnMute.isSelected = volumeSwitch
         gameView?.setAudioMute(!volumeSwitch)
@@ -423,6 +423,10 @@ class GameSettings @JvmOverloads constructor(
     private fun updateLight(value: Int) {
         LogUtils.d("updateLight->value=$value")
         dataBinding.sbLight.progress = value
+    }
+
+    fun updatePlayTime(time: Long) {
+        currentPlayTime = time / 1000
     }
 
     // 游戏计时
@@ -449,7 +453,9 @@ class GameSettings @JvmOverloads constructor(
                 gamePlayTime += 1L
                 if (currentPlayTime <= 300L) {
                     // 临下机还有5分钟
-                    gameSettingChangeListener?.onPlayTimeLack()
+                    gameSettingChangeListener?.onPlayTimeLack(true)
+                } else {
+                    gameSettingChangeListener?.onPlayTimeLack(false)
                 }
                 updateNetDelay()
             }
@@ -539,6 +545,13 @@ class GameSettings @JvmOverloads constructor(
             }
         })
         animatorSet.start()
+    }
+
+    fun hideGameOffNotice() {
+        if (dataBinding.layoutGameOffNotice.visibility != VISIBLE) {
+            return
+        }
+        dataBinding.layoutGameOffNotice.visibility = INVISIBLE
     }
 
     fun showLayout() {

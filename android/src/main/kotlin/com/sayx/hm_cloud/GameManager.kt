@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
@@ -27,6 +28,7 @@ import com.haima.hmcp.listeners.OnContronListener
 import com.haima.hmcp.listeners.OnGameIsAliveListener
 import com.haima.hmcp.listeners.OnInitCallBackListener
 import com.haima.hmcp.listeners.OnSaveGameCallBackListener
+import com.haima.hmcp.listeners.OnUpdataGameUIDListener
 import com.haima.hmcp.utils.StatusCallbackUtil
 import com.haima.hmcp.widgets.HmcpVideoView
 import com.haima.hmcp.widgets.beans.VirtualOperateType
@@ -36,6 +38,7 @@ import com.sayx.hm_cloud.model.GameError
 import com.sayx.hm_cloud.model.GameErrorEvent
 import com.sayx.hm_cloud.model.GameParam
 import com.sayx.hm_cloud.model.PCMouseEvent
+import com.sayx.hm_cloud.model.TimeUpdateEvent
 import com.sayx.hm_cloud.utils.GameUtils
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -93,6 +96,10 @@ object GameManager : HmcpPlayerListener, OnContronListener {
         this.gameParam = gameParam
         // 手游与端游对应的sdk配置不同，所以每次启动游戏都执行初始化
         initGameSdk()
+//        Intent().apply {
+//            setClass(activity, GameActivity::class.java)
+//            activity.startActivityForResult(this, 200)
+//        }
     }
 
     private fun initGameSdk() {
@@ -113,7 +120,8 @@ object GameManager : HmcpPlayerListener, OnContronListener {
             this.userId = gameParam?.userId ?: ""
 
 //            Log.e("CloudGame", "init haiMaSDK:${gameParam?.accessKeyId}")
-            LogUtils.d("init haiMaSDK:${gameParam?.accessKeyId}")
+            LogUtils.d("init haiMaSDK:${config}")
+            HmcpManager.getInstance().releaseRequestManager()
             HmcpManager.getInstance().init(config, activity, object : OnInitCallBackListener {
                 override fun success() {
                     LogUtils.d("haiMaSDK success:${HmcpManager.getInstance().sdkVersion}")
@@ -123,12 +131,30 @@ object GameManager : HmcpPlayerListener, OnContronListener {
 
                 override fun fail(msg: String?) {
                     LogUtils.e("haiMaSDK fail:$msg")
+                    var errorCode = GameError.gameInitErrorCode
+                    var errorMsg = GameError.gameInitErrorMsg
+                    if (msg is String && !TextUtils.isEmpty(msg)) {
+                        val resultData = gson.fromJson(msg, Map::class.java)
+                        var errorCodeWithoutCid = ""
+                        try {
+                            errorCodeWithoutCid =
+                                if (resultData["errorCodeWithoutCid"].toString() == "null") GameError.gameInitErrorCode else resultData["errorCodeWithoutCid"].toString()
+                        } catch (e: Exception) {
+                            LogUtils.e("${e.message}")
+                        }
+                        errorCode =
+                            if (TextUtils.isEmpty(errorCodeWithoutCid)) GameError.gameInitErrorCode else errorCodeWithoutCid
+                        try {
+                            errorMsg =
+                                if (resultData["errorMessage"].toString() == "null") resultData["errorMsg"].toString() else resultData["errorMessage"].toString()
+                        } catch (e: Exception) {
+                            LogUtils.e("${e.message}")
+                        }
+                    }
+                    EventBus.getDefault().post(GameErrorEvent(errorCode, errorMsg))
                     channel.invokeMethod(
                         "errorInfo",
-                        mapOf(
-                            Pair("errorCode", GameError.gameInitErrorCode),
-                            Pair("cid", HmcpManager.getInstance().cloudId),
-                        )
+                        mapOf(Pair("errorCode", errorCode), Pair("errorMsg", errorMsg))
                     )
                 }
             }, true)
@@ -196,20 +222,18 @@ object GameManager : HmcpPlayerListener, OnContronListener {
                 // token
                 it.putString(HmcpVideoView.C_TOKEN, gameParam?.cToken)
 //                it.putString(HmcpVideoView.EXTRA_ID, AppConstants.extraId)
-                // 是否存档
+                // 是否使用存档
                 it.putBoolean(HmcpVideoView.ARCHIVED, true)
-                // 业务参数（调试版不传扣费数据）
-//                if (!BuildConfig.DEBUG) {
+                // 业务参数
                 it.putString(
                     HmcpVideoView.PAY_PROTO_DATA,
                     GameUtils.getProtoData(
                         gson,
                         gameParam?.userId,
                         gameParam?.gameId,
-                        gameParam?.priority ?: 0
+                        gameParam?.priority ?: 1
                     )
                 )
-//                }
                 // 码率
 //                it.putInt(HmcpVideoView.INTERNET_SPEED, 300)
                 // 清晰度挡位，会员默认超清，非会员默认流畅
@@ -271,7 +295,7 @@ object GameManager : HmcpPlayerListener, OnContronListener {
             gameParam?.accountInfo?.let { accountInfo ->
 //            LogUtils.d("AccountInfo 1:${accountInfo.javaClass}")
                 val result = gson.fromJson(gson.toJson(accountInfo), AccountInfo::class.java)
-//            LogUtils.d("AccountInfo 2:${result}")
+//            LogUtils.d("AccountInfo 2:${result.json}")
                 gameView?.setExtraData(IntentExtraData().also {
                     it.setStringExtra(GameUtils.getStringData(result))
                 })
@@ -282,7 +306,7 @@ object GameManager : HmcpPlayerListener, OnContronListener {
             gameView?.virtualDeviceType = VirtualOperateType.NONE
             gameView?.play(bundle)
             // 默认静音启动，隐藏虚拟操作按钮
-            gameView?.setAudioMute(true)
+//            gameView?.setAudioMute(true)
             gameView?.virtualDeviceType = VirtualOperateType.NONE
         }
     }
@@ -592,6 +616,41 @@ object GameManager : HmcpPlayerListener, OnContronListener {
         channel.invokeMethod("openPage", param)
     }
 
+    fun updateGamePlayableTime() {
+        channel.invokeMethod("updateTime", null)
+    }
+
+    fun updatePlayTime(time: Long) {
+        val bundle = Bundle().apply {
+            putLong(HmcpVideoView.PLAY_TIME, time)
+            putString(HmcpVideoView.USER_ID, gameParam?.userId)
+            putString(HmcpVideoView.TIPS_MSG, "");
+            putString(
+                HmcpVideoView.PAY_PROTO_DATA,
+                GameUtils.getProtoData(
+                    gson,
+                    gameParam?.userId,
+                    gameParam?.gameId,
+                    gameParam?.priority ?: 1
+                )
+            )
+            putString(HmcpVideoView.C_TOKEN, gameParam?.cToken)
+        }
+        LogUtils.d("updatePlayTime:$bundle")
+        gameView?.updateGameUID(bundle, object : OnUpdataGameUIDListener {
+            override fun success(result: Boolean) {
+                LogUtils.v("updateGameUID->success:$result")
+                if (result) {
+                    EventBus.getDefault().post(TimeUpdateEvent(time))
+                }
+            }
+
+            override fun fail(result: String?) {
+                LogUtils.v("updateGameUID->fail:$result")
+            }
+        })
+    }
+
     fun exitQueue() {
         releaseGame("-1")
     }
@@ -693,12 +752,20 @@ object GameManager : HmcpPlayerListener, OnContronListener {
 //        channel.invokeMethod("contronLost", null)
     }
 
-    override fun controlDistribute(success: Boolean, controlInfo: MutableList<ControlInfo>?, msg: String?) {
+    override fun controlDistribute(
+        success: Boolean,
+        controlInfo: MutableList<ControlInfo>?,
+        msg: String?
+    ) {
         val controlInfos = controlInfo ?: emptyList()
         channel.invokeMethod("controlDistribute", gson.toJson(controlInfos))
     }
 
-    override fun controlQuery(success: Boolean, controlInfos: MutableList<ControlInfo>?, msg: String?) {
+    override fun controlQuery(
+        success: Boolean,
+        controlInfos: MutableList<ControlInfo>?,
+        msg: String?
+    ) {
         if (success) {
             val jsonArray = JSONArray()
             controlInfos?.forEach { controlInfo ->
@@ -768,7 +835,13 @@ object GameManager : HmcpPlayerListener, OnContronListener {
         }
     }
 
-    fun controlPlay(cid: String, pinCode: String, accessKeyID: String, userId: String, userToken: String) {
+    fun controlPlay(
+        cid: String,
+        pinCode: String,
+        accessKeyID: String,
+        userId: String,
+        userToken: String
+    ) {
         val userInfo = UserInfo()
         userInfo.userId = userId
         userInfo.userToken = userToken
@@ -795,7 +868,7 @@ object GameManager : HmcpPlayerListener, OnContronListener {
         gameView?.hmcpPlayerListener = this
         gameView?.virtualDeviceType = VirtualOperateType.NONE
         // 默认静音启动，隐藏云端操作
-        gameView?.setAudioMute(true)
+//        gameView?.setAudioMute(true)
     }
 
     fun sendCurrentCid() {

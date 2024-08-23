@@ -21,7 +21,6 @@ class EditKeyView @JvmOverloads constructor(
     private var data: KeyInfo? = null
 
     fun setData(keyInfo: KeyInfo?) {
-        this.data = keyInfo
         if (keyInfo != null) {
             dataBinding.tvName.text = keyInfo.text
             dataBinding.ivDelete.visibility = VISIBLE
@@ -29,6 +28,8 @@ class EditKeyView @JvmOverloads constructor(
             dataBinding.tvName.text = ""
             dataBinding.ivDelete.visibility = INVISIBLE
         }
+        this.data?.isRou = false
+        this.data = keyInfo
     }
 
     fun getData(): KeyInfo? {
