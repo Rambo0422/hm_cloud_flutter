@@ -268,9 +268,9 @@
         case KEY_kb_xbox_elliptic:
 
             if (model.inputOp == 16) {
-                return isHigh ? @"key_xbox_set_h" : @"key_xbox_set_n";
-            } else {
                 return isHigh ? @"key_xbox_menu_h" : @"key_xbox_menu_n";
+            } else {
+                return isHigh ? @"key_xbox_set_h" : @"key_xbox_set_n";
             }
 
         default:

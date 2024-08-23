@@ -37,6 +37,10 @@
 #define k_GameStop          @"gameStop"
 #define k_FirstFrameArrival @"firstFrameArrival"
 
+
+#define k_FirstPlay         @"firstPlay"
+#define k_FirstInstall      @"firstInstall"
+
 #define k_SanABundle        [NSBundle bundleWithPath:[[NSBundle bundleForClass:self.class] pathForResource:@"SanA_Game" ofType:@"bundle"]]
 #define k_BundleImage(name) [UIImage imageNamed:name inBundle:k_SanABundle withConfiguration:nil]
 

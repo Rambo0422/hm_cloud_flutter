@@ -121,7 +121,8 @@ static NSString *ActionClosePage = @"closePage";
 - (void)updateMouseSensitivity:(float)sensitivity;
 
 
-
+// MARK: 切换清晰度
+- (void)switchResolution:(NSInteger)resolutionId;
 @end
 
 NS_ASSUME_NONNULL_END

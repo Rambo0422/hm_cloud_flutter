@@ -218,6 +218,11 @@
     return [[HMCloudPlayer sharedCloudPlayer] getMouseSensitivity];
 }
 
+// MARK: 切换清晰度
+- (void)switchResolution:(NSInteger)resolutionId {
+    [[HMCloudPlayer sharedCloudPlayer] switchResolution:resolutionId];
+}
+
 - (NSString *)cloudId {
     return [HMCloudPlayer sharedCloudPlayer].cloudId;
 }
@@ -283,8 +288,6 @@
 
     if ([state isEqualToString:@"videoVisible"]) {
         [[HMCloudPlayer sharedCloudPlayer] cloudSetTouchModel:self.touchMode];
-
-        NSLog(@"cloudid = %@", self.cloudId);
 
         if (!self.isVip && !self.liveRoomId.length) {
             [self startLiving];

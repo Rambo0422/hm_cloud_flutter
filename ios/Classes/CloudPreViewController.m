@@ -15,6 +15,13 @@
 #import "HmCloudTool.h"
 #import "RequestTool.h"
 
+typedef enum : NSUInteger {
+    Resolution_BD = 1,
+    Resolution_High,
+    Resolution_Medium,
+    Resolution_Low,
+} ResolutionType;
+
 @interface CloudPreViewController ()
 
 @property (weak, nonatomic) IBOutlet UIButton *setBtn;
@@ -72,6 +79,18 @@
 /// 当前选中的操作模式（1 = 按键 ； 2 = 手柄）
 @property (nonatomic, assign) NSInteger currentOperation;
 
+/// 当前清晰度 1蓝光，2超清，3高清，4标清
+/// vip默认是蓝光，非vip默认是标清
+@property (nonatomic, assign) ResolutionType resolution;
+
+@property (nonatomic, strong) UIView *overlayView;
+
+@property (weak, nonatomic) IBOutlet UIButton *currentResolutionBtn;
+@property (weak, nonatomic) IBOutlet UIButton *lowResolutionBtn;
+@property (weak, nonatomic) IBOutlet UIButton *bdResolutionBtn;
+@property (weak, nonatomic) IBOutlet UIView *resolutionBgView;
+
+
 
 @end
 
@@ -80,6 +99,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+
     @weakify(self);
     [[AFNetworkReachabilityManager sharedManager] setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
         // 一共有四种状态
@@ -111,6 +131,71 @@
     [self request];
 }
 
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+
+    // 首次安装 创建引导层
+    NSUserDefaults *def = [NSUserDefaults standardUserDefaults];
+
+    if (![def boolForKey:k_FirstPlay]) {
+        [self showGuideOverlay];
+        [def setBool:YES forKey:k_FirstPlay];
+    }
+}
+
+- (void)showGuideOverlay {
+    // 创建覆盖视图
+    self.overlayView = [[UIView alloc] initWithFrame:self.view.bounds];
+    self.overlayView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.7];
+
+    // 创建一个路径，除了目标视图之外的区域都是黑色的
+    UIBezierPath *path = [UIBezierPath bezierPathWithRect:self.overlayView.bounds];
+
+    // 创建一个圆形的高亮区域
+    UIBezierPath *circlePath = [UIBezierPath bezierPathWithRoundedRect:self.setBtn.frame cornerRadius:self.setBtn.bounds.size.height / 2];
+    [path appendPath:circlePath];
+    path.usesEvenOddFillRule = YES;
+
+    CAShapeLayer *maskLayer = [CAShapeLayer layer];
+    maskLayer.path = path.CGPath;
+    maskLayer.fillRule = kCAFillRuleEvenOdd;
+    self.overlayView.layer.mask = maskLayer;
+
+
+    // 将引导视图添加到主视图
+    [self.view addSubview:self.overlayView];
+
+    // 手指
+    UIImageView *guide1Img = [[UIImageView alloc] initWithImage:k_BundleImage(@"ic_guide1")];
+
+    // 文字
+    UIImageView *guide2Img = [[UIImageView alloc] initWithImage:k_BundleImage(@"ic_guide2")];
+
+    [self.overlayView addSubview:guide1Img];
+    [self.overlayView addSubview:guide2Img];
+
+
+    [guide1Img mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.bottom.equalTo(self.setBtn.mas_bottom).offset(15);
+        make.right.equalTo(self.setBtn.mas_left);
+    }];
+
+    [guide2Img mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.bottom.equalTo(guide1Img.mas_bottom);
+        make.right.equalTo(guide1Img.mas_left).offset(-5);
+    }];
+
+
+    // 添加手势识别器以响应点击
+    UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideGuideOverlay)];
+    [self.overlayView addGestureRecognizer:tapGesture];
+}
+
+- (void)hideGuideOverlay {
+    [self.overlayView removeFromSuperview];
+    self.overlayView = nil;
+}
+
 - (void)viewWillLayoutSubviews {
     self.gameVC.view.frame = self.view.bounds;
     [self.view insertSubview:self.gameVC.view atIndex:0];
@@ -121,6 +206,52 @@
 
     @weakify(self);
     @weakify(tool);
+
+    [RACObserve(self, resolution) subscribeNext:^(id _Nullable x) {
+        @strongify(self);
+        [self.currentResolutionBtn setTitle:(self.resolution == Resolution_BD ? @"蓝光" : @"标清")
+                                   forState:UIControlStateNormal];
+
+        [self.lowResolutionBtn setTitleColor:(self.resolution == Resolution_BD ? kColor(0x9EA2AD) : kColor(0xC6EC4B))
+                                    forState:UIControlStateNormal];
+
+        [self.bdResolutionBtn setTitleColor:(self.resolution == Resolution_BD ? kColor(0xC6EC4B) : kColor(0x9EA2AD))
+                                   forState:UIControlStateNormal];
+    }];
+
+
+    [[self.bdResolutionBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
+        @strongify(self);
+        @strongify(tool);
+
+        if ([tool isVip]) {
+            self.resolution = Resolution_BD;
+            [tool switchResolution:Resolution_BD];
+        } else {
+            [NormalAlertView showAlertWithTitle:nil
+                                        content:nil
+                                   confirmTitle:nil
+                                    cancelTitle:nil
+                                confirmCallback:^{
+                [self pushToFlutterPage:Flutter_rechartVip];
+            }
+                                 cancelCallback:nil];
+        }
+    }];
+
+    [[self.lowResolutionBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
+        @strongify(self);
+        @strongify(tool);
+        self.resolution = Resolution_Low;
+        [tool switchResolution:Resolution_Low];
+    }];
+
+
+    [[self.currentResolutionBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
+        @strongify(self);
+        self.resolutionBgView.hidden = !self.resolutionBgView.hidden;
+    }];
+
     [RACObserve(self, ms) subscribeNext:^(id _Nullable x) {
         @strongify(self);
 
@@ -309,6 +440,12 @@
 }
 
 - (void)configView {
+    self.resolution = [HmCloudTool share].isVip ? Resolution_BD : Resolution_Low;
+
+    [[HmCloudTool share] switchResolution:self.resolution];
+
+    self.resolutionBgView.hidden = YES;
+
     self.modeSwitch.transform = CGAffineTransformMakeScale(0.85, 0.85);
 
     self.vibrationBtn.selected = [HmCloudTool share].isVibration;
@@ -436,6 +573,8 @@
 }
 
 - (void)hideSetView {
+    self.resolutionBgView.hidden = YES;
+
     @weakify(self);
     [UIView animateWithDuration:0.25
                      animations:^{
@@ -494,6 +633,10 @@
 
 - (IBAction)didTapSet:(id)sender {
     [self hideSetView];
+}
+
+- (IBAction)didTapShowKeyboard:(id)sender {
+    [[HMCloudPlayer sharedCloudPlayer] cloudSwitchKeyboard:YES];
 }
 
 - (IBAction)didTapTopup:(id)sender {
