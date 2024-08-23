@@ -119,6 +119,14 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
                 ToastUtils.showShort("编辑保存失败")
             }
 
+            "updatePlayTime" -> {
+                GameManager.updatePlayTime((arguments as Int).toLong())
+            }
+
+            "showToast" -> {
+                ToastUtils.showShort(arguments as String)
+            }
+
             GameViewConstants.getPinCode -> {
                 GameManager.getPinCode()
             }
@@ -180,6 +188,7 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
 
             "closePage" -> {
                 GameManager.flutterActivity?.finish()
+                GameManager.updateGamePlayableTime()
             }
 
             "exitQueue" -> {

@@ -6,7 +6,6 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
-import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.SizeUtils
 import com.sayx.hm_cloud.utils.ViewUtils
 import kotlin.math.abs
@@ -78,7 +77,9 @@ class AlignOverlayLayout @JvmOverloads constructor(
                 )
             }
             matchView?.let { view ->
-                if (abs((view.x + view.width / 2f) - (it.x + it.width / 2f)) <= SizeUtils.dp2px(4f)) {
+                val verticalAlign =
+                    abs((view.x + view.width / 2f) - (it.x + it.width / 2f)) <= SizeUtils.dp2px(4f)
+                if (verticalAlign) {
                     // 中心点竖向对齐
                     drawRelationLine(
                         canvas,
@@ -88,9 +89,10 @@ class AlignOverlayLayout @JvmOverloads constructor(
                         height.toFloat(),
                         0f
                     )
-                    return
                 }
-                if (abs((view.y + view.height / 2f) - (it.y + it.height / 2f)) <= SizeUtils.dp2px(4f)) {
+                val horizontalAlign =
+                    abs((view.y + view.height / 2f) - (it.y + it.height / 2f)) <= SizeUtils.dp2px(4f)
+                if (horizontalAlign) {
                     // 中心点横顺向对齐
                     drawRelationLine(
                         canvas,
@@ -100,6 +102,8 @@ class AlignOverlayLayout @JvmOverloads constructor(
                         view.y + view.height / 2f,
                         0f
                     )
+                }
+                if (verticalAlign || horizontalAlign) {
                     return
                 }
                 if (abs(ViewUtils.getViewLeft(view) - ViewUtils.getViewLeft(it)) <= SizeUtils.dp2px(
@@ -255,22 +259,6 @@ class AlignOverlayLayout @JvmOverloads constructor(
                     it.y = height / 2f - it.height / 2f
                 }
                 matchView?.let { view ->
-                    if (abs((view.x + view.width / 2f) - (it.x + it.width / 2f)) <= SizeUtils.dp2px(
-                            4f
-                        )
-                    ) {
-                        // 中心点竖向对齐
-                        it.x = view.x + view.width / 2 - it.width / 2
-                        return
-                    }
-                    if (abs((view.y + view.height / 2f) - (it.y + it.height / 2f)) <= SizeUtils.dp2px(
-                            4f
-                        )
-                    ) {
-                        // 中心点横顺向对齐
-                        it.y = view.y + view.height / 2 - it.height / 2
-                        return
-                    }
                     if (abs(ViewUtils.getViewLeft(view) - ViewUtils.getViewLeft(it)) <= SizeUtils.dp2px(
                             4f
                         )
@@ -326,6 +314,20 @@ class AlignOverlayLayout @JvmOverloads constructor(
                     ) {
                         // 顶部对齐
                         it.y = view.y + view.height
+                    }
+                    if (abs((view.x + view.width / 2f) - (it.x + it.width / 2f)) <= SizeUtils.dp2px(
+                            4f
+                        )
+                    ) {
+                        // 中心点竖向对齐
+                        it.x = view.x + view.width / 2 - it.width / 2
+                    }
+                    if (abs((view.y + view.height / 2f) - (it.y + it.height / 2f)) <= SizeUtils.dp2px(
+                            4f
+                        )
+                    ) {
+                        // 中心点横顺向对齐
+                        it.y = view.y + view.height / 2 - it.height / 2
                     }
                 }
             }

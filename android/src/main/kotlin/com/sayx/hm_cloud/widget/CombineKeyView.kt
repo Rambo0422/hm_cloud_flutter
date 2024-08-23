@@ -137,8 +137,6 @@ class CombineKeyView @JvmOverloads constructor(
                         if (it.getPointerId(it.actionIndex) == firstTouchId) {
                             onKeyTouchListener?.onKeyTouch(false)
                         }
-                    } else if (controllerStatus == ControllerStatus.Roulette){
-                        performClick()
                     }
                 }
 

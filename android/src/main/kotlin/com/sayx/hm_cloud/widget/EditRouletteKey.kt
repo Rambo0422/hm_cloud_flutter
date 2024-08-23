@@ -72,6 +72,8 @@ class EditRouletteKey @JvmOverloads constructor(
             editKeyView.setOnClickListener {
                 val data = editKeyView.getData()
                 if (data != null) {
+                    data.isRou = false
+                    data.editIndex = 0
                     keyList[index] = null
                     editKeyView.setData(null)
                     full = false
@@ -149,6 +151,7 @@ class EditRouletteKey @JvmOverloads constructor(
         if (full) {
             return
         }
+        keyInfo.isRou = true
         keyList.keys.forEach {
             if (keyList[it] == null) {
                 keyList[it] = keyInfo
@@ -182,6 +185,7 @@ class EditRouletteKey @JvmOverloads constructor(
                 keyInfoList.add(keyInfo)
             }
         }
+        LogUtils.d("keyInfoList:$keyInfoList")
         if (keyInfoList.size < 2) {
             ToastUtils.showLong(R.string.save_at_least_two)
             return

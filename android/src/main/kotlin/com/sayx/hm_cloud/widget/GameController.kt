@@ -266,74 +266,74 @@ class GameController @JvmOverloads constructor(
     }
 
     private fun initGamepad(keyInfoList: List<KeyInfo>) {
-        LogUtils.d("initGamepad:${keyInfoList.size}")
+        LogUtils.d("initGamepad:${keyInfoList}")
         editGamepadKeys.clear()
         removeAllViews(gamepadViews)
         for (item in keyInfoList) {
-            if (item.isRou) {
-                continue
-            }
             val keyInfo = item.copy()
+            keyInfo.editIndex = editGamepadKeys.size
             editGamepadKeys.add(keyInfo)
-            when (keyInfo.type) {
-                KeyType.GAMEPAD_SQUARE, KeyType.GAMEPAD_ELLIPTIC, KeyType.GAMEPAD_ROUND_MEDIUM,
-                KeyType.GAMEPAD_ROUND_SMALL -> {
-                    addKeyButton(keyInfo)
-                }
+            if (!item.isRou) {
+                when (keyInfo.type) {
+                    KeyType.GAMEPAD_SQUARE, KeyType.GAMEPAD_ELLIPTIC, KeyType.GAMEPAD_ROUND_MEDIUM,
+                    KeyType.GAMEPAD_ROUND_SMALL -> {
+                        addKeyButton(keyInfo)
+                    }
 
-                KeyType.ROCKER_RIGHT, KeyType.ROCKER_LEFT -> {
-                    addRocker(keyInfo)
-                }
+                    KeyType.ROCKER_RIGHT, KeyType.ROCKER_LEFT -> {
+                        addRocker(keyInfo)
+                    }
 
-                KeyType.ROCKER_CROSS -> {
-                    addCrossRocker(keyInfo)
-                }
+                    KeyType.ROCKER_CROSS -> {
+                        addCrossRocker(keyInfo)
+                    }
 
-                KeyType.GAMEPAD_COMBINE -> {
-                    addCombineKey(keyInfo)
-                }
+                    KeyType.GAMEPAD_COMBINE -> {
+                        addCombineKey(keyInfo)
+                    }
 
-                KeyType.GAMEPAD_ROULETTE -> {
-                    addRouletteKey(keyInfo)
-                }
+                    KeyType.GAMEPAD_ROULETTE -> {
+                        addRouletteKey(keyInfo)
+                    }
 
-                else -> {
-                    LogUtils.e("initGamepad:$keyInfo")
+                    else -> {
+                        LogUtils.e("initGamepad:$keyInfo")
+                    }
                 }
             }
         }
     }
 
     private fun initKeyboard(keyInfoList: List<KeyInfo>) {
-        LogUtils.d("initKeyboard:${keyInfoList.size}")
+        LogUtils.d("initKeyboard:${keyInfoList}")
         editKeyboardKeys.clear()
         removeAllViews(keyboardViews)
         for (item in keyInfoList) {
-            if (item.isRou) {
-                continue
-            }
             val keyInfo = item.copy()
+            keyInfo.editIndex = editKeyboardKeys.size
             editKeyboardKeys.add(keyInfo)
-            when (keyInfo.type) {
-                KeyType.KEYBOARD_KEY, KeyType.KEYBOARD_MOUSE_UP, KeyType.KEYBOARD_MOUSE_DOWN,
-                KeyType.KEYBOARD_MOUSE_LEFT, KeyType.KEYBOARD_MOUSE_RIGHT, KeyType.KEYBOARD_MOUSE_MIDDLE -> {
-                    addKeyButton(keyInfo)
-                }
+            if (!item.isRou) {
+                when (keyInfo.type) {
+                    KeyType.KEYBOARD_KEY, KeyType.KEYBOARD_MOUSE_UP, KeyType.KEYBOARD_MOUSE_DOWN,
+                    KeyType.KEYBOARD_MOUSE_LEFT, KeyType.KEYBOARD_MOUSE_RIGHT, KeyType.KEYBOARD_MOUSE_MIDDLE -> {
+                        addKeyButton(keyInfo)
+                    }
 
-                KeyType.ROCKER_LETTER, KeyType.ROCKER_ARROW -> {
-                    addRocker(keyInfo)
-                }
+                    KeyType.ROCKER_LETTER, KeyType.ROCKER_ARROW -> {
+                        addRocker(keyInfo)
+                    }
 
-                KeyType.KEY_COMBINE -> {
-                    addCombineKey(keyInfo)
-                }
+                    KeyType.KEY_COMBINE -> {
+                        addCombineKey(keyInfo)
+                    }
 
-                KeyType.KEY_ROULETTE -> {
-                    addRouletteKey(keyInfo)
-                }
+                    KeyType.KEY_ROULETTE -> {
+                        addRouletteKey(keyInfo)
+                    }
 
-                else -> {
-                    LogUtils.e("initGamepad:$keyInfo")
+                    else -> {
+                        LogUtils.e("initGamepad:$keyInfo")
+                    }
                 }
             }
         }
@@ -932,10 +932,17 @@ class GameController @JvmOverloads constructor(
         LogUtils.d("addRouletteKey:$type")
         if (type == AppVirtualOperateType.APP_STICK_XBOX) {
             editGamepadKeys.add(keyInfo)
+            keyInfo.rouArr?.forEach { rouKey ->
+                editGamepadKeys[rouKey.editIndex].isRou = true
+            }
+            initGamepad(editGamepadKeys.toList())
         } else if (type == AppVirtualOperateType.APP_KEYBOARD) {
             editKeyboardKeys.add(keyInfo)
+            keyInfo.rouArr?.forEach { rouKey ->
+                editKeyboardKeys[rouKey.editIndex].isRou = true
+            }
+            initKeyboard(editKeyboardKeys.toList())
         }
-        addRouletteKey(keyInfo)
         currentKey = keyInfo
     }
 
@@ -1024,9 +1031,23 @@ class GameController @JvmOverloads constructor(
                 if (view.parent is ViewGroup) {
                     (view.parent as ViewGroup).removeView(view)
                 }
-                getCurrentEditKeys()?.remove(currentKey)
+                val currentEditKeys = getCurrentEditKeys()
+                currentEditKeys?.let { list->
+                    if (view is RouletteKeyView) {
+                        LogUtils.d("remove RouletteKeyView")
+                        it.rouArr?.forEach { info ->
+                            list[info.editIndex].isRou = false
+                        }
+                        list.remove(currentKey)
+                        if (controllerType == AppVirtualOperateType.APP_STICK_XBOX) {
+                            initGamepad(list.toList())
+                        }
+                        if (controllerType == AppVirtualOperateType.APP_KEYBOARD) {
+                            initKeyboard(list.toList())
+                        }
+                    }
+                }
                 currentKey = null
-
                 LogUtils.d("deleteKey")
             } ?: LogUtils.e("deleteKey: View not found")
         }
@@ -1093,10 +1114,14 @@ class GameController @JvmOverloads constructor(
     fun saveKeyConfig() {
         val data = JsonObject()
         if (controllerType == AppVirtualOperateType.APP_STICK_XBOX) {
-            data.add("keyboard", Gson().toJsonTree(editGamepadKeys))
+            val toJsonTree = GameManager.gson.toJsonTree(editGamepadKeys)
+            LogUtils.d("saveKeyConfig:$toJsonTree")
+            data.add("keyboard", toJsonTree)
             data.addProperty("type", GameConstants.gamepadConfig)
         } else if (controllerType == AppVirtualOperateType.APP_KEYBOARD) {
-            data.add("keyboard", Gson().toJsonTree(editKeyboardKeys))
+            val toJsonTree = GameManager.gson.toJsonTree(editKeyboardKeys)
+            LogUtils.d("saveKeyConfig:$toJsonTree")
+            data.add("keyboard", toJsonTree)
             data.addProperty("type", GameConstants.keyboardConfig)
         }
         controllerCallback?.updateKeyboardData(data)

@@ -21,7 +21,7 @@ object AppSizeUtils {
         ScreenUtils.getScreenHeight()
     }
 
-    // size ：667 -> result:ScreenWidth
+    // size ：667 -> result.json:ScreenWidth
     fun convertWidthSize(size: Int): Int {
 //        val width = max(screenWidth, screenHeight) - navigationBarHeight
         val width = max(screenWidth, screenHeight)
@@ -30,7 +30,7 @@ object AppSizeUtils {
         return ceil(size * multiple).toInt()
     }
 
-    // size：ScreenWidth -> result:667
+    // size：ScreenWidth -> result.json:667
     fun reconvertWidthSize(size: Int): Int {
 //        val width = max(screenWidth, screenHeight) - navigationBarHeight
         val width = max(screenWidth, screenHeight)
@@ -39,7 +39,7 @@ object AppSizeUtils {
         return ceil(size / multiple).toInt()
     }
 
-    // size ：375 -> result:ScreenHeight
+    // size ：375 -> result.json:ScreenHeight
     fun convertHeightSize(size: Int): Int {
         val height = min(screenWidth, screenHeight)
         val multiple: Double = height.toDouble() / DESIGN_HEIGHT
@@ -47,7 +47,7 @@ object AppSizeUtils {
         return ceil(size * multiple).toInt()
     }
 
-    // size：ScreenHeight -> result:375
+    // size：ScreenHeight -> result.json:375
     fun reconvertHeightSize(size: Int): Int {
         val height = min(screenWidth, screenHeight)
         val multiple: Double = height.toDouble() / DESIGN_HEIGHT

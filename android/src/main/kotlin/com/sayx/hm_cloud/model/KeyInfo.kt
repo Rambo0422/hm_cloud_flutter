@@ -19,7 +19,7 @@ class KeyInfo(
     val height: Int,
     var composeArr: List<KeyInfo>? = null,
     var rouArr: List<KeyInfo>? = null,
-    var editIndex: Int? = 0,
+    var editIndex: Int = 0,
     var isRou: Boolean = false,
     var zoomChange: Boolean = false,
     var opacityChange: Boolean = false,

@@ -66,6 +66,7 @@ import com.sayx.hm_cloud.model.PCMouseEvent
 import com.sayx.hm_cloud.model.PartyPlayWantPlay
 import com.sayx.hm_cloud.model.PlayPartyRoomInfoEvent
 import com.sayx.hm_cloud.model.PlayPartyRoomSoundAndMicrophoneStateEvent
+import com.sayx.hm_cloud.model.TimeUpdateEvent
 import com.sayx.hm_cloud.utils.AppSizeUtils
 import com.sayx.hm_cloud.utils.GameUtils
 import com.sayx.hm_cloud.widget.AddGamepadKey
@@ -155,7 +156,9 @@ class GameActivity : AppCompatActivity() {
                 )
             )
         }
-        dataBinding.tvCloudId.text = HmcpManager.getInstance().cloudId
+        if (BuildConfig.DEBUG) {
+            dataBinding.tvCloudId.text = HmcpManager.getInstance().cloudId
+        }
         GameManager.gameView?.setAttachContext(this)
         GameManager.gameView?.virtualDeviceType = VirtualOperateType.NONE
         // 游戏设置
@@ -457,9 +460,13 @@ class GameActivity : AppCompatActivity() {
                 dataBinding.btnVirtualKeyboard.visibility = View.VISIBLE
             }
 
-            override fun onPlayTimeLack() {
+            override fun onPlayTimeLack(lack:Boolean) {
                 runOnUiThread {
-                    gameSettings?.showGameOffNotice()
+                    if (lack) {
+                        gameSettings?.showGameOffNotice()
+                    } else {
+                        gameSettings?.hideGameOffNotice()
+                    }
                 }
             }
 
@@ -1035,7 +1042,10 @@ class GameActivity : AppCompatActivity() {
     override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
 //        LogUtils.d("$this->dispatchTouchEvent:$event")
         event?.let {
-            if (GameUtils.isGamePadEvent(it) || GameUtils.isKeyBoardEvent(it) || GameUtils.isMouseEvent(it)) {
+            if (GameUtils.isGamePadEvent(it) || GameUtils.isKeyBoardEvent(it) || GameUtils.isMouseEvent(
+                    it
+                )
+            ) {
 //                LogUtils.d("外设输入:$it")
                 if (dataBinding.gameController.controllerType != AppVirtualOperateType.NONE) {
                     dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
@@ -1055,7 +1065,10 @@ class GameActivity : AppCompatActivity() {
     override fun dispatchGenericMotionEvent(event: MotionEvent?): Boolean {
 //        LogUtils.d("$this->dispatchGenericMotionEvent:$event")
         event?.let {
-            if (GameUtils.isGamePadEvent(it) || GameUtils.isKeyBoardEvent(it) || GameUtils.isMouseEvent(it)) {
+            if (GameUtils.isGamePadEvent(it) || GameUtils.isKeyBoardEvent(it) || GameUtils.isMouseEvent(
+                    it
+                )
+            ) {
 //                LogUtils.d("外设输入:$it")
                 if (dataBinding.gameController.controllerType != AppVirtualOperateType.NONE) {
                     dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
@@ -1071,8 +1084,11 @@ class GameActivity : AppCompatActivity() {
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
 //        LogUtils.d("$this->dispatchKeyEvent:$event")
         event.let {
-            if (GameUtils.isGamePadEvent(it) || GameUtils.isKeyBoardEvent(it) || GameUtils.isMouseEvent(it)) {
- //                LogUtils.d("外设输入:$it")
+            if (GameUtils.isGamePadEvent(it) || GameUtils.isKeyBoardEvent(it) || GameUtils.isMouseEvent(
+                    it
+                )
+            ) {
+                //                LogUtils.d("外设输入:$it")
                 if (dataBinding.gameController.controllerType != AppVirtualOperateType.NONE) {
                     dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
                     gameSettings?.controllerType = AppVirtualOperateType.NONE
@@ -1115,6 +1131,11 @@ class GameActivity : AppCompatActivity() {
 //            GameManager.exitGame(mutableMapOf(Pair("action", "")))
 //        }
         super.onDestroy()
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onTimeUpdateEvent(event: TimeUpdateEvent) {
+        gameSettings?.updatePlayTime(event.time)
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

@@ -46,6 +46,10 @@ class HmCloudController {
     methodChannel.invokeMethod("controllerEditFail");
   }
 
+  void showToast(String msg) {
+    methodChannel.invokeMethod("showToast", msg);
+  }
+
   void controlPlay(params) {
     methodChannel.invokeMethod("controlPlay", params);
   }
@@ -92,5 +96,9 @@ class HmCloudController {
       'updatePlayPartySoundAndMicrophoneState',
       params,
     );
+  }
+
+  void updatePlayTime(int playTime) {
+    methodChannel.invokeMethod('updatePlayTime', playTime);
   }
 }

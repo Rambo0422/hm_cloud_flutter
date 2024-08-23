@@ -138,7 +138,7 @@ class RouletteKeyView @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        if (controllerStatus == ControllerStatus.Edit || controllerStatus == ControllerStatus.Combine) {
+        if (controllerStatus == ControllerStatus.Edit || controllerStatus == ControllerStatus.Roulette) {
             canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), bgPaint)
         }
         rouletteParts?.let {
@@ -268,7 +268,7 @@ class RouletteKeyView @JvmOverloads constructor(
                         if (rouletteRectF.contains(event.x, event.y)) {
                             rouletteParts?.let { list ->
                                 val position = computePosition(event.x, event.y)
-//                                LogUtils.d("computePosition result:$position")
+//                                LogUtils.d("computePosition result.json:$position")
                                 if (position != currentIndex && position >= 0 && position < list.size) {
                                     // 上一个按键抬起
                                     if (currentIndex in list.indices) {
