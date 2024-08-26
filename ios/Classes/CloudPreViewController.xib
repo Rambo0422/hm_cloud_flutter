@@ -49,6 +49,10 @@
             <rect key="frame" x="0.0" y="0.0" width="852" height="393"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
+                <view alpha="0.59999999999999998" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="sjq-0R-9BQ">
+                    <rect key="frame" x="0.0" y="0.0" width="852" height="393"/>
+                    <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                </view>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="S4t-EA-PR2">
                     <rect key="frame" x="798" y="5" width="44" height="44"/>
                     <constraints>
@@ -61,7 +65,7 @@
                         <action selector="didTapSet:" destination="-1" eventType="touchUpInside" id="yd9-NX-ntt"/>
                     </connections>
                 </button>
-                <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YMB-DP-pcs">
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YMB-DP-pcs">
                     <rect key="frame" x="798" y="344" width="44" height="44"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="44" id="8y7-9P-eVB"/>
@@ -73,10 +77,6 @@
                         <action selector="didTapShowKeyboard:" destination="-1" eventType="touchUpInside" id="snw-kJ-yeh"/>
                     </connections>
                 </button>
-                <view alpha="0.59999999999999998" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="sjq-0R-9BQ">
-                    <rect key="frame" x="0.0" y="0.0" width="852" height="393"/>
-                    <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tEf-wG-RYs">
                     <rect key="frame" x="0.0" y="0.0" width="293.33333333333331" height="393"/>
                     <subviews>

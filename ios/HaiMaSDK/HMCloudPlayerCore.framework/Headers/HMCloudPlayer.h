@@ -34,26 +34,6 @@ typedef NS_ENUM(NSInteger, CloudPlayerDownlodFileEventStatus) {
     CloudPlayerDownlodFileEventStatusListFile,       //可下载文件列表
 };
 
-typedef NS_ENUM(NSInteger, CloudPlayerDownloadResponseStatus) {
-    CloudPlayerDownloadResponseStatusSuccess,           //下载成功
-    CloudPlayerDownloadResponseStatusEmpty,             //下载队列空
-    CloudPlayerDownloadResponseStatusOutList,           //不在下载列表
-    CloudPlayerDownloadResponseStatusDownloaded,        //已下载完成
-    CloudPlayerDownloadResponseStatusTimeout,           //取消超时
-    CloudPlayerDownloadResponseStatusDisconnect,        //链接断开
-    CloudPlayerDownloadResponseStatusKeepAliveTimeout,  //保活时间用尽
-    CloudPlayerDownloadResponseStatusInternalError,     //内部错误
-};
-
-typedef NS_ENUM(NSInteger, CloudPlayerCancelDownloadResponseStatus) {
-    CloudPlayerCancelDownloadResponseStatusSuccess,      //取消成功
-    CloudPlayerCancelDownloadResponseStatusEmpty,        //下载队列空
-    CloudPlayerCancelDownloadResponseStatusOutList,      //不在下载列表
-    CloudPlayerCancelDownloadResponseStatusDownloaded,   //已下载完成
-    CloudPlayerCancelDownloadResponseStatusTimeout,      //取消超时
-    CloudPlayerCancelDownloadResponseStatusDisconnect,   //链接断开
-};
-
 typedef NS_ENUM(NSInteger,CloudPlayerPrivacyType) {
     CloudPlayerPrivacyTypeCamera,
     CloudPlayerPrivacyTypePhotosAlbum,
@@ -91,38 +71,7 @@ typedef NS_ENUM(NSInteger, ELivingCapabilityStatus) {
     LivingSupported   = 1,    //支持直播
 };
 
-typedef NS_ENUM(NSInteger, CloudInstanceType) {
-    CloudInstanceTypeUnknown        = -1, //无法确定
-    CloudInstanceTypeArm            =  0, //arm
-    CloudInstanceTypeX86            =  1, //x86
-};
-
-typedef NS_ENUM(NSInteger, CloudPlayerFileUploadResponseStatus) {
-    CloudPlayerFileUploadResponseStatusSuccess,        //上传成功
-    CloudPlayerFileUploadResponseStatusEmpty,          //上传队列空
-    CloudPlayerFileUploadResponseStatusTimeout,        //超时
-    CloudPlayerFileUploadResponseStatusCancel,         //取消
-    CloudPlayerFileUploadResponseStatusIncorrectFormat,//格式不正确
-    CloudPlayerFileUploadResponseStatusBeyondMaxLimit, //超过最大文件限制
-    CloudPlayerFileUploadResponseStatusInternalError,  //内部错误
-    CloudPlayerFileUploadResponseStatusDisconnect,     //链接断开
-};
-
 typedef void (^HMReservedIncetanceCallback)(NSArray <HMCloudPlayerReservedSingleIncetance*>*);
-
-typedef void (^HMCloudFileDownloadProgressBlock)(double downloadProgress, HMFile *file);
-
-typedef void (^HMCloudFileDownloadResponseBlock)(BOOL result, CloudPlayerDownloadResponseStatus status, NSString *errorMsg, HMFile *file);
-
-typedef void (^HMCloudFileDownloadComplete)(void);
-
-typedef void (^HMCloudFileCancelDownloadResponseBlock)(BOOL result, CloudPlayerCancelDownloadResponseStatus status, HMFile *file);
-
-typedef void (^HMCloudFileCancelDownloadComplete)(void);
-
-typedef void (^HMCloudFileUploadResponseBlock)(BOOL result, CloudPlayerFileUploadResponseStatus status ,NSString *errorMsg, HMFile *file);
-
-typedef void (^HMCloudFileUploadComplete)(void);
 
 const extern NSString *CLOUDGAME_SDK_VERSION;
 
@@ -160,7 +109,61 @@ const extern NSString *CloudGameOptionKeyUserDeviceInfo;    //设备信息
 const extern NSString *CloudGameOptionKeyLanguage;          //设置语言
 const extern NSString *CloudGameOptionKeyRichData;          //透传到SAAS的字段
 const extern NSString *CloudGameOptionKeyResolutionId;      //起播分辨率
+const extern NSString *CloudGameOptionKeyDisableAutoStream; //禁用自动串流
+const extern NSString *CloudGameOptionKeyGid;               //gid: gameId
 const extern NSString *CloudGameOptionKeyLargeBitrate;      //高帧率开关
+const extern NSString *CloudGameOptionKeyStreamingMode;     //视频流模式
+const extern NSString *CloudGameOptionKeyNoInputTimeout;    //无操作超时时间
+
+typedef NS_ENUM(NSInteger, CloudPlayerFileUploadResponseStatus) {
+    CloudPlayerFileUploadResponseStatusSuccess,        //上传成功
+    CloudPlayerFileUploadResponseStatusEmpty,          //上传队列空
+    CloudPlayerFileUploadResponseStatusTimeout,        //超时
+    CloudPlayerFileUploadResponseStatusCancel,         //取消
+    CloudPlayerFileUploadResponseStatusIncorrectFormat,//格式不正确
+    CloudPlayerFileUploadResponseStatusBeyondMaxLimit, //超过最大文件限制
+    CloudPlayerFileUploadResponseStatusInternalError,  //内部错误
+    CloudPlayerFileUploadResponseStatusDisconnect,     //链接断开
+};
+
+typedef NS_ENUM(NSInteger, CloudPlayerDownloadResponseStatus) {
+    CloudPlayerDownloadResponseStatusSuccess,           //下载成功
+    CloudPlayerDownloadResponseStatusEmpty,             //下载队列空
+    CloudPlayerDownloadResponseStatusOutList,           //不在下载列表
+    CloudPlayerDownloadResponseStatusDownloaded,        //已下载完成
+    CloudPlayerDownloadResponseStatusTimeout,           //取消超时
+    CloudPlayerDownloadResponseStatusDisconnect,        //链接断开
+    CloudPlayerDownloadResponseStatusKeepAliveTimeout,  //保活时间用尽
+    CloudPlayerDownloadResponseStatusInternalError,     //内部错误
+};
+
+typedef NS_ENUM(NSInteger, CloudPlayerCancelDownloadResponseStatus) {
+    CloudPlayerCancelDownloadResponseStatusSuccess,      //取消成功
+    CloudPlayerCancelDownloadResponseStatusEmpty,        //下载队列空
+    CloudPlayerCancelDownloadResponseStatusOutList,      //不在下载列表
+    CloudPlayerCancelDownloadResponseStatusDownloaded,   //已下载完成
+    CloudPlayerCancelDownloadResponseStatusTimeout,      //取消超时
+    CloudPlayerCancelDownloadResponseStatusDisconnect,   //链接断开
+};
+
+typedef NS_ENUM (NSInteger, CloudPlayerStreamingMode){
+    CloudPlayerStreamingModeFluency = 0,
+    CloudPlayerStreamingModeImageQuality = 1,
+};
+
+typedef void (^HMCloudFileUploadResponseBlock)(BOOL result, CloudPlayerFileUploadResponseStatus status ,NSString *errorMsg, HMFile *file);
+
+typedef void (^HMCloudFileUploadComplete)(void);
+
+typedef void (^HMCloudFileDownloadProgressBlock)(double downloadProgress,HMFile *file);
+
+typedef void (^HMCloudFileDownloadResponseBlock)(BOOL result, CloudPlayerDownloadResponseStatus status,NSString *errorMsg, HMFile *file);
+
+typedef void (^HMCloudFileDownloadComplete)(void);
+
+typedef void (^HMCloudFileCancelDownloadResponseBlock)(BOOL result, CloudPlayerCancelDownloadResponseStatus status,HMFile *file);
+
+typedef void (^HMCloudFileCancelDownloadComplete)(void);
 
 @interface HMCloudPlayer : HMCloudCorePlayer
 
@@ -221,6 +224,12 @@ IDC路由查询
  @param playingTime 恢复后的时长，单位：ms
  */
 - (void) resume:(NSInteger)playingTime;
+
+/**
+ 开始串流
+ 注： 仅在收到"waitStreamingConfirm"场景回调后有效
+ */
+- (BOOL) startStreaming;
 
 /**
  手动切换清晰度
@@ -545,6 +554,16 @@ typedef void (^HMAssignControlCallback)(NSArray<HMCloudPlayerControlInfo *>*);
 - (void)cancelUploadFileAllTask;
 
 /**
+ 开始录音
+ */
+- (void)startRecord;
+
+/**
+ 停止录音
+ */
+- (void)stopRecord;
+
+/**
  开启/关闭 高帧率模式
  @param enabled 是否开启
  @param success 开启成功回调
@@ -552,6 +571,19 @@ typedef void (^HMAssignControlCallback)(NSArray<HMCloudPlayerControlInfo *>*);
  @return 是否调用成功
  */
 - (BOOL) enlargeBitrate:(BOOL)enabled success:(void (^)(BOOL enabled))success fail:(void (^)(NSString *errorCode))fail;
+
+/**
+ 设置视频流模式
+ @param mode 视频流模式
+ @param completion 设置结果
+ */
+- (void)setStreamingMode:(CloudPlayerStreamingMode)mode completion:(void (^)(BOOL success, NSString *errorCode))completion;
+
+/**
+ @param options 游戏参数
+ @return 返回申请实例必要参数
+ */
+- (NSDictionary *)getApplyInstanceParams:(NSDictionary *)options;
 
 @end
 

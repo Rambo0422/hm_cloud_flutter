@@ -90,7 +90,7 @@ typedef enum : NSUInteger {
 @property (weak, nonatomic) IBOutlet UIButton *bdResolutionBtn;
 @property (weak, nonatomic) IBOutlet UIView *resolutionBgView;
 
-
+@property (nonatomic, assign) BOOL showKeyboard;
 
 @end
 
@@ -636,7 +636,9 @@ typedef enum : NSUInteger {
 }
 
 - (IBAction)didTapShowKeyboard:(id)sender {
-    [[HMCloudPlayer sharedCloudPlayer] cloudSwitchKeyboard:YES];
+    self.showKeyboard = !self.showKeyboard;
+
+    [[HMCloudPlayer sharedCloudPlayer] cloudSwitchKeyboard:self.showKeyboard];
 }
 
 - (IBAction)didTapTopup:(id)sender {

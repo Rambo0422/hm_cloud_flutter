@@ -11,6 +11,7 @@
 #import "HMCloudCoreMarco.h"
 #import "HMCCPayloadData.h"
 #import "HMCloudCorePlayerViewController.h"
+#import "HMStreamingFileModel.h"
 
 typedef NS_ENUM(NSInteger, CloudPlayerDownloadMode){
     CloudPlayerDownloadModeNormal = 0,      //正常播流
@@ -78,6 +79,7 @@ typedef NS_ENUM(NSInteger, CloudCorePlayerStatus) {
     PlayerStatusPaused          = PlayerStatusPlaying<<1,
     PlayerStatusStopped         = PlayerStatusPaused<<1,
     PlayerStatusCanResume       = (PlayerStatusStarted|PlayerStatusPlaying),
+    PlayerStatusCantNotPuase    = (PlayerStatusPaused|PlayerStatusStopped)
 };
 
 typedef NS_ENUM(NSInteger, CloudPlayerFileListStatus) {
@@ -117,9 +119,20 @@ typedef NS_ENUM(NSInteger,CloudPlayerScreenshotStatus){
     CloudPlayerScreenshotStatusInternalError,
 };
 
+typedef NS_ENUM(NSInteger, CloudlPlayerDataChanneWSMessageType) {
+    CloudlPlayerDataChanneWSMessageTypeNormal,
+    CloudlPlayerDataChanneWSMessageTypeClipboard,
+};
+
 typedef NS_ENUM(NSInteger,HMCloudAppStopReason) {
     HMCloudAppStopReasonNormal,                    //正常退出
     HMCloudAppStopReasonTimeout,                   //app认定超时后调用sdk退出方法
+};
+
+typedef NS_ENUM(NSInteger, CloudInstanceType) {
+    CloudInstanceTypeUnknown        = -1, //无法确定
+    CloudInstanceTypeArm            =  0, //arm
+    CloudInstanceTypeX86            =  1, //x86
 };
 
 typedef void (^HMCloudScreenshotBlock)(BOOL result,NSData *data,CloudPlayerScreenshotStatus status,NSString *errorMsg);
@@ -200,9 +213,13 @@ const extern NSString *CloudGameOptionKeyStretch;                 //是否拉伸
 @property (nonatomic, assign)           BOOL hiddenMaskView;
 @property (nonatomic, assign)           BOOL openMultiConnect;
 @property (nonatomic, assign)           long long saasLinkTimestamp;
+@property (nonatomic, assign)           CloudInstanceType instanceType;
+
 
 - (NSString *) getFinalCountlyUrl;
 - (NSString *) getFinalCountlyKey;
+- (BOOL)supportReplaceCountlyUrl;
+- (void)replaceCountlyUrl;
 
 /**
  向海马云端注册
@@ -338,6 +355,7 @@ const extern NSString *CloudGameOptionKeyStretch;                 //是否拉伸
 
 - (void) connectWebSocket:(NSString *)url;
 - (BOOL) reconnectWebSocket;
+- (BOOL) reconnectWebSocket:(NSString *)url;
 - (void) disconnectWebSocket;
 
 /**
@@ -612,11 +630,30 @@ const extern NSString *CloudGameOptionKeyStretch;                 //是否拉伸
  */
 - (void)setStretch:(BOOL)stretch;
 
+- (BOOL)uploadX86:(NSArray<HMStreamingFileModel *> *)uploadList cloudFileUploadResponseBlock:(CloudCorePlayerUploadResponseBlock)cloudFileUploadResponseBlock cloudFileUploadComplete:(CloudCorePlayerUploadComplete)cloudFileUploadComplete;
+
+- (BOOL)downloadX86:(NSArray<HMStreamingFileModel *> *)downloadList downloadProgress:(CloudCorePlayerDownloadProgressBlock)downloadProgressBlock responseBlock:(CloudCorePlayerDownloadResponseBlock)responseBlock completeBlock:(CloudCorePlayerDownloadComplete)completeBlock;
+
+- (BOOL)cancelDownloadX86:(NSArray<HMStreamingFileModel *> *)fileList cloudFileCancelDownloadResponseBlock:(CloudCoreFileCancelDownloadResponseBlock)cancelDownloadResponseBlock cloudFileCancelDownloadComplete:(CloudCoreFileCancelDownloadComplete)cancelDownloadComplete;
+
+- (BOOL)sendMessageToDataChannel:(CloudCorePlayerWSMessageType)messageType message:(NSString *)message;
+
+- (NSString *)readClipboard;
+
+- (void)writeContentToClipboard:(NSString *)content;
+
 /**
  重置player,input,screen重连次数
  */
 - (void)resetRetryPlayerTimes;
 
+- (void)receivedDNSIPData:(NSDictionary *)dataDict url:(NSString *)url;
+
+- (NSString *)tryNextIpConnect;
+
+- (void)reconnectWebsoketyWithNextIp;
+
+- (CGSize)adjustShowSize:(NSString *)size;
 @end
 
 typedef NS_ENUM (NSInteger, CloudPlayerStopReason) {
@@ -633,6 +670,11 @@ typedef NS_ENUM (NSInteger, CloudPlayerStopReason) {
     CloudPlayerStopReasonLowSpeed,              //低于服务下限
     CloudPlayerStopReasonUrlTimeout,            //获取流地址超时
     CloudPlayerStopReasonLoseControl,           //失去控制权
+    CloudPlayerStopReasonStreamReadyTimeout,    //禁用自动串流时等待op68超时
+    CloudPlayerStopReasonGameMaintenance,       //游戏维护中
+    CloudPlayerStopReasonStartStreamingFailed,  //请求串流失败
+    CloudPlayerStopReasonWaitStreamingTimeout,  //等待app调用串流接口超时
+    CloudPlayerStopReasonNORemainingTime,       //启动游戏时返回无游戏时长
     CloudPlayerStopReasonInvalidMultiConn,      //cid被踢下线
 };
 
@@ -643,6 +685,8 @@ typedef NS_ENUM (NSInteger, CloudPlayerStopReason) {
 @property (nonatomic, copy)   NSString              *errorMsg;
 @property (nonatomic, strong) NSArray               *queues;
 @property (nonatomic, copy)   NSString              *openApiReleaseInstance;
+@property (nonatomic, copy)   NSString              *maintainBegin;
+@property (nonatomic, copy)   NSString              *maintainEnd;
 
 + (instancetype) stopInfo:(CloudPlayerStopReason)reason errorCode:(NSString *)errorCode errorMsg:(NSString *)errorMsg;
 + (instancetype) stopInfo:(CloudPlayerStopReason)reason queues:(NSArray *)queues errorCode:(NSString *)errorCode errorMsg:(NSString *)errorMsg;
@@ -669,6 +713,7 @@ typedef NS_ENUM (NSInteger, CloudPlayerStopReason) {
 
 - (void) messageReceived:(NSString *)msg;
 - (void) recordWSMessage:(NSString *)msg;
+- (void) messageReceivedFromDataChannel:(NSNumber *)type msg:(NSString *)msg;
 
 - (void) maintanceWillStart:(HMCCPayloadData *)data;
 - (void) maintanceDone;
@@ -704,6 +749,13 @@ typedef NS_ENUM (NSInteger, CloudPlayerStopReason) {
 - (void) keepAliveTimeData:(HMCCPayloadData *)data;
 
 - (void) cloudCorePlayerDelayInfoCallBack:(HMDelayInfoModel *)delayModel;
+
+- (void) websoketDNSTimeout:(NSString *)hostUrl;
+
+- (void)stopSaasLinkTimer;
+
+- (void)startSaasLinkTimer;
+
 @end
 
 

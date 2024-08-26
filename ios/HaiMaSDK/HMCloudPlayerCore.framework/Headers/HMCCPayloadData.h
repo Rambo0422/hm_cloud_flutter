@@ -34,6 +34,7 @@
 @property (nonatomic, copy)     NSString    *screenUrl;
 @property (nonatomic, copy)     NSString    *screenRecordUrl;
 @property (nonatomic, copy)     NSString    *resolution;
+@property (nonatomic, copy)     NSString    *signalV2Url;
 
 @property (nonatomic, copy)     NSString    *idcId;
 @property (nonatomic, copy)     NSString    *idcName;
