@@ -56,4 +56,12 @@ class HmCloudController {
   Future<void> queryControlUsers() {
     return methodChannel.invokeMethod('queryControlUsers', null);
   }
+
+  Future<dynamic> checkUnReleaseGame() {
+    return methodChannel.invokeMethod("checkUnReleaseGame", "");
+  }
+
+  void releaseGame() {
+    methodChannel.invokeMethod("releaseGame", null);
+  }
 }

@@ -26,7 +26,7 @@ data class GameParam(
     var gameId: String,
     var accountInfo: Any?,
     var mouseMode: Int,
-    var isPeakChannel: Boolean
+    var isReconnect: Boolean
 ) {
     fun isVip(): Boolean {
         return vipExpiredTime > realTime
@@ -51,7 +51,7 @@ data class GameParam(
                 arguments["gameId"] as String? ?: "",
                 arguments["accountInfo"] ?: mapOf<String, Any>(),
                 arguments["mouseMode"] as Int? ?: 2,
-                arguments["isPeakChannel"] as Boolean? ?: false,
+                arguments["isReconnect"] as Boolean? ?: false,
             )
         }
 

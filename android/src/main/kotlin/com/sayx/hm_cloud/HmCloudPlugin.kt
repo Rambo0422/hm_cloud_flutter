@@ -47,7 +47,7 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
     override fun onMethodCall(call: MethodCall, callback: MethodChannel.Result) {
         val arguments = call.arguments
 //        Log.e("CloudGame", "onMethodCall:${call.method}, param:$arguments")
-        LogUtils.d("callMethod:${call.method}, param:$arguments")
+        LogUtils.d("onMethodCall->callMethod:${call.method}, param:$arguments")
         when (call.method) {
             // 游戏启动
             GameViewConstants.startCloudGame -> {
@@ -59,7 +59,12 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
                     GameManager.startGame(gameParam)
                 }
             }
-
+            "checkUnReleaseGame" -> {
+                GameManager.checkPlayingGame(callback)
+            }
+            "releaseGame" -> {
+                GameManager.releaseGame("1", null)
+            }
             else -> {
                 callback.notImplemented()
             }

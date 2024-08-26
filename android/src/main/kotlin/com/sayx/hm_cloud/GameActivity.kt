@@ -1,6 +1,7 @@
 package com.sayx.hm_cloud
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.KeyEvent
@@ -97,6 +98,12 @@ class GameActivity : AppCompatActivity() {
             GameManager.gameView?.resolutionList?.first(),
             0
         )
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        countTime = noOperateTime
+        startTimer()
     }
 
     private fun startTimer() {
@@ -207,7 +214,9 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun showErrorDialog(errorCode: String, errorMsg: String? = null) {
-        GameManager.releaseGame(finish = errorCode, bundle = null)
+        GameManager.gameView?.onDestroy()
+        GameManager.gameView = null
+        GameManager.isPlaying = false
         try {
             val title = StringBuilder()
             if (TextUtils.isEmpty(errorMsg) || errorMsg == "null") {
@@ -250,66 +259,17 @@ class GameActivity : AppCompatActivity() {
             .build().show()
     }
 
-    override fun onStart() {
-        GameManager.gameView?.onStart()
-        super.onStart()
-    }
-
-    override fun onResume() {
-        GameManager.gameView?.onResume()
-        dataBinding.root.requestFocus()
-        hideNavigationBar()
-        super.onResume()
-    }
-
-    override fun onRestart() {
-        GameManager.gameView?.onRestart(1000)
-        super.onRestart()
-    }
-
-    override fun onPause() {
-        GameManager.gameView?.onPause()
-        super.onPause()
-    }
-
     override fun onStop() {
-        GameManager.gameView?.onStop()
         super.onStop()
-    }
-
-    override fun onDestroy() {
         EventBus.getDefault().unregister(this)
-        GameManager.gameView?.onDestroy()
-        if (GameManager.isPlaying) {
-            GameManager.exitGame(mapOf(Pair("action", "")))
-        }
+        GameManager.gameView?.onStop()
+        GameManager.isPlaying = false
         try {
+            gameTimer?.purge()
             gameTimer?.cancel()
+            gameTimer = null
         } catch (e: Exception) {
-            LogUtils.e("${e.message}")
-        }
-        super.onDestroy()
-    }
-
-    override fun onWindowFocusChanged(hasFocus: Boolean) {
-        super.onWindowFocusChanged(hasFocus)
-        hideNavigationBar()
-    }
-
-    @Suppress("DEPRECATION")
-    private fun hideNavigationBar() {
-        LogUtils.d("hideNavigationBar")
-        val insetsController = WindowCompat.getInsetsController(window, window.decorView)
-        insetsController.hide(WindowInsetsCompat.Type.navigationBars())
-        insetsController.hide(WindowInsetsCompat.Type.statusBars())
-        val isHas = hasNavigationBar(this)
-        if (isHas) {
-            window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    or View.SYSTEM_UI_FLAG_FULLSCREEN
-                    or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                    or View.SYSTEM_UI_FLAG_IMMERSIVE)
+            LogUtils.e("cancel Timer error:${e.message}")
         }
     }
 

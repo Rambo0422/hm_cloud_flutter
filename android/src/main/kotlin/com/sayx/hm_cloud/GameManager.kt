@@ -11,6 +11,7 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.haima.hmcp.Constants
 import com.haima.hmcp.HmcpManager
+import com.haima.hmcp.beans.CheckCloudServiceResult
 //import com.haima.hmcp.beans.PlayNotification
 import com.haima.hmcp.beans.UserInfo
 import com.haima.hmcp.beans.UserInfo2
@@ -19,6 +20,7 @@ import com.haima.hmcp.enums.ErrorType
 import com.haima.hmcp.enums.NetWorkState
 import com.haima.hmcp.enums.ScreenOrientation
 import com.haima.hmcp.listeners.HmcpPlayerListener
+import com.haima.hmcp.listeners.OnGameIsAliveListener
 import com.haima.hmcp.listeners.OnInitCallBackListener
 import com.haima.hmcp.listeners.OnSaveGameCallBackListener
 import com.haima.hmcp.utils.StatusCallbackUtil
@@ -28,15 +30,12 @@ import com.sayx.hm_cloud.model.GameError
 import com.sayx.hm_cloud.model.GameErrorEvent
 import com.sayx.hm_cloud.model.GameParam
 import com.sayx.hm_cloud.utils.GameUtils
-import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import org.greenrobot.eventbus.EventBus
 import org.json.JSONObject
 
 @SuppressLint("StaticFieldLeak")
 object GameManager : HmcpPlayerListener {
-
-    private var gameSdkInt = false
 
     private lateinit var channel: MethodChannel
 
@@ -50,15 +49,13 @@ object GameManager : HmcpPlayerListener {
 
     private lateinit var context: Context
 
-    lateinit var flutterEngine: FlutterEngine
-
     var isPlaying = false
 
     fun init(channel: MethodChannel, context: Context) {
         this.channel = channel
         this.context = context
         LogUtils.getConfig().also {
-            it.isLogSwitch = BuildConfig.DEBUG
+            it.isLogSwitch = true
             it.globalTag = "GameManager"
         }
     }
@@ -69,8 +66,13 @@ object GameManager : HmcpPlayerListener {
 
     fun startGame(gameParam: GameParam) {
         this.gameParam = gameParam
-        if (gameSdkInt) {
-            prepareGame()
+        if (gameParam?.isReconnect == true) {
+            Intent().apply {
+                setClass(context, GameActivity::class.java)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                context.startActivity(this)
+            }
+            gameView?.restartGame(0)
         } else {
             initGameSdk()
         }
@@ -88,21 +90,39 @@ object GameManager : HmcpPlayerListener {
             Constants.IS_ERROR = false
             Constants.IS_INFO = false
             LogUtils.d("init haiMaSDK:${gameParam?.accessKeyId}")
+//            HmcpManager.getInstance().releaseRequestManager()
             HmcpManager.getInstance().init(config, context, object : OnInitCallBackListener {
                 override fun success() {
                     LogUtils.d("haiMaSDK success:${HmcpManager.getInstance().sdkVersion}")
-                    gameSdkInt = true
                     prepareGame()
                 }
 
                 override fun fail(msg: String?) {
                     LogUtils.e("haiMaSDK fail:$msg")
+                    var errorCode = GameError.gameInitErrorCode
+                    var errorMsg = GameError.gameInitErrorMsg
+                    if (msg is String && !TextUtils.isEmpty(msg)) {
+                        val resultData = gson.fromJson(msg, Map::class.java)
+                        var errorCodeWithoutCid = ""
+                        try {
+                            errorCodeWithoutCid =
+                                if (resultData["errorCodeWithoutCid"].toString() == "null") GameError.gameInitErrorCode else resultData["errorCodeWithoutCid"].toString()
+                        } catch (e: Exception) {
+                            LogUtils.e("${e.message}")
+                        }
+                        errorCode =
+                            if (TextUtils.isEmpty(errorCodeWithoutCid)) GameError.gameInitErrorCode else errorCodeWithoutCid
+                        try {
+                            errorMsg =
+                                if (resultData["errorMessage"].toString() == "null") resultData["errorMsg"].toString() else resultData["errorMessage"].toString()
+                        } catch (e: Exception) {
+                            LogUtils.e("${e.message}")
+                        }
+                    }
+//                    EventBus.getDefault().post(GameErrorEvent(errorCode, errorMsg))
                     channel.invokeMethod(
                         "errorInfo",
-                        mapOf(
-                            Pair("errorCode", GameError.gameInitErrorCode),
-                            Pair("cid", HmcpManager.getInstance().cloudId),
-                        )
+                        mapOf(Pair("errorCode", errorCode), Pair("errorMsg", errorMsg))
                     )
                 }
             }, true)
@@ -116,6 +136,37 @@ object GameManager : HmcpPlayerListener {
                 )
             )
         }
+    }
+
+    fun checkPlayingGame(callback: MethodChannel.Result) {
+        if (gameParam == null) {
+            callback.success(false)
+            return
+        }
+        LogUtils.d("checkPlayingGame->userId:${this.gameParam?.userId}, userToken:${this.gameParam?.userToken}")
+        HmcpManager.getInstance().checkPlayingGame(UserInfo().also {
+            it.userId = this.gameParam?.userId
+            it.userToken = this.gameParam?.userToken
+        }, object : OnGameIsAliveListener {
+            override fun success(list: MutableList<CheckCloudServiceResult.ChannelInfo>?) {
+                LogUtils.d("checkPlayingGame:$list")
+                if (!list.isNullOrEmpty()) {
+                    // 有未释放的游戏实例
+                    callback.success(true)
+                } else {
+                    callback.success(false)
+                }
+            }
+
+            override fun fail(msg: String?) {
+                LogUtils.d("checkPlayingGameFail->Msg:$msg")
+                callback?.success(false)
+            }
+        })
+    }
+
+    fun onBackHome() {
+        channel.invokeMethod("homeShow", null)
     }
 
     /**
@@ -134,7 +185,7 @@ object GameManager : HmcpPlayerListener {
                     if (playTime > Int.MAX_VALUE) Int.MAX_VALUE else playTime.toInt()
                 )
                 // 排队优先级：1~48
-                it.putInt(HmcpVideoView.PRIORITY, 48)
+                it.putInt(HmcpVideoView.PRIORITY, gameParam?.priority ?: 0)
                 // 游戏包名：GTAV
                 it.putString(HmcpVideoView.APP_NAME, gameParam?.gamePkName)
                 // 渠道商名称：szlk
@@ -143,14 +194,14 @@ object GameManager : HmcpPlayerListener {
                 it.putString(HmcpVideoView.C_TOKEN, gameParam?.cToken)
 //                it.putString(HmcpVideoView.EXTRA_ID, AppConstants.extraId)
                 // 是否存档
-//                it.putBoolean(HmcpVideoView.ARCHIVED, true)
+                it.putBoolean(HmcpVideoView.ARCHIVED, true)
                 it.putString(
                     HmcpVideoView.PAY_PROTO_DATA,
                     GameUtils.getProtoData(
                         gson,
                         gameParam?.userId,
                         gameParam?.gameId,
-                        gameParam?.priority ?: 0
+                        gameParam?.priority ?: 1
                     )
                 )
                 // 码率
@@ -159,6 +210,9 @@ object GameManager : HmcpPlayerListener {
                 it.putInt(HmcpVideoView.RESOLUTION_ID, 4)
                 // 显示剩余时间
 //                it.putBoolean(HmcpVideoView.IS_SHOW_TIME, true)
+                if (!TextUtils.isEmpty(cid)) {
+                    it.putString(HmcpVideoView.C_ID, cid)
+                }
                 // 背景色
 //                it.putInt(HmcpVideoView.VERTICAL_BACKGROUND, Color.BLACK)
                 // 分辨率宽高
@@ -188,23 +242,16 @@ object GameManager : HmcpPlayerListener {
 
     private fun playGame(bundle: Bundle?) {
         LogUtils.d("playGame:$gameView")
-        if (gameView != null) {
-            // 通常是已进入普通队列，切换高速队列，释放普通队列实例，重新进入高速队列
-            releaseGame(finish = "0", bundle)
-        } else {
+        if (gameView == null) {
             gameView = HmcpVideoView(context)
-            gameView?.setUserInfo(UserInfo().also {
-                it.userId = gameParam?.userId
-                it.userToken = gameParam?.userToken
-            })
-            gameView?.setConfigInfo("configInfo")
-            gameView?.hmcpPlayerListener = this
-//            gameView?.virtualDeviceType = VirtualOperateType.NONE
-            gameView?.play(bundle)
-            // 默认静音启动，隐藏云端操作
-            gameView?.setAudioMute(true)
-//            gameView?.virtualDeviceType = VirtualOperateType.NONE
         }
+        gameView?.setUserInfo(UserInfo().also {
+            it.userId = gameParam?.userId
+            it.userToken = gameParam?.userToken
+        })
+        gameView?.setConfigInfo("configInfo")
+        gameView?.hmcpPlayerListener = this
+        gameView?.play(bundle)
     }
 
     override fun HmcpPlayerStatusCallback(statusData: String?) {
@@ -225,24 +272,11 @@ object GameManager : HmcpPlayerListener {
                 }
                 // 实例进入排队，sdk反馈排队时间
                 Constants.STATUS_OPERATION_INTERVAL_TIME -> {
-                    val dataStr = data.getString(StatusCallbackUtil.DATA)
-                    if (dataStr is String && !TextUtils.isEmpty(dataStr)) {
-                        val resultData = gson.fromJson(dataStr, Map::class.java)
-                        channel.invokeMethod(
-                            "queueInfo",
-                            mapOf(
-                                Pair("queueTime", resultData["time"])
-                            )
-                        )
-                    } else {
-                        LogUtils.e("queue info error:$dataStr")
-                    }
                 }
 
                 Constants.STATUS_FIRST_FRAME_ARRIVAL -> {
                     if (!isPlaying) {
                         isPlaying = true
-//                        gameView?.virtualDeviceType = VirtualOperateType.NONE
                         channel.invokeMethod(
                             GameViewConstants.firstFrameArrival, mapOf(
                                 Pair("cid", HmcpManager.getInstance().cloudId)
@@ -412,12 +446,9 @@ object GameManager : HmcpPlayerListener {
         val cloudId = HmcpManager.getInstance().cloudId
         if (TextUtils.isEmpty(cloudId)) {
             LogUtils.d("undo releaseGame, cid is empty")
+            gameParam = null
             gameView?.onDestroy()
             gameView = null
-            if (finish == "0") {
-                // 切换队列
-                playGame(bundle)
-            }
             return
         }
         HmcpManager.getInstance().setReleaseCid(
@@ -429,27 +460,18 @@ object GameManager : HmcpPlayerListener {
             object : OnSaveGameCallBackListener {
                 override fun success(result: Boolean) {
                     // 游戏释放成功
-                    LogUtils.d("releaseGame:$result")
+                    LogUtils.d("releaseGame->success:$result")
                     gameView?.onDestroy()
                     gameView = null
-                    if (finish == "0") {
-                        // 切换队列
-                        playGame(bundle)
-                    }
+                    gameParam = null
                 }
 
                 override fun fail(error: String?) {
                     // 游戏释放失败
-                    LogUtils.e("releaseGame:$error")
+                    LogUtils.e("releaseGame->fail:$error")
                     gameView?.onDestroy()
                     gameView = null
-                    channel.invokeMethod(
-                        "errorInfo",
-                        mapOf(
-                            Pair("errorCode", GameError.gameReleaseErrorCode),
-                            Pair("cid", cloudId)
-                        )
-                    )
+                    gameParam = null
                 }
             }
         )
