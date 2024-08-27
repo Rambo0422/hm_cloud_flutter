@@ -14,6 +14,8 @@
             <connections>
                 <outlet property="bdResolutionBtn" destination="Qab-ly-Kvh" id="clg-aC-m1g"/>
                 <outlet property="bgView" destination="sjq-0R-9BQ" id="pet-Mb-yl3"/>
+                <outlet property="countDownLab" destination="c9K-PS-GCi" id="nWT-nI-3f5"/>
+                <outlet property="countDownView" destination="qDU-Le-tQw" id="ep7-Vq-Y4Y"/>
                 <outlet property="currentResolutionBtn" destination="iPj-7h-MtL" id="wZl-hL-sVh"/>
                 <outlet property="customBtn" destination="OK7-Xr-vEK" id="jRt-2U-leI"/>
                 <outlet property="fuzhiBtn" destination="S4y-td-g3Y" id="cpu-uG-Soh"/>
@@ -40,6 +42,7 @@
                 <outlet property="sliderBgView1" destination="EHp-2s-kgB" id="ND1-Z3-WI2"/>
                 <outlet property="timeLab" destination="L3D-0s-HPj" id="k1Q-sb-WRa"/>
                 <outlet property="topCos" destination="fRZ-OU-SKB" id="mmR-dZ-JD5"/>
+                <outlet property="topupBtn" destination="Bsh-Ab-ssL" id="4vT-kN-Rdl"/>
                 <outlet property="vibrationBtn" destination="xEP-zE-vCL" id="fTZ-qY-hoW"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
@@ -813,7 +816,7 @@
                     </constraints>
                 </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qRc-3l-WBU">
-                    <rect key="frame" x="317.66666666666669" y="0.0" width="217.00000000000006" height="32"/>
+                    <rect key="frame" x="317.66666666666669" y="-50" width="217.00000000000006" height="32"/>
                     <subviews>
                         <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ic_top_bg.png" translatesAutoresizingMaskIntoConstraints="NO" id="jAw-tD-8h9">
                             <rect key="frame" x="0.0" y="0.0" width="217" height="32"/>
@@ -845,7 +848,7 @@
                             <nil key="highlightedColor"/>
                         </label>
                         <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ic_wifi_high.png" translatesAutoresizingMaskIntoConstraints="NO" id="38h-gl-cbx">
-                            <rect key="frame" x="38.666666666666629" y="8.6666666666666643" width="15" height="15"/>
+                            <rect key="frame" x="38.666666666666629" y="8.3333333333333357" width="15" height="15"/>
                         </imageView>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="丢包率" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uqP-93-604">
                             <rect key="frame" x="115.66666666666664" y="10" width="30.666666666666671" height="12"/>
@@ -874,6 +877,60 @@
                         <constraint firstItem="d3t-DI-CgW" firstAttribute="centerX" secondItem="qRc-3l-WBU" secondAttribute="centerX" id="wFR-Lk-6Xd"/>
                     </constraints>
                 </view>
+                <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qDU-Le-tQw">
+                    <rect key="frame" x="316" y="0.0" width="220" height="31.666666666666668"/>
+                    <subviews>
+                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ic_countdown_bg.png" translatesAutoresizingMaskIntoConstraints="NO" id="fZM-8t-GNQ">
+                            <rect key="frame" x="0.0" y="0.0" width="220" height="31.666666666666668"/>
+                        </imageView>
+                        <stackView opaque="NO" contentMode="scaleToFill" distribution="equalCentering" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="nZP-SJ-a1L">
+                            <rect key="frame" x="23.333333333333314" y="6" width="173.66666666666666" height="20"/>
+                            <subviews>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="游戏剩余时长" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ra7-jP-7OJ">
+                                    <rect key="frame" x="0.0" y="2.6666666666666652" width="73.666666666666671" height="14.333333333333336"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                    <color key="textColor" red="0.72549019607843135" green="0.74117647058823533" blue="0.79607843137254897" alpha="1" colorSpace="calibratedRGB"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="05:00" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="c9K-PS-GCi">
+                                    <rect key="frame" x="78.666666666666686" y="2.6666666666666652" width="35" height="14.333333333333336"/>
+                                    <fontDescription key="fontDescription" type="system" weight="medium" pointSize="12"/>
+                                    <color key="textColor" red="0.77647058823529413" green="0.92549019607843142" blue="0.29411764705882354" alpha="1" colorSpace="calibratedRGB"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Bsh-Ab-ssL">
+                                    <rect key="frame" x="133.66666666666669" y="0.0" width="40" height="20"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" constant="40" id="N37-LX-4aD"/>
+                                        <constraint firstAttribute="height" constant="20" id="qtj-hI-0pe"/>
+                                    </constraints>
+                                    <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                    <state key="normal" title="充值">
+                                        <color key="titleColor" red="0.77647058820000003" green="0.92549019610000005" blue="0.29411764709999999" alpha="1" colorSpace="calibratedRGB"/>
+                                    </state>
+                                    <connections>
+                                        <action selector="didTapTopup:" destination="-1" eventType="touchUpInside" id="3R6-7h-e0K"/>
+                                    </connections>
+                                </button>
+                            </subviews>
+                            <constraints>
+                                <constraint firstItem="c9K-PS-GCi" firstAttribute="leading" secondItem="ra7-jP-7OJ" secondAttribute="trailing" constant="5" id="P50-9H-Ye1"/>
+                                <constraint firstItem="Bsh-Ab-ssL" firstAttribute="leading" secondItem="c9K-PS-GCi" secondAttribute="trailing" constant="20" id="Y0E-yi-uce"/>
+                            </constraints>
+                        </stackView>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstItem="nZP-SJ-a1L" firstAttribute="centerY" secondItem="qDU-Le-tQw" secondAttribute="centerY" id="28J-vw-KHK"/>
+                        <constraint firstAttribute="width" constant="220" id="7Ms-fE-gcR"/>
+                        <constraint firstItem="fZM-8t-GNQ" firstAttribute="top" secondItem="qDU-Le-tQw" secondAttribute="top" id="Ftt-4K-E6o"/>
+                        <constraint firstItem="nZP-SJ-a1L" firstAttribute="centerX" secondItem="qDU-Le-tQw" secondAttribute="centerX" id="RZ7-pn-iTG"/>
+                        <constraint firstItem="fZM-8t-GNQ" firstAttribute="leading" secondItem="qDU-Le-tQw" secondAttribute="leading" id="ViC-rB-HYo"/>
+                        <constraint firstAttribute="trailing" secondItem="fZM-8t-GNQ" secondAttribute="trailing" id="XZe-EU-S4x"/>
+                        <constraint firstAttribute="bottom" secondItem="fZM-8t-GNQ" secondAttribute="bottom" id="cJf-Eo-kCp"/>
+                    </constraints>
+                </view>
             </subviews>
             <viewLayoutGuide key="safeArea" id="Q5M-cg-NOt"/>
             <color key="backgroundColor" systemColor="systemTealColor"/>
@@ -882,18 +939,20 @@
                 <constraint firstItem="YMB-DP-pcs" firstAttribute="trailing" secondItem="S4t-EA-PR2" secondAttribute="trailing" id="8kf-M6-TvR"/>
                 <constraint firstAttribute="bottom" secondItem="sjq-0R-9BQ" secondAttribute="bottom" id="EiP-yR-OYT"/>
                 <constraint firstAttribute="bottom" secondItem="1AV-Tz-6cG" secondAttribute="bottom" id="GVW-Gc-5ln"/>
+                <constraint firstItem="qDU-Le-tQw" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="MeI-Oa-Agq"/>
                 <constraint firstItem="S4t-EA-PR2" firstAttribute="top" secondItem="Q5M-cg-NOt" secondAttribute="top" constant="5" id="MkI-Mj-lqu"/>
                 <constraint firstItem="qRc-3l-WBU" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="OB4-wy-eim"/>
                 <constraint firstAttribute="trailing" secondItem="sjq-0R-9BQ" secondAttribute="trailing" id="OPR-ue-m7i"/>
                 <constraint firstAttribute="bottom" secondItem="tEf-wG-RYs" secondAttribute="bottom" id="VkP-eM-12m"/>
                 <constraint firstItem="sjq-0R-9BQ" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="au0-UO-miT"/>
-                <constraint firstItem="qRc-3l-WBU" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="fRZ-OU-SKB"/>
+                <constraint firstItem="qRc-3l-WBU" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="-50" id="fRZ-OU-SKB"/>
                 <constraint firstAttribute="trailing" secondItem="S4t-EA-PR2" secondAttribute="trailing" constant="10" id="hIE-92-4wX"/>
                 <constraint firstAttribute="bottom" secondItem="YMB-DP-pcs" secondAttribute="bottom" constant="5" id="hdr-ek-d7L"/>
                 <constraint firstItem="sjq-0R-9BQ" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="mxY-Z9-OX4"/>
                 <constraint firstItem="tEf-wG-RYs" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="oRh-vF-pbq"/>
                 <constraint firstItem="1AV-Tz-6cG" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="uWt-pd-QHE"/>
                 <constraint firstItem="tEf-wG-RYs" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="v2g-On-Oxe"/>
+                <constraint firstItem="qDU-Le-tQw" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="y08-3v-5at"/>
             </constraints>
             <point key="canvasLocation" x="177.46478873239437" y="17.557251908396946"/>
         </view>
@@ -937,6 +996,7 @@
         </designable>
     </designables>
     <resources>
+        <image name="ic_countdown_bg.png" width="335" height="31.666666030883789"/>
         <image name="ic_huazhi.png" width="30" height="18"/>
         <image name="ic_keyboard_show.png" width="25" height="25"/>
         <image name="ic_left_bg.png" width="280" height="375"/>

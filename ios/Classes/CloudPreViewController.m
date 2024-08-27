@@ -92,9 +92,20 @@ typedef enum : NSUInteger {
 
 @property (nonatomic, assign) BOOL showKeyboard;
 
+
+// countDown View
+@property (weak, nonatomic) IBOutlet UIView *countDownView;
+@property (weak, nonatomic) IBOutlet UILabel *countDownLab;
+@property (weak, nonatomic) IBOutlet UIButton *topupBtn;
+@property (nonatomic, strong) NSTimer *timer;
+
+
 @end
 
-@implementation CloudPreViewController
+@implementation CloudPreViewController{
+    NSDateComponentsFormatter *_hourFormatter;
+    NSDateComponentsFormatter *_countDownFormatter;
+}
 
 
 - (void)viewDidLoad {
@@ -127,6 +138,7 @@ typedef enum : NSUInteger {
     [[AFNetworkReachabilityManager sharedManager] startMonitoring];
 
     [self configView];
+
     [self configRac];
     [self request];
 }
@@ -440,14 +452,15 @@ typedef enum : NSUInteger {
 }
 
 - (void)configView {
+    // 初始化清晰度
     self.resolution = [HmCloudTool share].isVip ? Resolution_BD : Resolution_Low;
-
     [[HmCloudTool share] switchResolution:self.resolution];
-
     self.resolutionBgView.hidden = YES;
 
+    // 设置switch的大小
     self.modeSwitch.transform = CGAffineTransformMakeScale(0.85, 0.85);
 
+    // 初始化震动按钮
     self.vibrationBtn.selected = [HmCloudTool share].isVibration;
 
     self.mouseSlider.value = [HmCloudTool share].sensitivity;
@@ -462,16 +475,36 @@ typedef enum : NSUInteger {
     }];
 
     // 创建 DateComponentsFormatter
-    NSDateComponentsFormatter *formatter = [[NSDateComponentsFormatter alloc] init];
+    _hourFormatter = [[NSDateComponentsFormatter alloc] init];
 
-    formatter.unitsStyle = NSDateComponentsFormatterUnitsStylePositional;
-    formatter.allowedUnits = NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond;
-    formatter.zeroFormattingBehavior = NSDateComponentsFormatterZeroFormattingBehaviorPad;
+    _hourFormatter.unitsStyle = NSDateComponentsFormatterUnitsStylePositional;
+    _hourFormatter.allowedUnits = NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond;
+    _hourFormatter.zeroFormattingBehavior = NSDateComponentsFormatterZeroFormattingBehaviorPad;
 
     // 格式化时间戳
-    NSString *formattedTime = [formatter stringFromTimeInterval:[HmCloudTool share].peakTime.intValue];
+    NSString *formattedTime = [_hourFormatter stringFromTimeInterval:[HmCloudTool share].peakTime.intValue];
 
     self.timeLab.text = formattedTime;
+
+    // 格式化倒计时
+    _countDownFormatter = [[NSDateComponentsFormatter alloc] init];
+
+    _countDownFormatter.unitsStyle = NSDateComponentsFormatterUnitsStylePositional;
+    _countDownFormatter.allowedUnits =   NSCalendarUnitMinute | NSCalendarUnitSecond;
+    _countDownFormatter.zeroFormattingBehavior = NSDateComponentsFormatterZeroFormattingBehaviorPad;
+
+
+    NSString *countDownTime = [_countDownFormatter stringFromTimeInterval:[HmCloudTool share].playTime.intValue / 1000];
+
+    self.countDownLab.text = countDownTime;
+
+    // 初始化倒计时
+    [self configTimer];
+
+    self.topupBtn.layer.cornerRadius = 10;
+    self.topupBtn.layer.borderColor = kColor(0x58652B).CGColor;
+    self.topupBtn.layer.borderWidth = 1;
+
 
     [self.mouseSlider setThumbImage:k_BundleImage(@"set_mouse_slider_thumb") forState:UIControlStateNormal];
 
@@ -503,6 +536,27 @@ typedef enum : NSUInteger {
     self.lightSlider.value = [UIScreen mainScreen].brightness;
 
     [self.sliderBgView1 addSubview:self.lightSlider];
+}
+
+- (void)configTimer {
+    @weakify(self);
+    self.timer = [NSTimer scheduledTimerWithTimeInterval:1
+                                                 repeats:YES
+                                                   block:^(NSTimer *_Nonnull timer) {
+        @strongify(self);
+        [HmCloudTool share].playTime = @([HmCloudTool share].playTime.intValue - 1000);
+
+        self.countDownView.hidden = !([HmCloudTool share].playTime.intValue <= 300000);
+
+        NSString *countDownTime = [self->_countDownFormatter stringFromTimeInterval:[HmCloudTool share].playTime.intValue / 1000];
+
+        self.countDownLab.text = countDownTime;
+
+        if ([HmCloudTool share].playTime.intValue <= 0) {
+            [self.timer invalidate];
+            self.timer = nil;
+        }
+    }];
 }
 
 - (void)request {
@@ -638,6 +692,8 @@ typedef enum : NSUInteger {
 - (IBAction)didTapShowKeyboard:(id)sender {
     self.showKeyboard = !self.showKeyboard;
 
+    self.keyView.hidden = self.showKeyboard;
+
     [[HMCloudPlayer sharedCloudPlayer] cloudSwitchKeyboard:self.showKeyboard];
 }
 
@@ -665,6 +721,11 @@ typedef enum : NSUInteger {
 - (void)refreshfps:(NSInteger)fps ms:(NSInteger)ms rate:(float)rate packetLoss:(float)packetLoss {
     self.ms = ms;
     self.packetLoss = packetLoss;
+}
+
+- (void)stopTimer {
+    [self.timer invalidate];
+    self.timer = nil;
 }
 
 - (void)dealloc {

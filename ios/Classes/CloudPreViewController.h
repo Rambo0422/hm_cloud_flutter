@@ -22,6 +22,7 @@ typedef enum : NSUInteger {
 @property (nonatomic, strong) void (^ didDismiss)(void);
 @property (nonatomic, strong) void (^ pushFlutter)(FlutterPageType pageType);
 
+- (void)stopTimer;
 
 
 /// 刷新延迟信息

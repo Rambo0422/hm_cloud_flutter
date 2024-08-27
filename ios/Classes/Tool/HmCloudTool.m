@@ -21,8 +21,33 @@
 
 @implementation HmCloudTool
 
+//return {
+//        "account": StringUtils.rsaEncrypt(gameAccount.username),
+//        "password": StringUtils.rsaEncrypt(gameAccount.password),
+//        "platform_game_id": StringUtils.rsaEncrypt(gameTokenInfo.runPath),
+//        "key": StringUtils.rsaEncrypt(gameAccount.key),
+//        "token": StringUtils.rsaEncrypt(gameAccount.token),
+//        "gameid": gameAccount.gameId,
+//        "userid": UserInfo.userId.value,
+//        "platform": gameTokenInfo.runPlatform,
+//      };
+
++ (NSDictionary *)mj_replacedKeyFromPropertyName {
+    return @{
+        @"account": @"accountInfo.account",
+        @"password": @"accountInfo.password",
+        @"platform_game_id": @"accountInfo.platform_game_id",
+        @"key": @"accountInfo.key",
+        @"accountToken": @"accountInfo.token",
+        @"accountGameid": @"accountInfo.gameid",
+        @"accountUserid": @"accountInfo.userid",
+        @"platform": @"accountInfo.platform",
+    };
+}
+
 + (instancetype)share {
     static HmCloudTool *cloudTool;
+
     static dispatch_once_t token;
 
     dispatch_once(&token, ^{
@@ -41,6 +66,16 @@
 }
 
 - (void)configWithParams:(NSDictionary *)params {
+    // 还原自动上号数据
+    [self mj_setKeyValues:@{ @"accountInfo": @{ @"account": @"",
+                                                @"password": @"",
+                                                @"platform_game_id": @"",
+                                                @"key": @"",
+                                                @"token": @"",
+                                                @"gameid": @"",
+                                                @"userid": @"",
+                                                @"platform": @"", } }];
+
     [self mj_setKeyValues:params];
 }
 
@@ -53,6 +88,10 @@
 }
 
 - (void)stop {
+    if (self.vc) {
+        [self.vc stopTimer];
+    }
+
     self.vc = nil;
     self.gameVC = nil;
 
@@ -81,6 +120,7 @@
 
         self.vc.didDismiss = ^{
             @strongify(self);
+
             [self stop];
         };
 
@@ -289,6 +329,8 @@
     if ([state isEqualToString:@"videoVisible"]) {
         [[HMCloudPlayer sharedCloudPlayer] cloudSetTouchModel:self.touchMode];
 
+//        [[HMCloudPlayer sharedCloudPlayer] setExtraId:<#(NSString *)#>];
+
         if (!self.isVip && !self.liveRoomId.length) {
             [self startLiving];
         }
@@ -473,9 +515,6 @@
 
 // MARK: 初始化gameVC
 - (void)initGameVC {
-//    [self pushPreView];
-//    return;
-
     dispatch_async(dispatch_get_main_queue(), ^{
         NSDictionary *dict = @{
                 @"uid": self.userId,
@@ -493,6 +532,12 @@
         NSString *base64String = [data base64EncodedStringWithOptions:0];
 
 
+
+        HMIntentExtraData *extraData = [[HMIntentExtraData alloc] init];
+        extraData.stringExtra = [self stringExtraDataDict];
+
+
+
         NSDictionary *gameOptions = @{
                 CloudGameOptionKeyId: self.gamePkName,
                 CloudGameOptionKeyOrientation: @(0),
@@ -506,11 +551,29 @@
                 CloudGameOptionKeyProtoData: base64String,
                 CloudGameOptionKeyAppChannel: self.channelName,
                 CloudGameOptionKeyStreamType: @(CloudCoreStreamingTypeRTC),
-                CloudGameOptionKeyPriority: self.priority
+                CloudGameOptionKeyPriority: self.priority,
+                CloudGameOptionKeyIntentExtraData: extraData,
+                CloudGameOptionKeyComponentType: @(CloudPlayerComponentTypeActivity),
         };
 
         self.gameVC = [[HMCloudPlayer sharedCloudPlayer] prepare:gameOptions];
     });
+}
+
+- (NSDictionary *)stringExtraDataDict {
+    NSString *value = @"";
+
+    if (self.account.length && self.password.length) {
+        value = [NSString stringWithFormat:@"--platform=%@ --userid=%@ --gameid=%@ --account=%@ --password=%@ --platform_game_id=%@", self.platform, self.accountUserid, self.accountGameid, self.account, self.password, self.platform_game_id];
+    } else if (self.account.length && self.password.length) {
+        value = [NSString stringWithFormat:@"--platform=%@ --userid=%@ --gameid=%@ --token=%@ --key=%@ --platform_game_id=%@ --mode=1", self.platform, self.accountUserid, self.accountGameid, self.accountToken, self.key, self.platform_game_id];
+    } else {
+        value = [NSString stringWithFormat:@"--platform=%@ --userid=%@ --gameid=%@ --platform_game_id=%@", self.platform, self.accountUserid, self.accountGameid, self.platform_game_id];
+    }
+
+    return @{
+        @"StartAppParams": value
+    };
 }
 
 @end

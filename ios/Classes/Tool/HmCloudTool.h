@@ -73,6 +73,17 @@ static NSString *ActionClosePage = @"closePage";
 /// 当前服务器时间
 @property (nonatomic, strong)   NSNumber *realTime;
 
+// 上号助手相关
+@property (nonatomic, strong)   NSString *account;
+@property (nonatomic, strong)   NSString *password;
+@property (nonatomic, strong)   NSString *platform_game_id;
+@property (nonatomic, strong)   NSString *key;
+@property (nonatomic, strong)   NSString *accountToken;
+@property (nonatomic, strong)   NSString *accountGameid;
+@property (nonatomic, strong)   NSString *accountUserid;
+@property (nonatomic, strong)   NSString *platform;
+
+
 /// 按键震动
 @property (nonatomic, assign)   BOOL isVibration;
 
