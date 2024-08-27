@@ -1041,10 +1041,13 @@ class GameController @JvmOverloads constructor(
                         list.remove(currentKey)
                         if (controllerType == AppVirtualOperateType.APP_STICK_XBOX) {
                             initGamepad(list.toList())
-                        }
-                        if (controllerType == AppVirtualOperateType.APP_KEYBOARD) {
+                        } else if (controllerType == AppVirtualOperateType.APP_KEYBOARD) {
                             initKeyboard(list.toList())
+                        } else {
+                            LogUtils.e("deleteKey: $controllerType")
                         }
+                    } else {
+                        list.remove(currentKey)
                     }
                 }
                 currentKey = null

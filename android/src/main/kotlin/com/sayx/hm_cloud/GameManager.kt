@@ -238,9 +238,9 @@ object GameManager : HmcpPlayerListener, OnContronListener {
 //                it.putInt(HmcpVideoView.INTERNET_SPEED, 300)
                 // 清晰度挡位，会员默认超清，非会员默认流畅
                 if (gameParam?.isVip() == false) {
-                    it.putInt(HmcpVideoView.RESOLUTION_ID, 1)
-                } else {
                     it.putInt(HmcpVideoView.RESOLUTION_ID, 4)
+                } else {
+                    it.putInt(HmcpVideoView.RESOLUTION_ID, 1)
                 }
                 // 显示剩余时间
 //                it.putBoolean(HmcpVideoView.IS_SHOW_TIME, true)
@@ -441,6 +441,10 @@ object GameManager : HmcpPlayerListener, OnContronListener {
             }
         }
         EventBus.getDefault().post(GameErrorEvent(errorCode, errorMsg))
+        channel.invokeMethod(
+            "reportError",
+            mapOf(Pair("cid", HmcpManager.getInstance().cloudId), Pair("errorInfo", dataStr))
+        )
         channel.invokeMethod(
             "errorInfo",
             mapOf(Pair("errorCode", errorCode), Pair("errorMsg", errorMsg))
