@@ -13,13 +13,15 @@ NS_ASSUME_NONNULL_BEGIN
 static NSString *MethodStart = @"startCloudGame";
 static NSString *MethodExitQueue = @"exitQueue";
 static NSString *MethodClosePage = @"closePage";
+static NSString *MethodBuySuccess = @"buySuccess";
+static NSString *MethodUpdatePlayInfo = @"updatePlayInfo";
 
 
 /// MARK: action name
 static NSString *ActionExitGame = @"exitGame";
 static NSString *ActionQueueInfo = @"queueInfo";
 static NSString *ActionOpenPage = @"openPage";
-static NSString *ActionClosePage = @"closePage";
+static NSString *ActionUpdateTime = @"updateTime";
 
 @protocol HmCloudToolDelegate <NSObject>
 
@@ -134,6 +136,13 @@ static NSString *ActionClosePage = @"closePage";
 
 // MARK: 切换清晰度
 - (void)switchResolution:(NSInteger)resolutionId;
+
+
+/// 更新游玩时间
+/// - Parameters:
+///   - playTime: 游玩时间
+- (void)updatePlayInfo:(NSDictionary *)playInfo;
+
 @end
 
 NS_ASSUME_NONNULL_END

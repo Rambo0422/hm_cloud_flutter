@@ -104,10 +104,25 @@
 
 - (void)restart {
     if (self.vc) {
-        [self.delegate sendToFlutter:ActionClosePage
-                              params:nil];
         [[UIViewController topViewController] presentViewController:self.vc animated:NO completion:nil];
     }
+}
+
+- (void)updatePlayInfo:(NSDictionary *)playInfo {
+    [self configWithParams:playInfo];
+
+    NSLog(@"%@   %@", self.playTime, self.peakTime);
+
+    [[HMCloudPlayer sharedCloudPlayer] updateGameUID:self.userId
+                                           userToken:self.userToken
+                                              ctoken:self.cToken
+                                         playingTime:self.playTime.intValue
+                                                 tip:nil
+                                           protoData:nil
+                                             success:^(BOOL successed) {
+    }
+                                                fail:^(NSString *errorCode) {
+    }];
 }
 
 - (void)pushPreView {
@@ -328,8 +343,6 @@
 
     if ([state isEqualToString:@"videoVisible"]) {
         [[HMCloudPlayer sharedCloudPlayer] cloudSetTouchModel:self.touchMode];
-
-//        [[HMCloudPlayer sharedCloudPlayer] setExtraId:<#(NSString *)#>];
 
         if (!self.isVip && !self.liveRoomId.length) {
             [self startLiving];

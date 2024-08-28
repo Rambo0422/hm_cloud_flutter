@@ -39,9 +39,18 @@
     if ([call.method isEqualToString:MethodExitQueue]) {
         [[HmCloudTool share] stop];
     }
-    
+
     if ([call.method isEqualToString:MethodClosePage]) {
         [[HmCloudTool share] restart];
+    }
+
+    // 收到更新时间action的时候，通知flutter端计算用户的游玩时长，并更新插件
+    if ([call.method isEqualToString:MethodBuySuccess]) {
+        [self sendToFlutter:ActionUpdateTime params:nil];
+    }
+
+    if ([call.method isEqualToString:MethodUpdatePlayInfo]) {
+        [[HmCloudTool share] updatePlayInfo:call.arguments];
     }
 }
 

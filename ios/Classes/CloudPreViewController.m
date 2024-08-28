@@ -438,7 +438,7 @@ typedef enum : NSUInteger {
         if (self.mouseSlider.value < 0.1) {
             [tool updateMouseSensitivity:0.1];
         } else {
-            [tool updateMouseSensitivity:self.mouseSlider.value];
+            [tool updateMouseSensitivity:self.mouseSlider.value * 2];
         }
     }];
 
@@ -463,7 +463,7 @@ typedef enum : NSUInteger {
     // 初始化震动按钮
     self.vibrationBtn.selected = [HmCloudTool share].isVibration;
 
-    self.mouseSlider.value = [HmCloudTool share].sensitivity;
+    self.mouseSlider.value = [HmCloudTool share].sensitivity / 2;
 
     self.fuzhiBtn.layer.cornerRadius = 3.0;
 
