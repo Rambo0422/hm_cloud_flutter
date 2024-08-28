@@ -9,6 +9,8 @@
 #ifndef HMCloudCoreMarco_h
 #define HMCloudCoreMarco_h
 
+#import "HMLogger.h"
+
 #define hm_dispatch_main_async_safe(block)\
 if ([NSThread isMainThread]) {\
     block();\
@@ -16,9 +18,6 @@ if ([NSThread isMainThread]) {\
     dispatch_async(dispatch_get_main_queue(), block);\
 }
 
-#ifndef DEBUG
-#define NSLog(FORMAT, ...) nil
-#endif
 
 typedef NS_ENUM(NSInteger, HMCloudCorePlayerOrientation) {
     HMCloudCorePlayerOrientationLandscape   = 0,    //横屏

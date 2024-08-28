@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="JoystickAddKeyView">
+            <rect key="frame" x="0.0" y="0.0" width="796" height="120"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <stackView opaque="NO" contentMode="scaleToFill" distribution="equalSpacing" alignment="top" translatesAutoresizingMaskIntoConstraints="NO" id="4tS-Nx-5ar">
+                    <rect key="frame" x="5" y="22.666666666666671" width="786" height="75"/>
+                    <subviews>
+                        <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="top" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="SWW-Dt-b2c">
+                            <rect key="frame" x="0.0" y="0.0" width="50" height="70.666666666666671"/>
+                            <subviews>
+                                <button opaque="NO" tag="1" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5xa-Lz-T8i">
+                                    <rect key="frame" x="0.0" y="0.0" width="50" height="37.666666666666664"/>
+                                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                    <state key="normal" image="xbox_lt.png"/>
+                                    <connections>
+                                        <action selector="didTapKey:" destination="iN0-l3-epB" eventType="touchUpInside" id="wxl-OO-0y2"/>
+                                    </connections>
+                                </button>
+                                <button opaque="NO" tag="2" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="76x-MZ-8Ob">
+                                    <rect key="frame" x="0.0" y="45.666666666666657" width="25" height="25"/>
+                                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                    <state key="normal" image="xbox_ls.png"/>
+                                    <connections>
+                                        <action selector="didTapKey:" destination="iN0-l3-epB" eventType="touchUpInside" id="aao-8B-ABl"/>
+                                    </connections>
+                                </button>
+                            </subviews>
+                        </stackView>
+                        <button opaque="NO" tag="3" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MqR-ib-q1R">
+                            <rect key="frame" x="73.666666666666671" y="0.0" width="50" height="37.666666666666664"/>
+                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                            <state key="normal" image="xbox_lb.png"/>
+                            <connections>
+                                <action selector="didTapKey:" destination="iN0-l3-epB" eventType="touchUpInside" id="km9-lb-BBK"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" tag="4" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5t8-9J-cvl">
+                            <rect key="frame" x="147.33333333333334" y="0.0" width="75" height="75"/>
+                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                            <state key="normal" image="xbox_rock_l.png"/>
+                            <connections>
+                                <action selector="didTapKey:" destination="iN0-l3-epB" eventType="touchUpInside" id="Veo-gb-Ldl"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" tag="5" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="v5k-fL-tA0">
+                            <rect key="frame" x="246" y="0.0" width="75" height="75"/>
+                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                            <state key="normal" image="xbox_cross.png"/>
+                            <connections>
+                                <action selector="didTapKey:" destination="iN0-l3-epB" eventType="touchUpInside" id="gKQ-Da-0T3"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" tag="6" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MsC-ho-T5Q">
+                            <rect key="frame" x="344.66666666666669" y="0.0" width="40" height="25"/>
+                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                            <state key="normal" image="xbox_set.png"/>
+                            <connections>
+                                <action selector="didTapKey:" destination="iN0-l3-epB" eventType="touchUpInside" id="l7I-x0-9uF"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" tag="7" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PDm-gt-kyI">
+                            <rect key="frame" x="408.33333333333331" y="0.0" width="40" height="25"/>
+                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                            <state key="normal" image="xbox_menu.png"/>
+                            <connections>
+                                <action selector="didTapKey:" destination="iN0-l3-epB" eventType="touchUpInside" id="CCH-nF-ccB"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" tag="8" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="c53-TD-W2k">
+                            <rect key="frame" x="472" y="0.0" width="75" height="75"/>
+                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                            <state key="normal" image="xbox_rock_r.png"/>
+                            <connections>
+                                <action selector="didTapKey:" destination="iN0-l3-epB" eventType="touchUpInside" id="dlO-ic-9EB"/>
+                            </connections>
+                        </button>
+                        <stackView opaque="NO" contentMode="scaleToFill" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="enJ-ZX-4M5">
+                            <rect key="frame" x="570.66666666666663" y="0.0" width="68" height="68"/>
+                            <subviews>
+                                <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="kuc-yq-M36">
+                                    <rect key="frame" x="0.0" y="0.0" width="30" height="68"/>
+                                    <subviews>
+                                        <button opaque="NO" tag="9" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ai3-Cd-zRD">
+                                            <rect key="frame" x="0.0" y="0.0" width="30" height="30"/>
+                                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                            <state key="normal" image="xbox_a.png"/>
+                                            <connections>
+                                                <action selector="didTapKey:" destination="iN0-l3-epB" eventType="touchUpInside" id="I89-uI-8Rb"/>
+                                            </connections>
+                                        </button>
+                                        <button opaque="NO" tag="10" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="d9e-cO-LE7">
+                                            <rect key="frame" x="0.0" y="38" width="30" height="30"/>
+                                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                            <state key="normal" image="xbox_b.png"/>
+                                            <connections>
+                                                <action selector="didTapKey:" destination="iN0-l3-epB" eventType="touchUpInside" id="qgd-pi-N5e"/>
+                                            </connections>
+                                        </button>
+                                    </subviews>
+                                </stackView>
+                                <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="uzc-In-Kpw">
+                                    <rect key="frame" x="38" y="0.0" width="30" height="68"/>
+                                    <subviews>
+                                        <button opaque="NO" tag="11" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="KL4-Si-H1R">
+                                            <rect key="frame" x="0.0" y="0.0" width="30" height="30"/>
+                                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                            <state key="normal" image="xbox_x.png"/>
+                                            <connections>
+                                                <action selector="didTapKey:" destination="iN0-l3-epB" eventType="touchUpInside" id="vxM-MA-KBa"/>
+                                            </connections>
+                                        </button>
+                                        <button opaque="NO" tag="12" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="loz-rc-cwh">
+                                            <rect key="frame" x="0.0" y="38" width="30" height="30"/>
+                                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                            <state key="normal" image="xbox_y.png"/>
+                                            <connections>
+                                                <action selector="didTapKey:" destination="iN0-l3-epB" eventType="touchUpInside" id="SCw-To-wu9"/>
+                                            </connections>
+                                        </button>
+                                    </subviews>
+                                </stackView>
+                            </subviews>
+                        </stackView>
+                        <button opaque="NO" tag="13" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oPE-XR-4ld">
+                            <rect key="frame" x="662.33333333333337" y="0.0" width="50" height="37.666666666666664"/>
+                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                            <state key="normal" image="xbox_rb.png"/>
+                            <connections>
+                                <action selector="didTapKey:" destination="iN0-l3-epB" eventType="touchUpInside" id="7ym-Qj-UgK"/>
+                            </connections>
+                        </button>
+                        <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="bottom" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="X3N-Rh-qfC">
+                            <rect key="frame" x="736" y="0.0" width="50" height="70.666666666666671"/>
+                            <subviews>
+                                <button opaque="NO" tag="14" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ht9-DF-trr">
+                                    <rect key="frame" x="0.0" y="0.0" width="50" height="37.666666666666664"/>
+                                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                    <state key="normal" image="xbox_rt.png"/>
+                                    <connections>
+                                        <action selector="didTapKey:" destination="iN0-l3-epB" eventType="touchUpInside" id="8IF-LY-yfX"/>
+                                    </connections>
+                                </button>
+                                <button opaque="NO" tag="15" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="HdB-H1-4qS">
+                                    <rect key="frame" x="25" y="45.666666666666657" width="25" height="25"/>
+                                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                    <state key="normal" image="xbox_rs.png"/>
+                                    <connections>
+                                        <action selector="didTapKey:" destination="iN0-l3-epB" eventType="touchUpInside" id="ELb-tO-Td3"/>
+                                    </connections>
+                                </button>
+                            </subviews>
+                        </stackView>
+                    </subviews>
+                </stackView>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="Gn7-R5-fgu"/>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <constraints>
+                <constraint firstItem="Gn7-R5-fgu" firstAttribute="trailing" secondItem="4tS-Nx-5ar" secondAttribute="trailing" constant="5" id="28d-l0-4Sq"/>
+                <constraint firstItem="4tS-Nx-5ar" firstAttribute="leading" secondItem="Gn7-R5-fgu" secondAttribute="leading" constant="5" id="Rgb-no-kph"/>
+                <constraint firstItem="4tS-Nx-5ar" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="fYN-vj-NvM"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <point key="canvasLocation" x="380" y="102"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="xbox_a.png" width="30" height="30"/>
+        <image name="xbox_b.png" width="30" height="30"/>
+        <image name="xbox_cross.png" width="75" height="75"/>
+        <image name="xbox_lb.png" width="50" height="37.666667938232422"/>
+        <image name="xbox_ls.png" width="25" height="25"/>
+        <image name="xbox_lt.png" width="50" height="37.666667938232422"/>
+        <image name="xbox_menu.png" width="40" height="25"/>
+        <image name="xbox_rb.png" width="50" height="37.666667938232422"/>
+        <image name="xbox_rock_l.png" width="75" height="75"/>
+        <image name="xbox_rock_r.png" width="75" height="75"/>
+        <image name="xbox_rs.png" width="25" height="25"/>
+        <image name="xbox_rt.png" width="50" height="37.666667938232422"/>
+        <image name="xbox_set.png" width="40" height="25"/>
+        <image name="xbox_x.png" width="30" height="30"/>
+        <image name="xbox_y.png" width="30" height="30"/>
+    </resources>
+</document>

@@ -9,14 +9,18 @@
 #import "HMStreamingModel.h"
 
 @interface HMCloudPlayerWebRtcInfoModel : HMStreamingModel
-@property (nonatomic, strong) NSString *coTurnUrl;
-@property (nonatomic, strong) NSString *roomId;
-@property (nonatomic, strong) NSString *signalUrl;
-@property (nonatomic, strong) NSString *inputUrl;
-@property (nonatomic, strong) NSString *screenUrl;
+@property (nonatomic, copy)   NSString *coTurnUrl;
+@property (nonatomic, copy)   NSString *roomId;
+@property (nonatomic, copy)   NSString *signalUrl;
+@property (nonatomic, copy)   NSString *signalV2Url;
+@property (nonatomic, copy)   NSString *inputUrl;
+@property (nonatomic, copy)   NSString *screenUrl;
 @property (nonatomic, assign) int       supportLiving;
 @property (nonatomic, copy)   NSString *gsmUrl;
 @property (nonatomic, copy)   NSString *screenRecordUrl;
+@property (nonatomic, copy)   NSNumber *deviceId;
+@property (nonatomic, copy)   NSString *userId;
+@property (nonatomic, copy)   NSString *sdkVersion;
 
 - (BOOL) isValid;
 @end

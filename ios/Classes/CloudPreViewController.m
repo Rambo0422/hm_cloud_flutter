@@ -6,123 +6,730 @@
 //
 
 #import "CloudPreViewController.h"
-#import <AVFAudio/AVFAudio.h>
-#import "WMDragView.h"
+#import "CustomKeyViewController.h"
+#import "CustomSelectViewController.h"
+#import "CustomSlider.h"
+#import "GameDetailsModel.h"
+#import "GameKeyView.h"
+#import "GameKeyView.h"
+#import "HmCloudTool.h"
+#import "RequestTool.h"
+
+typedef enum : NSUInteger {
+    Resolution_BD = 1,
+    Resolution_High,
+    Resolution_Medium,
+    Resolution_Low,
+} ResolutionType;
 
 @interface CloudPreViewController ()
-@property (weak, nonatomic) IBOutlet UIButton *disMissBtn;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *rightCos;
-@property (weak, nonatomic) IBOutlet UISwitch *soundSwitch;
 
-@property (nonatomic, strong) WMDragView    *setView;
+@property (weak, nonatomic) IBOutlet UIButton *setBtn;
+@property (weak, nonatomic) IBOutlet UIView *bgView;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *topCos;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *rightCos;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *leftCos;
+@property (weak, nonatomic) IBOutlet UILabel *timeLab;
+@property (weak, nonatomic) IBOutlet UIView *operationView1;
+@property (weak, nonatomic) IBOutlet UIView *operationView2;
+@property (weak, nonatomic) IBOutlet UIView *operationView3;
+@property (weak, nonatomic) IBOutlet UIView *operationView4;
+@property (weak, nonatomic) IBOutlet UIButton *fuzhiBtn;
+
+// 鼠标灵敏度
+@property (weak, nonatomic) IBOutlet UISlider *mouseSlider;
+
+@property (weak, nonatomic) IBOutlet UIView *sliderBgView1;
+@property (weak, nonatomic) IBOutlet UIView *sliderBgView2;
+@property (weak, nonatomic) IBOutlet UILabel *msLab;
+@property (weak, nonatomic) IBOutlet UILabel *packetLossLab;
+@property (weak, nonatomic) IBOutlet UIImageView *netImgView;
+
+
+@property (weak, nonatomic) IBOutlet SPButton *joystickBtn;
+@property (weak, nonatomic) IBOutlet SPButton *keyboardBtn;
+@property (weak, nonatomic) IBOutlet SPButton *vibrationBtn;
+@property (weak, nonatomic) IBOutlet SPButton *customBtn;
+@property (weak, nonatomic) IBOutlet SPButton *liveBtn;
+
+// 鼠标设置开关
+@property (weak, nonatomic) IBOutlet UISwitch *modeSwitch;
+// 鼠标点击
+@property (weak, nonatomic) IBOutlet SPButton *modeMouseBtn;
+// 触控点击
+@property (weak, nonatomic) IBOutlet SPButton *modeScreenBtn;
+// 触屏攻击
+@property (weak, nonatomic) IBOutlet SPButton *modeSwipeBtn;
+
+
+@property (nonatomic, strong) CustomSlider *lightSlider;
+@property (nonatomic, strong) CustomSlider *soundSlider;
+
+@property (nonatomic, assign) NSInteger ms;
+@property (nonatomic, assign) float packetLoss;
+@property (nonatomic, assign) BOOL isWifi;
+
+@property (nonatomic, strong) NSMutableArray<KeyModel *> *keyboardList;
+@property (nonatomic, strong) NSMutableArray<KeyModel *> *joystickList;
+
+@property (nonatomic, strong) GameKeyView *keyView;
+
+@property (nonatomic, strong) GameDetailsModel *gameDetails;
+
+/// 当前选中的操作模式（1 = 按键 ； 2 = 手柄）
+@property (nonatomic, assign) NSInteger currentOperation;
+
+/// 当前清晰度 1蓝光，2超清，3高清，4标清
+/// vip默认是蓝光，非vip默认是标清
+@property (nonatomic, assign) ResolutionType resolution;
+
+@property (nonatomic, strong) UIView *overlayView;
+
+@property (weak, nonatomic) IBOutlet UIButton *currentResolutionBtn;
+@property (weak, nonatomic) IBOutlet UIButton *lowResolutionBtn;
+@property (weak, nonatomic) IBOutlet UIButton *bdResolutionBtn;
+@property (weak, nonatomic) IBOutlet UIView *resolutionBgView;
+
+@property (nonatomic, assign) BOOL showKeyboard;
+
+
+// countDown View
+@property (weak, nonatomic) IBOutlet UIView *countDownView;
+@property (weak, nonatomic) IBOutlet UILabel *countDownLab;
+@property (weak, nonatomic) IBOutlet UIButton *topupBtn;
+@property (nonatomic, strong) NSTimer *timer;
+
 
 @end
 
-@implementation CloudPreViewController
-
-- (WMDragView *)setView {
-    if (!_setView) {
-        
-        self.setView = [[WMDragView alloc] initWithFrame:CGRectMake(100, 100, 40, 40)];
-        
-        self.setView.imageView.image = k_BundleImage(@"cloud_set");
-        self.setView.isKeepBounds = YES;
-        self.setView.backgroundColor = [UIColor clearColor];
-        __weak typeof(self) weakSelf = self;
-        
-        self.setView.clickDragViewBlock = ^(WMDragView *dragView) {
-            
-            __strong typeof(weakSelf) strongSelf = weakSelf;
-            
-            [UIView animateWithDuration:0.25 animations:^{
-               
-                strongSelf.rightCos.constant = (strongSelf.rightCos.constant == 0) ? -160 : 0;
-                [strongSelf.view layoutIfNeeded];
-                
-            }];
-            
-        };
-        
-    }
-    return _setView;
+@implementation CloudPreViewController{
+    NSDateComponentsFormatter *_hourFormatter;
+    NSDateComponentsFormatter *_countDownFormatter;
 }
+
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
-    
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(hideSetView) name:@"touchBegan" object:nil];
-    
-    [self configView];
-}
 
-- (void)configView{
-    
-    self.disMissBtn.layer.cornerRadius = 5.0;
-    self.soundSwitch.transform = CGAffineTransformMakeScale(0.85, 0.85);
-    
-}
+    @weakify(self);
+    [[AFNetworkReachabilityManager sharedManager] setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
+        // 一共有四种状态
+        @strongify(self);
+        switch (status) {
+            case AFNetworkReachabilityStatusNotReachable:
+                break;
 
-- (void)hideSetView {
-    [UIView animateWithDuration:0.25 animations:^{
-       
-        self.rightCos.constant = -160;
-        [self.view layoutIfNeeded];
-        
+            case AFNetworkReachabilityStatusReachableViaWWAN:{
+                self.isWifi = NO;
+            }
+            break;
+
+            case AFNetworkReachabilityStatusReachableViaWiFi:{
+                self.isWifi = YES;
+            }
+            break;
+
+            case AFNetworkReachabilityStatusUnknown:
+            default:
+                break;
+        }
     }];
-}
 
-- (void)viewWillLayoutSubviews {
-    
-    self.gameVC.view.frame = self.view.bounds;
-    [self.view insertSubview:self.gameVC.view atIndex:0];
-}
+    [[AFNetworkReachabilityManager sharedManager] startMonitoring];
 
+    [self configView];
+
+    [self configRac];
+    [self request];
+}
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
 
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        self.setView.frame = CGRectMake(self.view.frame.size.width, 200, 40, 40);
-        [self.view addSubview:self.setView];
-    });
+    // 首次安装 创建引导层
+    NSUserDefaults *def = [NSUserDefaults standardUserDefaults];
+
+    if (![def boolForKey:k_FirstPlay]) {
+        [self showGuideOverlay];
+        [def setBool:YES forKey:k_FirstPlay];
+    }
 }
 
-//- (BOOL)prefersHomeIndicatorAutoHidden {
-//    return YES;
-//}
+- (void)showGuideOverlay {
+    // 创建覆盖视图
+    self.overlayView = [[UIView alloc] initWithFrame:self.view.bounds];
+    self.overlayView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.7];
 
-- (UIRectEdge)preferredScreenEdgesDeferringSystemGestures{
-    return UIRectEdgeAll;
+    // 创建一个路径，除了目标视图之外的区域都是黑色的
+    UIBezierPath *path = [UIBezierPath bezierPathWithRect:self.overlayView.bounds];
+
+    // 创建一个圆形的高亮区域
+    UIBezierPath *circlePath = [UIBezierPath bezierPathWithRoundedRect:self.setBtn.frame cornerRadius:self.setBtn.bounds.size.height / 2];
+    [path appendPath:circlePath];
+    path.usesEvenOddFillRule = YES;
+
+    CAShapeLayer *maskLayer = [CAShapeLayer layer];
+    maskLayer.path = path.CGPath;
+    maskLayer.fillRule = kCAFillRuleEvenOdd;
+    self.overlayView.layer.mask = maskLayer;
+
+
+    // 将引导视图添加到主视图
+    [self.view addSubview:self.overlayView];
+
+    // 手指
+    UIImageView *guide1Img = [[UIImageView alloc] initWithImage:k_BundleImage(@"ic_guide1")];
+
+    // 文字
+    UIImageView *guide2Img = [[UIImageView alloc] initWithImage:k_BundleImage(@"ic_guide2")];
+
+    [self.overlayView addSubview:guide1Img];
+    [self.overlayView addSubview:guide2Img];
+
+
+    [guide1Img mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.bottom.equalTo(self.setBtn.mas_bottom).offset(15);
+        make.right.equalTo(self.setBtn.mas_left);
+    }];
+
+    [guide2Img mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.bottom.equalTo(guide1Img.mas_bottom);
+        make.right.equalTo(guide1Img.mas_left).offset(-5);
+    }];
+
+
+    // 添加手势识别器以响应点击
+    UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideGuideOverlay)];
+    [self.overlayView addGestureRecognizer:tapGesture];
+}
+
+- (void)hideGuideOverlay {
+    [self.overlayView removeFromSuperview];
+    self.overlayView = nil;
+}
+
+- (void)viewWillLayoutSubviews {
+    self.gameVC.view.frame = self.view.bounds;
+    [self.view insertSubview:self.gameVC.view atIndex:0];
+}
+
+- (void)configRac {
+    HmCloudTool *tool = [HmCloudTool share];
+
+    @weakify(self);
+    @weakify(tool);
+
+    [RACObserve(self, resolution) subscribeNext:^(id _Nullable x) {
+        @strongify(self);
+        [self.currentResolutionBtn setTitle:(self.resolution == Resolution_BD ? @"蓝光" : @"标清")
+                                   forState:UIControlStateNormal];
+
+        [self.lowResolutionBtn setTitleColor:(self.resolution == Resolution_BD ? kColor(0x9EA2AD) : kColor(0xC6EC4B))
+                                    forState:UIControlStateNormal];
+
+        [self.bdResolutionBtn setTitleColor:(self.resolution == Resolution_BD ? kColor(0xC6EC4B) : kColor(0x9EA2AD))
+                                   forState:UIControlStateNormal];
+    }];
+
+
+    [[self.bdResolutionBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
+        @strongify(self);
+        @strongify(tool);
+
+        if ([tool isVip]) {
+            self.resolution = Resolution_BD;
+            [tool switchResolution:Resolution_BD];
+        } else {
+            [NormalAlertView showAlertWithTitle:nil
+                                        content:nil
+                                   confirmTitle:nil
+                                    cancelTitle:nil
+                                confirmCallback:^{
+                [self pushToFlutterPage:Flutter_rechartVip];
+            }
+                                 cancelCallback:nil];
+        }
+    }];
+
+    [[self.lowResolutionBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
+        @strongify(self);
+        @strongify(tool);
+        self.resolution = Resolution_Low;
+        [tool switchResolution:Resolution_Low];
+    }];
+
+
+    [[self.currentResolutionBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
+        @strongify(self);
+        self.resolutionBgView.hidden = !self.resolutionBgView.hidden;
+    }];
+
+    [RACObserve(self, ms) subscribeNext:^(id _Nullable x) {
+        @strongify(self);
+
+        if (self.ms <= 30) {
+            self.msLab.textColor = kColor(0x00D38E);
+            self.packetLossLab.textColor = kColor(0x00D38E);
+            self.netImgView.image = self.isWifi ? k_BundleImage(@"ic_wifi_high") : k_BundleImage(@"ic_4g_high");
+            [self.setBtn setImage:(self.isWifi ? k_BundleImage(@"ic_wifi_high") : k_BundleImage(@"ic_4g_high"))
+                         forState:UIControlStateNormal];
+        } else if (self.ms > 60) {
+            self.msLab.textColor = kColor(0xFF2D2D);
+            self.packetLossLab.textColor = kColor(0xFF2D2D);
+            self.netImgView.image = self.isWifi ? k_BundleImage(@"ic_wifi_low") : k_BundleImage(@"ic_4g_low");
+            [self.setBtn setImage:(self.isWifi ? k_BundleImage(@"ic_wifi_low") : k_BundleImage(@"ic_4g_low"))
+                         forState:UIControlStateNormal];
+        } else {
+            self.msLab.textColor = kColor(0xF7DC00);
+            self.packetLossLab.textColor = kColor(0xF7DC00);
+            self.netImgView.image = self.isWifi ? k_BundleImage(@"ic_wifi_medium") : k_BundleImage(@"ic_4g_medium");
+            [self.setBtn setImage:(self.isWifi ? k_BundleImage(@"ic_wifi_medium") : k_BundleImage(@"ic_4g_medium"))
+                         forState:UIControlStateNormal];
+        }
+
+        self.msLab.text = [NSString stringWithFormat:@"%ldms", self.ms];
+        self.packetLossLab.text = [NSString stringWithFormat:@"%.0f%%", self.packetLoss];
+    }];
+
+
+    [[self.lightSlider rac_signalForControlEvents:UIControlEventValueChanged] subscribeNext:^(__kindof UIControl *_Nullable x) {
+        @strongify(self);
+        [UIScreen mainScreen].brightness = self.lightSlider.value;
+    }];
+
+    [RACObserve(self, gameDetails) subscribeNext:^(id _Nullable x) {
+        @strongify(self);
+        self.joystickBtn.enabled = self.gameDetails.support == 2 || self.gameDetails.support == 3;
+        self.keyboardBtn.enabled = self.gameDetails.support == 1 || self.gameDetails.support == 3;
+    }];
+
+    [RACObserve(self, currentOperation) subscribeNext:^(id _Nullable x) {
+        @strongify(self);
+
+        self.joystickBtn.selected = self.currentOperation == 2;
+        self.keyboardBtn.selected = self.currentOperation == 1;
+    }];
+
+    [[self.customBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
+        @strongify(self);
+        @strongify(tool);
+
+        if ([tool isVip]) {
+            [self hideSetView];
+            [self pushCustomKeyController];
+        } else {
+            [NormalAlertView showAlertWithTitle:nil
+                                        content:nil
+                                   confirmTitle:nil
+                                    cancelTitle:nil
+                                confirmCallback:^{
+                [self pushToFlutterPage:Flutter_rechartVip];
+            }
+                                 cancelCallback:nil];
+        }
+    }];
+
+    [[self.joystickBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
+        @strongify(self);
+
+        if (!self.joystickBtn.isSelected) {
+            self.currentOperation = 2;
+            [self getJoystickAndSet:YES];
+        }
+    }];
+
+    [[self.keyboardBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
+        @strongify(self);
+
+        if (!self.keyboardBtn.isSelected) {
+            self.currentOperation = 1;
+            [self getKeyboardAndSet:YES];
+        }
+    }];
+
+    [[self.liveBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
+        @strongify(self);
+        @strongify(tool);
+
+        if ([tool isVip]) {
+            if (tool.isLiving) {
+                [tool stopLiving];
+            } else {
+                [tool startLiving];
+            }
+        } else {
+            [NormalAlertView showAlertWithTitle:nil
+                                        content:nil
+                                   confirmTitle:nil
+                                    cancelTitle:nil
+                                confirmCallback:^{
+                [self pushToFlutterPage:Flutter_rechartVip];
+            }
+                                 cancelCallback:nil];
+        }
+    }];
+
+    RAC(self.liveBtn, selected) = RACObserve(tool, isLiving);
+
+
+    [[self.vibrationBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
+        @strongify(tool);
+        tool.isVibration = !tool.isVibration;
+    }];
+
+    RAC(self.vibrationBtn, selected) = RACObserve(tool, isVibration);
+
+    [[self.modeSwitch rac_signalForControlEvents:UIControlEventValueChanged] subscribeNext:^(__kindof UIControl *_Nullable x) {
+        @strongify(self);
+        @strongify(tool);
+
+        [tool updateTouchMode:(self.modeSwitch.on ? HMCloudCoreTouchModeMouse : HMCloudCoreTouchModeNone)];
+    }];
+
+    [RACObserve(tool, touchMode) subscribeNext:^(id _Nullable x) {
+        @strongify(tool);
+        @strongify(self);
+        switch (tool.touchMode) {
+            case HMCloudCoreTouchModeNone:{
+                self.modeMouseBtn.enabled = NO;
+                self.modeScreenBtn.enabled = NO;
+                self.modeSwipeBtn.enabled = NO;
+            }
+            break;
+
+            case HMCloudCoreTouchModeMouse:
+            case HMCloudCoreTouchModeScreen:
+            case HMCloudCoreTouchSwipe:{
+                self.modeMouseBtn.enabled = YES;
+                self.modeScreenBtn.enabled = YES;
+                self.modeSwipeBtn.enabled = YES;
+
+                self.modeMouseBtn.selected = (tool.touchMode == HMCloudCoreTouchModeMouse);
+                self.modeScreenBtn.selected = (tool.touchMode == HMCloudCoreTouchModeScreen);
+                self.modeSwipeBtn.selected = (tool.touchMode == HMCloudCoreTouchSwipe);
+            }
+
+            break;
+
+            default:
+                break;
+        }
+    }];
+
+    [[self.modeMouseBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
+        @strongify(tool);
+        [tool updateTouchMode:HMCloudCoreTouchModeMouse];
+    }];
+
+    [[self.modeScreenBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
+        @strongify(tool);
+        [tool updateTouchMode:HMCloudCoreTouchModeScreen];
+    }];
+
+    [[self.modeSwipeBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
+        @strongify(tool);
+        [tool updateTouchMode:HMCloudCoreTouchSwipe];
+    }];
+
+    [[self.mouseSlider rac_signalForControlEvents:UIControlEventValueChanged] subscribeNext:^(__kindof UIControl *_Nullable x) {
+        @strongify(self);
+        @strongify(tool);
+
+        if (self.mouseSlider.value < 0.1) {
+            [tool updateMouseSensitivity:0.1];
+        } else {
+            [tool updateMouseSensitivity:self.mouseSlider.value * 2];
+        }
+    }];
+
+    [[self.fuzhiBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
+        @strongify(tool);
+        NSString *textToCopy = [NSString stringWithFormat:@"cid:%@ , uid:%@", tool.cloudId, tool.userId];
+        UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+        pasteboard.string = textToCopy;
+        [SVProgressHUD showSuccessWithStatus:@"复制成功~"];
+    }];
+}
+
+- (void)configView {
+    // 初始化清晰度
+    self.resolution = [HmCloudTool share].isVip ? Resolution_BD : Resolution_Low;
+    [[HmCloudTool share] switchResolution:self.resolution];
+    self.resolutionBgView.hidden = YES;
+
+    // 设置switch的大小
+    self.modeSwitch.transform = CGAffineTransformMakeScale(0.85, 0.85);
+
+    // 初始化震动按钮
+    self.vibrationBtn.selected = [HmCloudTool share].isVibration;
+
+    self.mouseSlider.value = [HmCloudTool share].sensitivity / 2;
+
+    self.fuzhiBtn.layer.cornerRadius = 3.0;
+
+    self.keyView = [[GameKeyView alloc] initWithEdit:NO];
+    [self.view insertSubview:self.keyView atIndex:0];
+
+    [self.keyView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.edges.equalTo(@0);
+    }];
+
+    // 创建 DateComponentsFormatter
+    _hourFormatter = [[NSDateComponentsFormatter alloc] init];
+
+    _hourFormatter.unitsStyle = NSDateComponentsFormatterUnitsStylePositional;
+    _hourFormatter.allowedUnits = NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond;
+    _hourFormatter.zeroFormattingBehavior = NSDateComponentsFormatterZeroFormattingBehaviorPad;
+
+    // 格式化时间戳
+    NSString *formattedTime = [_hourFormatter stringFromTimeInterval:[HmCloudTool share].peakTime.intValue];
+
+    self.timeLab.text = formattedTime;
+
+    // 格式化倒计时
+    _countDownFormatter = [[NSDateComponentsFormatter alloc] init];
+
+    _countDownFormatter.unitsStyle = NSDateComponentsFormatterUnitsStylePositional;
+    _countDownFormatter.allowedUnits =   NSCalendarUnitMinute | NSCalendarUnitSecond;
+    _countDownFormatter.zeroFormattingBehavior = NSDateComponentsFormatterZeroFormattingBehaviorPad;
+
+
+    NSString *countDownTime = [_countDownFormatter stringFromTimeInterval:[HmCloudTool share].playTime.intValue / 1000];
+
+    self.countDownLab.text = countDownTime;
+
+    // 初始化倒计时
+    [self configTimer];
+
+    self.topupBtn.layer.cornerRadius = 10;
+    self.topupBtn.layer.borderColor = kColor(0x58652B).CGColor;
+    self.topupBtn.layer.borderWidth = 1;
+
+
+    [self.mouseSlider setThumbImage:k_BundleImage(@"set_mouse_slider_thumb") forState:UIControlStateNormal];
+
+    [self.setBtn setImage:k_BundleImage(@"ic_4g_high") forState:UIControlStateNormal];
+
+    self.rightCos.constant = -kScreenH;
+    self.leftCos.constant = -kScreenH;
+    self.topCos.constant = -50;
+    self.bgView.alpha = 0;
+
+    self.operationView1.layer.cornerRadius = 5;
+    self.operationView2.layer.cornerRadius = 5;
+    self.operationView3.layer.cornerRadius = 5;
+    self.operationView4.layer.cornerRadius = 5;
+
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideSetView)];
+    [self.bgView addGestureRecognizer:tap];
+
+    // 配置亮度slider
+    self.lightSlider = [[CustomSlider alloc] initWithFrame:CGRectMake(0, 0, 200, 15)];
+    self.lightSlider.center = CGPointMake(11, 100);
+
+    [self.lightSlider setThumbImage:k_BundleImage(@"set_slider_thumb") forState:UIControlStateNormal];
+    self.lightSlider.transform = CGAffineTransformMakeRotation(-M_PI_2);
+
+    [self.lightSlider setMaximumTrackTintColor:[UIColor colorWithRed:41.0 / 255 green:45.0 / 255 blue:56.0 / 255 alpha:1]];
+    [self.lightSlider setMinimumTrackTintColor:[UIColor colorWithRed:167.0 / 255 green:200.0 / 255 blue:62.0 / 255 alpha:1]];
+
+    self.lightSlider.value = [UIScreen mainScreen].brightness;
+
+    [self.sliderBgView1 addSubview:self.lightSlider];
+}
+
+- (void)configTimer {
+    @weakify(self);
+    self.timer = [NSTimer scheduledTimerWithTimeInterval:1
+                                                 repeats:YES
+                                                   block:^(NSTimer *_Nonnull timer) {
+        @strongify(self);
+        [HmCloudTool share].playTime = @([HmCloudTool share].playTime.intValue - 1000);
+
+        self.countDownView.hidden = !([HmCloudTool share].playTime.intValue <= 300000);
+
+        NSString *countDownTime = [self->_countDownFormatter stringFromTimeInterval:[HmCloudTool share].playTime.intValue / 1000];
+
+        self.countDownLab.text = countDownTime;
+
+        if ([HmCloudTool share].playTime.intValue <= 0) {
+            [self.timer invalidate];
+            self.timer = nil;
+        }
+    }];
+}
+
+- (void)request {
+    [[RequestTool share] requestUrl:k_api_get_game_detail
+                         methodType:Request_GET
+                             params:@{ @"game_id": [HmCloudTool share].gameId }
+                      faildCallBack:nil
+                    successCallBack:^(id _Nonnull obj) {
+        self.gameDetails = [GameDetailsModel mj_objectWithKeyValues:obj[@"data"]];
+
+        if (self.gameDetails.support == 1) {
+            self.currentOperation = 1;
+            [self getKeyboardAndSet:YES];
+        } else if (self.gameDetails.support == 2) {
+            self.currentOperation = 2;
+            [self getJoystickAndSet:YES];
+        } else {
+            self.currentOperation = 2;
+            [self getJoystickAndSet:YES];
+            [self getKeyboardAndSet:NO];
+        }
+    }];
+}
+
+- (void)getJoystickAndSet:(BOOL)set {
+    // 获取手柄配置，如果获取失败 则取本地的默认配置
+    [[RequestTool share] requestUrl:k_api_getKeyboard
+                         methodType:Request_GET
+                             params:@{ @"type": @"1", @"game_id": [HmCloudTool share].gameId }
+                      faildCallBack:^{
+        NSString *path = [k_SanABundle pathForResource:@"joystick"
+                                                ofType:@"json"];
+        NSData *data = [NSData dataWithContentsOfFile:path];
+        NSError *error;
+        NSArray *arr = [NSJSONSerialization JSONObjectWithData:data
+                                                       options:kNilOptions
+                                                         error:&error];
+
+        if (!error) {
+            self.joystickList = [[KeyModel mj_objectArrayWithKeyValuesArray:arr] mutableCopy];
+
+            if (set) {
+                self.keyView.keyList = self.joystickList;
+            }
+        }
+    }
+                    successCallBack:^(id _Nonnull obj) {
+        self.joystickList = [[KeyModel mj_objectArrayWithKeyValuesArray:obj[@"data"][@"keyboard"]] mutableCopy];
+
+        if (set) {
+            self.keyView.keyList = self.joystickList;
+        }
+    }];
+}
+
+- (void)getKeyboardAndSet:(BOOL)set {
+    [[RequestTool share] requestUrl:k_api_getKeyboard
+                         methodType:Request_GET
+                             params:@{ @"type": @"2", @"game_id": [HmCloudTool share].gameId }
+                      faildCallBack:nil
+                    successCallBack:^(id _Nonnull obj) {
+        self.keyboardList = [[KeyModel mj_objectArrayWithKeyValuesArray:obj[@"data"][@"keyboard"]] mutableCopy];
+
+        if (set) {
+            self.keyView.keyList = self.keyboardList;
+        }
+    }];
+}
+
+- (void)hideSetView {
+    self.resolutionBgView.hidden = YES;
+
+    @weakify(self);
+    [UIView animateWithDuration:0.25
+                     animations:^{
+        @strongify(self);
+        self.topCos.constant = (self.topCos.constant == 0) ? -50 : 0;
+        self.leftCos.constant = (self.leftCos.constant == 0) ? -kScreenH : 0;
+        self.rightCos.constant = (self.rightCos.constant == 0) ? -kScreenH : 0;
+
+        self.bgView.alpha = (self.rightCos.constant == 0) ? 0.6 : 0;
+
+        [self.view layoutIfNeeded];
+    }];
+}
+
+- (void)pushToFlutterPage:(FlutterPageType)pagetype {
+    if (self.pushFlutter) {
+        self.pushFlutter(pagetype);
+        [self dismissViewControllerAnimated:YES completion:nil];
+    }
+}
+
+- (void)pushCustomKeyController {
+    CustomSelectViewController *vc = [[CustomSelectViewController alloc] initWithNibName:@"CustomSelectViewController"
+                                                                                  bundle:k_SanABundle];
+
+    vc.modalPresentationStyle = UIModalPresentationCustom;
+    vc.transitioningDelegate = self;
+    @weakify(self);
+    vc.selectCallback = ^(CustomType type) {
+        @strongify(self);
+        CustomKeyViewController *vc = [[CustomKeyViewController alloc] initWithNibName:@"CustomKeyViewController"
+                                                                                bundle:k_SanABundle];
+        vc.modalPresentationStyle = UIModalPresentationCustom;
+        vc.transitioningDelegate = self;
+        vc.type = type;
+        @weakify(self);
+        vc.dismissCallback = ^(BOOL isSave) {
+            @strongify(self);
+            self.keyView.hidden = NO;
+
+            if (isSave) {
+                [self request];
+            }
+        };
+        [self presentViewController:vc
+                           animated:YES
+                         completion:nil];
+
+        self.keyView.hidden = YES;
+    };
+
+    [self presentViewController:vc
+                       animated:YES
+                     completion:nil];
+}
+
+- (IBAction)didTapSet:(id)sender {
+    [self hideSetView];
+}
+
+- (IBAction)didTapShowKeyboard:(id)sender {
+    self.showKeyboard = !self.showKeyboard;
+
+    self.keyView.hidden = self.showKeyboard;
+
+    [[HMCloudPlayer sharedCloudPlayer] cloudSwitchKeyboard:self.showKeyboard];
+}
+
+- (IBAction)didTapTopup:(id)sender {
+    [self pushToFlutterPage:Flutter_rechartTime];
 }
 
 - (IBAction)didTapDismiss:(id)sender {
-    if (self.didDismiss) {
-        [self.view.subviews.firstObject removeFromSuperview];
-        self.didDismiss();
+    [NormalAlertView showAlertWithTitle:@"是否结束游戏？"
+                                content:@""
+                           confirmTitle:@"结束"
+                            cancelTitle:@"继续游玩"
+                        confirmCallback:^{
+        if (self.didDismiss) {
+            [self.view.subviews.firstObject removeFromSuperview];
+            self.didDismiss();
+        }
+
+        [self dismissViewControllerAnimated:YES
+                                 completion:nil];
     }
-    [self dismissViewControllerAnimated:YES completion:nil];
+                         cancelCallback:nil];
 }
 
-- (IBAction)didChangeSoundSwitch:(UISwitch *)sender {
-    // 改变声音
-    if (self.channelAction) {
-        self.channelAction(k_changeSound, sender.on);
-    }
+- (void)refreshfps:(NSInteger)fps ms:(NSInteger)ms rate:(float)rate packetLoss:(float)packetLoss {
+    self.ms = ms;
+    self.packetLoss = packetLoss;
 }
+
+- (void)stopTimer {
+    [self.timer invalidate];
+    self.timer = nil;
+}
+
 - (void)dealloc {
     NSLog(@"CloudPreViewController dealloc");
 }
-
-- (BOOL)shouldAutorotate{
-    return YES;
-}
-
-- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-    // 如果该界面需要支持横竖屏切换
-    return UIInterfaceOrientationMaskLandscapeRight;
-}
-
 
 @end

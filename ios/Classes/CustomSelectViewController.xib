@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="landscape" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="CustomSelectViewController">
+            <connections>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="852" height="393"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <stackView opaque="NO" contentMode="scaleToFill" spacing="40" translatesAutoresizingMaskIntoConstraints="NO" id="amc-hR-iT6">
+                    <rect key="frame" x="186" y="121.66666666666669" width="480" height="150"/>
+                    <subviews>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jYs-Pa-aGR">
+                            <rect key="frame" x="0.0" y="0.0" width="220" height="150"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                            <state key="normal" image="set_custom_keyboard.png"/>
+                            <connections>
+                                <action selector="didTapKeyboard:" destination="-1" eventType="touchUpInside" id="A51-5R-aum"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cp1-fy-ysg">
+                            <rect key="frame" x="260" y="0.0" width="220" height="150"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                            <state key="normal" image="set_custom_joystick.png"/>
+                            <connections>
+                                <action selector="didTapJoystick:" destination="-1" eventType="touchUpInside" id="n0t-PP-ngl"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                </stackView>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="选择自定义按键类型" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fqS-a9-lsY">
+                    <rect key="frame" x="348" y="76.333333333333329" width="156" height="20.333333333333329"/>
+                    <fontDescription key="fontDescription" type="system" weight="medium" pointSize="17"/>
+                    <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <nil key="highlightedColor"/>
+                </label>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="Q5M-cg-NOt"/>
+            <color key="backgroundColor" white="0.0" alpha="0.80000000000000004" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <constraints>
+                <constraint firstItem="fqS-a9-lsY" firstAttribute="centerX" secondItem="amc-hR-iT6" secondAttribute="centerX" id="HcX-Tk-k8n"/>
+                <constraint firstItem="amc-hR-iT6" firstAttribute="centerY" secondItem="i5M-Pr-FkT" secondAttribute="centerY" id="Lhm-el-uvb"/>
+                <constraint firstItem="amc-hR-iT6" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="QMX-SX-79F"/>
+                <constraint firstItem="amc-hR-iT6" firstAttribute="top" secondItem="fqS-a9-lsY" secondAttribute="bottom" constant="25" id="ksO-bX-WOi"/>
+            </constraints>
+            <point key="canvasLocation" x="249" y="-13"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="set_custom_joystick.png" width="220" height="150"/>
+        <image name="set_custom_keyboard.png" width="220" height="150"/>
+    </resources>
+</document>

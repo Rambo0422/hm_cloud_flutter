@@ -113,6 +113,8 @@ typedef NS_ENUM(NSInteger, CloudPlayerWSGPSMessageOperation) {
                                        cloudId:(NSString *)cloudId
                                           text:(NSString *)text;
 
+@property (nonatomic, assign) NSInteger maxLength;
+
 - (NSArray<HMCloudPlayerWSClipboardMessageItem*> *) clipboardItems;
 
 @end
@@ -152,6 +154,10 @@ typedef NS_ENUM(NSInteger, CloudPlayerWSKeyboardMessage) {
 @property (nonatomic, assign, readonly) CloudPlayerWSKeyboardMessage keyboardStatus;
 @property (nonatomic, copy, readonly)   NSString *message;
 
+@end
+
+@interface HMCloudPlayerWSMessageFactroy : NSObject
++ (HMCloudPlayerWSMessage *)wsMessageFactroyWithDict:(NSDictionary *)dict;
 @end
 
 NS_ASSUME_NONNULL_END

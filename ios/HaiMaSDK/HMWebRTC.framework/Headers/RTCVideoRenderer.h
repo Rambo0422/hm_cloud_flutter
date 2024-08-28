@@ -39,7 +39,7 @@ RTC_OBJC_EXPORT
 /// CurrentImage
 - (UIImage *)getCurrentImage:(BOOL)is_portrait;
 
-/// Render fps, following up android func name.
+/// Render fps, following up anroid func name. 
 - (int)getEglRenderFps;
 @end
 
