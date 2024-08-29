@@ -33,6 +33,11 @@ typedef enum : NSUInteger {
 ///   - packetLoss: 丢包率
 - (void)refreshfps:(NSInteger)fps ms:(NSInteger)ms rate:(float)rate packetLoss:(float)packetLoss;
 
+
+/// 刷新键盘状态
+/// - Parameter status: 键盘状态
+- (void)refreshKeyboardStatus:(CloudPlayerKeyboardStatus)status;
+
 @end
 
 NS_ASSUME_NONNULL_END

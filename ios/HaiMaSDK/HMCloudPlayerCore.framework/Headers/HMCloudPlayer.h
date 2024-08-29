@@ -112,8 +112,12 @@ const extern NSString *CloudGameOptionKeyResolutionId;      //起播分辨率
 const extern NSString *CloudGameOptionKeyDisableAutoStream; //禁用自动串流
 const extern NSString *CloudGameOptionKeyGid;               //gid: gameId
 const extern NSString *CloudGameOptionKeyLargeBitrate;      //高帧率开关
+const extern NSString *CloudGameOptionKeyDevicePixelRatio;  //设置dpi参数
+const extern NSString *CloudGameOptionKeyKeepAliveTimeSeconds; //设置保活时间 单位秒
+const extern NSString *CloudGameOptionKeyNoInputTimeout;    //设置无操作超时时间 单位秒
 const extern NSString *CloudGameOptionKeyStreamingMode;     //视频流模式
 const extern NSString *CloudGameOptionKeyNoInputTimeout;    //无操作超时时间
+const extern NSString *CloudGameOptionKeyIMEType;           //app指定键盘类型
 
 typedef NS_ENUM(NSInteger, CloudPlayerFileUploadResponseStatus) {
     CloudPlayerFileUploadResponseStatusSuccess,        //上传成功
@@ -573,6 +577,17 @@ typedef void (^HMAssignControlCallback)(NSArray<HMCloudPlayerControlInfo *>*);
 - (BOOL) enlargeBitrate:(BOOL)enabled success:(void (^)(BOOL enabled))success fail:(void (^)(NSString *errorCode))fail;
 
 /**
+ 设置保活时长
+ @param keepAliveTimeSeconds 保活时长
+ @param noInputTimeSeconds 无操作保活时长
+ @param success 保活成功
+ @param fail 保活失败
+ @retrun 是否调用成功
+ */
+- (BOOL)updateInstanceTime:(NSInteger)keepAliveTimeSeconds noInputTimeSeconds:(NSInteger)noInputTimeSeconds success:(void (^)(BOOL success))success fail:(void (^)(NSString *errorCode))fail;
+
+/**
+ 获取申请实例参数
  设置视频流模式
  @param mode 视频流模式
  @param completion 设置结果
@@ -585,6 +600,12 @@ typedef void (^HMAssignControlCallback)(NSArray<HMCloudPlayerControlInfo *>*);
  */
 - (NSDictionary *)getApplyInstanceParams:(NSDictionary *)options;
 
+/**
+ 重启游戏
+ @param completion 设置结果
+ */
+- (void)relaunchGame:(void (^)(BOOL success, NSString *errorCode))completion;
+
 @end
 
 
@@ -592,6 +613,7 @@ typedef void (^HMAssignControlCallback)(NSArray<HMCloudPlayerControlInfo *>*);
 
 - (void) cloudPlayerSceneChangedCallback:(NSDictionary *)dict;
 - (void) cloudPlayerTouchBegan;
+- (void) cloudPlayerTouchBegan:(NSSet<UITouch *> *)touches;
 - (void) cloudPlayerUsageAuthorization:(HMCloudPlayerUsageAuthorization)type success:(void (^)(BOOL authorization))success;
 - (void) cloudPlayerDidReceiveWSMessage:(HMCloudPlayerWSMessage *)msg;
 - (void) cloudPlayerKeyboardStatusChanged:(CloudPlayerKeyboardStatus)status;

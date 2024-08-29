@@ -247,6 +247,14 @@
     });
 }
 
+- (void)cloudPlayerKeyboardStatusChanged:(CloudPlayerKeyboardStatus)status {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.vc) {
+            [self.vc refreshKeyboardStatus:status];
+        }
+    });
+}
+
 // MARK: 发送指令消息到海马
 - (void)sendCustomKey:(NSArray<NSDictionary *> *)dictList {
     NSLog(@"sendCustomKey = %@", dictList);

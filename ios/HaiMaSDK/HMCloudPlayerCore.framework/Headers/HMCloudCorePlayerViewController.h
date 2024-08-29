@@ -100,6 +100,11 @@ typedef NS_ENUM(NSInteger, HMCloudCorePlayerEvent) {
     HMCloudCorePlayerEventCameraApplyPermission,        //正在申请相机权限
     HMCloudCorePlayerEventCameraPermissionCheck,        //相机权限检查
 
+    HMCloudCorePlayerEventSwitchIMECalled,  //切换键盘被调用
+    HMCloudCorePlayerEventSwitchIMEResult,  //切换键盘结果
+
+    HMCloudCorePlayerEventGetIMEStart,   //开始获取键盘类型
+    HMCloudCorePlayerEventGetIMEResult,  //获取键盘类型结果
 };
 
 typedef NS_ENUM(NSInteger, HMCloudCorePlayerSubViewCenterStyle) {
@@ -136,6 +141,7 @@ typedef NS_ENUM(NSInteger,HMCloudCorePlayerDataChannelType) {
     HMCloudCorePlayerDataChannelTypePingPong,
     HMCloudCorePlayerDataChannelTypePay,
     HMCloudCorePlayerDataChannelTypeDataClipboard,
+    HMCloudCorePlayerDataChannelTypeDataShellCommonds,
 };
 
 typedef NS_ENUM(NSInteger,HMCloudCorePlayerRecordStatusType) {
@@ -206,8 +212,20 @@ typedef NS_ENUM(NSInteger, CloudCorePlayerCancelDownloadResponseStatus) {
 typedef NS_ENUM(NSInteger, CloudCorePlayerWSMessageType) {
     CloudCorePlayerWSMessageTypeNormal,
     CloudCorePlayerWSMessageTypeClipboard,
+    CloudCorePlayerWSMessageShellCommands,
 };
 
+typedef NS_ENUM (NSInteger,CloudCorePlayerIMEType){
+    CloudCorePlayerIMETypeCloud,       //云端键盘
+    CloudCorePlayerIMETypeLocal,       //本地键盘
+};
+
+typedef NS_ENUM (NSInteger,CloudCorePlayerIMEResponseStatus) {
+    CloudCorePlayerIMEResponseStatusSuccess,//切换成功
+    CloudCorePlayerIMEResponseStatusUnsupported,//不支持切换
+    CloudCorePlayerIMEResponseStatusTimeout,//切换超时
+    CloudCorePlayerIMEResponseStatusRomReject,//切换失败
+};
 
 typedef void (^CloudCorePlayerScreenshotBlock)(BOOL result,NSData *data,CloudCorePlayerScreenshotStatus status,NSString *errorMsg);
 
@@ -224,6 +242,8 @@ typedef void (^CloudCorePlayerDownloadProgressBlock)(double downloadProgress,HMS
 typedef void (^CloudCoreFileCancelDownloadResponseBlock)(BOOL result, CloudCorePlayerCancelDownloadResponseStatus status,HMStreamingFileModel *file);
 
 typedef void (^CloudCoreFileCancelDownloadComplete)(void);
+
+typedef void (^CloudCorePlayerIMECompletion)(CloudCorePlayerIMEResponseStatus status);
 
 @protocol HMCloudCorePlayerViewControllerDelegate <NSObject>
 @optional
@@ -280,6 +300,13 @@ typedef void (^CloudCoreFileCancelDownloadComplete)(void);
  点击事件触发
  */
 - (void) cloudCorePlayerTouchBegan;
+
+/**
+ 点击事件触发
+ 
+ @param touches 触摸事件的集合
+ */
+- (void) cloudCorePlayerTouchBegan:(NSSet<UITouch *> *)touches;
 
 /**
  有事件需要上报
@@ -636,13 +663,14 @@ openCameraPermissionCheckByServer:(BOOL)openCameraPermissionCheckByServer
  @param fpsprobesize 帧大小
  @param framedropaudio 音频帧丢帧开关
  @param framedropvideo 视频帧丢帧开关
+ @param config 108配置
  */
 - (void)setRTMPProbesize:(int)probesize
          analyzeduration:(int)analyzeduration
             fpsprobesize:(int)fpsprobesize
           framedropaudio:(int)framedropaudio
-          framedropvideo:(int)framedropvideo;
-
+          framedropvideo:(int)framedropvideo
+                  config:(NSDictionary *)config;
 /**
  展示本地键盘 如x86类型
  */
@@ -834,5 +862,12 @@ openCameraPermissionCheckByServer:(BOOL)openCameraPermissionCheckByServer
  @param dataDict ip地址
  */
 - (void)receivedDNSIPData:(NSDictionary *)dataDict url:(NSString *)url;
+
+/**
+ 切换键盘类型
+ @param type 键盘类型
+ @param completion 设置结果
+ */
+- (void)switchImeType:(CloudCorePlayerIMEType)type completion:(CloudCorePlayerIMECompletion)completion;
 
 @end

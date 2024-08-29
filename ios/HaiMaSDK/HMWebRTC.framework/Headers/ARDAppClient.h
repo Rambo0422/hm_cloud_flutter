@@ -119,14 +119,10 @@ RTC_OBJC_HM_EXPORT
 
 // Convenience constructor since all expected use cases will need a delegate
 // in order to receive remote tracks.
-- (instancetype)initWithDelegate:(id<RTC_OBJC_TYPE (ARDAppClientDelegate)> __nullable)delegate;
-
 - (instancetype)initWithDelegateAndControllog:(id<RTC_OBJC_TYPE (ARDAppClientDelegate)> __nullable)delegate enablelog:(bool)enablelog;
 // Establishes a connection with the AppRTC servers for the given room id.
 // |settings| is an object containing settings such as video codec for the call.
 // If |isLoopback| is true, the call will connect to itself.
-- (void)connectWithParameter:(RTC_OBJC_TYPE (ARDAppClientParameter) *)params rtcConfig:(RTC_OBJC_TYPE (ARDAppClientRtcConfig) *)rtcConfig cid:(NSString *)cid;
-
 - (void)connectWithParameter:(RTC_OBJC_TYPE (ARDAppClientParameter) *)params globalConfig:(NSDictionary *)globalConfig cid:(NSString *)cid capturemode:(RTC_OBJC_TYPE (ARDRtcCaptureMode))mode gametype:(RTC_OBJC_TYPE (ARDAppClientGameType)) type ascategory:(RTC_OBJC_TYPE (ARDAudioSessionCategory)) category;
 
 // Disconnects from the AppRTC servers and any connected clients.

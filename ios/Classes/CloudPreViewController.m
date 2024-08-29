@@ -449,6 +449,9 @@ typedef enum : NSUInteger {
         pasteboard.string = textToCopy;
         [SVProgressHUD showSuccessWithStatus:@"复制成功~"];
     }];
+
+
+    RAC(self.keyView, hidden) = RACObserve(self, showKeyboard);
 }
 
 - (void)configView {
@@ -692,8 +695,6 @@ typedef enum : NSUInteger {
 - (IBAction)didTapShowKeyboard:(id)sender {
     self.showKeyboard = !self.showKeyboard;
 
-    self.keyView.hidden = self.showKeyboard;
-
     [[HMCloudPlayer sharedCloudPlayer] cloudSwitchKeyboard:self.showKeyboard];
 }
 
@@ -721,6 +722,10 @@ typedef enum : NSUInteger {
 - (void)refreshfps:(NSInteger)fps ms:(NSInteger)ms rate:(float)rate packetLoss:(float)packetLoss {
     self.ms = ms;
     self.packetLoss = packetLoss;
+}
+
+- (void)refreshKeyboardStatus:(CloudPlayerKeyboardStatus)status {
+    self.showKeyboard = (status == CloudPlayerKeyboardStatusDidShow);
 }
 
 - (void)stopTimer {
