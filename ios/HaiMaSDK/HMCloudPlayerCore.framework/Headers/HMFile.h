@@ -13,31 +13,50 @@ NS_ASSUME_NONNULL_BEGIN
 @interface HMFile : HMCCBaseModel
 
 /*
+ arm实例
+ x86实例
  通用
  */
-@property (nonatomic, copy)   NSString *destinationPath;
-@property (nonatomic, assign) BOOL      isCancel;
+@property (nonatomic, copy)   NSString *destinationPath; //文件下载时存储本地目标路径，文件上传时本地源文件路径
+@property (nonatomic, copy)   NSString *fileName;        //文件上传，文件下载时创建的文件名称
+@property (nonatomic, assign) BOOL      isCancel;        //文件上传，文件下载取消标识
+@property (nonatomic, copy)   NSString *cloudPath;       //文件上传,文件下载相对路径
+
+/**
+ arm实例
+ 图片下载
+ */
+@property (nonatomic, copy)   NSString *fileSize; //图片下载接口，图片大小
+@property (nonatomic, copy)   NSString *mimeType; //图片下载接口，图片类型
+@property (nonatomic, copy)   NSString *md5sum;   //图片下载接口，md5值
 
 /*
- 图片下载
+ arm实例
+ 文件下载相关属性
+ */
+@property (nonatomic, copy, readonly)   NSString *name; //文件名称
+@property (nonatomic, copy, readonly)   NSString *size; //文件大小
+@property (nonatomic, copy, readonly)   NSString *type; //文件类型
+@property (nonatomic, copy, readonly)   NSString *duration;      //视频时长
+@property (nonatomic, copy)             NSString *keepAliveTime; //保活时长
+@property (nonatomic, assign)           BOOL      downloadOnly;  // true 断流下载  false不断流下载
+@property (nonatomic, copy, readonly)   NSString *path; //云端文件相对路径
+
+/*
+ 创建文件方法
+ @param fileName 文件名
+ @param destinationPath 文件下载时存储本地目标路径，文件上传时本地源文件路径
  */
 - (instancetype) initFile:(NSString *)fileName destinationPath:(NSString *)destinationPath;
 
-@property (nonatomic, copy)   NSString *fileSize;
-@property (nonatomic, copy)   NSString *fileName;
-@property (nonatomic, copy)   NSString *mimeType;
-@property (nonatomic, copy)   NSString *md5sum;
-
-/*
- 视频下载
+/**
+ 创建文件方法
+ @param fileName 文件名
+ @param destinationPath 文件下载时存储本地目标路径，文件上传时本地源文件路径
+ @param cloudPath 指定云端相对路径
  */
-@property (nonatomic, copy, readonly)   NSString *name;
-@property (nonatomic, copy, readonly)   NSString *path;
-@property (nonatomic, copy, readonly)   NSString *size;
-@property (nonatomic, copy, readonly)   NSString *type;
-@property (nonatomic, copy, readonly)   NSString *duration;
-@property (nonatomic, copy)             NSString *keepAliveTime;
-@property (nonatomic, assign)           BOOL      downloadOnly;  // true 断流下载  false不断流下载
+
+- (instancetype) initFile:(NSString *)fileName destinationPath:(NSString *)destinationPath cloudPath:(NSString *)cloudPath;
 
 @end
 

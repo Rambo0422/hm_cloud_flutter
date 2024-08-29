@@ -10,6 +10,7 @@
 #import "HMCloudCoreMarco.h"
 #import "HMCloudPlayerWebRtcInfoModel.h"
 #import "HMInputOpData.h"
+#import "HMStreamingFileModel.h"
 
 @class HMDelayInfoModel;
 
@@ -99,6 +100,11 @@ typedef NS_ENUM(NSInteger, HMCloudCorePlayerEvent) {
     HMCloudCorePlayerEventCameraApplyPermission,        //正在申请相机权限
     HMCloudCorePlayerEventCameraPermissionCheck,        //相机权限检查
 
+    HMCloudCorePlayerEventSwitchIMECalled,  //切换键盘被调用
+    HMCloudCorePlayerEventSwitchIMEResult,  //切换键盘结果
+
+    HMCloudCorePlayerEventGetIMEStart,   //开始获取键盘类型
+    HMCloudCorePlayerEventGetIMEResult,  //获取键盘类型结果
 };
 
 typedef NS_ENUM(NSInteger, HMCloudCorePlayerSubViewCenterStyle) {
@@ -134,6 +140,8 @@ typedef NS_ENUM(NSInteger,HMCloudCorePlayerOperationType){
 typedef NS_ENUM(NSInteger,HMCloudCorePlayerDataChannelType) {
     HMCloudCorePlayerDataChannelTypePingPong,
     HMCloudCorePlayerDataChannelTypePay,
+    HMCloudCorePlayerDataChannelTypeDataClipboard,
+    HMCloudCorePlayerDataChannelTypeDataShellCommonds,
 };
 
 typedef NS_ENUM(NSInteger,HMCloudCorePlayerRecordStatusType) {
@@ -153,10 +161,102 @@ typedef NS_ENUM(NSInteger,CloudCorePlayerScreenshotStatus){
     CloudCorePlayerScreenshotStatusTimeout,
     CloudCorePlayerScreenshotStatusInternalError,
 };
+
+typedef NS_ENUM(NSInteger, CloudCorePlayerUploadResponseStatus) {
+    CloudCorePlayerUploadResponseStatusSuccess,        //上传成功
+    CloudCorePlayerUploadResponseStatusEmpty,          //上传队列空
+    CloudCorePlayerUploadResponseStatusTimeout,        //超时
+    CloudCorePlayerUploadResponseStatusCancel,         //取消
+    CloudCorePlayerUploadResponseStatusIncorrectFormat,//格式不正确
+    CloudCorePlayerUploadResponseStatusBeyondMaxLimit, //超过最大文件限制
+    CloudCorePlayerUploadResponseStatusInternalError,  //内部错误
+    CloudCorePlayerUploadResponseStatusDisconnect,     //链接断开
+};
+
+typedef NS_ENUM (NSInteger, CloudCorePlayerFileAction) {
+    CloudCorePlayerFileActionDownloadStart = 0,             //12611 开始下载
+    CloudCorePlayerFileActionDownloadSuccess,               //12612 文件下载成功
+    CloudCorePlayerFileActionDownloadStop,                  //12613 文件下载停止
+    CloudCorePlayerFileActionDownloadCancel,                //12614 文件取消下载
+    CloudCorePlayerFileActionnDownloadError,                //12615 下载错误
+    CloudCorePlayerFileActionDownloadComplete,              //12616 下载完成
+    CloudCorePlayerFileActionDownloadProgress,              //12617 下载状态
+    CloudCorePlayerFileActionUploadStart,                   //12601 开始上传
+    CloudCorePlayerFileActionUploadSuccess,                 //12602 文件上传成功
+    CloudCorePlayerFileActionUploadStop,                    //12603 文件上传停止
+    CloudCorePlayerFileActionUploadCancel,                  //12604 文件取消上传
+    CloudCorePlayerFileActionUploadError,                   //12605 上传错误
+    CloudCorePlayerFileActionUploadComplete,                //12606 上传完成
+    CloudCorePlayerFileActionUploadProgress,                //12607 上传状态
+};
+
+typedef NS_ENUM(NSInteger, CloudCorePlayerFileDownloaderResponseStatus) {
+    CloudCorePlayerFileDownloaderResponseStatusSuccess,             //下载成功
+    CloudCorePlayerFileDownloaderResponseStatusCancelList,          //下载列表中取消下载
+    CloudCorePlayerFileDownloaderResponseStatusCancelSuccess,       //长连接取消下载成功
+    CloudCorePlayerFileDownloaderResponseStatusLimited,             //下载受限
+    CloudCorePlayerFileDownloaderResponseStatusTimeout,             //下载超时
+    CloudCorePlayerFileDownloaderResponseStatusSaveFailed,          //保存失败
+    CloudCorePlayerFileDownloaderResponseStatusKeepAliveTimeout,    //保活时间用尽
+};
+
+typedef NS_ENUM(NSInteger, CloudCorePlayerCancelDownloadResponseStatus) {
+    CloudCorePlayerCancelDownloadResponseStatusSuccess,      //取消成功
+    CloudCorePlayerCancelDownloadResponseStatusEmpty,        //下载队列空
+    CloudCorePlayerCancelDownloadResponseStatusOutList,      //不在下载列表
+    CloudCorePlayerCancelDownloadResponseStatusDownloaded,   //已下载完成
+    CloudCorePlayerCancelDownloadResponseStatusTimeout,      //取消超时
+    CloudCorePlayerCancelDownloadResponseStatusDisconnect,   //链接断开
+};
+
+typedef NS_ENUM(NSInteger, CloudCorePlayerWSMessageType) {
+    CloudCorePlayerWSMessageTypeNormal,
+    CloudCorePlayerWSMessageTypeClipboard,
+    CloudCorePlayerWSMessageShellCommands,
+};
+
+typedef NS_ENUM (NSInteger,CloudCorePlayerIMEType){
+    CloudCorePlayerIMETypeCloud,       //云端键盘
+    CloudCorePlayerIMETypeLocal,       //本地键盘
+};
+
+typedef NS_ENUM (NSInteger,CloudCorePlayerIMEResponseStatus) {
+    CloudCorePlayerIMEResponseStatusSuccess,//切换成功
+    CloudCorePlayerIMEResponseStatusUnsupported,//不支持切换
+    CloudCorePlayerIMEResponseStatusTimeout,//切换超时
+    CloudCorePlayerIMEResponseStatusRomReject,//切换失败
+};
+
 typedef void (^CloudCorePlayerScreenshotBlock)(BOOL result,NSData *data,CloudCorePlayerScreenshotStatus status,NSString *errorMsg);
+
+typedef void (^CloudCorePlayerUploadResponseBlock)(BOOL result, CloudCorePlayerUploadResponseStatus status ,NSString *errorMsg, HMStreamingFileModel *file);
+
+typedef void (^CloudCorePlayerUploadComplete)(void);
+
+typedef void (^CloudCorePlayerDownloadResponseBlock)(BOOL result, CloudCorePlayerFileDownloaderResponseStatus status ,NSString *errorMsg, HMStreamingFileModel *file);
+
+typedef void (^CloudCorePlayerDownloadComplete)(void);
+
+typedef void (^CloudCorePlayerDownloadProgressBlock)(double downloadProgress,HMStreamingFileModel *file);
+
+typedef void (^CloudCoreFileCancelDownloadResponseBlock)(BOOL result, CloudCorePlayerCancelDownloadResponseStatus status,HMStreamingFileModel *file);
+
+typedef void (^CloudCoreFileCancelDownloadComplete)(void);
+
+typedef void (^CloudCorePlayerIMECompletion)(CloudCorePlayerIMEResponseStatus status);
 
 @protocol HMCloudCorePlayerViewControllerDelegate <NSObject>
 @optional
+
+/**
+ 重置stoken次数
+ */
+- (void) resetRefreshStokenTimes;
+
+/**
+ 超出重连最大次数
+ */
+- (void) beyondReconnectPlayerTimes;
 
 /**
  播放器出错
@@ -200,6 +300,13 @@ typedef void (^CloudCorePlayerScreenshotBlock)(BOOL result,NSData *data,CloudCor
  点击事件触发
  */
 - (void) cloudCorePlayerTouchBegan;
+
+/**
+ 点击事件触发
+ 
+ @param touches 触摸事件的集合
+ */
+- (void) cloudCorePlayerTouchBegan:(NSSet<UITouch *> *)touches;
 
 /**
  有事件需要上报
@@ -275,6 +382,19 @@ typedef void (^CloudCorePlayerScreenshotBlock)(BOOL result,NSData *data,CloudCor
  */
 - (void)cloudCorePlayerDelayInfoCallBack:(HMDelayInfoModel *)delayModel;
 
+/**
+ 更新文件状态事件上报
+ @param status 文件状态
+ @param description 状态描述
+ */
+- (void)cloudCorePlayerStatusChanged:(CloudCorePlayerFileAction)status description:(NSString *)description;
+
+/**
+ DNS解析超时
+ @param hostUrl 解析地址
+ */
+- (void)cloudCorePlayerDNSTimeout:(NSString *)hostUrl;
+
 @end
 
 @interface HMCloudCorePlayerViewController : UIViewController
@@ -291,6 +411,13 @@ typedef void (^CloudCorePlayerScreenshotBlock)(BOOL result,NSData *data,CloudCor
 @property (nonatomic, assign) BOOL isInputConnectSuccess;
 @property (nonatomic, assign) BOOL isScreenConnectSuccess;
 @property (nonatomic, assign) BOOL stretching;
+@property (nonatomic, assign) BOOL signalConnectSuccess;
+@property (nonatomic, assign) BOOL receivedOffer;
+@property (nonatomic, assign) BOOL sendAnswer;
+@property (nonatomic, assign) BOOL sendCandidate;
+@property (nonatomic, assign) BOOL receivedCandidate;
+@property (nonatomic, assign) BOOL webrtcConnected;
+@property (nonatomic, assign) BOOL isWebrtcConnectTimeout;
 
 
 /**
@@ -347,6 +474,15 @@ typedef void (^CloudCorePlayerScreenshotBlock)(BOOL result,NSData *data,CloudCor
  @param showLastFrame 是否显示最后一帧画面
  */
 - (void) stopPlayer:(BOOL)showLastFrame disconnectStream:(BOOL)disconnectStream;
+
+/**
+ 停止Player
+ @param showLastFrame 是否显示最后一帧画面
+ @param disconnectStream 是否断流
+ @param onlyPause 是否仅暂停游戏
+
+ */
+- (void) stopPlayer:(BOOL)showLastFrame disconnectStream:(BOOL)disconnectStream onlyPause:(BOOL)onlyPause;
 
 /**
  播流过程中数据统计参数
@@ -511,9 +647,9 @@ openCameraPermissionCheckByServer:(BOOL)openCameraPermissionCheckByServer
 - (void)disconnectScreenUrl;
 
 /**
- 刷新stoken,取消第一帧超时，rtc连接超时计时器
+取消第一帧超时，rtc连接超时计时器
  */
-- (void)cancelTimerWithRereshStoken;
+- (void)cancelFirstArriveTimer;
 
 /**
  获取webrtc版本号
@@ -527,13 +663,14 @@ openCameraPermissionCheckByServer:(BOOL)openCameraPermissionCheckByServer
  @param fpsprobesize 帧大小
  @param framedropaudio 音频帧丢帧开关
  @param framedropvideo 视频帧丢帧开关
+ @param config 108配置
  */
 - (void)setRTMPProbesize:(int)probesize
          analyzeduration:(int)analyzeduration
             fpsprobesize:(int)fpsprobesize
           framedropaudio:(int)framedropaudio
-          framedropvideo:(int)framedropvideo;
-
+          framedropvideo:(int)framedropvideo
+                  config:(NSDictionary *)config;
 /**
  展示本地键盘 如x86类型
  */
@@ -678,7 +815,59 @@ openCameraPermissionCheckByServer:(BOOL)openCameraPermissionCheckByServer
  */
 - (BOOL)convertToPcMouseModel:(BOOL)model;
 
-
+/**
+ 拉伸画面
+ @param stretch true 拉伸 false 还原
+ */
 - (void)setStretch:(BOOL)stretch;
+
+/**
+ 开始录音
+ */
+- (void)startRecordX86;
+
+/**
+ 停止录音
+ */
+- (void)stopRecordX86;
+
+/**
+ x86开始上传图片
+ @param uploadList 上传列表
+ @param cloudFileUploadResponseBlock 上传某一个文件回调
+ @param cloudFileUploadComplete 上传完成回调
+ @return 是否成功调用下载方法
+ */
+
+- (BOOL)upload:(NSArray<HMStreamingFileModel *> *)uploadList cloudFileUploadResponseBlock:(CloudCorePlayerUploadResponseBlock)cloudFileUploadResponseBlock cloudFileUploadComplete:(CloudCorePlayerUploadComplete)cloudFileUploadComplete;
+
+- (BOOL)download:(NSArray<HMStreamingFileModel *> *)downloadList downloadProgress:(CloudCorePlayerDownloadProgressBlock)downloadProgressBlock responseBlock:(CloudCorePlayerDownloadResponseBlock)responseBlock completeBlock:(CloudCorePlayerDownloadComplete)completeBlock;
+
+- (BOOL)cancelDownloadFileWithX86:(NSArray<HMStreamingFileModel *> *)fileList cloudFileCancelDownloadResponseBlock:(CloudCoreFileCancelDownloadResponseBlock)cancelDownloadResponseBlock cloudFileCancelDownloadComplete:(CloudCoreFileCancelDownloadComplete)cancelDownloadComplete;
+
+- (BOOL)sendMessageToDataChannel:(CloudCorePlayerWSMessageType)messageType message:(NSString *)message;
+
+- (NSString *)readClipboard;
+
+- (void)writeContentToClipboard:(NSString *)content;
+/**
+ x86取消上传任务
+ */
+- (void)cancelUploadFileAllTask;
+
+- (void)resetRetryPlayerTimes;
+
+/**
+ 接收到dns解析后的ip
+ @param dataDict ip地址
+ */
+- (void)receivedDNSIPData:(NSDictionary *)dataDict url:(NSString *)url;
+
+/**
+ 切换键盘类型
+ @param type 键盘类型
+ @param completion 设置结果
+ */
+- (void)switchImeType:(CloudCorePlayerIMEType)type completion:(CloudCorePlayerIMECompletion)completion;
 
 @end

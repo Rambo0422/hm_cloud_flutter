@@ -15,7 +15,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-RTC_OBJC_EXPORT
+RTC_OBJC_HM_EXPORT
 @interface RTC_OBJC_TYPE (RTCDataBuffer) : NSObject
 
 /** NSData representation of the underlying buffer. */
@@ -126,6 +126,9 @@ RTC_OBJC_EXPORT
 
 /** Attempt to send `data` on this data channel's underlying data transport. */
 - (BOOL)sendData:(RTC_OBJC_TYPE(RTCDataBuffer) *)data;
+
+/** Attempt to send `binary data` in type NSData on this data channel's underlying data transport. */
+- (BOOL)sendBinaryNSData:(NSData *)data;
 
 @end
 
