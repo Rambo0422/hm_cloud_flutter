@@ -12,6 +12,7 @@ import com.google.gson.GsonBuilder
 import com.haima.hmcp.Constants
 import com.haima.hmcp.HmcpManager
 import com.haima.hmcp.beans.CheckCloudServiceResult
+import com.haima.hmcp.beans.IntentExtraData
 //import com.haima.hmcp.beans.PlayNotification
 import com.haima.hmcp.beans.UserInfo
 import com.haima.hmcp.beans.UserInfo2
@@ -28,7 +29,9 @@ import com.haima.hmcp.widgets.HmcpVideoView
 //import com.haima.hmcp.widgets.beans.VirtualOperateType
 import com.sayx.hm_cloud.model.GameError
 import com.sayx.hm_cloud.model.GameErrorEvent
+import com.sayx.hm_cloud.model.GameOverEvent
 import com.sayx.hm_cloud.model.GameParam
+import com.sayx.hm_cloud.model.AccountInfo
 import com.sayx.hm_cloud.utils.GameUtils
 import io.flutter.plugin.common.MethodChannel
 import org.greenrobot.eventbus.EventBus
@@ -42,6 +45,8 @@ object GameManager : HmcpPlayerListener {
     val gson: Gson by lazy {
         GsonBuilder().disableHtmlEscaping().create()
     }
+
+    var cid = ""
 
     private var gameParam: GameParam? = null
 
@@ -66,7 +71,7 @@ object GameManager : HmcpPlayerListener {
 
     fun startGame(gameParam: GameParam) {
         this.gameParam = gameParam
-        if (gameParam?.isReconnect == true) {
+        if (gameParam.isReconnect) {
             Intent().apply {
                 setClass(context, GameActivity::class.java)
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -74,6 +79,7 @@ object GameManager : HmcpPlayerListener {
             }
             gameView?.restartGame(0)
         } else {
+            cid = ""
             initGameSdk()
         }
     }
@@ -86,11 +92,12 @@ object GameManager : HmcpPlayerListener {
                 it.putString(HmcpManager.ACCESS_KEY_ID, gameParam?.accessKeyId)
                 it.putString(HmcpManager.CHANNEL_ID, "app_cloud_game")
             }
-            Constants.IS_DEBUG = false
-            Constants.IS_ERROR = false
-            Constants.IS_INFO = false
+            val openDebug = false
+            Constants.IS_DEBUG = openDebug
+            Constants.IS_ERROR = openDebug
+            Constants.IS_INFO = openDebug
             LogUtils.d("init haiMaSDK:${gameParam?.accessKeyId}")
-//            HmcpManager.getInstance().releaseRequestManager()
+            HmcpManager.getInstance().releaseRequestManager()
             HmcpManager.getInstance().init(config, context, object : OnInitCallBackListener {
                 override fun success() {
                     LogUtils.d("haiMaSDK success:${HmcpManager.getInstance().sdkVersion}")
@@ -206,8 +213,8 @@ object GameManager : HmcpPlayerListener {
                 )
                 // 码率
 //                it.putInt(HmcpVideoView.INTERNET_SPEED, 300)
-                // 清晰度挡位：1流畅，2标清，3高清，4超清
-                it.putInt(HmcpVideoView.RESOLUTION_ID, 4)
+                // 清晰度挡位：4流畅，3标清，2高清，1超清，5蓝光
+                it.putInt(HmcpVideoView.RESOLUTION_ID, 5)
                 // 显示剩余时间
 //                it.putBoolean(HmcpVideoView.IS_SHOW_TIME, true)
                 if (!TextUtils.isEmpty(cid)) {
@@ -249,13 +256,23 @@ object GameManager : HmcpPlayerListener {
             it.userId = gameParam?.userId
             it.userToken = gameParam?.userToken
         })
+        gameParam?.accountInfo?.let {accountInfo->
+            val result = gson.fromJson(gson.toJson(accountInfo), AccountInfo::class.java)
+            gameView?.setExtraData(IntentExtraData().also {
+                it.setStringExtra(GameUtils.getStringData(result))
+            })
+        }
         gameView?.setConfigInfo("configInfo")
         gameView?.hmcpPlayerListener = this
         gameView?.play(bundle)
     }
 
     override fun HmcpPlayerStatusCallback(statusData: String?) {
-        LogUtils.d("playerStatusCallback:$statusData, cid:${HmcpManager.getInstance().cloudId}")
+        val cloudId = HmcpManager.getInstance().cloudId
+        if (cloudId != "") {
+            cid = cloudId
+        }
+        LogUtils.d("playerStatusCallback:$statusData, cid:$cloudId")
         statusData?.let {
             val data = JSONObject(it)
             when (val status = data.getInt(StatusCallbackUtil.STATUS)) {
@@ -301,14 +318,16 @@ object GameManager : HmcpPlayerListener {
                         LogUtils.e("gameTimeCountDown error:$dataStr")
                     }
                 }
+                // 15,游戏时间到
+                Constants.STATUS_OPERATION_GAME_OVER -> {
+                    EventBus.getDefault().post(GameOverEvent())
+                }
                 // 9,连接失败
                 Constants.STATUS_CONNECTION_ERROR,
                     // 10,排队人数过多
                 Constants.STATUS_OPERATION_REFUSE_QUEUE,
                     // 11,长时间无操作
                 Constants.STATUS_TOAST_NO_INPUT,
-                    // 15,游戏时间到
-                Constants.STATUS_OPERATION_GAME_OVER,
                     // 18,服务器开始维护
                 Constants.STATUS_OPERATION_PAUSE_SAAS_SERVER,
                     // 19,服务维护中
@@ -391,6 +410,12 @@ object GameManager : HmcpPlayerListener {
 
     override fun onSceneChanged(sceneMessage: String?) {
         LogUtils.d("onSceneChanged:$sceneMessage")
+        sceneMessage?.let {
+           val scene = gson.fromJson(sceneMessage, Map::class.java)
+            if (scene["sceneId"] == "stop") {
+
+            }
+        }
     }
 
     override fun onNetworkChanged(networkState: NetWorkState?) {
@@ -437,6 +462,9 @@ object GameManager : HmcpPlayerListener {
 //    }
 
     fun releaseGame(finish: String, bundle: Bundle?) {
+        if (!isPlaying) {
+            return
+        }
         LogUtils.d("releaseGame:$finish")
         if (finish != "0") {
             // 非切换队列调用此方法，认定为退出游戏
@@ -445,7 +473,7 @@ object GameManager : HmcpPlayerListener {
         isPlaying = false
         val cloudId = HmcpManager.getInstance().cloudId
         if (TextUtils.isEmpty(cloudId)) {
-            LogUtils.d("undo releaseGame, cid is empty")
+            LogUtils.d("releaseGame:cid is empty")
             gameParam = null
             gameView?.onDestroy()
             gameView = null
@@ -461,17 +489,17 @@ object GameManager : HmcpPlayerListener {
                 override fun success(result: Boolean) {
                     // 游戏释放成功
                     LogUtils.d("releaseGame->success:$result")
+                    gameParam = null
                     gameView?.onDestroy()
                     gameView = null
-                    gameParam = null
                 }
 
                 override fun fail(error: String?) {
                     // 游戏释放失败
                     LogUtils.e("releaseGame->fail:$error")
+                    gameParam = null
                     gameView?.onDestroy()
                     gameView = null
-                    gameParam = null
                 }
             }
         )

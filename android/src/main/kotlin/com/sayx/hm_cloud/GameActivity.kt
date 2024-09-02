@@ -15,6 +15,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
 import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.gyf.immersionbar.BarHide
 import com.gyf.immersionbar.ImmersionBar.hasNavigationBar
 import com.gyf.immersionbar.ktx.immersionBar
@@ -26,6 +27,7 @@ import com.sayx.hm_cloud.dialog.AppCommonDialog
 import com.sayx.hm_cloud.dialog.GameErrorDialog
 import com.sayx.hm_cloud.dialog.NoOperateOfflineDialog
 import com.sayx.hm_cloud.model.GameErrorEvent
+import com.sayx.hm_cloud.model.GameOverEvent
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -79,7 +81,6 @@ class GameActivity : AppCompatActivity() {
                 )
             )
         }
-//        GameManager.gameView?.setAttachContext(this)
         initGameSettings()
         startTimer()
     }
@@ -91,35 +92,40 @@ class GameActivity : AppCompatActivity() {
      * 3，设置为超清
      */
     private fun initGameSettings() {
-//        GameManager.gameView?.setPCMouseMode(true)
-//        GameManager.gameView?.virtualDeviceType = VirtualOperateType.NONE
-        GameManager.gameView?.onSwitchResolution(
-            0,
-            GameManager.gameView?.resolutionList?.first(),
-            0
-        )
+//        GameManager.gameView?.onSwitchResolution(
+//            0,
+//            GameManager.gameView?.resolutionList?.first(),
+//            0
+//        )
+        LogUtils.d("initGameSettings:${GameManager.gameView?.resolutionList}");
     }
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         countTime = noOperateTime
+        if (!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().register(this)
+        }
         startTimer()
     }
 
     private fun startTimer() {
         try {
             if (gameTimer != null) {
+                gameTimer?.purge()
                 gameTimer?.cancel()
                 gameTimer = null
             }
             gameTimer = Timer()
             gameTimer?.schedule(object : TimerTask() {
                 override fun run() {
-                    LogUtils.d("startTimer->countTime:$countTime")
+//                    LogUtils.d("startTimer->countTime:$countTime")
                     if (countTime == 0L) {
+                        gameTimer?.purge()
                         gameTimer?.cancel()
                         gameTimer = null
                         runOnUiThread {
+                            LogUtils.e("No operate timeout!")
                             // 3分钟无操作，提示下线
                             showNoOperateDialog()
                         }
@@ -184,6 +190,9 @@ class GameActivity : AppCompatActivity() {
                 // 提示下线30秒无操作，下线处理
                 LogUtils.w("No operation overtime")
                 runOnUiThread {
+                    gameTimer?.purge()
+                    gameTimer?.cancel()
+                    gameTimer = null
                     GameManager.releaseGame(finish = "1", bundle = null)
                     finish()
                 }
@@ -202,9 +211,14 @@ class GameActivity : AppCompatActivity() {
         exitGame(errorCode = event.errorCode, errorMsg = event.errorMsg)
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onGameOver(event: GameOverEvent) {
+        finish()
+    }
+
     private fun exitGame(errorCode: String = "0", errorMsg: String? = null) {
         val str =
-            "cid:${HmcpManager.getInstance().cloudId},uid:${GameManager.getGameParam()?.userId}"
+            "cid:${GameManager.cid},uid:${GameManager.getGameParam()?.userId}"
         LogUtils.d("exitGame:$str")
         if (errorCode != "0") {
             showErrorDialog(errorCode, errorMsg)
@@ -259,6 +273,26 @@ class GameActivity : AppCompatActivity() {
             .build().show()
     }
 
+    override fun onStart() {
+        GameManager.gameView?.onStart()
+        super.onStart()
+    }
+
+    override fun onResume() {
+        GameManager.gameView?.onResume()
+        super.onResume()
+    }
+
+    override fun onRestart() {
+        GameManager.gameView?.onRestart(0)
+        super.onRestart()
+    }
+
+    override fun onPause() {
+        GameManager.gameView?.onPause()
+        super.onPause()
+    }
+
     override fun onStop() {
         super.onStop()
         EventBus.getDefault().unregister(this)
@@ -274,19 +308,25 @@ class GameActivity : AppCompatActivity() {
     }
 
     override fun dispatchGenericMotionEvent(event: MotionEvent?): Boolean {
-        LogUtils.v("dispatchGenericMotionEvent:$event")
+//        LogUtils.v("dispatchGenericMotionEvent:$event")
         countTime = noOperateTime
         return super.dispatchGenericMotionEvent(event)
     }
 
     override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
-        LogUtils.v("dispatchTouchEvent:$event")
+//        LogUtils.v("dispatchTouchEvent:$event")
         countTime = noOperateTime
         return super.dispatchTouchEvent(event)
     }
 
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        LogUtils.v("dispatchKeyEvent:$event")
+        countTime = noOperateTime
+        return super.dispatchKeyEvent(event)
+    }
+
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
-        LogUtils.v("onKeyDown:$event")
+//        LogUtils.v("onKeyDown:$event")
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             return true
         }
@@ -294,7 +334,7 @@ class GameActivity : AppCompatActivity() {
     }
 
     override fun onKeyUp(keyCode: Int, event: KeyEvent): Boolean {
-        LogUtils.v("onKeyUp:$event")
+//        LogUtils.v("onKeyUp:$event")
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             return true
         }
