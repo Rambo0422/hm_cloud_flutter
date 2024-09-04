@@ -307,6 +307,20 @@
     if ([state isEqualToString:@"success"]) {
         [self initGameVC];
     } else if ([state isEqualToString:@"failed"]) {
+        
+        NSString *errorCode = [info objectForKey:@"errorCode"];
+
+        [ErrorAlertView showAlertWithCid:[HMCloudPlayer sharedCloudPlayer].cloudId
+                                     uid:self.userId
+                               errorCode:errorCode
+                                   title:@"初始化失败！"
+                                 content:nil
+                        dissMissCallback:^{
+            [self stop];
+            [[UIViewController topViewController] dismissViewControllerAnimated:YES
+                                                                     completion:^{
+            }];
+        }];
     }
 }
 
