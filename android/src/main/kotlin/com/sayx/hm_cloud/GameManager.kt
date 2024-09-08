@@ -410,12 +410,6 @@ object GameManager : HmcpPlayerListener {
 
     override fun onSceneChanged(sceneMessage: String?) {
         LogUtils.d("onSceneChanged:$sceneMessage")
-        sceneMessage?.let {
-           val scene = gson.fromJson(sceneMessage, Map::class.java)
-            if (scene["sceneId"] == "stop") {
-
-            }
-        }
     }
 
     override fun onNetworkChanged(networkState: NetWorkState?) {

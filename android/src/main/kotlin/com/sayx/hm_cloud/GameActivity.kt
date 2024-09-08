@@ -92,11 +92,6 @@ class GameActivity : AppCompatActivity() {
      * 3，设置为超清
      */
     private fun initGameSettings() {
-//        GameManager.gameView?.onSwitchResolution(
-//            0,
-//            GameManager.gameView?.resolutionList?.first(),
-//            0
-//        )
         LogUtils.d("initGameSettings:${GameManager.gameView?.resolutionList}");
     }
 
@@ -320,7 +315,7 @@ class GameActivity : AppCompatActivity() {
     }
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
-        LogUtils.v("dispatchKeyEvent:$event")
+//        LogUtils.v("dispatchKeyEvent:$event")
         countTime = noOperateTime
         return super.dispatchKeyEvent(event)
     }

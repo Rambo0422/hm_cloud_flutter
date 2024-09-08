@@ -88,7 +88,7 @@ dependencies {
     implementation('io.socket:socket.io-client:1.0.0') {
         exclude group: 'org.json', module: 'json'
     }
-    implementation 'androidx.databinding:databinding-runtime:8.5.0'
+    implementation 'androidx.databinding:databinding-runtime:8.6.0'
 }
 
 rootProject.allprojects {
