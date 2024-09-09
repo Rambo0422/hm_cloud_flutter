@@ -5,6 +5,7 @@
 //  Created by 周智水 on 2023/1/6.
 //
 
+#import <GameController/GameController.h>
 #import "CloudPreViewController.h"
 #import "CustomKeyViewController.h"
 #import "CustomSelectViewController.h"
@@ -100,6 +101,9 @@ typedef enum : NSUInteger {
 @property (nonatomic, strong) NSTimer *timer;
 
 
+@property (nonatomic, assign) BOOL isConnectGameControl;
+
+
 @end
 
 @implementation CloudPreViewController{
@@ -141,6 +145,23 @@ typedef enum : NSUInteger {
 
     [self configRac];
     [self request];
+
+    [self configGameControllers];
+}
+
+- (void)configGameControllers {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(gameControllerDidConnect:) name:GCControllerDidConnectNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(gameControllerDidDisConnect:) name:GCControllerDidDisconnectNotification object:nil];
+}
+
+- (void)gameControllerDidConnect:(NSNotification *)noti {
+    [SVProgressHUD showInfoWithStatus:@"手柄已连接~"];
+    self.isConnectGameControl = YES;
+}
+
+- (void)gameControllerDidDisConnect:(NSNotification *)noti {
+    [SVProgressHUD showInfoWithStatus:@"手柄已断开~"];
+    self.isConnectGameControl = NO;
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -451,10 +472,17 @@ typedef enum : NSUInteger {
     }];
 
 
-    RAC(self.keyView, hidden) = RACObserve(self, showKeyboard);
+    [[RACObserve(self, showKeyboard) merge:RACObserve(self, isConnectGameControl)] subscribeNext:^(id _Nullable x) {
+        @strongify(self);
+        self.keyView.hidden = (self.showKeyboard || self.isConnectGameControl);
+    }];
 }
 
 - (void)configView {
+    if ([GCController controllers].count) {
+        self.isConnectGameControl = YES;
+    }
+
     // 初始化清晰度
     self.resolution = [HmCloudTool share].isVip ? Resolution_BD : Resolution_Low;
     [[HmCloudTool share] switchResolution:self.resolution];
@@ -485,7 +513,7 @@ typedef enum : NSUInteger {
     _hourFormatter.zeroFormattingBehavior = NSDateComponentsFormatterZeroFormattingBehaviorPad;
 
     // 格式化时间戳
-    NSString *formattedTime = [_hourFormatter stringFromTimeInterval:[HmCloudTool share].peakTime.intValue];
+    NSString *formattedTime = [_hourFormatter stringFromTimeInterval:[HmCloudTool share].peakTime.integerValue];
 
     self.timeLab.text = formattedTime;
 
@@ -493,11 +521,13 @@ typedef enum : NSUInteger {
     _countDownFormatter = [[NSDateComponentsFormatter alloc] init];
 
     _countDownFormatter.unitsStyle = NSDateComponentsFormatterUnitsStylePositional;
-    _countDownFormatter.allowedUnits =   NSCalendarUnitMinute | NSCalendarUnitSecond;
+    _countDownFormatter.allowedUnits =  NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond;
     _countDownFormatter.zeroFormattingBehavior = NSDateComponentsFormatterZeroFormattingBehaviorPad;
 
 
-    NSString *countDownTime = [_countDownFormatter stringFromTimeInterval:[HmCloudTool share].playTime.intValue / 1000];
+    NSInteger time = [HmCloudTool share].playTime.integerValue / 1000;
+
+    NSString *countDownTime = [_countDownFormatter stringFromTimeInterval:[HmCloudTool share].playTime.integerValue / 1000];
 
     self.countDownLab.text = countDownTime;
 
@@ -547,15 +577,15 @@ typedef enum : NSUInteger {
                                                  repeats:YES
                                                    block:^(NSTimer *_Nonnull timer) {
         @strongify(self);
-        [HmCloudTool share].playTime = @([HmCloudTool share].playTime.intValue - 1000);
+        [HmCloudTool share].playTime = @([HmCloudTool share].playTime.integerValue - 1000);
 
-        self.countDownView.hidden = !([HmCloudTool share].playTime.intValue <= 300000);
+        self.countDownView.hidden = !([HmCloudTool share].playTime.integerValue <= 300000);
 
-        NSString *countDownTime = [self->_countDownFormatter stringFromTimeInterval:[HmCloudTool share].playTime.intValue / 1000];
+        NSString *countDownTime = [self->_countDownFormatter stringFromTimeInterval:[HmCloudTool share].playTime.integerValue / 1000];
 
         self.countDownLab.text = countDownTime;
 
-        if ([HmCloudTool share].playTime.intValue <= 0) {
+        if ([HmCloudTool share].playTime.integerValue <= 0) {
             [self.timer invalidate];
             self.timer = nil;
         }
