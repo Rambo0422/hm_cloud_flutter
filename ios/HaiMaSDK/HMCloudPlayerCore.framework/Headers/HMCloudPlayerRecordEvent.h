@@ -112,7 +112,8 @@ typedef NS_ENUM(NSInteger, HMCPEventType) {
 
     HMCEventAppForceground              = 12040,    //播流应用进入前台
     HMCEventAppBackground               = 12041,    //播流应用进入后台
-
+    HMCCEventAnalyseLog                 = 12200,    //分析问题log
+    HMCCEventSceneCallback              = 13505,    //回调APP的scene
 //    HMCEventStasticInfoReport           = 12299,    //配合App性能参数上报
 
     HMCEventQueueConfirm                = 12019,    //用户选择继续
@@ -172,7 +173,7 @@ typedef NS_ENUM(NSInteger, HMCPEventType) {
     HMCCEventSwitchStreamInfo           = 13801,    //226请求
     HMCCEventSwitchStreamInfoSuccess    = 13802,    //226请求成功
     HMCCEventSwitchStreamInfoFailed     = 13803,    //226请求失败
-    HMCCEventAnalyseLog                 = 12200,    //分析问题log
+
     HMCCEventRereceive                  = 13248,    //WEBRTC收到第一帧
     HMCCEventDecoded                    = 13249,    //WEBRTC解码完第一帧
     HMCCEventWebrtcConnectionFailed     = 13217,    //WEBRTC连接失败
@@ -265,6 +266,22 @@ typedef NS_ENUM(NSInteger, HMCPEventType) {
     HMCCEventGetScreenshotSuccess        = 12881,  //获取游戏截屏成功
     HMCCEventGetScreenshotTimeOut        = 12882,  //获取游戏截屏超时
     HMCCEventGetScreenshotFail           = 12883,  //获取游戏截屏失败
+    
+    HMCCEventStreamingReadyTimeout       = 14700,  //等待op68超时
+    HMCCEventWaitStartStreamingConfrim   = 14701,  //收到op68
+    HMCCEventWaitStartScreamingTimeout   = 14702,  //收到op69
+    HMCCEventStartStreaming              = 14703,  //确认开始串流
+    HMCCEventStartStreamingSuccess       = 14704,  //开始串流成功
+    HMCCEventStartStreamingFailed        = 14705,  //开始串流失败
+    HMCCEventGameMaintenance             = 14706,  //游戏维护中
+    HMCCEventNoRemainingTime             = 14707,  //无游戏时长
+    HMCCEventDNSRequestIPStart           = 12514,  //开始请求ip地址
+    HMCCEventDNSRequestIPSuccess         = 12515,  //请求ip地址成功
+    HMCCEventDNSRequestIPFail            = 12516,  //请求ip地址失败
+    HMCCEventStartStreamingMode          = 12727,  //开始设置流模式
+    HMCCEventStreamingModeSuccess        = 12728,  //设置流模式成功
+    HMCCEventStreamingModeFail           = 12729,  //设置流模式失败
+    HMCCEventChangeDomainReconnect       = 12124,  //换域名重试
 };
 
 @interface HMCloudPlayerRecordEvent : NSObject

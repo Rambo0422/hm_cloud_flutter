@@ -23,6 +23,18 @@
 #define RTC_OBJC_EXPORT
 #endif
 
+#ifdef WEBRTC_ENABLE_OBJC_SYMBOL_HM_EXPORT
+
+#if defined(WEBRTC_LIBRARY_IMPL)
+#define RTC_OBJC_HM_EXPORT __attribute__((visibility("default")))
+#endif
+
+#endif  // WEBRTC_ENABLE_OBJC_SYMBOL_HM_EXPORT
+
+#ifndef RTC_OBJC_HM_EXPORT
+#define RTC_OBJC_HM_EXPORT
+#endif
+
 // Internal macros used to correctly concatenate symbols.
 #define RTC_SYMBOL_CONCAT_HELPER(a, b) a##b
 #define RTC_SYMBOL_CONCAT(a, b) RTC_SYMBOL_CONCAT_HELPER(a, b)
@@ -51,6 +63,12 @@
 #define RTC_EXTERN extern "C" RTC_OBJC_EXPORT
 #else
 #define RTC_EXTERN extern RTC_OBJC_EXPORT
+#endif
+
+#if defined(__cplusplus)
+#define RTC_HM_EXTERN extern "C" RTC_OBJC_HM_EXPORT
+#else
+#define RTC_HM_EXTERN extern RTC_OBJC_HM_EXPORT
 #endif
 
 #ifdef __OBJC__

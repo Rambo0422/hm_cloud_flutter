@@ -20,4 +20,4 @@ FOUNDATION_EXPORT const unsigned char HMCloudPlayerCoreVersionString[];
 #import "HMCloudPlayerResolution.h"
 #import "HMCloudPlayerFileDownloader.h"
 #import "HMCloudPlayerRecordEvent.h"
-//#import "HMCloudPlayerWSMessage.h"
+#import "HMLogger.h"

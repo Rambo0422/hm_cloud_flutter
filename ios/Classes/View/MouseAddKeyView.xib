@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="landscape" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="MouseAddKeyView">
+            <rect key="frame" x="0.0" y="0.0" width="1020" height="259"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="Xmu-Fp-IAY">
+                    <rect key="frame" x="69" y="84.666666666666686" width="882" height="90"/>
+                    <subviews>
+                        <button opaque="NO" tag="1" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hkU-l3-6eH" customClass="SPButton">
+                            <rect key="frame" x="0.0" y="0.0" width="126" height="90"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                            <state key="normal" title="左键" image="mouse_left.png"/>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="number" keyPath="imagePosition">
+                                    <integer key="value" value="2"/>
+                                </userDefinedRuntimeAttribute>
+                                <userDefinedRuntimeAttribute type="number" keyPath="imageTitleSpace">
+                                    <real key="value" value="6"/>
+                                </userDefinedRuntimeAttribute>
+                            </userDefinedRuntimeAttributes>
+                            <connections>
+                                <action selector="didTapKey:" destination="iN0-l3-epB" eventType="touchUpInside" id="7nk-CB-775"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" tag="2" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="osr-NJ-0Zn" customClass="SPButton">
+                            <rect key="frame" x="126" y="0.0" width="126" height="90"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                            <state key="normal" title="右键" image="mouse_right.png"/>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="number" keyPath="imagePosition">
+                                    <integer key="value" value="2"/>
+                                </userDefinedRuntimeAttribute>
+                                <userDefinedRuntimeAttribute type="number" keyPath="imageTitleSpace">
+                                    <real key="value" value="6"/>
+                                </userDefinedRuntimeAttribute>
+                            </userDefinedRuntimeAttributes>
+                            <connections>
+                                <action selector="didTapKey:" destination="iN0-l3-epB" eventType="touchUpInside" id="VpS-5e-EnM"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" tag="3" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uR7-AM-adw" customClass="SPButton">
+                            <rect key="frame" x="252" y="0.0" width="126" height="90"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                            <state key="normal" title="中键" image="mouse_center.png"/>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="number" keyPath="imagePosition">
+                                    <integer key="value" value="2"/>
+                                </userDefinedRuntimeAttribute>
+                                <userDefinedRuntimeAttribute type="number" keyPath="imageTitleSpace">
+                                    <real key="value" value="6"/>
+                                </userDefinedRuntimeAttribute>
+                            </userDefinedRuntimeAttributes>
+                            <connections>
+                                <action selector="didTapKey:" destination="iN0-l3-epB" eventType="touchUpInside" id="gzK-2F-nss"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" tag="4" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="y0p-0V-Fjy" customClass="SPButton">
+                            <rect key="frame" x="378" y="0.0" width="126" height="90"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                            <state key="normal" title="滚轮上" image="mouse_up.png"/>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="number" keyPath="imagePosition">
+                                    <integer key="value" value="2"/>
+                                </userDefinedRuntimeAttribute>
+                                <userDefinedRuntimeAttribute type="number" keyPath="imageTitleSpace">
+                                    <real key="value" value="6"/>
+                                </userDefinedRuntimeAttribute>
+                            </userDefinedRuntimeAttributes>
+                            <connections>
+                                <action selector="didTapKey:" destination="iN0-l3-epB" eventType="touchUpInside" id="Qex-26-iHx"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" tag="5" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Fln-ZL-keu" customClass="SPButton">
+                            <rect key="frame" x="504" y="0.0" width="126" height="90"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                            <state key="normal" title="滚轮下" image="mouse_down.png"/>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="number" keyPath="imagePosition">
+                                    <integer key="value" value="2"/>
+                                </userDefinedRuntimeAttribute>
+                                <userDefinedRuntimeAttribute type="number" keyPath="imageTitleSpace">
+                                    <real key="value" value="6"/>
+                                </userDefinedRuntimeAttribute>
+                            </userDefinedRuntimeAttributes>
+                            <connections>
+                                <action selector="didTapKey:" destination="iN0-l3-epB" eventType="touchUpInside" id="FbG-v5-VXF"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" tag="6" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oqd-vE-zIs" customClass="SPButton">
+                            <rect key="frame" x="630" y="0.0" width="126" height="90"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                            <state key="normal" title="上下左右轮盘" image="rock_arrow.png"/>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="number" keyPath="imagePosition">
+                                    <integer key="value" value="2"/>
+                                </userDefinedRuntimeAttribute>
+                                <userDefinedRuntimeAttribute type="number" keyPath="imageTitleSpace">
+                                    <real key="value" value="6"/>
+                                </userDefinedRuntimeAttribute>
+                            </userDefinedRuntimeAttributes>
+                            <connections>
+                                <action selector="didTapKey:" destination="iN0-l3-epB" eventType="touchUpInside" id="haL-za-sTO"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" tag="7" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Rw7-1K-9Bo" customClass="SPButton">
+                            <rect key="frame" x="756" y="0.0" width="126" height="90"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                            <state key="normal" title="WASD轮盘" image="rock_wasd.png"/>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="number" keyPath="imagePosition">
+                                    <integer key="value" value="2"/>
+                                </userDefinedRuntimeAttribute>
+                                <userDefinedRuntimeAttribute type="number" keyPath="imageTitleSpace">
+                                    <real key="value" value="6"/>
+                                </userDefinedRuntimeAttribute>
+                            </userDefinedRuntimeAttributes>
+                            <connections>
+                                <action selector="didTapKey:" destination="iN0-l3-epB" eventType="touchUpInside" id="NbO-XR-6Ck"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="90" id="Ckh-l4-tFD"/>
+                    </constraints>
+                </stackView>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <constraints>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="Xmu-Fp-IAY" secondAttribute="trailing" constant="10" id="5eu-VA-89M"/>
+                <constraint firstItem="Xmu-Fp-IAY" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="10" id="V8S-94-JcP"/>
+                <constraint firstItem="Xmu-Fp-IAY" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="bIK-BZ-YKb"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <point key="canvasLocation" x="209.85915492957747" y="-139.69465648854961"/>
+        </view>
+    </objects>
+    <designables>
+        <designable name="Fln-ZL-keu">
+            <size key="intrinsicContentSize" width="102" height="65"/>
+        </designable>
+        <designable name="Rw7-1K-9Bo">
+            <size key="intrinsicContentSize" width="127" height="65"/>
+        </designable>
+        <designable name="hkU-l3-6eH">
+            <size key="intrinsicContentSize" width="90" height="65"/>
+        </designable>
+        <designable name="oqd-vE-zIs">
+            <size key="intrinsicContentSize" width="139" height="65"/>
+        </designable>
+        <designable name="osr-NJ-0Zn">
+            <size key="intrinsicContentSize" width="90" height="65"/>
+        </designable>
+        <designable name="uR7-AM-adw">
+            <size key="intrinsicContentSize" width="90" height="65"/>
+        </designable>
+        <designable name="y0p-0V-Fjy">
+            <size key="intrinsicContentSize" width="102" height="65"/>
+        </designable>
+    </designables>
+    <resources>
+        <image name="mouse_center.png" width="65" height="65"/>
+        <image name="mouse_down.png" width="65" height="65"/>
+        <image name="mouse_left.png" width="65" height="65"/>
+        <image name="mouse_right.png" width="65" height="65"/>
+        <image name="mouse_up.png" width="65" height="65"/>
+        <image name="rock_arrow.png" width="65" height="65"/>
+        <image name="rock_wasd.png" width="65" height="65"/>
+    </resources>
+</document>

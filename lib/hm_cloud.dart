@@ -102,11 +102,13 @@ class HmCloudController {
     methodChannel.invokeMethod('updatePlayTime', playTime);
   }
 
-  void updatePlayInfo(Map<String, int> map) {
-
+// 购买成功通知
+  void buySuccess() {
+    methodChannel.invokeMethod('buySuccess', null);
   }
 
-  void buySuccess() {
-
+// 更新可玩时长，vip过期时间，高峰时长
+  void updatePlayInfo(Map<String, dynamic> params) {
+    methodChannel.invokeMethod('updatePlayInfo', params);
   }
 }

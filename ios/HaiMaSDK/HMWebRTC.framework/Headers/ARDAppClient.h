@@ -17,13 +17,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-RTC_EXTERN const NSString *kConfigKeyLog;               //是否打印日志 @YES or  @NO
-RTC_EXTERN const NSString *kConfigKeyReconnect;         //是否自动重连 @YES or  @NO
-RTC_EXTERN const NSString *kConfigKeyReconnectAttempts; //自动重连最大次数 NSNumber, int
-RTC_EXTERN const NSString *kConfigKeyReconnectWait;     //自动重连等待时间 float 单位：s
-RTC_EXTERN const NSString *kConfigKeyReconnectWaitMax;  //自动重连最大等待时间 float 单位：s
-RTC_EXTERN const NSString *kConfigKeyConnectTimeout;    //Signal连接超时时间 float 单位：s
-RTC_EXTERN const NSString *kConfigKeyForceWebsockets;   //是否强制使用weboskcets  @YES or  @NO
+RTC_HM_EXTERN const NSString *kConfigKeyLog;               //是否打印日志 @YES or  @NO
+RTC_HM_EXTERN const NSString *kConfigKeyReconnect;         //是否自动重连 @YES or  @NO
+RTC_HM_EXTERN const NSString *kConfigKeyReconnectAttempts; //自动重连最大次数 NSNumber, int
+RTC_HM_EXTERN const NSString *kConfigKeyReconnectWait;     //自动重连等待时间 float 单位：s
+RTC_HM_EXTERN const NSString *kConfigKeyReconnectWaitMax;  //自动重连最大等待时间 float 单位：s
+RTC_HM_EXTERN const NSString *kConfigKeyConnectTimeout;    //Signal连接超时时间 float 单位：s
+RTC_HM_EXTERN const NSString *kConfigKeyForceWebsockets;   //是否强制使用weboskcets  @YES or  @NO
 
 typedef NS_ENUM(NSInteger, RTC_OBJC_TYPE(ARDAppStreamType)) {
     kARDAppStreamTypeUnknown,
@@ -71,7 +71,7 @@ typedef NS_ENUM(NSInteger, RTC_OBJC_TYPE(ARDAppClientStatus)) {
 };
 
 //extern const NSString* ARDAppClientStatusString(RTC_OBJC_TYPE (ARDAppClientStatus) status);
-RTC_EXTERN const NSString* ARDAppClientStatusString(RTC_OBJC_TYPE (ARDAppClientStatus) status);
+RTC_HM_EXTERN const NSString* ARDAppClientStatusString(RTC_OBJC_TYPE (ARDAppClientStatus) status);
 
 typedef NS_ENUM(NSInteger, RTC_OBJC_TYPE(ARDAppClientErrorCode)) {
     //connectWithParameter 方法错误回调
@@ -107,7 +107,7 @@ typedef NS_ENUM(NSInteger, RTC_OBJC_TYPE(ARDAudioSessionCategory)) {
 
 // Handles connections to the AppRTC server for a given room. Methods on this
 // class should only be called from the main queue.
-RTC_OBJC_EXPORT
+RTC_OBJC_HM_EXPORT
 @interface RTC_OBJC_TYPE (ARDAppClient) : NSObject
 
 // If |shouldGetStats| is true, stats will be reported in 1s intervals through
@@ -115,7 +115,7 @@ RTC_OBJC_EXPORT
 @property(nonatomic, assign) BOOL shouldGetStats;
 
 @property(nonatomic, weak) id<RTC_OBJC_TYPE (ARDAppClientDelegate)> delegate;
-@property(nonatomic, readonly) __kindof UIView<HMRTCVideoRenderer> *rtcVideoView;
+@property(nonatomic, readonly) __kindof UIView<RTC_OBJC_TYPE(RTCVideoRenderer)> *rtcVideoView;
 
 // Convenience constructor since all expected use cases will need a delegate
 // in order to receive remote tracks.
@@ -147,6 +147,7 @@ RTC_OBJC_EXPORT
 
 // for x86 to setting offer sdp
 - (void) settingRemoteOfferSdp:(NSString*)sdp;
+// 一次最大可发送256000字节，发送返回false时，稍后重试。
 - (BOOL) sendDataWithDataBuffer:(NSData *)data withDC:(RTC_OBJC_TYPE (RTCDataChannel)*)dc;
 
 // for media capture
@@ -167,7 +168,7 @@ RTC_OBJC_EXPORT
 
 // The delegate is informed of pertinent events and will be called on the
 // main queue.
-RTC_OBJC_EXPORT
+RTC_OBJC_HM_EXPORT
 @protocol RTC_OBJC_TYPE (ARDAppClientDelegate) <NSObject>
 
 /// ARDAppClient Status Changed callback, desp is error description if not nil
@@ -199,9 +200,16 @@ RTC_OBJC_EXPORT
 
 - (void)appClientDataChannelConnected;
 
+/** Called when remote terminal video encoding has kindly adapted down. */
+- (void)appClient:(RTC_OBJC_TYPE (ARDAppClient) *)client
+    didRemoteVideoEncodeAdaptationWithCodecName:(NSString *)codecName
+                                            fps:(int)fps
+                                          width:(int)width
+                                         height:(int)height;
+
 @end
 
-RTC_OBJC_EXPORT
+RTC_OBJC_HM_EXPORT
 @interface RTC_OBJC_TYPE (ARDAppClientParameter) : NSObject
 
 /// ARDAppClientParameter Initializer
@@ -210,7 +218,11 @@ RTC_OBJC_EXPORT
 /// @param iceServerUrls  ice server uls
 + (instancetype) instanceWithRoomId:(NSString *)roomId
                     signalServerUrl:(NSString *)signalServerUrl
-                      iceServerUrls:(NSArray<NSString *> *)iceServerUrls;
+                    signalServerV2Url:(NSString *)signalServerV2Url
+                    iceServerUrls:(NSArray<NSString *> *)iceServerUrls
+                    deviceId:(NSString *)deviceId
+                    userId:(NSString *)userId
+                    sdkVersion:(NSString *)saasSdkVersion;
 
 /// ARDAppClientParameter Initializer
 /// @param roomId  roomId
@@ -219,11 +231,15 @@ RTC_OBJC_EXPORT
 /// @param config rtc configs
 + (instancetype) instanceWithRoomId:(NSString *)roomId
                     signalServerUrl:(NSString *)signalServerUrl
-                      iceServerUrls:(NSArray<NSString *> *)iceServerUrls
-                             config:(NSDictionary * __nullable)config;
+                    signalServerV2Url:(NSString *)signalServerV2Url
+                    iceServerUrls:(NSArray<NSString *> *)iceServerUrls
+                    config:(NSDictionary * __nullable)config
+                    deviceId:(NSString *)deviceId
+                    userId:(NSString *)userId
+                    sdkVersion:(NSString *)saasSdkVersion;
 @end
 
-RTC_OBJC_EXPORT
+RTC_OBJC_HM_EXPORT
 @interface RTC_OBJC_TYPE (ARDAppClientDelayInfo) : NSObject
 // 采集时间|网络耗时|解码耗时|渲染耗时|单帧耗时|采集延迟|帧大小|展示帧率|推流帧率|码率|乒乓耗时|感知延迟｜丢包率
 //采集时间，Date.now()，ms
@@ -319,10 +335,13 @@ RTC_OBJC_EXPORT
 @property(nonatomic, assign) long videoSendFps;
 // streamer端统计的发送码率，单位是kbps. streamerReports: `sendKbps`
 @property(nonatomic, assign) long videoSendKbps;
-
+// video frame width
+@property (nonatomic, assign) long frameWidth;
+// video frame height
+@property (nonatomic, assign) long frameHeight;
 @end
 
-RTC_OBJC_EXPORT
+RTC_OBJC_HM_EXPORT
 @interface RTC_OBJC_TYPE (ARDAppClientRtcConfig) : NSObject
 @property (nonatomic, copy) NSNumber *dropClientCandidate;
 @property (nonatomic, copy) NSNumber *connPingIntervalMs;
