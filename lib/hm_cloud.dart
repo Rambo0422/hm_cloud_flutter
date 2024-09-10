@@ -101,4 +101,12 @@ class HmCloudController {
   void updatePlayTime(int playTime) {
     methodChannel.invokeMethod('updatePlayTime', playTime);
   }
+
+  void updatePlayInfo(Map<String, int> map) {
+
+  }
+
+  void buySuccess() {
+
+  }
 }
