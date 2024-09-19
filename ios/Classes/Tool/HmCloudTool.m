@@ -21,16 +21,13 @@
 
 @implementation HmCloudTool
 
-//return {
-//        "account": StringUtils.rsaEncrypt(gameAccount.username),
-//        "password": StringUtils.rsaEncrypt(gameAccount.password),
-//        "platform_game_id": StringUtils.rsaEncrypt(gameTokenInfo.runPath),
-//        "key": StringUtils.rsaEncrypt(gameAccount.key),
-//        "token": StringUtils.rsaEncrypt(gameAccount.token),
-//        "gameid": gameAccount.gameId,
-//        "userid": UserInfo.userId.value,
-//        "platform": gameTokenInfo.runPlatform,
-//      };
+- (NSMutableSet<NSNumber *> *)xboxKeyList {
+    if (!_xboxKeyList) {
+        _xboxKeyList = [NSMutableSet set];
+    }
+
+    return _xboxKeyList;
+}
 
 + (NSDictionary *)mj_replacedKeyFromPropertyName {
     return @{
@@ -83,12 +80,10 @@
     self.delegate = delegate;
     NSLog(@" =============== SDK_VERSION : %@", CLOUDGAME_SDK_VERSION);
 
-    
     if ([HmCloudTool share].playTime.integerValue < 0) {
-    
         [ErrorAlertView showAlertWithCid:[HMCloudPlayer sharedCloudPlayer].cloudId
                                      uid:self.userId
-                               errorCode:[NSString stringWithFormat:@"-1(%ld)",[HmCloudTool share].playTime.integerValue]
+                               errorCode:[NSString stringWithFormat:@"-1(%ld)", [HmCloudTool share].playTime.integerValue]
                                    title:@"特殊错误，请联系客服!"
                                  content:nil
                         dissMissCallback:^{
@@ -99,9 +94,10 @@
         }];
         return;
     }
-    
-    
-    
+
+//    [self pushPreView];
+//    return;
+
     [[HMCloudPlayer sharedCloudPlayer] setDelegate:self];
     [[HMCloudPlayer sharedCloudPlayer] registCloudPlayer:self.accessKeyId channelId:self.channelName options:nil];
 }
@@ -142,6 +138,10 @@
     }
                                                 fail:^(NSString *errorCode) {
     }];
+}
+
+- (BOOL)convertToPcMouseModel:(BOOL)model {
+    return [[HMCloudPlayer sharedCloudPlayer] convertToPcMouseModel:model];
 }
 
 - (void)pushPreView {
@@ -326,7 +326,6 @@
     if ([state isEqualToString:@"success"]) {
         [self initGameVC];
     } else if ([state isEqualToString:@"failed"]) {
-        
         NSString *errorCode = [info objectForKey:@"errorCode"];
 
         [ErrorAlertView showAlertWithCid:[HMCloudPlayer sharedCloudPlayer].cloudId
@@ -586,13 +585,7 @@
         NSString *base64String = [data base64EncodedStringWithOptions:0];
 
 
-
-        HMIntentExtraData *extraData = [[HMIntentExtraData alloc] init];
-        extraData.stringExtra = [self stringExtraDataDict];
-
-
-
-        NSDictionary *gameOptions = @{
+        NSMutableDictionary *gameOptions = @{
                 CloudGameOptionKeyId: self.gamePkName,
                 CloudGameOptionKeyOrientation: @(0),
                 CloudGameOptionKeyUserId: self.userId,
@@ -606,9 +599,15 @@
                 CloudGameOptionKeyAppChannel: self.channelName,
                 CloudGameOptionKeyStreamType: @(CloudCoreStreamingTypeRTC),
                 CloudGameOptionKeyPriority: self.priority,
-                CloudGameOptionKeyIntentExtraData: extraData,
-                CloudGameOptionKeyComponentType: @(CloudPlayerComponentTypeActivity),
-        };
+            }.mutableCopy;
+
+        if (self.account.length || self.password.length || self.key.length || self.accountToken.length || self.accountGameid.length || self.accountUserid.length) {
+            HMIntentExtraData *extraData = [[HMIntentExtraData alloc] init];
+            extraData.stringExtra = [self stringExtraDataDict];
+
+            [gameOptions setObject:extraData forKey:CloudGameOptionKeyIntentExtraData];
+            [gameOptions setObject:@(CloudPlayerComponentTypeActivity) forKey:CloudGameOptionKeyComponentType];
+        }
 
         self.gameVC = [[HMCloudPlayer sharedCloudPlayer] prepare:gameOptions];
     });
@@ -619,7 +618,7 @@
 
     if (self.account.length && self.password.length) {
         value = [NSString stringWithFormat:@"--platform=%@ --userid=%@ --gameid=%@ --account=%@ --password=%@ --platform_game_id=%@", self.platform, self.accountUserid, self.accountGameid, self.account, self.password, self.platform_game_id];
-    } else if (self.account.length && self.password.length) {
+    } else if (self.key.length && self.accountToken.length) {
         value = [NSString stringWithFormat:@"--platform=%@ --userid=%@ --gameid=%@ --token=%@ --key=%@ --platform_game_id=%@ --mode=1", self.platform, self.accountUserid, self.accountGameid, self.accountToken, self.key, self.platform_game_id];
     } else {
         value = [NSString stringWithFormat:@"--platform=%@ --userid=%@ --gameid=%@ --platform_game_id=%@", self.platform, self.accountUserid, self.accountGameid, self.platform_game_id];

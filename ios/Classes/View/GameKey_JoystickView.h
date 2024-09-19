@@ -11,7 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 typedef void (^PointCallback)(CGPoint point);
 
-@interface JoystickView : BaseKeyView
+@interface GameKey_JoystickView : BaseKeyView
 
 @property (nonatomic, strong) UIImage *bgImg;
 @property (nonatomic, strong) UIImage *thumbImg;

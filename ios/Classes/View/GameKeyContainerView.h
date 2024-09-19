@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface GameKeyView : UIView
+@interface GameKeyContainerView : UIView
 
 - (instancetype)initWithEdit:(BOOL)isEdit;
 

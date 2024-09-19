@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface GameButtonView : BaseKeyView
+@interface GameKey_ButtonView : BaseKeyView
 
 
 @end

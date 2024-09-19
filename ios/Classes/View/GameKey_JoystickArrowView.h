@@ -23,7 +23,7 @@ typedef enum : NSUInteger {
 
 typedef void (^DirectionCallback)(Direction oldD, Direction newD);
 
-@interface JoystickArrowView : BaseKeyView
+@interface GameKey_JoystickArrowView : BaseKeyView
 
 @property (nonatomic, strong) UIImage *bgImg;
 @property (nonatomic, strong) UIImage *thumbImg;

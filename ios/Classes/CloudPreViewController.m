@@ -11,8 +11,7 @@
 #import "CustomSelectViewController.h"
 #import "CustomSlider.h"
 #import "GameDetailsModel.h"
-#import "GameKeyView.h"
-#import "GameKeyView.h"
+#import "GameKeyContainerView.h"
 #import "HmCloudTool.h"
 #import "RequestTool.h"
 
@@ -70,10 +69,10 @@ typedef enum : NSUInteger {
 @property (nonatomic, assign) float packetLoss;
 @property (nonatomic, assign) BOOL isWifi;
 
-@property (nonatomic, strong) NSMutableArray<KeyModel *> *keyboardList;
-@property (nonatomic, strong) NSMutableArray<KeyModel *> *joystickList;
+@property (nonatomic, strong) NSMutableArray<KeyDetailModel *> *keyboardList;
+@property (nonatomic, strong) NSMutableArray<KeyDetailModel *> *joystickList;
 
-@property (nonatomic, strong) GameKeyView *keyView;
+@property (nonatomic, strong) GameKeyContainerView *keyView;
 
 @property (nonatomic, strong) GameDetailsModel *gameDetails;
 
@@ -111,6 +110,21 @@ typedef enum : NSUInteger {
     NSDateComponentsFormatter *_countDownFormatter;
 }
 
+- (NSMutableArray<KeyDetailModel *> *)joystickList {
+    if (!_joystickList) {
+        _joystickList = [NSMutableArray array];
+    }
+
+    return _joystickList;
+}
+
+- (NSMutableArray<KeyDetailModel *> *)keyboardList {
+    if (!_keyboardList) {
+        _keyboardList = [NSMutableArray array];
+    }
+
+    return _keyboardList;
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -333,21 +347,9 @@ typedef enum : NSUInteger {
 
     [[self.customBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
         @strongify(self);
-        @strongify(tool);
 
-        if ([tool isVip]) {
-            [self hideSetView];
-            [self pushCustomKeyController];
-        } else {
-            [NormalAlertView showAlertWithTitle:nil
-                                        content:nil
-                                   confirmTitle:nil
-                                    cancelTitle:nil
-                                confirmCallback:^{
-                [self pushToFlutterPage:Flutter_rechartVip];
-            }
-                                 cancelCallback:nil];
-        }
+        [self hideSetView];
+        [self pushCustomKeyController];
     }];
 
     [[self.joystickBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
@@ -483,6 +485,8 @@ typedef enum : NSUInteger {
         self.isConnectGameControl = YES;
     }
 
+//    [[HmCloudTool share] convertToPcMouseModel:YES];
+
     // 初始化清晰度
     self.resolution = [HmCloudTool share].isVip ? Resolution_BD : Resolution_Low;
     [[HmCloudTool share] switchResolution:self.resolution];
@@ -498,7 +502,7 @@ typedef enum : NSUInteger {
 
     self.fuzhiBtn.layer.cornerRadius = 3.0;
 
-    self.keyView = [[GameKeyView alloc] initWithEdit:NO];
+    self.keyView = [[GameKeyContainerView alloc] initWithEdit:NO];
     [self.view insertSubview:self.keyView atIndex:0];
 
     [self.keyView mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -524,8 +528,6 @@ typedef enum : NSUInteger {
     _countDownFormatter.allowedUnits =  NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond;
     _countDownFormatter.zeroFormattingBehavior = NSDateComponentsFormatterZeroFormattingBehaviorPad;
 
-
-    NSInteger time = [HmCloudTool share].playTime.integerValue / 1000;
 
     NSString *countDownTime = [_countDownFormatter stringFromTimeInterval:[HmCloudTool share].playTime.integerValue / 1000];
 
@@ -616,7 +618,7 @@ typedef enum : NSUInteger {
 
 - (void)getJoystickAndSet:(BOOL)set {
     // 获取手柄配置，如果获取失败 则取本地的默认配置
-    [[RequestTool share] requestUrl:k_api_getKeyboard
+    [[RequestTool share] requestUrl:k_api_getKeyboard_v2
                          methodType:Request_GET
                              params:@{ @"type": @"1", @"game_id": [HmCloudTool share].gameId }
                       faildCallBack:^{
@@ -629,33 +631,126 @@ typedef enum : NSUInteger {
                                                          error:&error];
 
         if (!error) {
-            self.joystickList = [[KeyModel mj_objectArrayWithKeyValuesArray:arr] mutableCopy];
+            KeyDetailModel *normalJoystick = [[KeyDetailModel alloc] init];
+            normalJoystick.keyboard = [KeyModel mj_objectArrayWithKeyValuesArray:arr];
+            normalJoystick.isOfficial = YES;
+            normalJoystick.type = TypeJoystick;
+            [self.joystickList addObject:normalJoystick];
 
-            if (set) {
-                self.keyView.keyList = self.joystickList;
-            }
+            [self getCustomJoystick:set];
         }
     }
                     successCallBack:^(id _Nonnull obj) {
-        self.joystickList = [[KeyModel mj_objectArrayWithKeyValuesArray:obj[@"data"][@"keyboard"]] mutableCopy];
+        // 有默认手柄 则正常处理，如果没有默认手柄 看上面faildCallback 👆🏻
+        KeyDetailModel *normalJoystick = [KeyDetailModel mj_objectWithKeyValues:obj[@"data"]];
+        normalJoystick.isOfficial = YES;
+        normalJoystick.type = TypeJoystick;
+        [self.joystickList addObject:normalJoystick];
+
+        [self getCustomJoystick:set];
+    }];
+}
+
+- (void)getCustomJoystick:(BOOL)set {
+    [[RequestTool share] requestUrl:k_api_getKeyboard_custom_v2
+                         methodType:Request_GET
+                             params:@{ @"type": @"1", @"game_id": [HmCloudTool share].gameId, @"page": @"1", @"size": @"3" }
+                      faildCallBack:^{
+        KeyDetailModel *m = self.joystickList.firstObject;
+        m.use = YES;
 
         if (set) {
-            self.keyView.keyList = self.joystickList;
+            self.keyView.keyList = [m.keyboard mutableCopy];
         }
+    }
+
+                    successCallBack:^(id _Nonnull obj) {
+        __block BOOL isUseOfficial = YES;
+
+        NSArray *temp = [[KeyDetailModel mj_objectArrayWithKeyValuesArray:obj[@"data"][@"datas"]] mapUsingBlock:^id _Nullable (KeyDetailModel *_Nonnull obj, NSUInteger idx) {
+            if (obj.use) {
+                isUseOfficial = NO;
+            }
+
+            return obj;
+        }];
+
+        if (isUseOfficial) {
+            KeyDetailModel *m = self.joystickList.firstObject;
+            m.use = YES;
+        }
+
+        [self.joystickList addObjectsFromArray:temp];
+
+
+        [self.joystickList enumerateObjectsUsingBlock:^(KeyDetailModel *_Nonnull obj, NSUInteger idx, BOOL *_Nonnull stop) {
+            if (obj.use) {
+                if (set) {
+                    self.keyView.keyList = [obj.keyboard mutableCopy];
+                }
+
+                *stop = YES;
+            }
+        }];
     }];
 }
 
 - (void)getKeyboardAndSet:(BOOL)set {
-    [[RequestTool share] requestUrl:k_api_getKeyboard
+    [[RequestTool share] requestUrl:k_api_getKeyboard_v2
                          methodType:Request_GET
                              params:@{ @"type": @"2", @"game_id": [HmCloudTool share].gameId }
                       faildCallBack:nil
                     successCallBack:^(id _Nonnull obj) {
-        self.keyboardList = [[KeyModel mj_objectArrayWithKeyValuesArray:obj[@"data"][@"keyboard"]] mutableCopy];
+        KeyDetailModel *normalKeyboard = [KeyDetailModel mj_objectWithKeyValues:obj[@"data"]];
+        normalKeyboard.isOfficial = YES;
+        normalKeyboard.type = TypeKeyboard;
+        [self.keyboardList addObject:normalKeyboard];
+
+        [self getCustomKeyboard:set];
+    }];
+}
+
+- (void)getCustomKeyboard:(BOOL)set {
+    [[RequestTool share] requestUrl:k_api_getKeyboard_custom_v2
+                         methodType:Request_GET
+                             params:@{ @"type": @"2", @"game_id": [HmCloudTool share].gameId, @"page": @"1", @"size": @"3" }
+                      faildCallBack:^{
+        KeyDetailModel *m = self.keyboardList.firstObject;
+        m.use = YES;
 
         if (set) {
-            self.keyView.keyList = self.keyboardList;
+            self.keyView.keyList = [m.keyboard mutableCopy];
         }
+    }
+
+                    successCallBack:^(id _Nonnull obj) {
+        __block BOOL isUseOfficial = YES;
+
+        NSArray *temp = [[KeyDetailModel mj_objectArrayWithKeyValuesArray:obj[@"data"][@"datas"]] mapUsingBlock:^id _Nullable (KeyDetailModel *_Nonnull obj, NSUInteger idx) {
+            if (obj.use) {
+                isUseOfficial = NO;
+            }
+
+            return obj;
+        }];
+
+        if (isUseOfficial) {
+            KeyDetailModel *m = self.keyboardList.firstObject;
+            m.use = YES;
+        }
+
+        [self.keyboardList addObjectsFromArray:temp];
+
+
+        [self.keyboardList enumerateObjectsUsingBlock:^(KeyDetailModel *_Nonnull obj, NSUInteger idx, BOOL *_Nonnull stop) {
+            if (obj.use) {
+                if (set) {
+                    self.keyView.keyList = [obj.keyboard mutableCopy];
+                }
+
+                *stop = YES;
+            }
+        }];
     }];
 }
 
@@ -690,27 +785,24 @@ typedef enum : NSUInteger {
     vc.modalPresentationStyle = UIModalPresentationCustom;
     vc.transitioningDelegate = self;
     @weakify(self);
-    vc.selectCallback = ^(CustomType type) {
+
+    vc.useCallback = ^(KeyDetailModel *_Nonnull model) {
         @strongify(self);
-        CustomKeyViewController *vc = [[CustomKeyViewController alloc] initWithNibName:@"CustomKeyViewController"
-                                                                                bundle:k_SanABundle];
-        vc.modalPresentationStyle = UIModalPresentationCustom;
-        vc.transitioningDelegate = self;
-        vc.type = type;
-        @weakify(self);
-        vc.dismissCallback = ^(BOOL isSave) {
-            @strongify(self);
-            self.keyView.hidden = NO;
 
-            if (isSave) {
-                [self request];
-            }
-        };
-        [self presentViewController:vc
-                           animated:YES
-                         completion:nil];
+        if (model.type == TypeJoystick) {
+            self.currentOperation = 2;
+        }
 
-        self.keyView.hidden = YES;
+        if (model.type == TypeKeyboard) {
+            self.currentOperation = 1;
+        }
+
+        self.keyView.keyList = [model.keyboard mutableCopy];
+    };
+
+    vc.pushVipCallback = ^{
+        @strongify(self);
+        [self pushToFlutterPage:Flutter_rechartVip];
     };
 
     [self presentViewController:vc

@@ -6,9 +6,9 @@
 //
 
 
-#import "JoystickArrowView.h"
+#import "GameKey_JoystickArrowView.h"
 #import "SanA_Macro.h"
-@interface JoystickArrowView ()
+@interface GameKey_JoystickArrowView ()
 
 @property (nonatomic, strong) UIImageView *bgImgView;
 @property (nonatomic, strong) UIImageView *thumbImgView;
@@ -17,7 +17,7 @@
 
 @end
 
-@implementation JoystickArrowView
+@implementation GameKey_JoystickArrowView
 
 - (instancetype)initWithEidt:(BOOL)isEdit model:(nonnull KeyModel *)model {
     self = [super initWithEidt:isEdit model:model];
@@ -36,9 +36,6 @@
             make.centerY.equalTo(@0);
         }];
 
-        // 添加拖动手势识别器
-        UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
-        [self addGestureRecognizer:pan];
 
         self._d = DirectionNormal;
     }
@@ -61,61 +58,38 @@
     }
 }
 
-- (void)handlePan:(UIPanGestureRecognizer *)gestureRecognizer {
-    if (self.isEdit) {
-        UIView *draggedView = gestureRecognizer.view;
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    CGPoint location = [[touches anyObject] locationInView:self];
 
-        // 获取拖拽的位移
-        CGPoint translation = [gestureRecognizer translationInView:draggedView.superview];
+    [self updateCenterViewPositionWithLocation:location];
+}
 
-        // 根据拖拽的位移更新视图的位置
-        CGPoint newCenter = CGPointMake(draggedView.center.x + translation.x, draggedView.center.y + translation.y);
+- (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    CGPoint location = [[touches anyObject] locationInView:self];
 
-        // 获取屏幕边界
-        CGFloat halfWidth = CGRectGetWidth(draggedView.bounds) / 2.0;
-        CGFloat halfHeight = CGRectGetHeight(draggedView.bounds) / 2.0;
-        CGFloat screenWidth = CGRectGetWidth(draggedView.superview.bounds);
-        CGFloat screenHeight = CGRectGetHeight(draggedView.superview.bounds);
+    [self updateCenterViewPositionWithLocation:location];
+}
 
-        // 确保新中心点不会超出屏幕边界
-        newCenter.x = MAX(halfWidth, MIN(screenWidth - halfWidth, newCenter.x));
-        newCenter.y = MAX(halfHeight, MIN(screenHeight - halfHeight, newCenter.y));
+- (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    @weakify(self);
+    [UIView animateWithDuration:0.1
+                     animations:^{
+        @strongify(self);
+        self.thumbImgView.center = CGPointMake(CGRectGetMidX(self.bounds), CGRectGetMidY(self.bounds));
 
-        // 更新视图的位置
-        draggedView.center = newCenter;
+        [self reset];
+    }];
+}
 
+- (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    @weakify(self);
+    [UIView animateWithDuration:0.1
+                     animations:^{
+        @strongify(self);
+        self.thumbImgView.center = CGPointMake(CGRectGetMidX(self.bounds), CGRectGetMidY(self.bounds));
 
-        NSInteger top = (NSInteger)CGRectGetMinY(draggedView.frame);
-        NSInteger left = (NSInteger)CGRectGetMinX(draggedView.frame);
-
-
-        self.model.top = top / (kScreenH / 375.0);
-        self.model.left = left / (kScreenW / 667.0);
-
-
-        // 重置拖拽手势的累积位移
-        [gestureRecognizer setTranslation:CGPointZero inView:self.superview];
-
-        if (self.tapCallback) {
-            self.tapCallback(self.model);
-        }
-    } else {
-        CGPoint location = [gestureRecognizer locationInView:self];
-
-        @weakify(self);
-        [self updateCenterViewPositionWithLocation:location];
-
-        // 在手势结束时将中心视图移回圆心
-        if (gestureRecognizer.state == UIGestureRecognizerStateEnded) {
-            [UIView animateWithDuration:0.1
-                             animations:^{
-                @strongify(self);
-                self.thumbImgView.center = CGPointMake(CGRectGetMidX(self.bounds), CGRectGetMidY(self.bounds));
-
-                [self reset];
-            }];
-        }
-    }
+        [self reset];
+    }];
 }
 
 - (void)updateCenterViewPositionWithLocation:(CGPoint)location {

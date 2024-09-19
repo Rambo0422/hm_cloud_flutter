@@ -10,6 +10,8 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="CustomSelectViewController">
             <connections>
+                <outlet property="joystickCollectionView" destination="Yoh-R3-nTt" id="3Tm-3R-iWY"/>
+                <outlet property="keyboardCollectionView" destination="VQD-V4-NQG" id="oC0-Dh-s5n"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
         </placeholder>
@@ -18,49 +20,127 @@
             <rect key="frame" x="0.0" y="0.0" width="852" height="393"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <stackView opaque="NO" contentMode="scaleToFill" spacing="40" translatesAutoresizingMaskIntoConstraints="NO" id="amc-hR-iT6">
-                    <rect key="frame" x="186" y="121.66666666666669" width="480" height="150"/>
+                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="set_custom_bg.png" translatesAutoresizingMaskIntoConstraints="NO" id="Cu3-oc-Z0Z">
+                    <rect key="frame" x="0.0" y="0.0" width="852" height="393"/>
+                </imageView>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eZz-W7-Ww5">
+                    <rect key="frame" x="45" y="0.0" width="72" height="44"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="44" id="reA-lb-gIk"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                    <state key="normal" title="  更多按键" image="set_custom_back.png">
+                        <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    </state>
+                    <connections>
+                        <action selector="didTapDismiss:" destination="-1" eventType="touchUpInside" id="vuB-kK-M4H"/>
+                    </connections>
+                </button>
+                <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="equalCentering" translatesAutoresizingMaskIntoConstraints="NO" id="icV-Vi-uYe">
+                    <rect key="frame" x="55" y="49" width="742" height="318"/>
                     <subviews>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jYs-Pa-aGR">
-                            <rect key="frame" x="0.0" y="0.0" width="220" height="150"/>
-                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                            <state key="normal" image="set_custom_keyboard.png"/>
-                            <connections>
-                                <action selector="didTapKeyboard:" destination="-1" eventType="touchUpInside" id="A51-5R-aum"/>
-                            </connections>
-                        </button>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cp1-fy-ysg">
-                            <rect key="frame" x="260" y="0.0" width="220" height="150"/>
-                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                            <state key="normal" image="set_custom_joystick.png"/>
-                            <connections>
-                                <action selector="didTapJoystick:" destination="-1" eventType="touchUpInside" id="n0t-PP-ngl"/>
-                            </connections>
-                        </button>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="xAf-XQ-sRb">
+                            <rect key="frame" x="0.0" y="0.0" width="742" height="145"/>
+                            <subviews>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="手柄配置" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uWF-Wl-abU">
+                                    <rect key="frame" x="0.0" y="0.0" width="45" height="15"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="15" id="qoO-Od-9tJ"/>
+                                    </constraints>
+                                    <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                                    <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                                <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="Yoh-R3-nTt">
+                                    <rect key="frame" x="0.0" y="25" width="742" height="120"/>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="120" id="s7k-Vj-Fhv"/>
+                                    </constraints>
+                                    <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="7Y8-KB-n1M">
+                                        <size key="itemSize" width="128" height="128"/>
+                                        <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                        <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                        <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                    </collectionViewFlowLayout>
+                                    <connections>
+                                        <outlet property="dataSource" destination="-1" id="3r1-JK-Wwc"/>
+                                        <outlet property="delegate" destination="-1" id="UU2-Mi-fws"/>
+                                    </connections>
+                                </collectionView>
+                            </subviews>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <constraints>
+                                <constraint firstAttribute="bottom" secondItem="Yoh-R3-nTt" secondAttribute="bottom" id="5xP-DZ-rGc"/>
+                                <constraint firstItem="Yoh-R3-nTt" firstAttribute="leading" secondItem="xAf-XQ-sRb" secondAttribute="leading" id="Ad7-fS-Fzs"/>
+                                <constraint firstItem="uWF-Wl-abU" firstAttribute="top" secondItem="xAf-XQ-sRb" secondAttribute="top" id="FlC-uG-0Vc"/>
+                                <constraint firstAttribute="trailing" secondItem="Yoh-R3-nTt" secondAttribute="trailing" id="Mz6-WY-QCZ"/>
+                                <constraint firstItem="Yoh-R3-nTt" firstAttribute="top" secondItem="uWF-Wl-abU" secondAttribute="bottom" constant="10" id="UuG-o0-fkT"/>
+                                <constraint firstItem="uWF-Wl-abU" firstAttribute="leading" secondItem="xAf-XQ-sRb" secondAttribute="leading" id="oGq-WL-O6H"/>
+                            </constraints>
+                        </view>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mT0-v4-9li">
+                            <rect key="frame" x="0.0" y="173" width="742" height="145"/>
+                            <subviews>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="键盘配置" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1VR-zP-iHc">
+                                    <rect key="frame" x="0.0" y="0.0" width="45" height="15"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="15" id="Yxr-zn-oye"/>
+                                    </constraints>
+                                    <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                                    <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                                <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="VQD-V4-NQG">
+                                    <rect key="frame" x="0.0" y="25" width="742" height="120"/>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="120" id="7Vu-BF-SYc"/>
+                                    </constraints>
+                                    <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="r3C-wc-ioL">
+                                        <size key="itemSize" width="128" height="128"/>
+                                        <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                        <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                        <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                    </collectionViewFlowLayout>
+                                    <connections>
+                                        <outlet property="dataSource" destination="-1" id="7jU-Im-8pt"/>
+                                        <outlet property="delegate" destination="-1" id="vxB-r9-CC2"/>
+                                    </connections>
+                                </collectionView>
+                            </subviews>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <constraints>
+                                <constraint firstItem="VQD-V4-NQG" firstAttribute="top" secondItem="1VR-zP-iHc" secondAttribute="bottom" constant="10" id="JhX-uA-aXl"/>
+                                <constraint firstItem="1VR-zP-iHc" firstAttribute="leading" secondItem="mT0-v4-9li" secondAttribute="leading" id="K7o-AH-jDW"/>
+                                <constraint firstAttribute="trailing" secondItem="VQD-V4-NQG" secondAttribute="trailing" id="LoP-VS-WWh"/>
+                                <constraint firstItem="1VR-zP-iHc" firstAttribute="top" secondItem="mT0-v4-9li" secondAttribute="top" id="TVR-ya-xm2"/>
+                                <constraint firstItem="VQD-V4-NQG" firstAttribute="leading" secondItem="mT0-v4-9li" secondAttribute="leading" id="bfE-Z6-CHh"/>
+                                <constraint firstAttribute="bottom" secondItem="VQD-V4-NQG" secondAttribute="bottom" id="tzg-dR-5L5"/>
+                            </constraints>
+                        </view>
                     </subviews>
                 </stackView>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="选择自定义按键类型" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fqS-a9-lsY">
-                    <rect key="frame" x="348" y="76.333333333333329" width="156" height="20.333333333333329"/>
-                    <fontDescription key="fontDescription" type="system" weight="medium" pointSize="17"/>
-                    <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                    <nil key="highlightedColor"/>
-                </label>
             </subviews>
             <viewLayoutGuide key="safeArea" id="Q5M-cg-NOt"/>
-            <color key="backgroundColor" white="0.0" alpha="0.80000000000000004" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <constraints>
-                <constraint firstItem="fqS-a9-lsY" firstAttribute="centerX" secondItem="amc-hR-iT6" secondAttribute="centerX" id="HcX-Tk-k8n"/>
-                <constraint firstItem="amc-hR-iT6" firstAttribute="centerY" secondItem="i5M-Pr-FkT" secondAttribute="centerY" id="Lhm-el-uvb"/>
-                <constraint firstItem="amc-hR-iT6" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="QMX-SX-79F"/>
-                <constraint firstItem="amc-hR-iT6" firstAttribute="top" secondItem="fqS-a9-lsY" secondAttribute="bottom" constant="25" id="ksO-bX-WOi"/>
+                <constraint firstAttribute="bottom" secondItem="Cu3-oc-Z0Z" secondAttribute="bottom" id="964-ag-cth"/>
+                <constraint firstItem="Cu3-oc-Z0Z" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="CzG-JP-buq"/>
+                <constraint firstItem="Q5M-cg-NOt" firstAttribute="bottom" secondItem="icV-Vi-uYe" secondAttribute="bottom" constant="5" id="Kor-AG-7pV"/>
+                <constraint firstItem="eZz-W7-Ww5" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="45" id="UYL-kN-nPd"/>
+                <constraint firstAttribute="trailing" secondItem="Cu3-oc-Z0Z" secondAttribute="trailing" id="az2-y2-YEB"/>
+                <constraint firstItem="icV-Vi-uYe" firstAttribute="top" secondItem="eZz-W7-Ww5" secondAttribute="bottom" constant="5" id="iGK-H8-h2L"/>
+                <constraint firstAttribute="trailing" secondItem="icV-Vi-uYe" secondAttribute="trailing" constant="55" id="oM1-y6-wIA"/>
+                <constraint firstItem="Cu3-oc-Z0Z" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="oc4-iy-kZZ"/>
+                <constraint firstItem="eZz-W7-Ww5" firstAttribute="top" secondItem="Q5M-cg-NOt" secondAttribute="top" id="r34-CX-fhg"/>
+                <constraint firstItem="icV-Vi-uYe" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="55" id="sXU-Fw-T4v"/>
             </constraints>
-            <point key="canvasLocation" x="249" y="-13"/>
+            <point key="canvasLocation" x="248.59154929577466" y="-14.503816793893129"/>
         </view>
     </objects>
     <resources>
-        <image name="set_custom_joystick.png" width="220" height="150"/>
-        <image name="set_custom_keyboard.png" width="220" height="150"/>
+        <image name="set_custom_back.png" width="20" height="20"/>
+        <image name="set_custom_bg.png" width="812" height="375"/>
     </resources>
 </document>

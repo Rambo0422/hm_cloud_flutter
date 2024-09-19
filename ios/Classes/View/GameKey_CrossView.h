@@ -11,7 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 typedef void (^CrossCallback)(NSNumber *op);
 
-@interface CrossView : BaseKeyView
+@interface GameKey_CrossView : BaseKeyView
 
 @property (nonatomic, strong) CrossCallback callback;
 

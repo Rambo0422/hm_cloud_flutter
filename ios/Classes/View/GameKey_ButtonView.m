@@ -5,17 +5,17 @@
 //  Created by a水 on 2024/8/8.
 //
 
-#import "GameButtonView.h"
+#import "GameKey_ButtonView.h"
 #import "HmCloudTool.h"
 #import "SanA_Macro.h"
 
-@interface GameButtonView ()
+@interface GameKey_ButtonView ()
 
 @property (nonatomic, strong) UIButton *btn;
 
 @end
 
-@implementation GameButtonView
+@implementation GameKey_ButtonView
 
 - (instancetype)initWithEidt:(BOOL)isEdit model:(nonnull KeyModel *)model {
     self = [super initWithEidt:isEdit model:model];
@@ -44,57 +44,13 @@
         [self.btn setTitleColor:[kColor(0xFFFFFF) colorWithAlphaComponent:0.6] forState:UIControlStateNormal];
         self.btn.titleLabel.font = [UIFont systemFontOfSize:9];
 
-        if (self.isEdit) {
-            UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
-            [self addGestureRecognizer:pan];
-        } else {
+        if (!self.isEdit) {
             [self.btn addTarget:self action:@selector(didTapTouchUp) forControlEvents:UIControlEventTouchUpInside];
             [self.btn addTarget:self action:@selector(didTapTouchDown) forControlEvents:UIControlEventTouchDown];
         }
     }
 
     return self;
-}
-
-- (void)handlePan:(UIPanGestureRecognizer *)gestureRecognizer {
-    UIView *draggedView = gestureRecognizer.view;
-
-    // 获取拖拽的位移
-    CGPoint translation = [gestureRecognizer translationInView:draggedView.superview];
-
-    // 根据拖拽的位移更新视图的位置
-    CGPoint newCenter = CGPointMake(draggedView.center.x + translation.x, draggedView.center.y + translation.y);
-
-    // 获取屏幕边界
-    CGFloat halfWidth = CGRectGetWidth(draggedView.bounds) / 2.0;
-    CGFloat halfHeight = CGRectGetHeight(draggedView.bounds) / 2.0;
-    CGFloat screenWidth = CGRectGetWidth(draggedView.superview.bounds);
-    CGFloat screenHeight = CGRectGetHeight(draggedView.superview.bounds);
-
-    // 确保新中心点不会超出屏幕边界
-    newCenter.x = MAX(halfWidth, MIN(screenWidth - halfWidth, newCenter.x));
-    newCenter.y = MAX(halfHeight, MIN(screenHeight - halfHeight, newCenter.y));
-
-    // 更新视图的位置
-    draggedView.center = newCenter;
-
-
-    NSInteger top = (NSInteger)CGRectGetMinY(draggedView.frame);
-    NSInteger left = (NSInteger)CGRectGetMinX(draggedView.frame);
-
-    //    (_top * (kScreenH / 375.0)) = top;
-    //    (_left * (kScreenW / 667.0)) = left;
-
-    self.model.top = top / (kScreenH / 375.0);
-    self.model.left = left / (kScreenW / 667.0);
-
-
-    // 重置拖拽手势的累积位移
-    [gestureRecognizer setTranslation:CGPointZero inView:self.superview];
-
-    if (self.tapCallback) {
-        self.tapCallback(self.model);
-    }
 }
 
 /// MARK: 手指抬起
