@@ -52,7 +52,6 @@ class GameErrorDialog : DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         val window = dialog?.window
         window?.let {
-            it.addFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE)
             it.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN)
             val insetsController = WindowCompat.getInsetsController(it, it.decorView)
             insetsController.hide(WindowInsetsCompat.Type.statusBars())
@@ -65,9 +64,7 @@ class GameErrorDialog : DialogFragment() {
         showTitle()
         showSubTitle()
         dataBinding.btnLeft.setOnClickListener(leftBtnClickListener)
-        dataBinding.layoutBg.setOnClickListener {
-
-        }
+        dataBinding.btnLeft.requestFocus()
     }
 
     private fun showTitle() {
@@ -78,7 +75,7 @@ class GameErrorDialog : DialogFragment() {
         dataBinding.tvContent.text = subTitle
     }
 
-    class Builder(val activity: FragmentActivity) {
+    class Builder(private val activity: FragmentActivity) {
 
         private var title: String? = null
         private var subTitle: String? = null

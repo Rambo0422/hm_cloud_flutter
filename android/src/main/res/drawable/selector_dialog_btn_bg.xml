@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@drawable/shape_dialog_left_button_bg" android:state_focused="false" />
-    <item android:drawable="@drawable/shape_dialog_right_button_bg" android:state_focused="true" />
+    <item android:state_focused="false">
+        <shape android:shape="rectangle">
+            <corners android:radius="6dp" />
+            <solid android:color="#FF4C5360" />
+        </shape>
+    </item>
+    <item android:state_focused="true">
+        <shape android:shape="rectangle">
+            <corners android:radius="6dp" />
+            <solid android:color="#FFC6EC4B" />
+        </shape>
+    </item>
 </selector>

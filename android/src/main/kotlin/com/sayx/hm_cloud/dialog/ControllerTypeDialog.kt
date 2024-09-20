@@ -53,7 +53,6 @@ class ControllerTypeDialog : DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         val window = dialog?.window
         window?.let {
-            it.addFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE)
             it.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN)
             val insetsController = WindowCompat.getInsetsController(it, it.decorView)
             insetsController.hide(WindowInsetsCompat.Type.statusBars())

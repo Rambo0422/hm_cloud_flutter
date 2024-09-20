@@ -63,7 +63,6 @@ class AppCommonDialog : DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         val window = dialog?.window
         window?.let {
-            it.addFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE)
             it.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN)
             val insetsController = WindowCompat.getInsetsController(it, it.decorView)
             insetsController.hide(WindowInsetsCompat.Type.statusBars())
@@ -105,6 +104,7 @@ class AppCommonDialog : DialogFragment() {
 
     private fun showRightBtn() {
         dataBinding.btnRight.text = rightBtnText
+        dataBinding.btnRight.requestFocus()
     }
 
     override fun onStart() {
@@ -118,7 +118,7 @@ class AppCommonDialog : DialogFragment() {
         window?.attributes = windowParams
     }
 
-    class Builder(val activity: FragmentActivity) {
+    class Builder(private val activity: FragmentActivity) {
 
         private var title: CharSequence? = null
         private var titleColor: Int? = null

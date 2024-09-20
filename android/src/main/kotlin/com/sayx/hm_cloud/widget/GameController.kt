@@ -147,105 +147,6 @@ class GameController @JvmOverloads constructor(
         }
     }
 
-
-    fun checkAlignment(view: View) {
-        val viewCenterX = view.x + view.width / 2f
-        val viewCenterY = view.y + view.height / 2f
-
-        val centerX = width / 2f
-        val centerY = height / 2f
-
-        dataBinding.layoutMask.isCenterHorizontal =
-            abs(viewCenterX - centerX) <= SizeUtils.dp2px(4f)
-        dataBinding.layoutMask.isCenterVertical = abs(viewCenterY - centerY) <= SizeUtils.dp2px(4f)
-        if (dataBinding.layoutMask.isCenterHorizontal || dataBinding.layoutMask.isCenterVertical) {
-            // 居中对齐画居中对齐线
-            dataBinding.layoutMask.drawCenterLine(view)
-            return
-        }
-        val viewList =
-            if (controllerType == AppVirtualOperateType.APP_STICK_XBOX) gamepadViews else keyboardViews
-        var alignViews = mutableListOf<View>()
-        for (index in 0..<viewList.size) {
-            val child = viewList[index]
-            if (child == view || child.visibility != VISIBLE) {
-                continue
-            }
-            val leftAlign =
-                abs(ViewUtils.getViewLeft(view) - ViewUtils.getViewLeft(child)) <= SizeUtils.dp2px(
-                    4f
-                )
-            val leftRightAlign =
-                abs(ViewUtils.getViewLeft(view) - ViewUtils.getViewRight(child)) <= SizeUtils.dp2px(
-                    4f
-                )
-            val topAlign =
-                abs(ViewUtils.getViewTop(view) - ViewUtils.getViewTop(child)) <= SizeUtils.dp2px(
-                    4f
-                )
-            val topBottomAlign =
-                abs(ViewUtils.getViewTop(view) - ViewUtils.getViewBottom(child)) <= SizeUtils.dp2px(
-                    4f
-                )
-            val rightAlign =
-                abs(ViewUtils.getViewRight(view) - ViewUtils.getViewRight(child)) <= SizeUtils.dp2px(
-                    4f
-                )
-            val rightLeftAlign =
-                abs(ViewUtils.getViewRight(view) - ViewUtils.getViewLeft(child)) <= SizeUtils.dp2px(
-                    4f
-                )
-            val bottomAlign =
-                abs(ViewUtils.getViewBottom(view) - ViewUtils.getViewBottom(child)) <= SizeUtils.dp2px(
-                    4f
-                )
-            val bottomTopAlign =
-                abs(ViewUtils.getViewBottom(view) - ViewUtils.getViewTop(child)) <= SizeUtils.dp2px(
-                    4f
-                )
-            val centerXAlign =
-                abs(ViewUtils.getViewCenterX(view) - ViewUtils.getViewCenterX(child)) <= SizeUtils.dp2px(
-                    4f
-                )
-            val centerYAlign =
-                abs(ViewUtils.getViewCenterY(view) - ViewUtils.getViewCenterY(child)) <= SizeUtils.dp2px(
-                    4f
-                )
-            if (leftAlign || topAlign || rightAlign || bottomAlign || centerXAlign ||
-                centerYAlign || leftRightAlign || topBottomAlign || rightLeftAlign || bottomTopAlign
-            ) {
-                // 关联对齐
-                alignViews.add(child)
-            }
-        }
-        if (alignViews.isEmpty()) {
-            dataBinding.layoutMask.clearLine()
-        } else {
-            val matchView: View = findMostMatchView(view, alignViews)
-            dataBinding.layoutMask.drawRelation(view, matchView)
-        }
-    }
-
-    private fun findMostMatchView(targetView: View, views: List<View>): View {
-        var resultView = views.first()
-        var minDistance = ViewUtils.getViewDistance(targetView, resultView)
-        for (view in views) {
-            if (view == resultView) {
-                continue
-            }
-            val distance = ViewUtils.getViewDistance(targetView, view)
-            if (distance < minDistance) {
-                minDistance = distance
-                resultView = view
-            }
-        }
-        return resultView
-    }
-
-    fun clearLine() {
-        dataBinding.layoutMask.clearLine()
-    }
-
     private fun showKeyboard() {
         LogUtils.d("showKeyboard:${keyboardKeys.size}")
         try {
@@ -684,8 +585,6 @@ class GameController @JvmOverloads constructor(
         LogUtils.d("addKeyButton:$keyInfo")
         val keyView = KeyView(context)
         keyView.setKeyInfo(keyInfo)
-        keyView.isClickable = true
-        keyView.isFocusable = true
         keyView.setOnClickListener {
             LogUtils.d("onKeyClick:$keyInfo, editMode:$controllerStatus")
             if (controllerStatus == ControllerStatus.Edit) {
@@ -964,6 +863,104 @@ class GameController @JvmOverloads constructor(
             gamepadKeys.addAll(data.keyboard)
             initGamepad(data.keyboard)
         }
+    }
+
+    fun checkAlignment(view: View) {
+        val viewCenterX = view.x + view.width / 2f
+        val viewCenterY = view.y + view.height / 2f
+
+        val centerX = width / 2f
+        val centerY = height / 2f
+
+        dataBinding.layoutMask.isCenterHorizontal =
+            abs(viewCenterX - centerX) <= SizeUtils.dp2px(4f)
+        dataBinding.layoutMask.isCenterVertical = abs(viewCenterY - centerY) <= SizeUtils.dp2px(4f)
+        if (dataBinding.layoutMask.isCenterHorizontal || dataBinding.layoutMask.isCenterVertical) {
+            // 居中对齐画居中对齐线
+            dataBinding.layoutMask.drawCenterLine(view)
+            return
+        }
+        val viewList =
+            if (controllerType == AppVirtualOperateType.APP_STICK_XBOX) gamepadViews else keyboardViews
+        val alignViews = mutableListOf<View>()
+        for (index in 0..<viewList.size) {
+            val child = viewList[index]
+            if (child == view || child.visibility != VISIBLE) {
+                continue
+            }
+            val leftAlign =
+                abs(ViewUtils.getViewLeft(view) - ViewUtils.getViewLeft(child)) <= SizeUtils.dp2px(
+                    4f
+                )
+            val leftRightAlign =
+                abs(ViewUtils.getViewLeft(view) - ViewUtils.getViewRight(child)) <= SizeUtils.dp2px(
+                    4f
+                )
+            val topAlign =
+                abs(ViewUtils.getViewTop(view) - ViewUtils.getViewTop(child)) <= SizeUtils.dp2px(
+                    4f
+                )
+            val topBottomAlign =
+                abs(ViewUtils.getViewTop(view) - ViewUtils.getViewBottom(child)) <= SizeUtils.dp2px(
+                    4f
+                )
+            val rightAlign =
+                abs(ViewUtils.getViewRight(view) - ViewUtils.getViewRight(child)) <= SizeUtils.dp2px(
+                    4f
+                )
+            val rightLeftAlign =
+                abs(ViewUtils.getViewRight(view) - ViewUtils.getViewLeft(child)) <= SizeUtils.dp2px(
+                    4f
+                )
+            val bottomAlign =
+                abs(ViewUtils.getViewBottom(view) - ViewUtils.getViewBottom(child)) <= SizeUtils.dp2px(
+                    4f
+                )
+            val bottomTopAlign =
+                abs(ViewUtils.getViewBottom(view) - ViewUtils.getViewTop(child)) <= SizeUtils.dp2px(
+                    4f
+                )
+            val centerXAlign =
+                abs(ViewUtils.getViewCenterX(view) - ViewUtils.getViewCenterX(child)) <= SizeUtils.dp2px(
+                    4f
+                )
+            val centerYAlign =
+                abs(ViewUtils.getViewCenterY(view) - ViewUtils.getViewCenterY(child)) <= SizeUtils.dp2px(
+                    4f
+                )
+            if (leftAlign || topAlign || rightAlign || bottomAlign || centerXAlign ||
+                centerYAlign || leftRightAlign || topBottomAlign || rightLeftAlign || bottomTopAlign
+            ) {
+                // 关联对齐
+                alignViews.add(child)
+            }
+        }
+        if (alignViews.isEmpty()) {
+            dataBinding.layoutMask.clearLine()
+        } else {
+            val matchView: View = findMostMatchView(view, alignViews)
+            dataBinding.layoutMask.drawRelation(view, matchView)
+        }
+    }
+
+    private fun findMostMatchView(targetView: View, views: List<View>): View {
+        var resultView = views.first()
+        var minDistance = ViewUtils.getViewDistance(targetView, resultView)
+        for (view in views) {
+            if (view == resultView) {
+                continue
+            }
+            val distance = ViewUtils.getViewDistance(targetView, view)
+            if (distance < minDistance) {
+                minDistance = distance
+                resultView = view
+            }
+        }
+        return resultView
+    }
+
+    fun clearLine() {
+        dataBinding.layoutMask.clearLine()
     }
 
     /**

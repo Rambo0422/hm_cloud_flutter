@@ -208,7 +208,8 @@ object GameManager : HmcpPlayerListener, OnContronListener {
                 // 横屏
                 it.putSerializable(HmcpVideoView.ORIENTATION, ScreenOrientation.LANDSCAPE)
                 // 可玩时间
-                val playTime: Long = gameParam?.playTime ?: 0L
+//                val playTime: Long = gameParam?.playTime ?: 0L
+                val playTime: Long = 20 * 1000L
                 it.putInt(
                     HmcpVideoView.PLAY_TIME,
                     if (playTime > Int.MAX_VALUE) Int.MAX_VALUE else playTime.toInt()
@@ -441,10 +442,10 @@ object GameManager : HmcpPlayerListener, OnContronListener {
             }
         }
         EventBus.getDefault().post(GameErrorEvent(errorCode, errorMsg))
-        channel.invokeMethod(
-            "reportError",
-            mapOf(Pair("cid", HmcpManager.getInstance().cloudId), Pair("errorInfo", dataStr))
-        )
+//        channel.invokeMethod(
+//            "reportError",
+//            mapOf(Pair("cid", HmcpManager.getInstance().cloudId), Pair("errorInfo", dataStr))
+//        )
         channel.invokeMethod(
             "errorInfo",
             mapOf(Pair("errorCode", errorCode), Pair("errorMsg", errorMsg))

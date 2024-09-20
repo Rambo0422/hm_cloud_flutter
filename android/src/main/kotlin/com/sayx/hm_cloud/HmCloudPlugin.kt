@@ -186,9 +186,12 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
                 }
             }
 
+            "buySuccess"-> {
+                GameManager.updateGamePlayableTime()
+            }
+
             "closePage" -> {
                 GameManager.flutterActivity?.finish()
-                GameManager.updateGamePlayableTime()
             }
 
             "exitQueue" -> {

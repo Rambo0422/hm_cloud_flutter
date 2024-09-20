@@ -11,8 +11,6 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:clickable="true"
-        android:focusable="true"
         android:background="#E6232837"
         android:paddingTop="7.5dp"
         android:paddingBottom="7.5dp">

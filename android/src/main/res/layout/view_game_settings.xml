@@ -53,9 +53,7 @@
             android:layout_width="280dp"
             android:layout_height="match_parent"
             android:background="@drawable/img_game_settings_left_bg"
-            android:clickable="true"
             android:clipChildren="false"
-            android:focusable="true"
             android:visibility="invisible"
             app:layout_constraintStart_toStartOf="parent"
             tools:visibility="visible">
@@ -526,9 +524,7 @@
             android:layout_width="280dp"
             android:layout_height="match_parent"
             android:background="@drawable/img_game_settings_right_bg"
-            android:clickable="true"
             android:clipChildren="false"
-            android:focusable="true"
             android:visibility="invisible"
             app:layout_constraintEnd_toEndOf="parent"
             tools:visibility="visible">
