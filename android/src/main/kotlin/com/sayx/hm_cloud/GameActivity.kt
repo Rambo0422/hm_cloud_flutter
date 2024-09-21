@@ -531,11 +531,13 @@ class GameActivity : AppCompatActivity() {
 
                     override fun fail(msg: String?) {
                         LogUtils.d("GameArchive->fail:$msg")
+                        showExitGameDialog()
                     }
                 })
     }
 
     private fun showSaveGameDialog() {
+        GameManager.gameStat("游戏界面-正在存档", "show")
         AppCommonDialog.Builder(this)
             .setTitle("正在存档中")
             .setSubTitle(
@@ -543,12 +545,13 @@ class GameActivity : AppCompatActivity() {
                 subTitleColor = Color.parseColor("#FFA3ACBD")
             )
             .setLeftButton("退出游戏") {
-
+                GameManager.gameStat("游戏界面-正在存档-退出游戏", "click")
                 LogUtils.d("exitGameByUser")
                 GameManager.releaseGame(finish = "1", bundle = null)
                 gameSettings?.release()
                 finish() }
             .setRightButton("继续等待") {
+                GameManager.gameStat("游戏界面-正在存档-继续等待", "click")
                 AppCommonDialog.hideDialog(this@GameActivity)
             }
             .build().show()
@@ -1123,6 +1126,7 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun showExitGameDialog() {
+        GameManager.gameStat("游戏界面-关闭游戏退出提醒", "show")
         AppCommonDialog.Builder(this)
             .setTitle(getString(R.string.title_exit_game))
             .setLeftButton(getString(R.string.continue_game)) { AppCommonDialog.hideDialog(this@GameActivity) }

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/services.dart';
 import 'package:hm_cloud/hm_cloud_constants.dart';
 
@@ -35,7 +37,8 @@ class HmCloudController {
   }
 
   void setControllerData(dynamic data) {
-    methodChannel.invokeMethod("setControllerData", data);
+    log("setControllerData:${data}");
+    // methodChannel.invokeMethod("setControllerData", data);
   }
 
   void onEditSuccess(params) {

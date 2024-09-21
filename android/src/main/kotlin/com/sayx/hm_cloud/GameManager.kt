@@ -208,8 +208,8 @@ object GameManager : HmcpPlayerListener, OnContronListener {
                 // 横屏
                 it.putSerializable(HmcpVideoView.ORIENTATION, ScreenOrientation.LANDSCAPE)
                 // 可玩时间
-//                val playTime: Long = gameParam?.playTime ?: 0L
-                val playTime: Long = 20 * 1000L
+                val playTime: Long = gameParam?.playTime ?: 0L
+//                val playTime: Long = 20 * 1000L
                 it.putInt(
                     HmcpVideoView.PLAY_TIME,
                     if (playTime > Int.MAX_VALUE) Int.MAX_VALUE else playTime.toInt()
@@ -594,6 +594,10 @@ object GameManager : HmcpPlayerListener, OnContronListener {
 
     fun statGameTime(time: Long) {
         channel.invokeMethod("statGameTime", mapOf(Pair("time", time)))
+    }
+
+    fun gameStat(page: String, action: String, arg: Map<String, Any>? = null, type: String = "event") {
+        channel.invokeMethod("gameStat", mapOf(Pair("page", page), Pair("action", action), Pair("arguments", arg), Pair("type", type)))
     }
 
     fun statGamePlay() {
