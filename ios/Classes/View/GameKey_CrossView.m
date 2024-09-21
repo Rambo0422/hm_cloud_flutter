@@ -88,15 +88,31 @@
     // Calculate the angle of the touch point
     CGFloat dx = location.x - center.x;
     CGFloat dy = location.y - center.y;
+
     CGFloat angle = atan2(dy, dx) + M_PI; // atan2 returns value between -π and π, so we add π to make it between 0 and 2π
 
-    // Determine which segment the angle falls into-
-    CGFloat segmentAngle = 2 * M_PI / 8; // 8 equal segments
 
-    NSInteger segmentIndex = (NSInteger)ceil(angle / segmentAngle);
+    CGFloat segmentAngle = 2 * M_PI / 16; // 16 equal segments
 
-    if (segmentIndex == 8) {
+    NSInteger segmentIndex = 0;
+
+
+    if (angle >= 15 * segmentAngle || angle < segmentAngle) {
         segmentIndex = 0;
+    } else if (angle >= segmentAngle && angle < 3 * segmentAngle) {
+        segmentIndex = 1;
+    } else if (angle >= 3 * segmentAngle && angle < 5 * segmentAngle) {
+        segmentIndex = 2;
+    } else if (angle >= 5 * segmentAngle && angle < 7 * segmentAngle) {
+        segmentIndex = 3;
+    } else if (angle >= 7 * segmentAngle && angle < 9 * segmentAngle) {
+        segmentIndex = 4;
+    } else if (angle >= 9 * segmentAngle && angle < 11 * segmentAngle) {
+        segmentIndex = 5;
+    } else if (angle >= 11 * segmentAngle && angle < 13 * segmentAngle) {
+        segmentIndex = 6;
+    } else if (angle >= 13 * segmentAngle && angle < 15 * segmentAngle) {
+        segmentIndex = 7;
     }
 
     self.imageView.image = k_BundleImage(self.imgList[segmentIndex]);
