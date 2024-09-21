@@ -278,10 +278,24 @@ typedef NS_ENUM(NSInteger, HMCPEventType) {
     HMCCEventDNSRequestIPStart           = 12514,  //开始请求ip地址
     HMCCEventDNSRequestIPSuccess         = 12515,  //请求ip地址成功
     HMCCEventDNSRequestIPFail            = 12516,  //请求ip地址失败
+    HMCCEventUpdateKeepAliveStart        = 12256,  //开始更新保活时长
+    HMCCEventUpdateKeepAliveSuccess      = 12257,  //更新保活成功
+    HMCCEventUpdateKeepAliveFail         = 12258,  //更新保活失败
     HMCCEventStartStreamingMode          = 12727,  //开始设置流模式
     HMCCEventStreamingModeSuccess        = 12728,  //设置流模式成功
     HMCCEventStreamingModeFail           = 12729,  //设置流模式失败
     HMCCEventChangeDomainReconnect       = 12124,  //换域名重试
+    HMCCEventRelaunchGameStart           = 13328,  //开始重启游戏
+    HMCCEventRelaunchGameSuccess         = 13329,  //重启成功
+    HMCCEventRelaunchGameFailed          = 13330,  //重启失败
+
+    HMCCEventSwitchIMEConfigue           = 12704,  //键盘配置
+    HMCCEventSwitchIMECalled             = 12706,  //切换键盘被调用
+    HMCCEventSwitchIMEResult             = 12707,  //切换键盘结果
+
+    HMCCEventGetIMEStart                 = 12709,  //开始获取键盘类型
+    HMCCEventGetIMEResult                = 12710,  //获取键盘类型结果
+
 };
 
 @interface HMCloudPlayerRecordEvent : NSObject

@@ -19,8 +19,8 @@
             // LT
             m.type = @"xbox-square";
             m.inputOp = 1025;
-            m.width = 60;
-            m.height = 45;
+            m.width = 80;
+            m.height = 60;
             m.text = @"LT";
         }
 
@@ -30,8 +30,8 @@
             // LS
             m.type = @"xbox-round-small";
             m.inputOp = 64;
-            m.width = 25;
-            m.height = 25;
+            m.width = 40;
+            m.height = 40;
             m.text = @"LS";
         }
 
@@ -41,8 +41,8 @@
             // LB
             m.type = @"xbox-square";
             m.inputOp = 256;
-            m.width = 60;
-            m.height = 45;
+            m.width = 80;
+            m.height = 60;
             m.text = @"LB";
         }
 
@@ -52,8 +52,8 @@
             // rock_lt
             m.type = @"xbox-rock-lt";
 
-            m.width = 100;
-            m.height = 100;
+            m.width = 144;
+            m.height = 144;
         }
 
         break;
@@ -62,8 +62,8 @@
             // rock_lt
             m.type = @"xbox-cross";
 
-            m.width = 80;
-            m.height = 80;
+            m.width = 128;
+            m.height = 128;
         }
 
         break;
@@ -72,8 +72,8 @@
             // xbox-set
             m.type = @"xbox-elliptic";
             m.inputOp = 16;
-            m.width = 40;
-            m.height = 25;
+            m.width = 64;
+            m.height = 40;
         }
 
         break;
@@ -82,8 +82,8 @@
             // xbox-menu
             m.type = @"xbox-elliptic";
             m.inputOp = 32;
-            m.width = 40;
-            m.height = 25;
+            m.width = 64;
+            m.height = 40;
         }
 
         break;
@@ -92,8 +92,8 @@
             // rock_rt
             m.type = @"xbox-rock-rt";
 
-            m.width = 100;
-            m.height = 100;
+            m.width = 144;
+            m.height = 144;
         }
 
         break;
@@ -102,8 +102,8 @@
             // a
             m.type = @"xbox-round-medium";
             m.inputOp = 4096;
-            m.width = 30;
-            m.height = 30;
+            m.width = 48;
+            m.height = 48;
             m.text = @"A";
         }
 
@@ -113,8 +113,8 @@
             // b
             m.type = @"xbox-round-medium";
             m.inputOp = 8192;
-            m.width = 30;
-            m.height = 30;
+            m.width = 48;
+            m.height = 48;
             m.text = @"B";
         }
 
@@ -124,8 +124,8 @@
             // x
             m.type = @"xbox-round-medium";
             m.inputOp = 16384;
-            m.width = 30;
-            m.height = 30;
+            m.width = 48;
+            m.height = 48;
             m.text = @"X";
         }
 
@@ -135,8 +135,8 @@
             // Y
             m.type = @"xbox-round-medium";
             m.inputOp = 32768;
-            m.width = 30;
-            m.height = 30;
+            m.width = 48;
+            m.height = 48;
             m.text = @"Y";
         }
 
@@ -147,8 +147,8 @@
 
             m.type = @"xbox-square";
             m.inputOp = 512;
-            m.width = 60;
-            m.height = 45;
+            m.width = 80;
+            m.height = 60;
             m.text = @"RB";
         }
 
@@ -159,8 +159,8 @@
 
             m.type = @"xbox-square";
             m.inputOp = 1026;
-            m.width = 60;
-            m.height = 45;
+            m.width = 80;
+            m.height = 60;
             m.text = @"RT";
         }
 
@@ -170,8 +170,8 @@
             // RS
             m.type = @"xbox-round-small";
             m.inputOp = 128;
-            m.width = 25;
-            m.height = 25;
+            m.width = 40;
+            m.height = 40;
             m.text = @"RS";
         }
 

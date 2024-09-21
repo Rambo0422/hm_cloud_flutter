@@ -562,7 +562,7 @@
                 </button>
             </subviews>
             <viewLayoutGuide key="safeArea" id="Q5M-cg-NOt"/>
-            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <color key="backgroundColor" red="0.094657458360000002" green="0.11685734239999999" blue="0.15686780210000001" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
             <constraints>
                 <constraint firstItem="Ul2-Vw-8mO" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="57i-ep-olv"/>
                 <constraint firstItem="vS2-qN-sTP" firstAttribute="leading" secondItem="Ul2-Vw-8mO" secondAttribute="trailing" id="7DA-9A-5K8"/>

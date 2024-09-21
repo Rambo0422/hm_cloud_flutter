@@ -13,6 +13,18 @@
 #import "HMCloudCorePlayerViewController.h"
 #import "HMStreamingFileModel.h"
 
+typedef NS_ENUM (NSInteger,IMEType){
+    IMETypeCloud = 0,          //云端键盘
+    IMETypeLocal = 1,          //本地键盘
+};
+
+typedef NS_ENUM (NSInteger,IMEResponseStatus) {
+    IMEResponseStatusSuccess,//切换成功
+    IMEResponseStatusUnsupported,//不支持切换
+    IMEResponseStatusTimeout,//切换超时
+    IMEResponseStatusRomReject,//切换失败
+};
+
 typedef NS_ENUM(NSInteger, CloudPlayerDownloadMode){
     CloudPlayerDownloadModeNormal = 0,      //正常播流
     CloudPlayerDownloadModeDownloadOnly,    //断流下载
@@ -122,6 +134,7 @@ typedef NS_ENUM(NSInteger,CloudPlayerScreenshotStatus){
 typedef NS_ENUM(NSInteger, CloudlPlayerDataChanneWSMessageType) {
     CloudlPlayerDataChanneWSMessageTypeNormal,
     CloudlPlayerDataChanneWSMessageTypeClipboard,
+    CloudlPlayerDataChanneWSMessageTypeShellCommonds,
 };
 
 typedef NS_ENUM(NSInteger,HMCloudAppStopReason) {
@@ -480,12 +493,14 @@ const extern NSString *CloudGameOptionKeyStretch;                 //是否拉伸
  @param fpsprobesize 帧大小
  @param framedropaudio 音频帧丢帧开关
  @param framedropvideo 视频帧丢帧开关
+ @param config 108配置
  */
 - (void)setRTMPProbesize:(int)probesize
          analyzeduration:(int)analyzeduration
             fpsprobesize:(int)fpsprobesize
           framedropaudio:(int)framedropaudio
-          framedropvideo:(int)framedropvideo;
+          framedropvideo:(int)framedropvideo
+                  config:(NSDictionary *)config;
 
 /**
  设置是否接收帧回调
@@ -654,6 +669,14 @@ const extern NSString *CloudGameOptionKeyStretch;                 //是否拉伸
 - (void)reconnectWebsoketyWithNextIp;
 
 - (CGSize)adjustShowSize:(NSString *)size;
+
+/**
+ 切换键盘类型
+ @param type 键盘类型
+ @param completion 设置结果
+ */
+- (void)switchImeType:(IMEType)type completion:(void (^)(IMEResponseStatus))completion;
+
 @end
 
 typedef NS_ENUM (NSInteger, CloudPlayerStopReason) {

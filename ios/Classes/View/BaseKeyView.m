@@ -69,11 +69,19 @@
                 @"value": @0
         };
     } else {
+        NSInteger value = 0;
+
+        [[HmCloudTool share].xboxKeyList removeObject:@(m.inputOp)];
+
+        for (NSNumber *n in [HmCloudTool share].xboxKeyList) {
+            value = value | n.integerValue;
+        }
+
         // 普通按键
         dict = @{
                 @"inputState": @1,
                 @"inputOp": @1024,
-                @"value": @(0)
+                @"value": @(value)
         };
     }
 
@@ -130,11 +138,20 @@
         };
     } else {
         // 普通按键
+
+        NSInteger value = m.inputOp;
+
+        for (NSNumber *n in [HmCloudTool share].xboxKeyList) {
+            value = value | n.integerValue;
+        }
+
         dict = @{
                 @"inputState": @1,
                 @"inputOp": @1024,
-                @"value": @(m.inputOp)
+                @"value": @(value)
         };
+
+        [[HmCloudTool share].xboxKeyList addObject:@(m.inputOp)];
     }
 
     return dict;

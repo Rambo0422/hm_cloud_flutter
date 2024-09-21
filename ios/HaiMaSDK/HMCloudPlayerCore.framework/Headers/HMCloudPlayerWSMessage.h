@@ -27,6 +27,19 @@ typedef NS_ENUM(NSInteger, CloudPlayerWSMessageType) {
     CloudPlayerWSMessageTypeKeyboardChanged,
     CloudPlayerWSMessageTypeOpenCamera,
     CloudPlayerWSMessageTypeOpenPhotosAlbum,
+    CloudPlayerWSMessageTypeCloudIme,
+    CloudPlayerWSMessageTypeShellCommonds,
+};
+
+typedef NS_ENUM (NSInteger,CloudPlayerWSMessageIMEType) {
+    CloudPlayerWSMessageIMETypeCloud,
+    CloudPlayerWSMessageIMETypeLocal,
+};
+
+typedef NS_ENUM(NSInteger, HMCloudPlayerWSMessageInstanceType) {
+    HMCloudPlayerWSMessageInstanceTypeUnknown        = -1, //无法确定
+    HMCloudPlayerWSMessageInstanceTypeArm            =  0, //arm
+    HMCloudPlayerWSMessageInstanceTypeX86            =  1, //x86
 };
 
 typedef void (^HMCPWSMessageBlock)(BOOL successed, NSString *messageId, NSString *reason);
@@ -45,6 +58,7 @@ extern NSString* const _CloudPlayerWSMessageKeyType;
 @property (nonatomic, assign, readonly) CloudPlayerWSMessageType type;
 @property (nonatomic, assign, readonly) int timeoutSeconds;
 @property (nonatomic, copy, readonly)   NSString *messageId;
+@property (nonatomic, assign) HMCloudPlayerWSMessageInstanceType instanceType;
 
 
 - (BOOL) isValid;
@@ -158,6 +172,16 @@ typedef NS_ENUM(NSInteger, CloudPlayerWSKeyboardMessage) {
 
 @interface HMCloudPlayerWSMessageFactroy : NSObject
 + (HMCloudPlayerWSMessage *)wsMessageFactroyWithDict:(NSDictionary *)dict;
+@end
+
+@interface HMCloudPlayerWSCloudIMEMessage : HMCloudPlayerWSMessage
+@property(nonatomic,copy)NSString *imeTypeContent;
+@property(nonatomic,assign)CloudPlayerWSMessageIMEType imeType;
+@end
+
+@interface HMCloudPlayerWSShellCommondsMessage : HMCloudPlayerWSMessage
++ (instancetype) cloudPlayerWSShellCommonds:(NSString *)shellCommonds;
+@property (nonatomic, copy) NSString *shellCommonds;
 @end
 
 NS_ASSUME_NONNULL_END

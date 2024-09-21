@@ -101,6 +101,8 @@ static NSString *ActionUpdateTime = @"updateTime";
 @property (nonatomic, strong)             NSString *cloudId;
 @property (nonatomic, strong)             NSString *liveRoomId;
 
+/// 记录xbox按下抬起的按键
+@property (nonatomic, strong) NSMutableSet<NSNumber *> *xboxKeyList;
 
 @property (nonatomic, weak) id<HmCloudToolDelegate> delegate;
 
@@ -142,6 +144,14 @@ static NSString *ActionUpdateTime = @"updateTime";
 /// - Parameters:
 ///   - playTime: 游玩时间
 - (void)updatePlayInfo:(NSDictionary *)playInfo;
+
+
+/**
+   将鼠标模式切换成pc模式
+   仅x86游戏使用
+   @param model true pc模式  false 移动端模式
+ */
+- (BOOL)convertToPcMouseModel:(BOOL)model;
 
 @end
 
