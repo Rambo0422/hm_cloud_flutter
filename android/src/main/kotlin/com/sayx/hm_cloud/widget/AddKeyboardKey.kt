@@ -204,6 +204,9 @@ class AddKeyboardKey @JvmOverloads constructor(
     }
 
     fun hideBoard(listenerImp: AnimatorListenerImp?) {
+        if (!isShow) {
+            return
+        }
         isShow = false
         val animator = ObjectAnimator.ofFloat(
             dataBinding.root, "translationY", 0.0f, dataBinding.root.height.toFloat()

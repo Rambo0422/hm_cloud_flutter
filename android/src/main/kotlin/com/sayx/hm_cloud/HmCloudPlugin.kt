@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.res.Configuration
 import android.util.Log
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ScreenUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.google.gson.reflect.TypeToken
@@ -59,9 +60,8 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
     override fun onMethodCall(call: MethodCall, callback: MethodChannel.Result) {
         val arguments = call.arguments
 //        Log.e("CloudGame", "onMethodCall:${call.method}, param:$arguments")
-//        LogUtils.d("onMethodCall:${call.method}, param:$arguments")
+        LogUtils.d("onMethodCall:${call.method}, param:$arguments")
         when (call.method) {
-
             // 游戏启动
             GameViewConstants.startCloudGame -> {
                 if (arguments is Map<*, *>) {

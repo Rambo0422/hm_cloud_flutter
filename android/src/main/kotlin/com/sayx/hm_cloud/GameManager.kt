@@ -52,7 +52,8 @@ object GameManager : HmcpPlayerListener, OnContronListener {
     private lateinit var channel: MethodChannel
 
     val gson: Gson by lazy {
-        GsonBuilder().disableHtmlEscaping().create()
+        GsonBuilder().disableHtmlEscaping()
+            .create()
     }
 
     private var gameParam: GameParam? = null
@@ -122,6 +123,12 @@ object GameManager : HmcpPlayerListener, OnContronListener {
 //            Log.e("CloudGame", "init haiMaSDK:${gameParam?.accessKeyId}")
             LogUtils.d("init haiMaSDK:${config}")
             HmcpManager.getInstance().releaseRequestManager()
+            channel.invokeMethod("gameStatusStat", mapOf(
+                Pair("type", "game_init"),
+                Pair("page", "游戏初始化"),
+                Pair("action", "游戏初始化"),
+                Pair("arguments", gson.fromJson(gson.toJson(gameParam), Map::class.java))
+            ))
             HmcpManager.getInstance().init(config, activity, object : OnInitCallBackListener {
                 override fun success() {
                     LogUtils.d("haiMaSDK success:${HmcpManager.getInstance().sdkVersion}")
@@ -173,6 +180,12 @@ object GameManager : HmcpPlayerListener, OnContronListener {
 
     private fun checkPlayingGame() {
         LogUtils.d("checkPlayingGame->userId:${this.gameParam?.userId}, userToken:${this.gameParam?.userToken}")
+        channel.invokeMethod("gameStatusStat", mapOf(
+            Pair("type", "game_prepare"),
+            Pair("page", "游戏检查"),
+            Pair("action", "游戏检查"),
+            Pair("arguments", gson.fromJson(gson.toJson(gameParam), Map::class.java))
+        ))
         HmcpManager.getInstance().checkPlayingGame(UserInfo().also {
             it.userId = this.gameParam?.userId
             it.userToken = this.gameParam?.userToken
@@ -203,6 +216,12 @@ object GameManager : HmcpPlayerListener, OnContronListener {
      */
     private fun prepareGame(cid: String? = null) {
         LogUtils.d("prepareGame:${cid}, priority:${gameParam?.priority}")
+        channel.invokeMethod("gameStatusStat", mapOf(
+            Pair("type", "game_prepare"),
+            Pair("page", "游戏准备"),
+            Pair("action", "游戏准备:$cid"),
+            Pair("arguments", gson.fromJson(gson.toJson(gameParam), Map::class.java))
+        ))
         try {
             val bundle = Bundle().also {
                 // 横屏
@@ -280,6 +299,12 @@ object GameManager : HmcpPlayerListener, OnContronListener {
 
     private fun playGame(bundle: Bundle?) {
         LogUtils.d("playGame:$gameView")
+        channel.invokeMethod("gameStatusStat", mapOf(
+            Pair("type", "game_play"),
+            Pair("page", "游戏开始"),
+            Pair("action", "游戏开始"),
+            Pair("arguments", gson.fromJson(gson.toJson(gameParam), Map::class.java))
+        ))
         if (gameView != null) {
             // 通常是已进入普通队列，切换高速队列，释放普通队列实例，重新进入高速队列
             if (!isPlaying) {
@@ -316,7 +341,14 @@ object GameManager : HmcpPlayerListener, OnContronListener {
         LogUtils.d("playerStatusCallback:$statusData, cid:${HmcpManager.getInstance().cloudId}")
         statusData?.let {
             val data = JSONObject(it)
-            when (val status = data.getInt(StatusCallbackUtil.STATUS)) {
+            val status = data.getInt(StatusCallbackUtil.STATUS)
+            channel.invokeMethod("gameStatusStat", mapOf(
+                Pair("type", "game_sdk_status"),
+                Pair("page", "$status"),
+                Pair("action", "${data.getString(StatusCallbackUtil.DATA)}"),
+                Pair("arguments", gson.fromJson(gson.toJson(gameParam), Map::class.java))
+            ))
+            when (status) {
                 // 游戏准备完成，可以启动游戏
                 Constants.STATUS_PLAY_INTERNAL -> {
                     gameView?.play()
@@ -671,6 +703,13 @@ object GameManager : HmcpPlayerListener, OnContronListener {
     /// 游戏释放
     fun releaseGame(finish: String, bundle: Bundle? = null) {
         LogUtils.d("releaseGame:$finish")
+        val cloudId = HmcpManager.getInstance().cloudId
+        channel.invokeMethod("gameStatusStat", mapOf(
+            Pair("type", "game_release"),
+            Pair("page", "游戏释放"),
+            Pair("action", "游戏释放:$finish, $cloudId"),
+            Pair("arguments", gson.fromJson(gson.toJson(gameParam), Map::class.java))
+        ))
         if (finish != "0") {
             // 非切换队列调用此方法，认定为退出游戏
             channel.invokeMethod(
@@ -679,7 +718,6 @@ object GameManager : HmcpPlayerListener, OnContronListener {
             )
             needReattach = false
         }
-        val cloudId = HmcpManager.getInstance().cloudId
         if (TextUtils.isEmpty(cloudId)) {
             LogUtils.d("undo releaseGame, cid is empty")
             gameView?.onDestroy()

@@ -72,8 +72,6 @@ class EditRouletteKey @JvmOverloads constructor(
             editKeyView.setOnClickListener {
                 val data = editKeyView.getData()
                 if (data != null) {
-                    data.isRou = false
-                    data.editIndex = 0
                     keyList[index] = null
                     editKeyView.setData(null)
                     full = false
@@ -98,6 +96,16 @@ class EditRouletteKey @JvmOverloads constructor(
                 }
             }
             dataBinding.layoutKey.addView(editKeyView, layoutParams)
+        }
+        // 编辑菜单隐藏/显示
+        dataBinding.btnEditFold.setOnClickListener {
+            val selected = !dataBinding.btnEditFold.isSelected
+            dataBinding.btnEditFold.isSelected = selected
+            if (selected) {
+                foldMenu()
+            } else {
+                unfoldMenu()
+            }
         }
     }
 
@@ -146,12 +154,35 @@ class EditRouletteKey @JvmOverloads constructor(
         animator.start()
     }
 
+    private fun unfoldMenu() {
+        val animator = ObjectAnimator.ofFloat(
+            dataBinding.root,
+            "translationY",
+            -dataBinding.layoutBoard.height.toFloat(),
+            0.0f
+        )
+        animator.duration = 500L
+        animator.interpolator = AccelerateInterpolator()
+        animator.start()
+    }
+
+    private fun foldMenu() {
+        val animator = ObjectAnimator.ofFloat(
+            dataBinding.root,
+            "translationY",
+            0.0f,
+            -dataBinding.layoutBoard.height.toFloat()
+        )
+        animator.duration = 500L
+        animator.interpolator = AccelerateInterpolator()
+        animator.start()
+    }
+
     fun addKey(keyInfo: KeyInfo) {
         LogUtils.d("addKey:$keyInfo, keyList:$keyList")
         if (full) {
             return
         }
-        keyInfo.isRou = true
         keyList.keys.forEach {
             if (keyList[it] == null) {
                 keyList[it] = keyInfo

@@ -5,6 +5,7 @@ import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Build
 import android.os.Bundle
+import android.view.Gravity
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -44,10 +45,17 @@ class GameErrorDialog : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        dataBinding = DataBindingUtil.inflate(inflater, R.layout.dialog_game_error, container, false)
+        // 设置全屏
+        dialog?.window?.setFlags(
+            WindowManager.LayoutParams.FLAG_FULLSCREEN,
+            WindowManager.LayoutParams.FLAG_FULLSCREEN
+        )
+        dataBinding =
+            DataBindingUtil.inflate(inflater, R.layout.dialog_game_error, container, false)
         return dataBinding.root
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val window = dialog?.window
@@ -58,13 +66,39 @@ class GameErrorDialog : DialogFragment() {
             insetsController.hide(WindowInsetsCompat.Type.navigationBars())
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 // 水滴屏处理
-                it.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+                it.attributes.layoutInDisplayCutoutMode =
+                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
             }
         }
         showTitle()
         showSubTitle()
         dataBinding.btnLeft.setOnClickListener(leftBtnClickListener)
-        dataBinding.btnLeft.requestFocus()
+        dataBinding.btnLeft.setOnTouchListener { v, _ ->
+//            leftBtnClickListener?.onClick(v)
+            return@setOnTouchListener false
+        }
+        dataBinding.btnLeft.requestFocusFromTouch()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val window = dialog?.window
+        val windowParams = window?.attributes
+        windowParams?.gravity = Gravity.CENTER
+        windowParams?.width = ViewGroup.LayoutParams.WRAP_CONTENT
+        windowParams?.height = ViewGroup.LayoutParams.WRAP_CONTENT
+        windowParams?.dimAmount = 0.01f
+        windowParams?.flags  = windowParams?.flags?.or(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        window?.attributes = windowParams
+    }
+
+    override fun onResume() {
+        super.onResume()
+        dialog?.window?.decorView?.systemUiVisibility = (
+                View.SYSTEM_UI_FLAG_FULLSCREEN
+                        or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                )
     }
 
     private fun showTitle() {

@@ -680,12 +680,13 @@ class GameActivity : AppCompatActivity() {
             }
 
             override fun onEditCombine(keyInfo: KeyInfo) {
-                LogUtils.d("onEditCombine:$keyInfo")
                 controllerEditLayout?.hideLayout(object : AnimatorListenerImp() {
                     override fun onAnimationEnd(animation: Animator) {
                         if (keyInfo.type == KeyType.KEY_COMBINE || keyInfo.type == KeyType.GAMEPAD_COMBINE) {
+                            LogUtils.d("onEditCombine:$keyInfo")
                             showEditCombineKeyLayout(keyInfo)
                         } else if (keyInfo.type == KeyType.KEY_ROULETTE || keyInfo.type == KeyType.GAMEPAD_ROULETTE) {
+                            LogUtils.d("onEditRoulette:$keyInfo")
                             showEditRouletteKeyLayout(keyInfo)
                         }
                     }
@@ -771,6 +772,7 @@ class GameActivity : AppCompatActivity() {
             editRouletteKey?.setRouletteKeyInfo(keyInfo)
             editRouletteKey?.showBoard()
         }
+        // 展示键盘选择
 //        showKeyBoard(false)
     }
 
