@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong) NSMutableArray<KeyModel *> *keyList;
 
-@property (nonatomic, strong) void (^ tapCallback)(KeyModel *m);
+@property (nonatomic, strong) void (^ tapCallback)(KeyModel *m, UIView *v);
 
 @end
 

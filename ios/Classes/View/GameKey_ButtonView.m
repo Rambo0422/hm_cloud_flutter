@@ -13,6 +13,8 @@
 
 @property (nonatomic, strong) UIButton *btn;
 
+@property (nonatomic, strong) UILabel *lab;
+
 @end
 
 @implementation GameKey_ButtonView
@@ -47,6 +49,33 @@
         if (!self.isEdit) {
             [self.btn addTarget:self action:@selector(didTapTouchUp) forControlEvents:UIControlEventTouchUpInside];
             [self.btn addTarget:self action:@selector(didTapTouchDown) forControlEvents:UIControlEventTouchDown];
+        }
+
+        NSString *path = [k_SanABundle pathForResource:@"keyboard"
+                                                ofType:@"json"];
+        NSData *data = [NSData dataWithContentsOfFile:path];
+        NSError *error;
+        NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data
+                                                             options:kNilOptions
+                                                               error:&error];
+
+        NSString *key = [NSString stringWithFormat:@"%ld", model.inputOp];
+
+        if ([dict.allKeys containsObject:key]) {
+            self.lab = [[UILabel alloc] init];
+            self.lab.text = [NSString stringWithFormat:@" %@ ", [dict[key] objectForKey:@"name"]];
+            self.lab.backgroundColor = [kColor(0x020202) colorWithAlphaComponent:0.75];
+            self.lab.font = [UIFont systemFontOfSize:9 weight:UIFontWeightMedium];
+            self.lab.textColor = [kColor(0xC6EC4B) colorWithAlphaComponent:0.75];
+            self.lab.layer.cornerRadius = 6;
+            self.lab.layer.masksToBounds = YES;
+            [self addSubview:self.lab];
+
+            [self.lab mas_makeConstraints:^(MASConstraintMaker *make) {
+                make.top.equalTo(@0);
+                make.right.equalTo(@0);
+                make.height.equalTo(@12);
+            }];
         }
     }
 

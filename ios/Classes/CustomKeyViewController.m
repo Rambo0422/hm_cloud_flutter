@@ -52,6 +52,7 @@
 @property (nonatomic, strong) NSMutableArray<KeyModel *> *keyList;
 
 @property (nonatomic, strong) KeyModel *currentM;
+@property (nonatomic, strong) UIView *currentV;
 
 @end
 
@@ -71,7 +72,12 @@
     [self configView];
 
     if (self.model.keyboard) {
-        self.keyList = [self.model.keyboard mutableCopy];
+        // 为了还原功能，需要将数据copy一份新的，如果只是单纯的copy数组的话，里面的model还是指向同一个内存地址，model的数据修改，会同步生效
+
+        self.keyList = [[self.model.keyboard mapUsingBlock:^id _Nullable (KeyModel *_Nonnull obj, NSUInteger idx) {
+            KeyModel *new = [KeyModel mj_objectWithKeyValues:[obj toJson]];
+            return new;
+        }] mutableCopy];
     }
 
     self.keyView.keyList = self.keyList;
@@ -144,9 +150,16 @@
 
     self.keyView = [[GameKeyContainerView alloc] initWithEdit:YES];
     @weakify(self);
-    self.keyView.tapCallback = ^(KeyModel *_Nonnull m) {
+    self.keyView.tapCallback = ^(KeyModel *_Nonnull m, UIView *_Nonnull v) {
         @strongify(self);
+
+        if (self.currentV == v) {
+            return;
+        }
+
         self.currentM = m;
+        self.currentV.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:0.3];
+        self.currentV = v;
     };
     [self.view insertSubview:self.keyView atIndex:0];
 
@@ -411,8 +424,13 @@
 
 // MARK: 还原默认
 - (void)resetKeyList {
-    self.keyList = [self.model.keyboard mutableCopy];
+    self.keyList = [[self.model.keyboard mapUsingBlock:^id _Nullable (KeyModel *_Nonnull obj, NSUInteger idx) {
+        KeyModel *new = [KeyModel mj_objectWithKeyValues:[obj toJson]];
+        return new;
+    }] mutableCopy];
     self.keyView.keyList = self.keyList;
+
+    [ToastAlertView showAlertWithTitle:@"还原成功" content:@"继续编辑最适合你的按键配置吧！"];
 }
 
 @end

@@ -95,7 +95,7 @@ typedef enum : NSUInteger {
 @property (nonatomic, assign)  NSInteger inputOp;
 @property (nonatomic, strong)  NSString *text;
 @property (nonatomic, strong)  NSString *type;
-@property (nonatomic, assign)  BOOL isRou;
+//@property (nonatomic, assign)  BOOL isRou;
 @property (nonatomic, assign)  NSInteger editIndex;
 @property (nonatomic, strong)  NSArray<KeyModel *> *composeArr;
 @property (nonatomic, strong)  NSArray<KeyModel *> *rouArr;

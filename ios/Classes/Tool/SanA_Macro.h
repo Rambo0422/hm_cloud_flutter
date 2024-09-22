@@ -22,6 +22,7 @@
 #import "NormalAlertView.h"
 #import "NSArray+Category.h"
 #import "RequestTool.h"
+#import "ToastAlertView.h"
 #import "UIViewController+TopVc.h"
 
 #define k_changeSound       @"changeSound"
