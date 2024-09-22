@@ -1,30 +1,29 @@
 package com.sayx.hm_cloud.model
 
+import com.google.gson.annotations.Expose
 import com.sayx.hm_cloud.GameManager
 import java.io.Serializable
 import java.util.UUID
 import kotlin.math.ceil
 
 class KeyInfo(
-    var id: UUID?,
-    var left: Int,
-    var top: Int,
-    val width: Int,
-    var zoom: Int,
-    var text: String?,
-    var type: String,
-    var opacity: Int,
-    var click: Int,
-    val inputOp: Int,
-    val height: Int,
-    var composeArr: List<KeyInfo>? = null,
-    var rouArr: List<KeyInfo>? = null,
-    var editIndex: Int = 0,
-    var isRou: Boolean = false,
-    var zoomChange: Boolean = false,
-    var opacityChange: Boolean = false,
-    var textChange: Boolean = false,
-    var listChange: Boolean = false
+    @Expose(serialize = false) var id: UUID?,
+    @Expose(serialize = true) var left: Int,
+    @Expose(serialize = true) var top: Int,
+    @Expose(serialize = true) val width: Int,
+    @Expose(serialize = true) var zoom: Int,
+    @Expose(serialize = true) var text: String?,
+    @Expose(serialize = true) var type: String,
+    @Expose(serialize = true) var opacity: Int,
+    @Expose(serialize = true) var click: Int,
+    @Expose(serialize = true) val inputOp: Int,
+    @Expose(serialize = true) val height: Int,
+    @Expose(serialize = true) var composeArr: List<KeyInfo>? = null,
+    @Expose(serialize = true) var rouArr: List<KeyInfo>? = null,
+    @Expose(serialize = false) var zoomChange: Boolean = false,
+    @Expose(serialize = false) var opacityChange: Boolean = false,
+    @Expose(serialize = false) var textChange: Boolean = false,
+    @Expose(serialize = false) var listChange: Boolean = false
 ) : Serializable {
 
     init {
@@ -91,8 +90,6 @@ class KeyInfo(
             this.height,
             this.composeArr,
             this.rouArr,
-            this.editIndex,
-            this.isRou,
         )
     }
 

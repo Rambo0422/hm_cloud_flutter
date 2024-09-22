@@ -37,8 +37,7 @@ class HmCloudController {
   }
 
   void setControllerData(dynamic data) {
-    log("setControllerData:${data}");
-    // methodChannel.invokeMethod("setControllerData", data);
+    methodChannel.invokeMethod("setControllerData", data);
   }
 
   void onEditSuccess(params) {

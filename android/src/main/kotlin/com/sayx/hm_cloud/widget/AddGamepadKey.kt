@@ -96,6 +96,9 @@ class AddGamepadKey @JvmOverloads constructor(
     }
 
     fun hideBoard(listenerImp: AnimatorListenerImp?) {
+        if (!isShow) {
+            return
+        }
         isShow = false
         val animator = ObjectAnimator.ofFloat(
             dataBinding.root,
