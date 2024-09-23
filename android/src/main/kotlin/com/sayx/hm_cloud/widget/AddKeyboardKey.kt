@@ -236,6 +236,7 @@ class AddKeyboardKey @JvmOverloads constructor(
         var optical = 60
         var inputOp = 0
         var height = 30
+        var remark = 0
         when (v?.id) {
             R.id.btn_key_0,
 
@@ -464,6 +465,7 @@ class AddKeyboardKey @JvmOverloads constructor(
             R.id.btn_edit_pulley_up -> {
                 width = 40
                 height = 40
+                remark = 1
                 inputOp =
                     HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpMouseWheel.value
                 type = KeyType.KEYBOARD_MOUSE_UP
@@ -472,6 +474,7 @@ class AddKeyboardKey @JvmOverloads constructor(
             R.id.btn_edit_pulley_down -> {
                 width = 40
                 height = 40
+                remark = -1
                 inputOp =
                     HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpMouseWheel.value
                 type = KeyType.KEYBOARD_MOUSE_DOWN
@@ -480,16 +483,16 @@ class AddKeyboardKey @JvmOverloads constructor(
             R.id.btn_edit_arrow_pad -> {
                 width = 90
                 height = 90
-                optical = 80
-                zoom = 70
+                optical = 60
+                zoom = 60
                 type = KeyType.ROCKER_ARROW
             }
 
             R.id.btn_edit_letter_pad -> {
                 width = 90
                 height = 90
-                optical = 80
-                zoom = 70
+                optical = 60
+                zoom = 60
                 type = KeyType.ROCKER_LETTER
             }
         }
@@ -501,6 +504,7 @@ class AddKeyboardKey @JvmOverloads constructor(
                 width,
                 zoom,
                 text,
+                remark,
                 type,
                 optical,
                 0,

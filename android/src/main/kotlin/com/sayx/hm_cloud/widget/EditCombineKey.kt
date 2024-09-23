@@ -232,6 +232,7 @@ class EditCombineKey @JvmOverloads constructor(
                     30,
                     60,
                     context.getString(R.string.combine_key),
+                    0,
                     KeyType.KEY_COMBINE,
                     60,
                     0,

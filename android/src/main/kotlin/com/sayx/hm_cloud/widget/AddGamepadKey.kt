@@ -128,14 +128,14 @@ class AddGamepadKey @JvmOverloads constructor(
         var zoom = 0
         var text: String? = null
         var type = ""
-        val optical = 70
+        val optical = 60
         var inputOp = 0
         var height = 0
         when (v?.id) {
             R.id.btn_key_edit_ls -> {
                 width = 25
                 height = 25
-                zoom = 50
+                zoom = 60
                 text = "LS"
                 type = KeyType.GAMEPAD_ROUND_SMALL
                 inputOp = GameConstants.gamepadButtonLSValue
@@ -163,7 +163,7 @@ class AddGamepadKey @JvmOverloads constructor(
             R.id.btn_key_edit_rs -> {
                 width = 25
                 height = 25
-                zoom = 50
+                zoom = 60
                 text = "RS"
                 type = KeyType.GAMEPAD_ROUND_SMALL
                 inputOp = GameConstants.gamepadButtonRSValue
@@ -191,21 +191,21 @@ class AddGamepadKey @JvmOverloads constructor(
             R.id.btn_edit_rocker_l -> {
                 width = 90
                 height = 90
-                zoom = 50
+                zoom = 60
                 type = KeyType.ROCKER_LEFT
             }
 
             R.id.btn_edit_rocker_r -> {
                 width = 90
                 height = 90
-                zoom = 50
+                zoom = 60
                 type = KeyType.ROCKER_RIGHT
             }
 
             R.id.btn_key_setting -> {
                 width = 40
                 height = 25
-                zoom = 50
+                zoom = 60
                 type = KeyType.GAMEPAD_ELLIPTIC
                 inputOp = GameConstants.gamepadSettingValue
             }
@@ -213,7 +213,7 @@ class AddGamepadKey @JvmOverloads constructor(
             R.id.btn_key_menu -> {
                 width = 40
                 height = 25
-                zoom = 50
+                zoom = 60
                 type = KeyType.GAMEPAD_ELLIPTIC
                 inputOp = GameConstants.gamepadMenuValue
             }
@@ -221,7 +221,7 @@ class AddGamepadKey @JvmOverloads constructor(
             R.id.btn_edit_d_pad -> {
                 width = 80
                 height = 80
-                zoom = 50
+                zoom = 60
                 type = KeyType.ROCKER_CROSS
             }
 
@@ -269,6 +269,7 @@ class AddGamepadKey @JvmOverloads constructor(
                 width,
                 zoom,
                 text,
+                0,
                 type,
                 optical,
                 0,
