@@ -1056,29 +1056,12 @@ class GameController @JvmOverloads constructor(
                 }
                 if (it.listChange) {
                     if (view is RouletteKeyView) {
-                        val keyInfo = view.getKeyInfo()
-                        val addList = it.rouArr?.filter { info ->
-                            info !in (keyInfo.rouArr ?: listOf())
-                        }
-                        val removeList = keyInfo.rouArr?.filter { info ->
-                            info !in (it.rouArr ?: listOf())
-                        }
-                        if (!addList.isNullOrEmpty()) {
-                            addList.forEach { info ->
-                                addKey(info)
-                            }
-                        }
-                        if (!removeList.isNullOrEmpty()) {
-                            removeList.forEach { info ->
-                                removeView(findKeyView(this@GameController, info ))
-                            }
-                        }
                         view.setKeyInfo(it)
-                        LogUtils.d("listChange:${it.rouArr}")
+//                        LogUtils.d("listChange:${it.rouArr}")
                     }
                     if (view is CombineKeyView) {
                         view.setKeyInfo(it)
-                        LogUtils.d("listChange:${it.composeArr}")
+//                        LogUtils.d("listChange:${it.composeArr}")
                     }
                 }
                 it.updateChange(false)
@@ -1230,5 +1213,17 @@ class GameController @JvmOverloads constructor(
             this.removeView(it)
         }
         views.clear()
+    }
+
+    fun removeKeys(list: List<KeyInfo>) {
+        list.forEach {
+            removeView(findKeyView(this, it))
+        }
+    }
+
+    fun addKeys(list: List<KeyInfo>) {
+        list.forEach {
+            addKey(it)
+        }
     }
 }

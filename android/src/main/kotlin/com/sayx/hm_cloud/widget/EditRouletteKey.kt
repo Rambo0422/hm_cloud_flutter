@@ -209,38 +209,48 @@ class EditRouletteKey @JvmOverloads constructor(
 
     private fun saveKey() {
         LogUtils.d("saveKey:$keyList")
-        val keyInfoList: MutableList<KeyInfo> = mutableListOf()
+        val newData: MutableList<KeyInfo> = mutableListOf()
         keyList.keys.forEach {
             val keyInfo = keyList[it]
             if (keyInfo != null) {
-                keyInfoList.add(keyInfo)
+                newData.add(keyInfo)
             }
         }
-        LogUtils.d("keyInfoList:$keyInfoList")
-        if (keyInfoList.size < 2) {
+        LogUtils.d("keyInfoList:$newData")
+        if (newData.size < 2) {
             ToastUtils.showLong(R.string.save_at_least_two)
             return
         }
-        if (keyInfo == null) {
+        if (keyInfo != null) {
+            val oldData = keyInfo!!.rouArr
+            val addList = oldData?.filter { info ->
+                info !in newData
+            }
+            val removeList = newData.filter { info ->
+                info !in (oldData ?: listOf())
+            }
+            addKeyListener?.rouRemoveData(addList)
+            addKeyListener?.rouAddData(removeList)
+            keyInfo!!.updateRouList(newData)
+            addKeyListener?.onUpdateKey()
+        } else {
             addKeyListener?.onAddKey(
                 KeyInfo(
                     UUID.randomUUID(),
                     AppSizeUtils.DESIGN_WIDTH / 2 - 45,
                     AppSizeUtils.DESIGN_HEIGHT / 2 - 45,
                     90,
-                    50,
+                    60,
                     "轮盘",
+                    0,
                     KeyType.KEY_ROULETTE,
                     60,
                     0,
                     0,
                     90,
-                    rouArr = keyInfoList
+                    rouArr = newData
                 )
             )
-        } else {
-            keyInfo?.updateRouList(keyInfoList)
-            addKeyListener?.onUpdateKey()
         }
         hideLayout()
     }

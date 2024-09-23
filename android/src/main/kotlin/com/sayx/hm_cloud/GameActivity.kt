@@ -760,6 +760,18 @@ class GameActivity : AppCompatActivity() {
                 override fun onUpdateKey() {
                     dataBinding.gameController.updateKey()
                 }
+
+                override fun rouAddData(list: List<KeyInfo>?) {
+                    if (!list.isNullOrEmpty()) {
+                        dataBinding.gameController.removeKeys(list)
+                    }
+                }
+
+                override fun rouRemoveData(list: List<KeyInfo>?) {
+                    if (!list.isNullOrEmpty()) {
+                        dataBinding.gameController.addKeys(list)
+                    }
+                }
             }
             val layoutParams = FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,

@@ -345,7 +345,7 @@ object GameManager : HmcpPlayerListener, OnContronListener {
             channel.invokeMethod("gameStatusStat", mapOf(
                 Pair("type", "game_sdk_status"),
                 Pair("page", "$status"),
-                Pair("action", "${data.getString(StatusCallbackUtil.DATA)}"),
+                Pair("action", data.getString(StatusCallbackUtil.DATA)),
                 Pair("arguments", gson.fromJson(gson.toJson(gameParam), Map::class.java))
             ))
             when (status) {
