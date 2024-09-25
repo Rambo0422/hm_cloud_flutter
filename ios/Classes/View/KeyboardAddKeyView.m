@@ -67,10 +67,10 @@
         KeyModel *m = [[KeyModel alloc] init];
         m.text = dict[@"name"];
         m.opacity = 70;
-        m.zoom = 60;
+        m.zoom = 50;
         m.type = @"kb-round";
-        m.width = 40;
-        m.height = 40;
+        m.width = 48;
+        m.height = 48;
         m.inputOp = sender.tag;
         m.click = 0;
         m.left = (668 / 2) - 20;
