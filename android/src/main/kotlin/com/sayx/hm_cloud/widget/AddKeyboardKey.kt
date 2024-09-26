@@ -229,13 +229,13 @@ class AddKeyboardKey @JvmOverloads constructor(
     override fun onClick(v: View?) {
         val left = AppSizeUtils.DESIGN_WIDTH / 2
         val top = AppSizeUtils.DESIGN_HEIGHT / 2
-        var width = 30
-        var zoom = 60
+        var width = 48
+        var zoom = 50
         val text: String? = if (v is TextView) v.text?.toString() else null
         var type = ""
-        var optical = 60
+        var optical = 70
         var inputOp = 0
-        var height = 30
+        var height = 48
         var remark = 0
         when (v?.id) {
             R.id.btn_key_0,
@@ -439,32 +439,32 @@ class AddKeyboardKey @JvmOverloads constructor(
             }
 
             R.id.btn_edit_mouse_left -> {
-                width = 40
-                height = 40
+                width = 64
+                height = 64
                 inputOp =
                     HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpMouseButtonLeft.value
                 type = KeyType.KEYBOARD_MOUSE_LEFT
             }
 
             R.id.btn_edit_mouse_right -> {
-                width = 40
-                height = 40
+                width = 64
+                height = 64
                 inputOp =
                     HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpMouseButtonRight.value
                 type = KeyType.KEYBOARD_MOUSE_RIGHT
             }
 
             R.id.btn_edit_mouse_middle -> {
-                width = 40
-                height = 40
+                width = 64
+                height = 64
                 inputOp =
                     HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpMouseButtonMiddle.value
                 type = KeyType.KEYBOARD_MOUSE_MIDDLE
             }
 
             R.id.btn_edit_pulley_up -> {
-                width = 40
-                height = 40
+                width = 64
+                height = 64
                 remark = 1
                 inputOp =
                     HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpMouseWheel.value
@@ -472,8 +472,8 @@ class AddKeyboardKey @JvmOverloads constructor(
             }
 
             R.id.btn_edit_pulley_down -> {
-                width = 40
-                height = 40
+                width = 64
+                height = 64
                 remark = -1
                 inputOp =
                     HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpMouseWheel.value
@@ -481,18 +481,18 @@ class AddKeyboardKey @JvmOverloads constructor(
             }
 
             R.id.btn_edit_arrow_pad -> {
-                width = 90
-                height = 90
-                optical = 60
-                zoom = 60
+                width = 144
+                height = 144
+                optical = 70
+                zoom = 50
                 type = KeyType.ROCKER_ARROW
             }
 
             R.id.btn_edit_letter_pad -> {
-                width = 90
-                height = 90
-                optical = 60
-                zoom = 60
+                width = 144
+                height = 144
+                optical = 70
+                zoom = 50
                 type = KeyType.ROCKER_LETTER
             }
         }

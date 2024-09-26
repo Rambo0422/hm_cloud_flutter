@@ -83,15 +83,15 @@ class AppCommonDialog : DialogFragment() {
         showLeftBtn()
         showRightBtn()
         dataBinding.btnLeft.setOnClickListener(leftBtnClickListener)
-        dataBinding.btnLeft.setOnTouchListener { v, _ ->
-//            leftBtnClickListener?.onClick(v)
-            return@setOnTouchListener false
-        }
+//        dataBinding.btnLeft.setOnTouchListener { v, _ ->
+////            leftBtnClickListener?.onClick(v)
+//            return@setOnTouchListener false
+//        }
         dataBinding.btnRight.setOnClickListener(rightBtnClickListener)
-        dataBinding.btnRight.setOnTouchListener { v, _ ->
-//            rightBtnClickListener?.onClick(v)
-            return@setOnTouchListener false
-        }
+//        dataBinding.btnRight.setOnTouchListener { v, _ ->
+////            rightBtnClickListener?.onClick(v)
+//            return@setOnTouchListener false
+//        }
     }
 
     override fun onStart() {
@@ -101,7 +101,7 @@ class AppCommonDialog : DialogFragment() {
         windowParams?.gravity = Gravity.CENTER
         windowParams?.width = ViewGroup.LayoutParams.WRAP_CONTENT
         windowParams?.height = ViewGroup.LayoutParams.WRAP_CONTENT
-        windowParams?.dimAmount = 0.01f
+        windowParams?.dimAmount = 0.8f
         windowParams?.flags  = windowParams?.flags?.or(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         window?.attributes = windowParams
     }
@@ -139,7 +139,8 @@ class AppCommonDialog : DialogFragment() {
 
     private fun showRightBtn() {
         dataBinding.btnRight.text = rightBtnText
-        dataBinding.btnRight.requestFocusFromTouch()
+        dataBinding.btnRight.isSelected = true
+//        dataBinding.btnRight.requestFocusFromTouch()
     }
 
     class Builder(private val activity: FragmentActivity) {

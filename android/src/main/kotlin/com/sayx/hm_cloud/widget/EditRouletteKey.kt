@@ -51,6 +51,8 @@ class EditRouletteKey @JvmOverloads constructor(
 
     var keyInfo: KeyInfo? = null
 
+    var tempList : List<KeyInfo>? = null
+
     init {
 
         initView()
@@ -60,6 +62,32 @@ class EditRouletteKey @JvmOverloads constructor(
 
     private fun initView() {
         dataBinding.ivBack.setOnClickListener {
+            val newData: MutableList<KeyInfo> = mutableListOf()
+            keyList.keys.forEach {
+                val keyInfo = keyList[it]
+                if (keyInfo != null) {
+                    newData.add(keyInfo)
+                }
+            }
+            if (keyInfo != null) {
+                val oldData = tempList
+                val addList = newData.filter { info ->
+                    info !in (oldData ?: listOf())
+                }
+                val removeList = oldData?.filter { info ->
+                    info !in newData
+                }
+                // rou移除的数据会加回列表
+                addKeyListener?.rouRemoveData(addList)
+                // rou添加的数据会从列表移除
+                addKeyListener?.rouAddData(removeList)
+                keyInfo!!.updateRouList(oldData ?: listOf())
+                addKeyListener?.onUpdateKey()
+            } else {
+                newData.forEach { info ->
+                    addKeyListener?.onKeyRemove(info)
+                }
+            }
             hideLayout()
         }
         dataBinding.btnSaveEdit.setOnClickListener {
@@ -75,6 +103,12 @@ class EditRouletteKey @JvmOverloads constructor(
                     keyList[index] = null
                     editKeyView.setData(null)
                     full = false
+                    addKeyListener?.onKeyRemove(data)
+                    if (keyInfo != null) {
+                        keyInfo?.updateRouList(keyList.filter { item -> item.value != null }.map { item -> item.value!! }.toList())
+                        keyInfo?.listChange = true
+                        addKeyListener?.onUpdateKey()
+                    }
                 }
             }
             val layoutParams = FrameLayout.LayoutParams(
@@ -179,10 +213,11 @@ class EditRouletteKey @JvmOverloads constructor(
     }
 
     fun addKey(keyInfo: KeyInfo) {
-        LogUtils.d("addKey:$keyInfo, keyList:$keyList")
         if (full) {
             return
         }
+        LogUtils.d("addKey:$keyInfo, keyList:$keyList")
+        addKeyListener?.onKeyAdd(keyInfo)
         keyList.keys.forEach {
             if (keyList[it] == null) {
                 keyList[it] = keyInfo
@@ -192,8 +227,16 @@ class EditRouletteKey @JvmOverloads constructor(
                     if (it == dataBinding.layoutKey.childCount - 1) {
                         full = true
                     }
-                    return
                 }
+
+                if (this@EditRouletteKey.keyInfo != null) {
+                    this@EditRouletteKey.keyInfo?.updateRouList(keyList.filter
+                        { item -> item.value != null }.map { item -> item.value!! }.toList()
+                    )
+                    this@EditRouletteKey.keyInfo?.listChange = true
+                    addKeyListener?.onUpdateKey()
+                }
+                return
             }
         }
     }
@@ -217,8 +260,8 @@ class EditRouletteKey @JvmOverloads constructor(
             }
         }
         LogUtils.d("keyInfoList:$newData")
-        if (newData.size < 2) {
-            ToastUtils.showLong(R.string.save_at_least_two)
+        if (newData.size < 4) {
+            ToastUtils.showLong(R.string.save_at_least)
             return
         }
         if (keyInfo != null) {
@@ -239,15 +282,15 @@ class EditRouletteKey @JvmOverloads constructor(
                     UUID.randomUUID(),
                     AppSizeUtils.DESIGN_WIDTH / 2 - 45,
                     AppSizeUtils.DESIGN_HEIGHT / 2 - 45,
-                    90,
-                    60,
+                    144,
+                    50,
                     "轮盘",
                     0,
                     KeyType.KEY_ROULETTE,
-                    60,
+                    70,
                     0,
                     0,
-                    90,
+                    144,
                     rouArr = newData
                 )
             )
@@ -259,6 +302,7 @@ class EditRouletteKey @JvmOverloads constructor(
         this.keyInfo = keyInfo
         keyInfo?.let {
             val keyInfoList = it.rouArr
+            tempList = keyInfoList
             if (!keyInfoList.isNullOrEmpty()) {
                 for (index in keyInfoList.indices) {
                     val info = keyInfoList[index]

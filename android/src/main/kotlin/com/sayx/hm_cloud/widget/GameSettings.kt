@@ -427,6 +427,7 @@ class GameSettings @JvmOverloads constructor(
 
     fun updatePlayTime(time: Long) {
         currentPlayTime = time / 1000
+        updateAvailableTime(currentPlayTime)
     }
 
     // 游戏计时

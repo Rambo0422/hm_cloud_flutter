@@ -71,6 +71,8 @@ class CombineKeyView @JvmOverloads constructor(
         }
     }
 
+    private var clickTime = 0L
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         event?.let {
@@ -131,7 +133,10 @@ class CombineKeyView @JvmOverloads constructor(
                             (parent as GameController).clearLine()
                         }
                         if (!isDrag) {
-                            performClick()
+                            if (System.currentTimeMillis() - clickTime > 200) {
+                                clickTime = System.currentTimeMillis()
+                                performClick()
+                            }
                         }
                     } else if (controllerStatus == ControllerStatus.Normal) {
                         if (it.getPointerId(it.actionIndex) == firstTouchId) {

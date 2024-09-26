@@ -96,22 +96,33 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
                 GameManager.setPCMouseMode(arguments)
             }
 
+            "releaseGame" -> {
+                val gameParam = GameManager.gson.fromJson(
+                    GameManager.gson.toJson(arguments),
+                    GameParam::class.java
+                )
+                GameManager.releasePlayingGame(gameParam, callback)
+            }
+
             // 操作方式数据
             "setControllerData" -> {
                 val data = GameManager.gson.fromJson(
                     GameManager.gson.toJson(arguments),
-                    ControllerInfo::class.java
+                    Map::class.java
                 )
-                EventBus.getDefault().post(ControllerConfigEvent(data))
+                val controllerInfo = ControllerInfo.fromData(data)
+                LogUtils.v("setControllerData:$controllerInfo")
+                EventBus.getDefault().post(ControllerConfigEvent(controllerInfo))
             }
 
             // 操作方式编辑成功
             "controllerEditSuccess" -> {
                 ToastUtils.showShort("已保存")
                 val data =
-                    GameManager.gson.fromJson(arguments as String, ControllerInfo::class.java)
+                    GameManager.gson.fromJson(arguments as String, Map::class.java)
+                val controllerInfo = ControllerInfo.fromData(data)
                 EventBus.getDefault()
-                    .post(ControllerEditEvent(data.type))
+                    .post(ControllerEditEvent(controllerInfo.type))
             }
 
             // 操作方式编辑失败

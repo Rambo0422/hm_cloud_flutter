@@ -113,4 +113,12 @@ class HmCloudController {
   void updatePlayInfo(Map<String, dynamic> params) {
     methodChannel.invokeMethod('updatePlayInfo', params);
   }
+
+  Future<dynamic> releaseGame(Map<String, String?> params) {
+    return methodChannel.invokeMethod("releaseGame", params);
+  }
+
+  void getPinCode() {
+    methodChannel.invokeMethod("getPinCode", null);
+  }
 }

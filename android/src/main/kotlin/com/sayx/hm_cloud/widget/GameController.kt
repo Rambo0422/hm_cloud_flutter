@@ -74,7 +74,7 @@ class GameController @JvmOverloads constructor(
     private var currentKey: KeyInfo? = null
         set(value) {
             field = value
-            LogUtils.d("currentKey:${value?.id}")
+//            LogUtils.d("currentKey:${value?.id}")
         }
 
     var controllerType: AppVirtualOperateType = AppVirtualOperateType.NONE
@@ -364,6 +364,8 @@ class GameController @JvmOverloads constructor(
         rockerView.tag = keyInfo.id
         rockerView.alpha = keyInfo.opacity / 100f
         val layoutParams = FrameLayout.LayoutParams(
+//            SizeUtils.dp2px(keyInfo.getKeyWidth().toFloat()),
+//            SizeUtils.dp2px(keyInfo.getKeyHeight().toFloat())
             AppSizeUtils.convertViewSize(keyInfo.getKeyWidth()),
             AppSizeUtils.convertViewSize(keyInfo.getKeyHeight())
         )
@@ -373,6 +375,7 @@ class GameController @JvmOverloads constructor(
             keyboardViews.add(rockerView)
         }
         addView(rockerView, layoutParams)
+        invalidate()
         rockerView.post {
 //            val x = if (keyInfo.left < AppSizeUtils.DESIGN_WIDTH / 2) {
 //                AppSizeUtils.convertViewSize(keyInfo.left)
@@ -544,6 +547,8 @@ class GameController @JvmOverloads constructor(
         rockerView.tag = keyInfo.id
         rockerView.alpha = keyInfo.opacity / 100f
         val layoutParams = FrameLayout.LayoutParams(
+//            SizeUtils.dp2px(keyInfo.getKeyWidth().toFloat()),
+//            SizeUtils.dp2px(keyInfo.getKeyHeight().toFloat())
             AppSizeUtils.convertViewSize(keyInfo.getKeyWidth()),
             AppSizeUtils.convertViewSize(keyInfo.getKeyHeight())
         )
@@ -553,6 +558,7 @@ class GameController @JvmOverloads constructor(
             keyboardViews.add(rockerView)
         }
         addView(rockerView, layoutParams)
+        invalidate()
         rockerView.post {
 //            val x = if (keyInfo.left < AppSizeUtils.DESIGN_WIDTH / 2) {
 //                AppSizeUtils.convertViewSize(keyInfo.left)
@@ -621,6 +627,8 @@ class GameController @JvmOverloads constructor(
         keyView.tag = keyInfo.id
         keyView.alpha = keyInfo.opacity / 100f
         val layoutParams = FrameLayout.LayoutParams(
+//            SizeUtils.dp2px(keyInfo.getKeyWidth().toFloat()),
+//            SizeUtils.dp2px(keyInfo.getKeyHeight().toFloat())
             AppSizeUtils.convertViewSize(keyInfo.getKeyWidth()),
             AppSizeUtils.convertViewSize(keyInfo.getKeyHeight())
         )
@@ -630,6 +638,7 @@ class GameController @JvmOverloads constructor(
             keyboardViews.add(keyView)
         }
         addView(keyView, layoutParams)
+        invalidate()
         keyView.post {
 //            val x = if (keyInfo.left < AppSizeUtils.DESIGN_WIDTH / 2) {
 //                AppSizeUtils.convertViewSize(keyInfo.left)
@@ -662,7 +671,7 @@ class GameController @JvmOverloads constructor(
                     listener?.onEditKeyClick(info)
                 }
             } else if (controllerStatus == ControllerStatus.Roulette) {
-                listener?.onEditKeyClick(keyInfo)
+//                ToastUtils.showShort("无法在轮盘中添加")
             }
         }
         keyView.onKeyTouchListener = object : OnKeyTouchListener {
@@ -687,6 +696,8 @@ class GameController @JvmOverloads constructor(
         keyView.tag = keyInfo.id
         keyView.alpha = keyInfo.opacity / 100f
         val layoutParams = FrameLayout.LayoutParams(
+//            SizeUtils.dp2px(keyInfo.getKeyWidth().toFloat()),
+//            SizeUtils.dp2px(keyInfo.getKeyHeight().toFloat())
             AppSizeUtils.convertViewSize(keyInfo.getKeyWidth()),
             AppSizeUtils.convertViewSize(keyInfo.getKeyHeight())
         )
@@ -736,6 +747,8 @@ class GameController @JvmOverloads constructor(
         keyView.tag = keyInfo.id
         keyView.alpha = keyInfo.opacity / 100f
         val layoutParams = FrameLayout.LayoutParams(
+//            SizeUtils.dp2px(keyInfo.getKeyWidth().toFloat()),
+//            SizeUtils.dp2px(keyInfo.getKeyHeight().toFloat())
             AppSizeUtils.convertViewSize(keyInfo.getKeyWidth()),
             AppSizeUtils.convertViewSize(keyInfo.getKeyHeight())
         )
@@ -747,6 +760,7 @@ class GameController @JvmOverloads constructor(
         }
         keyView.layoutParams = layoutParams
         addView(keyView)
+        invalidate()
         keyView.post {
 //            val x = if (keyInfo.left < AppSizeUtils.DESIGN_WIDTH / 2) {
 //                AppSizeUtils.convertViewSize(keyInfo.left)
@@ -1080,7 +1094,7 @@ class GameController @JvmOverloads constructor(
                     (view.parent as ViewGroup).removeView(view)
                 }
                 val currentEditKeys = getCurrentEditKeys()
-                currentEditKeys?.let { list->
+                currentEditKeys?.let { list ->
                     if (view is RouletteKeyView) {
                         LogUtils.d("remove RouletteKeyView")
                         it.rouArr?.forEach { info ->
@@ -1113,8 +1127,9 @@ class GameController @JvmOverloads constructor(
         for (index in 0..<childCount) {
             when (val childView = viewGroup.getChildAt(index)) {
                 is KeyView, is RockerView, is CombineKeyView, is RouletteKeyView -> {
-//                    LogUtils.d("childView:{type:$childView, tag:${childView.tag}}, keyInfo{id:${keyInfo.id}, type:${keyInfo.type}}")
+                    LogUtils.d("childView:{tag:${childView.tag}}, keyInfo:{id:${keyInfo.id}}")
                     if (childView.tag == keyInfo.id) {
+                        LogUtils.d("findKeyView:${childView.tag}, $keyInfo")
                         return childView
                     }
                 }
@@ -1142,9 +1157,11 @@ class GameController @JvmOverloads constructor(
      */
     fun restoreDefault() {
         if (controllerType == AppVirtualOperateType.APP_STICK_XBOX) {
-            controllerCallback?.getDefaultGamepadData()
+//            controllerCallback?.getDefaultGamepadData()
+            initGamepad(gamepadKeys)
         } else if (controllerType == AppVirtualOperateType.APP_KEYBOARD) {
-            controllerCallback?.getDefaultKeyboardData()
+//            controllerCallback?.getDefaultKeyboardData()
+            initKeyboard(keyboardKeys)
         }
     }
 
@@ -1217,7 +1234,15 @@ class GameController @JvmOverloads constructor(
 
     fun removeKeys(list: List<KeyInfo>) {
         list.forEach {
-            removeView(findKeyView(this, it))
+            if (controllerType == AppVirtualOperateType.APP_STICK_XBOX) {
+                editGamepadKeys.remove(it)
+            } else if (controllerType == AppVirtualOperateType.APP_KEYBOARD) {
+                editKeyboardKeys.remove(it)
+            }
+            val findKeyView = findKeyView(this, it)
+            if (findKeyView != null) {
+                removeView(findKeyView)
+            }
         }
     }
 

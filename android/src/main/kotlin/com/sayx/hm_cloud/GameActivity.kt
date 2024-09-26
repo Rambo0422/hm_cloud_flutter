@@ -241,8 +241,8 @@ class GameActivity : AppCompatActivity() {
 
         if (GameManager.isPartyPlay) {
             if (GameManager.isPartyPlayOwner) {
-                startUpdatePinCode()
                 GameManager.queryControlUsers()
+                GameManager.getPinCode()
             }
             GameManager.sendCurrentCid()
             initPlayPartyView()
@@ -771,6 +771,14 @@ class GameActivity : AppCompatActivity() {
                     if (!list.isNullOrEmpty()) {
                         dataBinding.gameController.addKeys(list)
                     }
+                }
+
+                override fun onKeyAdd(keyInfo: KeyInfo) {
+                    dataBinding.gameController.removeKeys(listOf(keyInfo))
+                }
+
+                override fun onKeyRemove(keyInfo: KeyInfo) {
+                    dataBinding.gameController.addKey(keyInfo)
                 }
             }
             val layoutParams = FrameLayout.LayoutParams(
@@ -1310,19 +1318,6 @@ class GameActivity : AppCompatActivity() {
 
         dataBinding.gameController.addView(permissionView)
         permissionView.show()
-    }
-
-    // 一分钟更新一次pinCode
-    private fun startUpdatePinCode() {
-        if (pinCodeTimer == null) {
-            pinCodeTimer = Timer()
-            val task = object : TimerTask() {
-                override fun run() {
-                    GameManager.getPinCode()
-                }
-            }
-            pinCodeTimer?.schedule(task, 0, 60000)
-        }
     }
 
     private fun stopUpdatePinCode() {
