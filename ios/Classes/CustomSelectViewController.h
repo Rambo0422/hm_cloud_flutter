@@ -6,13 +6,16 @@
 //
 
 #import "HM_BaseViewController.h"
-
+#import "SelectKeyCollectionViewCell.h"
 NS_ASSUME_NONNULL_BEGIN
 
 @interface CustomSelectViewController : HM_BaseViewController
 
-/// 选择自定义的模式 1 = 键鼠 2 = 手柄
-@property (nonatomic, strong) void (^ selectCallback)(CustomType type);
+@property (nonatomic, strong) void (^ useCallback)(KeyDetailModel *model);
+
+//@property (nonatomic, strong) void (^ addCallback)(KeyDetailModel *model, BOOL isEdit);
+
+@property (nonatomic, strong) void (^ pushVipCallback)(void);
 
 @end
 

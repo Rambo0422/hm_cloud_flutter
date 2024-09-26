@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.res.Configuration
 import android.util.Log
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ScreenUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.google.gson.reflect.TypeToken
@@ -59,9 +60,8 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
     override fun onMethodCall(call: MethodCall, callback: MethodChannel.Result) {
         val arguments = call.arguments
 //        Log.e("CloudGame", "onMethodCall:${call.method}, param:$arguments")
-//        LogUtils.d("onMethodCall:${call.method}, param:$arguments")
+        LogUtils.d("onMethodCall:${call.method}, param:$arguments")
         when (call.method) {
-
             // 游戏启动
             GameViewConstants.startCloudGame -> {
                 if (arguments is Map<*, *>) {
@@ -96,22 +96,33 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
                 GameManager.setPCMouseMode(arguments)
             }
 
+            "releaseGame" -> {
+                val gameParam = GameManager.gson.fromJson(
+                    GameManager.gson.toJson(arguments),
+                    GameParam::class.java
+                )
+                GameManager.releasePlayingGame(gameParam, callback)
+            }
+
             // 操作方式数据
             "setControllerData" -> {
                 val data = GameManager.gson.fromJson(
                     GameManager.gson.toJson(arguments),
-                    ControllerInfo::class.java
+                    Map::class.java
                 )
-                EventBus.getDefault().post(ControllerConfigEvent(data))
+                val controllerInfo = ControllerInfo.fromData(data)
+                LogUtils.v("setControllerData:$controllerInfo")
+                EventBus.getDefault().post(ControllerConfigEvent(controllerInfo))
             }
 
             // 操作方式编辑成功
             "controllerEditSuccess" -> {
                 ToastUtils.showShort("已保存")
                 val data =
-                    GameManager.gson.fromJson(arguments as String, ControllerInfo::class.java)
+                    GameManager.gson.fromJson(arguments as String, Map::class.java)
+                val controllerInfo = ControllerInfo.fromData(data)
                 EventBus.getDefault()
-                    .post(ControllerEditEvent(data.type))
+                    .post(ControllerEditEvent(controllerInfo.type))
             }
 
             // 操作方式编辑失败
@@ -186,9 +197,12 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
                 }
             }
 
+            "buySuccess"-> {
+                GameManager.updateGamePlayableTime()
+            }
+
             "closePage" -> {
                 GameManager.flutterActivity?.finish()
-                GameManager.updateGamePlayableTime()
             }
 
             "exitQueue" -> {

@@ -44,8 +44,12 @@ class ControllerTypeDialog : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        // 设置全屏
+        dialog?.window?.setFlags(
+            WindowManager.LayoutParams.FLAG_FULLSCREEN,
+            WindowManager.LayoutParams.FLAG_FULLSCREEN
+        )
         dataBinding = DataBindingUtil.inflate(inflater, R.layout.dialog_controller_type, container, false)
-        dataBinding.lifecycleOwner = this
         return dataBinding.root
     }
 
@@ -53,7 +57,6 @@ class ControllerTypeDialog : DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         val window = dialog?.window
         window?.let {
-            it.addFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE)
             it.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN)
             val insetsController = WindowCompat.getInsetsController(it, it.decorView)
             insetsController.hide(WindowInsetsCompat.Type.statusBars())
@@ -78,7 +81,17 @@ class ControllerTypeDialog : DialogFragment() {
         windowParams?.width = ViewGroup.LayoutParams.MATCH_PARENT
         windowParams?.height = ViewGroup.LayoutParams.MATCH_PARENT
         windowParams?.dimAmount = 0.8f
+        windowParams?.flags  = windowParams?.flags?.or(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         window?.attributes = windowParams
+    }
+
+    override fun onResume() {
+        super.onResume()
+        dialog?.window?.decorView?.systemUiVisibility = (
+                View.SYSTEM_UI_FLAG_FULLSCREEN
+                        or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                )
     }
 
     companion object {

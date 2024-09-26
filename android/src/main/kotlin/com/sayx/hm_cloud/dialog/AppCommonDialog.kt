@@ -55,15 +55,20 @@ class AppCommonDialog : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        // 设置全屏
+        dialog?.window?.setFlags(
+            WindowManager.LayoutParams.FLAG_FULLSCREEN,
+            WindowManager.LayoutParams.FLAG_FULLSCREEN
+        )
         dataBinding = DataBindingUtil.inflate(inflater, R.layout.dialog_common_app, container, false)
         return dataBinding.root
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val window = dialog?.window
         window?.let {
-            it.addFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE)
             it.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN)
             val insetsController = WindowCompat.getInsetsController(it, it.decorView)
             insetsController.hide(WindowInsetsCompat.Type.statusBars())
@@ -78,7 +83,36 @@ class AppCommonDialog : DialogFragment() {
         showLeftBtn()
         showRightBtn()
         dataBinding.btnLeft.setOnClickListener(leftBtnClickListener)
+//        dataBinding.btnLeft.setOnTouchListener { v, _ ->
+////            leftBtnClickListener?.onClick(v)
+//            return@setOnTouchListener false
+//        }
         dataBinding.btnRight.setOnClickListener(rightBtnClickListener)
+//        dataBinding.btnRight.setOnTouchListener { v, _ ->
+////            rightBtnClickListener?.onClick(v)
+//            return@setOnTouchListener false
+//        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val window = dialog?.window
+        val windowParams = window?.attributes
+        windowParams?.gravity = Gravity.CENTER
+        windowParams?.width = ViewGroup.LayoutParams.WRAP_CONTENT
+        windowParams?.height = ViewGroup.LayoutParams.WRAP_CONTENT
+        windowParams?.dimAmount = 0.8f
+        windowParams?.flags  = windowParams?.flags?.or(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        window?.attributes = windowParams
+    }
+
+    override fun onResume() {
+        super.onResume()
+        dialog?.window?.decorView?.systemUiVisibility = (
+                View.SYSTEM_UI_FLAG_FULLSCREEN
+                        or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                )
     }
 
     private fun showTitle() {
@@ -105,20 +139,11 @@ class AppCommonDialog : DialogFragment() {
 
     private fun showRightBtn() {
         dataBinding.btnRight.text = rightBtnText
+        dataBinding.btnRight.isSelected = true
+//        dataBinding.btnRight.requestFocusFromTouch()
     }
 
-    override fun onStart() {
-        super.onStart()
-        val window = dialog?.window
-        val windowParams = window?.attributes
-        windowParams?.gravity = Gravity.CENTER
-        windowParams?.width = ViewGroup.LayoutParams.WRAP_CONTENT
-        windowParams?.height = ViewGroup.LayoutParams.WRAP_CONTENT
-        windowParams?.dimAmount = 0.01f
-        window?.attributes = windowParams
-    }
-
-    class Builder(val activity: FragmentActivity) {
+    class Builder(private val activity: FragmentActivity) {
 
         private var title: CharSequence? = null
         private var titleColor: Int? = null

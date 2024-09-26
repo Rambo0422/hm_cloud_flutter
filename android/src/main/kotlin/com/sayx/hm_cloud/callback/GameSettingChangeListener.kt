@@ -1,6 +1,7 @@
 package com.sayx.hm_cloud.callback
 
 import com.haima.hmcp.beans.ResolutionInfo
+import com.haima.hmcp.beans.VideoDelayInfo
 import com.sayx.hm_cloud.constants.AppVirtualOperateType
 
 interface GameSettingChangeListener {
@@ -32,4 +33,6 @@ interface GameSettingChangeListener {
     fun updateNetSignal(icon: Int)
 
     fun onShowPlayParty()
+
+    fun onDelayChange(delayInfo: VideoDelayInfo?)
 }

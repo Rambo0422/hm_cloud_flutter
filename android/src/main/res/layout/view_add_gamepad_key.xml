@@ -25,6 +25,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_board"
             android:layout_width="match_parent"
             android:layout_height="140dp"
             android:background="#232837"

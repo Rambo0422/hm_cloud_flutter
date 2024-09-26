@@ -6,4 +6,16 @@ interface AddKeyListener {
     fun onAddKey(keyInfo: KeyInfo)
 
     fun onUpdateKey()
+
+    fun rouAddData(list : List<KeyInfo>?)
+
+    fun rouRemoveData(list : List<KeyInfo>?)
+
+    fun onKeyAdd(keyInfo: KeyInfo) {
+
+    }
+
+    fun onKeyRemove(keyInfo: KeyInfo) {
+
+    }
 }

@@ -427,6 +427,7 @@ class GameSettings @JvmOverloads constructor(
 
     fun updatePlayTime(time: Long) {
         currentPlayTime = time / 1000
+        updateAvailableTime(currentPlayTime)
     }
 
     // 游戏计时
@@ -465,6 +466,7 @@ class GameSettings @JvmOverloads constructor(
     @SuppressLint("SetTextI18n")
     private fun updateNetDelay() {
         val latencyInfo = gameView?.clockDiffVideoLatencyInfo
+        gameSettingChangeListener?.onDelayChange(latencyInfo)
 //        LogUtils.d("updateNetDelay:${latencyInfo}")
         val delay = latencyInfo?.netDelay ?: 999
         val netDelay = if (delay > 450) 450 else delay

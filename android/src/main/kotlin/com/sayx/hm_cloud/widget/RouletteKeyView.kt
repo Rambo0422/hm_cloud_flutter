@@ -24,6 +24,7 @@ import com.sayx.hm_cloud.model.KeyInfo
 import com.sayx.hm_cloud.callback.OnKeyEventListener
 import com.sayx.hm_cloud.callback.OnPositionChangeListener
 import com.sayx.hm_cloud.constants.ControllerStatus
+import com.sayx.hm_cloud.constants.KeyType
 import com.sayx.hm_cloud.constants.controllerStatus
 import com.sayx.hm_cloud.model.RoulettePart
 import com.sayx.hm_cloud.utils.AppSizeUtils
@@ -73,6 +74,8 @@ class RouletteKeyView @JvmOverloads constructor(
     private var firstTouchId = 0
 
     private var currentIndex = -1
+
+    lateinit var keyInfoData: KeyInfo
 
     init {
         arcPaint.style = Paint.Style.FILL_AND_STROKE
@@ -176,12 +179,36 @@ class RouletteKeyView @JvmOverloads constructor(
     }
 
     private fun drawRouletteName(canvas: Canvas, roulettePart: RoulettePart) {
-        val name: String = roulettePart.keyInfo.text ?: ""
+        val name: String = when (roulettePart.keyInfo.type) {
+            KeyType.KEYBOARD_MOUSE_LEFT -> {
+                "左击"
+            }
+
+            KeyType.KEYBOARD_MOUSE_RIGHT -> {
+                "右击"
+            }
+
+            KeyType.KEYBOARD_MOUSE_MIDDLE -> {
+                "中键"
+            }
+
+            KeyType.KEYBOARD_MOUSE_UP -> {
+                "上滚"
+            }
+
+            KeyType.KEYBOARD_MOUSE_DOWN -> {
+                "下滚"
+            }
+
+            else -> {
+                roulettePart.keyInfo.text ?: ""
+            }
+        }
         val path = Path()
         path.addArc(rouletteRectF, roulettePart.startAngle, roulettePart.angle)
         val midAngle: Float = roulettePart.startAngle + roulettePart.angle / 2
-        val x = rouletteRectF.centerX() + radius * cos(Math.toRadians(midAngle.toDouble())) * 0.6f
-        val y = rouletteRectF.centerY() + radius * sin(Math.toRadians(midAngle.toDouble())) * 0.6f
+        val x = rouletteRectF.centerX() + radius * cos(Math.toRadians(midAngle.toDouble())) * 0.7f
+        val y = rouletteRectF.centerY() + radius * sin(Math.toRadians(midAngle.toDouble())) * 0.7f
         textPaint.color = Color.WHITE
         val fontMetrics = textPaint.fontMetrics
         val distance = (fontMetrics.bottom - fontMetrics.top) / 2 - fontMetrics.bottom
@@ -191,9 +218,7 @@ class RouletteKeyView @JvmOverloads constructor(
 
     fun setKeyInfo(keyInfo: KeyInfo) {
 //        LogUtils.d("setKeyInfo:$keyInfo")
-        if (keyInfo.rouArr.isNullOrEmpty()) {
-            return
-        }
+        this.keyInfoData = keyInfo
         thumbText = keyInfo.text
         keyInfo.rouArr?.let {
             rouletteParts = mutableListOf()
@@ -211,6 +236,12 @@ class RouletteKeyView @JvmOverloads constructor(
         showRoulette = controllerStatus != ControllerStatus.Normal
         invalidate()
     }
+
+    fun getKeyInfo(): KeyInfo {
+        return keyInfoData
+    }
+
+    private var clickTime = 0L
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
@@ -306,7 +337,10 @@ class RouletteKeyView @JvmOverloads constructor(
                             (parent as GameController).clearLine()
                         }
                         if (!isDrag) {
-                            performClick()
+                            if (System.currentTimeMillis() - clickTime > 200) {
+                                clickTime = System.currentTimeMillis()
+                                performClick()
+                            }
                         }
                     } else if (controllerStatus == ControllerStatus.Normal) {
                         showRoulette = false

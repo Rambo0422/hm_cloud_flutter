@@ -1,11 +1,13 @@
 package com.sayx.hm_cloud.widget
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.databinding.DataBindingUtil
 import com.sayx.hm_cloud.R
+import com.sayx.hm_cloud.constants.KeyType
 import com.sayx.hm_cloud.databinding.ViewEditKeyBinding
 import com.sayx.hm_cloud.model.KeyInfo
 
@@ -20,15 +22,35 @@ class EditKeyView @JvmOverloads constructor(
 
     private var data: KeyInfo? = null
 
+    @SuppressLint("SetTextI18n")
     fun setData(keyInfo: KeyInfo?) {
         if (keyInfo != null) {
-            dataBinding.tvName.text = keyInfo.text
+            val name: String = when(keyInfo.type) {
+                KeyType.KEYBOARD_MOUSE_LEFT-> {
+                    "左击"
+                }
+                KeyType.KEYBOARD_MOUSE_RIGHT-> {
+                    "右击"
+                }
+                KeyType.KEYBOARD_MOUSE_MIDDLE-> {
+                    "中键"
+                }
+                KeyType.KEYBOARD_MOUSE_UP-> {
+                    "上滚"
+                }
+                KeyType.KEYBOARD_MOUSE_DOWN-> {
+                    "下滚"
+                }
+                else -> {
+                    keyInfo.text ?: ""
+                }
+            }
+            dataBinding.tvName.text = name
             dataBinding.ivDelete.visibility = VISIBLE
         } else {
             dataBinding.tvName.text = ""
             dataBinding.ivDelete.visibility = INVISIBLE
         }
-        this.data?.isRou = false
         this.data = keyInfo
     }
 

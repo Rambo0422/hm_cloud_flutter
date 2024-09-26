@@ -5,10 +5,10 @@
 //  Created by a水 on 2024/8/20.
 //
 
-#import "RouletteView.h"
+#import "GameKey_RouletteView.h"
 #import "SanA_Macro.h"
 
-@interface RouletteView ()
+@interface GameKey_RouletteView ()
 
 @property (nonatomic, strong) UIColor *highlightColor;
 @property (nonatomic, assign) NSInteger numberOfSegments;
@@ -16,7 +16,7 @@
 
 @end
 
-@implementation RouletteView{
+@implementation GameKey_RouletteView{
     NSInteger _highlightedSegment;
 
     BOOL _isVisible; // 用于跟踪圆形视图是否可见
@@ -29,16 +29,9 @@
         _numberOfSegments = model.rouArr.count;
         _highlightColor = [kColor(0xC6EC4B) colorWithAlphaComponent:0.45];
         _highlightedSegment = -1; // 没有高亮的部分
-        _isVisible = NO; // 默认圆形视图不可见
+        _isVisible = isEdit; // 默认圆形视图不可见
         self.backgroundColor = [UIColor clearColor];
         [self setupCenterButton];
-
-        if (self.isEdit) {
-            UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
-            pan.delaysTouchesBegan = YES;
-            pan.delaysTouchesEnded = YES;
-            [self addGestureRecognizer:pan];
-        }
     }
 
     return self;
@@ -68,47 +61,6 @@
 
     [self.centerButton setTitleColor:[kColor(0xFFFFFF) colorWithAlphaComponent:0.6] forState:UIControlStateNormal];
     self.centerButton.titleLabel.font = [UIFont systemFontOfSize:9];
-}
-
-- (void)handlePan:(UIPanGestureRecognizer *)gestureRecognizer {
-    if (self.isEdit) {
-        UIView *draggedView = gestureRecognizer.view;
-
-        // 获取拖拽的位移
-        CGPoint translation = [gestureRecognizer translationInView:draggedView.superview];
-
-        // 根据拖拽的位移更新视图的位置
-        CGPoint newCenter = CGPointMake(draggedView.center.x + translation.x, draggedView.center.y + translation.y);
-
-        // 获取屏幕边界
-        CGFloat halfWidth = CGRectGetWidth(draggedView.bounds) / 2.0;
-        CGFloat halfHeight = CGRectGetHeight(draggedView.bounds) / 2.0;
-        CGFloat screenWidth = CGRectGetWidth(draggedView.superview.bounds);
-        CGFloat screenHeight = CGRectGetHeight(draggedView.superview.bounds);
-
-        // 确保新中心点不会超出屏幕边界
-        newCenter.x = MAX(halfWidth, MIN(screenWidth - halfWidth, newCenter.x));
-        newCenter.y = MAX(halfHeight, MIN(screenHeight - halfHeight, newCenter.y));
-
-        // 更新视图的位置
-        draggedView.center = newCenter;
-
-
-        NSInteger top = (NSInteger)CGRectGetMinY(draggedView.frame);
-        NSInteger left = (NSInteger)CGRectGetMinX(draggedView.frame);
-
-
-        self.model.top = top / (kScreenH / 375.0);
-        self.model.left = left / (kScreenW / 667.0);
-
-
-        // 重置拖拽手势的累积位移
-        [gestureRecognizer setTranslation:CGPointZero inView:self.superview];
-
-        if (self.tapCallback) {
-            self.tapCallback(self.model);
-        }
-    }
 }
 
 - (void)updateHighlightedSegmentForPoint:(CGPoint)point {
@@ -246,10 +198,12 @@
     _isVisible = NO;
 
     if (_highlightedSegment != -1) {
-        [self touchDown:self.model.rouArr[_highlightedSegment]];
+        __block NSInteger cacheSegment = _highlightedSegment;
+
+        [self touchDown:self.model.rouArr[cacheSegment]];
 
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self touchUp:self.model.rouArr[self->_highlightedSegment]];
+            [self touchUp:self.model.rouArr[cacheSegment]];
             self->_highlightedSegment = -1;
         });
     }

@@ -22,6 +22,8 @@ class FloatDragButton @JvmOverloads constructor(
     private var parentWidth = 0
     private var parentHeight = 0
 
+    private var clickTime = 0L
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         when (event?.action) {
@@ -59,7 +61,10 @@ class FloatDragButton @JvmOverloads constructor(
             MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> {
                 isPressed = false
                 if (!isDrag) {
-                    performClick()
+                    if (System.currentTimeMillis() - clickTime > 200) {
+                        clickTime = System.currentTimeMillis()
+                        performClick()
+                    }
                 }
             }
         }

@@ -9,7 +9,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface RouletteView : BaseKeyView
+@interface GameKey_RouletteView : BaseKeyView
 
 @property (nonatomic, strong) void (^ addCallback)(KeyModel *m);
 

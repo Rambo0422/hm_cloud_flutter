@@ -98,6 +98,16 @@ class EditCombineKey @JvmOverloads constructor(
             }
             dataBinding.layoutKey.addView(view, layoutParams)
         }
+        // 编辑菜单隐藏/显示
+        dataBinding.btnEditFold.setOnClickListener {
+            val selected = !dataBinding.btnEditFold.isSelected
+            dataBinding.btnEditFold.isSelected = selected
+            if (selected) {
+                foldMenu()
+            } else {
+                unfoldMenu()
+            }
+        }
     }
 
     override fun onAttachedToWindow() {
@@ -145,6 +155,30 @@ class EditCombineKey @JvmOverloads constructor(
         animator.start()
     }
 
+    private fun unfoldMenu() {
+        val animator = ObjectAnimator.ofFloat(
+            dataBinding.root,
+            "translationY",
+            -dataBinding.layoutBoard.height.toFloat(),
+            0.0f
+        )
+        animator.duration = 500L
+        animator.interpolator = AccelerateInterpolator()
+        animator.start()
+    }
+
+    private fun foldMenu() {
+        val animator = ObjectAnimator.ofFloat(
+            dataBinding.root,
+            "translationY",
+            0.0f,
+            -dataBinding.layoutBoard.height.toFloat()
+        )
+        animator.duration = 500L
+        animator.interpolator = AccelerateInterpolator()
+        animator.start()
+    }
+
     fun addKey(keyInfo: KeyInfo) {
         LogUtils.d("addKey:$keyInfo, keyList:$keyList")
         if (full) {
@@ -186,7 +220,7 @@ class EditCombineKey @JvmOverloads constructor(
             }
         }
         if (keyInfoList.size < 2) {
-            ToastUtils.showLong(R.string.save_at_least_two)
+            ToastUtils.showLong(R.string.save_at_least)
             return
         }
         if (keyInfo == null) {
@@ -195,14 +229,15 @@ class EditCombineKey @JvmOverloads constructor(
                     UUID.randomUUID(),
                     AppSizeUtils.DESIGN_WIDTH / 2 - 15,
                     AppSizeUtils.DESIGN_HEIGHT / 2 - 15,
-                    30,
-                    60,
+                    64,
+                    50,
                     context.getString(R.string.combine_key),
+                    0,
                     KeyType.KEY_COMBINE,
-                    60,
+                    70,
                     0,
                     0,
-                    30,
+                    64,
                     composeArr = keyInfoList
                 )
             )

@@ -83,6 +83,8 @@ class KeyView @JvmOverloads constructor(
 
     private fun showKeyboardKey(keyInfo: KeyInfo) {
         val layoutParams = LayoutParams(
+//            SizeUtils.dp2px(keyInfo.getKeyWidth().toFloat()),
+//            SizeUtils.dp2px(keyInfo.getKeyHeight().toFloat())
             AppSizeUtils.convertViewSize(keyInfo.getKeyWidth()),
             AppSizeUtils.convertViewSize(keyInfo.getKeyHeight())
         )
@@ -111,13 +113,15 @@ class KeyView @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        if (controllerStatus == ControllerStatus.Edit) {
+        if (controllerStatus == ControllerStatus.Edit || controllerStatus == ControllerStatus.Roulette) {
             canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), bgPaint)
         }
     }
 
     private fun showKeyboardMouse(keyInfo: KeyInfo) {
         val layoutParams = LayoutParams(
+//            SizeUtils.dp2px(keyInfo.getKeyWidth().toFloat()),
+//            SizeUtils.dp2px(keyInfo.getKeyHeight().toFloat())
             AppSizeUtils.convertViewSize(keyInfo.getKeyWidth()),
             AppSizeUtils.convertViewSize(keyInfo.getKeyHeight())
         )
@@ -197,6 +201,8 @@ class KeyView @JvmOverloads constructor(
         }
     }
 
+    private var clickTime = 0L
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         event?.let {
@@ -263,14 +269,20 @@ class KeyView @JvmOverloads constructor(
                             (parent as GameController).clearLine()
                         }
                         if (!isDrag) {
-                            performClick()
+                            if (System.currentTimeMillis() - clickTime > 200) {
+                                clickTime = System.currentTimeMillis()
+                                performClick()
+                            }
                         }
                     } else if (controllerStatus == ControllerStatus.Normal) {
                         if (it.getPointerId(it.actionIndex) == firstTouchId) {
                             onKeyTouchListener?.onKeyTouch(false)
                         }
-                    } else if (controllerStatus == ControllerStatus.Roulette){
-                        performClick()
+                    } else if (controllerStatus == ControllerStatus.Roulette) {
+                        if (System.currentTimeMillis() - clickTime > 200) {
+                            clickTime = System.currentTimeMillis()
+                            performClick()
+                        }
                     }
                 }
 

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/services.dart';
 import 'package:hm_cloud/hm_cloud_constants.dart';
 
@@ -110,5 +112,13 @@ class HmCloudController {
 // 更新可玩时长，vip过期时间，高峰时长
   void updatePlayInfo(Map<String, dynamic> params) {
     methodChannel.invokeMethod('updatePlayInfo', params);
+  }
+
+  Future<dynamic> releaseGame(Map<String, String?> params) {
+    return methodChannel.invokeMethod("releaseGame", params);
+  }
+
+  void getPinCode() {
+    methodChannel.invokeMethod("getPinCode", null);
   }
 }

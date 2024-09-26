@@ -17,71 +17,69 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:background="@drawable/shape_common_dialog_bg"
             android:clickable="true"
             android:focusable="true"
-            android:minHeight="150dp"
-            android:minWidth="300dp"
-            android:padding="25dp">
+            android:background="@drawable/img_common_dialog_bg"
+            android:minWidth="370dp"
+            android:minHeight="200dp"
+            android:paddingHorizontal="25dp">
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tv_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="25dp"
-                android:layout_marginEnd="25dp"
                 android:gravity="center"
                 android:textColor="@android:color/white"
                 android:textSize="17sp"
+                app:layout_constraintVertical_chainStyle="spread"
+                app:layout_constraintBottom_toTopOf="@id/tv_subtitle"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="" />
+                tools:text="弹窗标题" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tv_subtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
                 android:textColor="#FFC6EC4B"
                 android:textSize="13sp"
+                android:layout_marginBottom="10dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/btn_right"
                 app:layout_constraintTop_toBottomOf="@id/tv_title"
-                tools:text="每小时可加60经验值"
+                tools:text="弹窗副标题"
                 tools:visibility="visible" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/btn_left"
                 android:layout_width="0dp"
-                android:layout_height="45dp"
-                android:layout_marginTop="30dp"
+                android:layout_height="35dp"
+                android:layout_marginBottom="30dp"
                 android:layout_marginEnd="5dp"
-                android:background="@drawable/shape_dialog_left_button_bg"
+                android:background="@drawable/selector_dialog_btn_bg"
                 android:gravity="center"
-                android:textColor="#FF959CB1"
+                android:textColor="@color/selector_btn_text_color"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/btn_right"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_subtitle"
-                tools:text="继续排队"
+                tools:text="左按钮"
                 tools:visibility="visible" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/btn_right"
                 android:layout_width="0dp"
-                android:layout_height="45dp"
+                android:layout_height="35dp"
                 android:layout_marginStart="5dp"
-                android:layout_marginTop="30dp"
-                android:background="@drawable/shape_dialog_right_button_bg"
+                android:layout_marginBottom="30dp"
+                android:background="@drawable/selector_dialog_btn_bg"
                 android:gravity="center"
-                android:textColor="#FF000000"
+                android:textColor="@color/selector_btn_text_color"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/btn_left"
-                app:layout_constraintTop_toBottomOf="@id/tv_subtitle"
-                app:layout_goneMarginLeft="25dp"
-                tools:text="立即使用" />
+                tools:text="右按钮" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </FrameLayout>
 </layout>

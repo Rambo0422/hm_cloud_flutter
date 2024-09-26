@@ -6,4 +6,8 @@ abstract class AddKeyListenerImp : AddKeyListener {
     override fun onAddKey(keyInfo: KeyInfo) {}
 
     override fun onUpdateKey() {}
+
+    override fun rouAddData(list: List<KeyInfo>?) {}
+
+    override fun rouRemoveData(list: List<KeyInfo>?) {}
 }

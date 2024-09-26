@@ -6,7 +6,7 @@
 //
 
 #import "CustomKeyViewController.h"
-#import "GameKeyView.h"
+#import "GameKeyContainerView.h"
 #import "JoystickAddKeyView.h"
 #import "KeyboardAddKeyView.h"
 #import "MouseAddKeyView.h"
@@ -17,7 +17,7 @@
 
 @interface CustomKeyViewController ()
 
-@property (nonatomic, strong) GameKeyView *keyView;
+@property (nonatomic, strong) GameKeyContainerView *keyView;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *topCos;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *bottomCos;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *addKeyViewHeightCos;
@@ -57,12 +57,26 @@
 
 @implementation CustomKeyViewController
 
+- (NSMutableArray<KeyModel *> *)keyList {
+    if (!_keyList) {
+        _keyList = [NSMutableArray array];
+    }
+
+    return _keyList;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
 
     [self configView];
 
-    [self request];
+    if (self.model.keyboard) {
+        self.keyList = [self.model.keyboard mutableCopy];
+    }
+
+    self.keyView.keyList = self.keyList;
+
+
 
     [self configRac];
 }
@@ -128,7 +142,7 @@
 
     self.bottomCos.constant = -self.totalBottomHeight;
 
-    self.keyView = [[GameKeyView alloc] initWithEdit:YES];
+    self.keyView = [[GameKeyContainerView alloc] initWithEdit:YES];
     @weakify(self);
     self.keyView.tapCallback = ^(KeyModel *_Nonnull m) {
         @strongify(self);
@@ -142,10 +156,6 @@
 
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap)];
     [self.view addGestureRecognizer:tap];
-}
-
-- (void)request {
-    [self requestKeyList];
 }
 
 - (void)configRac {
@@ -359,87 +369,50 @@
     }];
 }
 
-/// MARK: 网络请求
-// 获取当前配置
-- (void)requestKeyList {
-    if (self.type == Custom_joystick) {
-        [self getJoystick];
-    } else {
-        [self getKeyboard];
-    }
-}
-
-// 更新当前配置
+// MARK: 更新当前配置
 - (void)updateKeyList {
     NSArray *keyboard = [self.keyList mapUsingBlock:^id _Nullable (KeyModel *_Nonnull obj, NSUInteger idx) {
         return [obj toJson];
     }];
 
-    [[RequestTool share] requestUrl:k_api_updateKeyboard
-                         methodType:Request_POST
-                             params:@{ @"type": self.type == Custom_joystick ? @"1" : @"2",
-                                       @"game_id": [HmCloudTool share].gameId,
-                                       @"keyboard": keyboard }
-                      faildCallBack:nil
-                    successCallBack:^(id _Nonnull obj) {
-        [self dismissViewControllerAnimated:YES
-                                 completion:^{
-            if (self.dismissCallback) {
-                self.dismissCallback(YES);
-            }
+
+    if (self.isEdit) {
+        [[RequestTool share] requestUrl:k_api_updateKeyboard_custom_v2
+                             methodType:Request_POST
+                                 params:@{ @"use": @(self.model.use),
+                                           @"id": self.model.ID,
+                                           @"keyboard": keyboard }
+                          faildCallBack:nil
+                        successCallBack:^(id _Nonnull obj) {
+            [self dismissViewControllerAnimated:YES
+                                     completion:^{
+                if (self.dismissCallback) {
+                    self.dismissCallback(YES);
+                }
+            }];
         }];
-    }];
-}
-
-// MARK: 获取手柄
-- (void)getJoystick {
-    // 获取手柄配置，如果获取失败 则取本地的默认配置
-    [[RequestTool share] requestUrl:k_api_getKeyboard
-                         methodType:Request_GET
-                             params:@{ @"type": @"1", @"game_id": [HmCloudTool share].gameId }
-                      faildCallBack:^{
-        NSString *path = [k_SanABundle pathForResource:@"joystick"
-                                                ofType:@"json"];
-        NSData *data = [NSData dataWithContentsOfFile:path];
-        NSError *error;
-        NSArray *arr = [NSJSONSerialization JSONObjectWithData:data
-                                                       options:kNilOptions
-                                                         error:&error];
-
-        if (!error) {
-            self.keyList = [[KeyModel mj_objectArrayWithKeyValuesArray:arr] mutableCopy];
-            self.keyView.keyList = self.keyList;
-        }
+    } else {
+        [[RequestTool share] requestUrl:k_api_createKeyboard_custom_v2
+                             methodType:Request_POST
+                                 params:@{ @"type": self.type == Custom_joystick ? @"1" : @"2",
+                                           @"game_id": [HmCloudTool share].gameId,
+                                           @"keyboard": keyboard }
+                          faildCallBack:nil
+                        successCallBack:^(id _Nonnull obj) {
+            [self dismissViewControllerAnimated:YES
+                                     completion:^{
+                if (self.dismissCallback) {
+                    self.dismissCallback(YES);
+                }
+            }];
+        }];
     }
-                    successCallBack:^(id _Nonnull obj) {
-        self.keyList = [KeyModel mj_objectArrayWithKeyValuesArray:obj[@"data"][@"keyboard"]];
-        self.keyView.keyList = self.keyList;
-    }];
-}
-
-// MARK: 获取键盘
-- (void)getKeyboard {
-    [[RequestTool share] requestUrl:k_api_getKeyboard
-                         methodType:Request_GET
-                             params:@{ @"type": @"2", @"game_id": [HmCloudTool share].gameId }
-                      faildCallBack:nil
-                    successCallBack:^(id _Nonnull obj) {
-        self.keyList = [[KeyModel mj_objectArrayWithKeyValuesArray:obj[@"data"][@"keyboard"]]  mutableCopy];
-        self.keyView.keyList = self.keyList;
-    }];
 }
 
 // MARK: 还原默认
 - (void)resetKeyList {
-//    k_api_resetKeyboard
-    [[RequestTool share] requestUrl:k_api_resetKeyboard
-                         methodType:Request_POST
-                             params:@{ @"type": self.type == Custom_joystick ? @"1" : @"2",
-                                       @"game_id": [HmCloudTool share].gameId, }
-                      faildCallBack:nil
-                    successCallBack: ^(id _Nonnull obj) {
-        [self requestKeyList];
-    }];
+    self.keyList = [self.model.keyboard mutableCopy];
+    self.keyView.keyList = self.keyList;
 }
 
 @end

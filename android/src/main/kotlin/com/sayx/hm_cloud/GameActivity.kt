@@ -1,6 +1,7 @@
 package com.sayx.hm_cloud
 
 import android.animation.Animator
+import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -35,7 +36,11 @@ import com.gyf.immersionbar.ktx.immersionBar
 import com.gyf.immersionbar.ktx.navigationBarHeight
 import com.haima.hmcp.HmcpManager
 import com.haima.hmcp.beans.ResolutionInfo
+import com.haima.hmcp.beans.UserInfo
+import com.haima.hmcp.beans.VideoDelayInfo
 import com.haima.hmcp.listeners.OnLivingListener
+import com.haima.hmcp.listeners.OnSaveGameCallBackListener
+import com.haima.hmcp.rtc.widgets.beans.RtcVideoDelayInfo
 import com.haima.hmcp.widgets.beans.VirtualOperateType
 import com.sayx.hm_cloud.callback.AddKeyListenerImp
 import com.sayx.hm_cloud.callback.AnimatorListenerImp
@@ -74,6 +79,7 @@ import com.sayx.hm_cloud.widget.AddKeyboardKey
 import com.sayx.hm_cloud.widget.ControllerEditLayout
 import com.sayx.hm_cloud.widget.EditCombineKey
 import com.sayx.hm_cloud.widget.EditRouletteKey
+import com.sayx.hm_cloud.widget.ExitNoticeView
 import com.sayx.hm_cloud.widget.GameSettings
 import com.sayx.hm_cloud.widget.PlayPartyGameView
 import com.sayx.hm_cloud.widget.PlayPartyPermissionView
@@ -230,10 +236,13 @@ class GameActivity : AppCompatActivity() {
         // 初始化设置面板
         initGameSettings()
 
+        // 展示存档提示
+        showSaveTips()
+
         if (GameManager.isPartyPlay) {
             if (GameManager.isPartyPlayOwner) {
-                startUpdatePinCode()
                 GameManager.queryControlUsers()
+                GameManager.getPinCode()
             }
             GameManager.sendCurrentCid()
             initPlayPartyView()
@@ -359,6 +368,17 @@ class GameActivity : AppCompatActivity() {
         }
     }
 
+    private fun showSaveTips() {
+        val tipsView = ExitNoticeView(this)
+        val layoutParams = FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+        dataBinding.layoutGame.post {
+            dataBinding.layoutGame.addView(tipsView, layoutParams)
+        }
+    }
+
     private fun configSettingCallback() {
         // 游戏设置监听
         gameSettings?.gameSettingChangeListener = object : GameSettingChangeListener {
@@ -444,7 +464,7 @@ class GameActivity : AppCompatActivity() {
 
             override fun onExitGame() {
                 LogUtils.d("onExitGame")
-                showExitGameDialog()
+                checkArchiveStatus()
             }
 
             override fun onCustomSettings() {
@@ -460,7 +480,7 @@ class GameActivity : AppCompatActivity() {
                 dataBinding.btnVirtualKeyboard.visibility = View.VISIBLE
             }
 
-            override fun onPlayTimeLack(lack:Boolean) {
+            override fun onPlayTimeLack(lack: Boolean) {
                 runOnUiThread {
                     if (lack) {
                         gameSettings?.showGameOffNotice()
@@ -477,7 +497,64 @@ class GameActivity : AppCompatActivity() {
             override fun onShowPlayParty() {
                 playPartyGameView?.show()
             }
+
+            @SuppressLint("SetTextI18n")
+            override fun onDelayChange(delayInfo: VideoDelayInfo?) {
+                if (BuildConfig.DEBUG) {
+                    if (delayInfo is RtcVideoDelayInfo) {
+                        dataBinding.tvInfo.text = "Fps:${delayInfo.videoFps}"
+                    }
+                }
+            }
         }
+    }
+
+    private fun checkArchiveStatus() {
+        HmcpManager.getInstance()
+            .getGameArchiveStatus(
+                GameManager.getGameParam()?.gamePkName,
+                UserInfo().also {
+                    it.userId = GameManager.getGameParam()?.userId
+                    it.userToken = GameManager.getGameParam()?.userToken
+                },
+                GameManager.getGameParam()?.accessKeyId,
+                GameManager.getGameParam()?.channelName,
+                object : OnSaveGameCallBackListener {
+                    override fun success(result: Boolean) {
+                        LogUtils.d("GameArchive->success:$result")
+                        if (result) {
+                            showExitGameDialog()
+                        } else {
+                            showSaveGameDialog()
+                        }
+                    }
+
+                    override fun fail(msg: String?) {
+                        LogUtils.d("GameArchive->fail:$msg")
+                        showExitGameDialog()
+                    }
+                })
+    }
+
+    private fun showSaveGameDialog() {
+        GameManager.gameStat("游戏界面-正在存档", "show")
+        AppCommonDialog.Builder(this)
+            .setTitle("正在存档中")
+            .setSubTitle(
+                "存档文件较大，正在上传，直接退出会导致存档丢失",
+                subTitleColor = Color.parseColor("#FFA3ACBD")
+            )
+            .setLeftButton("退出游戏") {
+                GameManager.gameStat("游戏界面-正在存档-退出游戏", "click")
+                LogUtils.d("exitGameByUser")
+                GameManager.releaseGame(finish = "1", bundle = null)
+                gameSettings?.release()
+                finish() }
+            .setRightButton("继续等待") {
+                GameManager.gameStat("游戏界面-正在存档-继续等待", "click")
+                AppCommonDialog.hideDialog(this@GameActivity)
+            }
+            .build().show()
     }
 
     private fun showGameSetting() {
@@ -603,12 +680,13 @@ class GameActivity : AppCompatActivity() {
             }
 
             override fun onEditCombine(keyInfo: KeyInfo) {
-                LogUtils.d("onEditCombine:$keyInfo")
                 controllerEditLayout?.hideLayout(object : AnimatorListenerImp() {
                     override fun onAnimationEnd(animation: Animator) {
                         if (keyInfo.type == KeyType.KEY_COMBINE || keyInfo.type == KeyType.GAMEPAD_COMBINE) {
+                            LogUtils.d("onEditCombine:$keyInfo")
                             showEditCombineKeyLayout(keyInfo)
                         } else if (keyInfo.type == KeyType.KEY_ROULETTE || keyInfo.type == KeyType.GAMEPAD_ROULETTE) {
+                            LogUtils.d("onEditRoulette:$keyInfo")
                             showEditRouletteKeyLayout(keyInfo)
                         }
                     }
@@ -682,6 +760,26 @@ class GameActivity : AppCompatActivity() {
                 override fun onUpdateKey() {
                     dataBinding.gameController.updateKey()
                 }
+
+                override fun rouAddData(list: List<KeyInfo>?) {
+                    if (!list.isNullOrEmpty()) {
+                        dataBinding.gameController.removeKeys(list)
+                    }
+                }
+
+                override fun rouRemoveData(list: List<KeyInfo>?) {
+                    if (!list.isNullOrEmpty()) {
+                        dataBinding.gameController.addKeys(list)
+                    }
+                }
+
+                override fun onKeyAdd(keyInfo: KeyInfo) {
+                    dataBinding.gameController.removeKeys(listOf(keyInfo))
+                }
+
+                override fun onKeyRemove(keyInfo: KeyInfo) {
+                    dataBinding.gameController.addKey(keyInfo)
+                }
             }
             val layoutParams = FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -694,6 +792,7 @@ class GameActivity : AppCompatActivity() {
             editRouletteKey?.setRouletteKeyInfo(keyInfo)
             editRouletteKey?.showBoard()
         }
+        // 展示键盘选择
 //        showKeyBoard(false)
     }
 
@@ -985,11 +1084,32 @@ class GameActivity : AppCompatActivity() {
         val str =
             "cid:${HmcpManager.getInstance().cloudId},uid:${GameManager.getGameParam()?.userId}"
         LogUtils.d("exitGame:$str")
-        if (errorCode != "0") {
+        if (errorCode == "11" || errorCode == "15" || errorCode == "42") {
+            showWarningDialog(errorCode)
+        } else if (errorCode != "0") {
             showErrorDialog(errorCode, errorMsg)
         } else {
             showExitGameDialog()
         }
+    }
+
+    private fun showWarningDialog(errorCode: String) {
+        gameSettings?.release()
+        GameManager.isPlaying = false
+        GameManager.releaseGame(finish = errorCode, bundle = null)
+        val subtitle = if (errorCode == "11") {
+            "游戏长时间无操作"
+        } else {
+            "游戏时间到"
+        }
+        AppCommonDialog.Builder(this)
+            .setTitle("游戏结束\n[$errorCode]")
+            .setSubTitle(subtitle, Color.parseColor("#FF555A69"))
+            .setRightButton("退出游戏") {
+                LogUtils.d("exitGameForTime")
+                finish()
+            }
+            .build().show()
     }
 
     private fun showErrorDialog(errorCode: String, errorMsg: String? = null) {
@@ -1007,12 +1127,13 @@ class GameActivity : AppCompatActivity() {
                 title.append("\n").append("[$errorCode]")
             }
 
-            val content =
-                StringBuilder().append("游戏名称:").append(GameManager.getGameParam()?.gameName)
-                    .append("\n")
-                    .append("CID:").append(HmcpManager.getInstance().cloudId).append("\n")
-                    .append("UID:").append(GameManager.getGameParam()?.userId).append("\n")
-                    .append("无法重连可截图联系客服QQ:3107321871")
+            val content = StringBuilder()
+                    .append("游戏名称:")
+                    .append(GameManager.getGameParam()?.gameName).append("\n")
+                    .append("CID:")
+                    .append(HmcpManager.getInstance().cloudId).append("\n")
+                    .append("UID:")
+                    .append(GameManager.getGameParam()?.userId).append("\n")
             GameErrorDialog.Builder(this)
                 .setTitle(title.toString())
                 .setSubTitle(content.toString())
@@ -1027,6 +1148,7 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun showExitGameDialog() {
+        GameManager.gameStat("游戏界面-关闭游戏退出提醒", "show")
         AppCommonDialog.Builder(this)
             .setTitle(getString(R.string.title_exit_game))
             .setLeftButton(getString(R.string.continue_game)) { AppCommonDialog.hideDialog(this@GameActivity) }
@@ -1196,19 +1318,6 @@ class GameActivity : AppCompatActivity() {
 
         dataBinding.gameController.addView(permissionView)
         permissionView.show()
-    }
-
-    // 一分钟更新一次pinCode
-    private fun startUpdatePinCode() {
-        if (pinCodeTimer == null) {
-            pinCodeTimer = Timer()
-            val task = object : TimerTask() {
-                override fun run() {
-                    GameManager.getPinCode()
-                }
-            }
-            pinCodeTimer?.schedule(task, 0, 60000)
-        }
     }
 
     private fun stopUpdatePinCode() {

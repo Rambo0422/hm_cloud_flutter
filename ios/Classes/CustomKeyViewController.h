@@ -6,6 +6,7 @@
 //
 
 #import "HM_BaseViewController.h"
+#import "KeyDetailModel.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -13,7 +14,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, assign) CustomType type;
 
-@property (nonatomic, strong) void (^ dismissCallback)(BOOL isSave);
+@property (nonatomic, assign) BOOL isEdit;
+@property (nonatomic, strong) KeyDetailModel *model;
+
+
+@property (nonatomic, strong) void (^ dismissCallback)(BOOL isRefresh);
+
+
 
 @end
 
