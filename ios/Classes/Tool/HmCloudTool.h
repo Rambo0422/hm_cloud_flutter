@@ -22,6 +22,9 @@ static NSString *ActionExitGame = @"exitGame";
 static NSString *ActionQueueInfo = @"queueInfo";
 static NSString *ActionOpenPage = @"openPage";
 static NSString *ActionUpdateTime = @"updateTime";
+static NSString *ActionFirstFrameArrival = @"firstFrameArrival";
+
+
 
 @protocol HmCloudToolDelegate <NSObject>
 

@@ -384,6 +384,8 @@
     if ([state isEqualToString:@"videoVisible"]) {
         [[HMCloudPlayer sharedCloudPlayer] cloudSetTouchModel:self.touchMode];
 
+        [self.delegate sendToFlutter:ActionFirstFrameArrival params:nil];
+
         if (!self.isVip && !self.liveRoomId.length) {
             [self startLiving];
         }

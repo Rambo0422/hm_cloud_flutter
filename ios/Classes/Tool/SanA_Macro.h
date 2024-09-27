@@ -25,19 +25,6 @@
 #import "ToastAlertView.h"
 #import "UIViewController+TopVc.h"
 
-#define k_changeSound       @"changeSound"
-#define k_startSuccess      @"startSuccess"
-#define k_startFailed       @"startFailed"
-#define k_cloudInitBegan    @"cloudInitBegan"
-#define k_cloudQueueInfo    @"cloudQueueInfo"
-#define k_videoVisble       @"videoVisble"
-#define k_videoFailed       @"videoFailed"
-
-
-#define k_DelayInfo         @"delayInfo"
-#define k_GameStop          @"gameStop"
-#define k_FirstFrameArrival @"firstFrameArrival"
-
 
 #define k_FirstPlay         @"firstPlay"
 #define k_FirstInstall      @"firstInstall"

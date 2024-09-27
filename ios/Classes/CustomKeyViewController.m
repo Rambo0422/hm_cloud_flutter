@@ -293,11 +293,11 @@
     if (self.currentM) {
         if (sender.tag == 10) {
             // 减
-            if (self.currentM.zoom <= 10) {
+            if (self.currentM.zoom <= 30) {
                 return;
             }
 
-            self.currentM.zoom -= 10;
+            self.currentM.zoom -= 5;
         }
 
         if (sender.tag == 20) {
@@ -307,7 +307,7 @@
                 return;
             }
 
-            self.currentM.zoom += 10;
+            self.currentM.zoom += 5;
         }
 
         [self configViewWithModel];
