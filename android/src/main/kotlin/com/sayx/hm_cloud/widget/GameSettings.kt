@@ -104,11 +104,7 @@ class GameSettings @JvmOverloads constructor(
         }
         dataBinding.btnCustom.setOnClickListener {
             hideLayout()
-            if (GameManager.getGameParam()?.isVip() == true) {
-                gameSettingChangeListener?.onCustomSettings()
-            } else {
-                gameSettingChangeListener?.onShowVipDialog()
-            }
+            gameSettingChangeListener?.onCustomSettings()
         }
         // 震动开关
         dataBinding.btnVibrate.setOnClickListener {

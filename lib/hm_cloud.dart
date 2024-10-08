@@ -23,6 +23,10 @@ class HmCloudController {
     methodChannel.setMethodCallHandler(platformCallHandler);
   }
 
+  void initGameSDK(Map<String, dynamic> params) {
+    methodChannel.invokeMethod("initGameSDK", params);
+  }
+
   /// 开始云游戏
   void startCloudGame(Map<String, dynamic> params) {
     methodChannel.invokeMethod(HMCloudConstants.startCloudGame, params);

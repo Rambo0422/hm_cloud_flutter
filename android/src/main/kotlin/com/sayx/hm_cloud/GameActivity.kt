@@ -468,7 +468,7 @@ class GameActivity : AppCompatActivity() {
             }
 
             override fun onCustomSettings() {
-                showChooseControllerDialog()
+//                showChooseControllerDialog()
             }
 
             override fun onShowVipDialog() {

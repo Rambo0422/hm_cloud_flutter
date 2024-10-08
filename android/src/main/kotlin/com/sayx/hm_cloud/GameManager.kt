@@ -79,11 +79,12 @@ object GameManager : HmcpPlayerListener, OnContronListener {
 
     var inQueue = false
 
-    var needReattach = false
+    private var needReattach = false
 
     // 是否是派对吧
     var isPartyPlay = false
     var isPartyPlayOwner = false
+
     fun init(channel: MethodChannel, context: Activity) {
         this.channel = channel
         this.activity = context
@@ -93,14 +94,40 @@ object GameManager : HmcpPlayerListener, OnContronListener {
         }
     }
 
+    fun initGameSDK(gameParam: GameParam) {
+        // 配置调试
+        Constants.IS_DEBUG = false
+        Constants.IS_ERROR = false
+        Constants.IS_INFO = false
+
+        channel.invokeMethod(
+            "gameStatusStat", mapOf(
+                Pair("type", "game_init"),
+                Pair("page", "游戏初始化"),
+                Pair("action", "游戏初始化"),
+                Pair("arguments", gson.fromJson(gson.toJson(GameManager.gameParam), Map::class.java))
+            )
+        )
+        // 初始化SDK
+        HmcpManager.getInstance().releaseRequestManager()
+        HmcpManager.getInstance().init(Bundle().also {
+            it.putString(HmcpManager.ACCESS_KEY_ID, gameParam.accessKeyId)
+            it.putString(HmcpManager.CHANNEL_ID, "app_cloud_game")
+        }, activity, object : OnInitCallBackListener {
+            override fun success() {
+                LogUtils.d("haiMaSDK success:${HmcpManager.getInstance().sdkVersion}")
+                channel.invokeMethod("gameInitSuccess", null)
+            }
+
+            override fun fail(msg: String?) {
+                LogUtils.e("haiMaSDK fail:$msg")
+                parseGameErrorInfo(msg)
+            }
+        }, true)
+    }
+
     fun startGame(gameParam: GameParam) {
         this.gameParam = gameParam
-        // 手游与端游对应的sdk配置不同，所以每次启动游戏都执行初始化
-        initGameSdk()
-//        Intent().apply {
-//            setClass(activity, GameActivity::class.java)
-//            activity.startActivityForResult(this, 200)
-//        }
     }
 
     private fun initGameSdk() {
@@ -1077,5 +1104,33 @@ object GameManager : HmcpPlayerListener, OnContronListener {
 
     fun kickOutUser(arguments: String) {
         channel.invokeMethod("kickOutUser", arguments)
+    }
+
+    fun parseGameErrorInfo(msg: String?) {
+        var errorCode = GameError.gameInitErrorCode
+        var errorMsg = GameError.gameInitErrorMsg
+        if (msg is String && !TextUtils.isEmpty(msg)) {
+            val resultData = gson.fromJson(msg, Map::class.java)
+            var errorCodeWithoutCid = ""
+            try {
+                errorCodeWithoutCid =
+                    if (resultData["errorCodeWithoutCid"].toString() == "null") GameError.gameInitErrorCode else resultData["errorCodeWithoutCid"].toString()
+            } catch (e: Exception) {
+                LogUtils.e("${e.message}")
+            }
+            errorCode =
+                if (TextUtils.isEmpty(errorCodeWithoutCid)) GameError.gameInitErrorCode else errorCodeWithoutCid
+            try {
+                errorMsg =
+                    if (resultData["errorMessage"].toString() == "null") resultData["errorMsg"].toString() else resultData["errorMessage"].toString()
+            } catch (e: Exception) {
+                LogUtils.e("${e.message}")
+            }
+        }
+        EventBus.getDefault().post(GameErrorEvent(errorCode, errorMsg))
+        channel.invokeMethod(
+            "errorInfo",
+            mapOf(Pair("errorCode", errorCode), Pair("errorMsg", errorMsg))
+        )
     }
 }
