@@ -65,10 +65,7 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
             // 游戏启动
             GameViewConstants.startCloudGame -> {
                 if (arguments is Map<*, *>) {
-                    val gameParam = GameManager.gson.fromJson(
-                        GameManager.gson.toJson(arguments),
-                        GameParam::class.java
-                    )
+                    val gameParam = GameParam.formGson(arguments)
                     GameManager.startGame(gameParam)
                 }
             }
@@ -97,11 +94,10 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
             }
 
             "releaseGame" -> {
-                val gameParam = GameManager.gson.fromJson(
-                    GameManager.gson.toJson(arguments),
-                    GameParam::class.java
-                )
-                GameManager.releasePlayingGame(gameParam, callback)
+                if (arguments is Map<*, *>) {
+                    val gameParam = GameParam.formGson(arguments)
+                    GameManager.releasePlayingGame(gameParam, callback)
+                }
             }
 
             // 操作方式数据

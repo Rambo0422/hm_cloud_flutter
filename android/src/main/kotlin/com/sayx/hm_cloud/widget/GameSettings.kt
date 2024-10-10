@@ -84,9 +84,11 @@ class GameSettings @JvmOverloads constructor(
     init {
         // 可用时长点击，添加可用时长
         dataBinding.tvAvailableTime.setOnClickListener {
+            hideLayout()
             gameSettingChangeListener?.onAddAvailableTime()
         }
         dataBinding.btnRecharge.setOnClickListener {
+            hideLayout()
             gameSettingChangeListener?.onAddAvailableTime()
         }
         // 调试码点击，复制调试码到剪切板

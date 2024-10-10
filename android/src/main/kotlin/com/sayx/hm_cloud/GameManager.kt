@@ -17,6 +17,7 @@ import com.haima.hmcp.beans.Control
 import com.haima.hmcp.beans.ControlInfo
 import com.haima.hmcp.beans.IntentExtraData
 import com.haima.hmcp.beans.PlayNotification
+import com.haima.hmcp.beans.SerializableMap
 import com.haima.hmcp.beans.UserInfo
 import com.haima.hmcp.beans.UserInfo2
 import com.haima.hmcp.enums.CloudPlayerKeyboardStatus
@@ -38,6 +39,7 @@ import com.sayx.hm_cloud.model.GameError
 import com.sayx.hm_cloud.model.GameErrorEvent
 import com.sayx.hm_cloud.model.GameParam
 import com.sayx.hm_cloud.model.PCMouseEvent
+import com.sayx.hm_cloud.model.SpecificArchive
 import com.sayx.hm_cloud.model.TimeUpdateEvent
 import com.sayx.hm_cloud.utils.GameUtils
 import io.flutter.embedding.engine.FlutterEngine
@@ -45,6 +47,7 @@ import io.flutter.plugin.common.MethodChannel
 import org.greenrobot.eventbus.EventBus
 import org.json.JSONArray
 import org.json.JSONObject
+import java.io.Serializable
 
 @SuppressLint("StaticFieldLeak")
 object GameManager : HmcpPlayerListener, OnContronListener {
@@ -287,6 +290,28 @@ object GameManager : HmcpPlayerListener, OnContronListener {
 //                it.putInt(HmcpVideoView.DECODE_TYPE, 1)
                 // 输入法类型 0：表示云端键盘 1：表示本地键盘
 //                it.putInt(HmcpVideoView.IME_TYPE, 1)
+                // 存档上传
+                val specificArchive = SpecificArchive()
+                specificArchive.uploadArchive = true
+                if (gameParam?.custodian != null) {
+                    if (gameParam?.custodian == "hm") {
+                        specificArchive.uploadArchive = false
+                    }
+                }
+                specificArchive.gameId = gameParam?.gameId ?: ""
+                if (gameParam?.specificArchive != null) {
+                    specificArchive.isThirdParty = true
+                    specificArchive.downloadUrl = gameParam?.specificArchive!!.downloadUrl
+                    specificArchive.md5 = gameParam?.specificArchive!!.md5
+                    // 注意这里的cid，是 long 类型
+                    specificArchive.cid = gameParam?.specificArchive!!.cid
+                } else {
+                    specificArchive.isThirdParty = false
+                }
+                val hashMap = HashMap<String, Serializable>()
+                hashMap["specificArchive"] = specificArchive
+                val data = SerializableMap(hashMap)
+                it.putSerializable(HmcpVideoView.TRANSMISSION_DATA_TO_SAAS, data)
             }
             LogUtils.d("prepareGame->bundle:$bundle")
             playGame(bundle)

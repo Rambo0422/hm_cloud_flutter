@@ -1,4 +1,5 @@
 package com.sayx.hm_cloud.model
+import com.blankj.utilcode.util.LogUtils
 
 data class GameParam(
     // 密钥id
@@ -22,11 +23,12 @@ data class GameParam(
     // 游戏channel
     var channelName: String,
     var vipExpiredTime: Long,
-    var mute: Boolean,
     var gameId: String,
     var accountInfo: Any?,
     var isPeakChannel: Boolean,
-    var isPartyGame: Boolean
+    var isPartyGame: Boolean,
+    var specificArchive: SpecificArchive?,
+    var custodian: String,
 ) {
     fun isVip(): Boolean {
         return vipExpiredTime > realTime
@@ -41,26 +43,39 @@ data class GameParam(
                 arguments["cToken"] as String? ?: "",
                 arguments["userToken"] as String? ?: "",
                 getTimeValue(arguments["playTime"]),
-                arguments["realTime"] as Long? ?: 0L,
                 getTimeValue(arguments["peakTime"]),
-                arguments["priority"] as Int? ?: 0,
+                getTimeValue(arguments["realTime"]),
+                (arguments["priority"] as Number?)?.toInt() ?: 0,
                 arguments["userId"] as String? ?: "",
                 arguments["channelName"] as String? ?: "",
-                arguments["vipExpiredTime"] as Long? ?: 0L,
-                arguments["mute"] as Boolean? ?: false,
+                getTimeValue(arguments["vipExpiredTime"]),
                 arguments["gameId"] as String? ?: "",
                 arguments["accountInfo"],
                 arguments["isPeakChannel"] as Boolean? ?: false,
                 arguments["isPartyGame"] as Boolean? ?: false,
+                getSpecificArchive(arguments["specificArchive"]),
+                arguments["custodian"] as String? ?: "",
             )
         }
 
-        private fun getTimeValue(any: Any?): Long {
-            if (any is Int) {
-                return any.toLong()
+        private fun getSpecificArchive(data: Any?): SpecificArchive? {
+            if (data is Map<*, *>) {
+                return SpecificArchive().also {
+                    it.gameId = data["gameId"] as String? ?: ""
+                    val cid = data["cid"] as String?
+                    it.cid = cid?.toLong() ?: 0L
+                    it.md5 = data["fileMD5"] as String? ?: ""
+                    it.downloadUrl = data["downLoadUrl"] as String? ?: ""
+                    it.format = data["format"] as String? ?: ""
+                    it.source = data["source"] as String? ?: ""
+                }
             }
-            if (any is Long) {
-                return any
+            return null
+        }
+
+        private fun getTimeValue(any: Any?): Long {
+            if (any is Number) {
+                return any.toLong()
             }
             return 0L
         }
