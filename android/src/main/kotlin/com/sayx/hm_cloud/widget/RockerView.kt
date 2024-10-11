@@ -261,6 +261,8 @@ class RockerView @JvmOverloads constructor(
         }
     }
 
+    private var clickTime = 0L
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         event?.let {
@@ -330,7 +332,10 @@ class RockerView @JvmOverloads constructor(
                             (parent as GameController).clearLine()
                         }
                         if (!isDrag) {
-                            performClick()
+                            if (System.currentTimeMillis() - clickTime > 200) {
+                                clickTime = System.currentTimeMillis()
+                                performClick()
+                            }
                         }
                     } else if (controllerStatus == ControllerStatus.Normal) {
 //                    LogUtils.d("onTouchEventUP:${it.getPointerId(it.actionIndex)}, $firstTouchId")

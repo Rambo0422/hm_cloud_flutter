@@ -84,6 +84,7 @@ class GameSettings @JvmOverloads constructor(
     init {
         // 可用时长点击，添加可用时长
         dataBinding.tvAvailableTime.setOnClickListener {
+            hideLayout()
             gameSettingChangeListener?.onAddAvailableTime()
         }
         dataBinding.btnRecharge.setOnClickListener {
@@ -427,6 +428,7 @@ class GameSettings @JvmOverloads constructor(
 
     fun updatePlayTime(time: Long) {
         currentPlayTime = time / 1000
+        updateAvailableTime(currentPlayTime)
     }
 
     // 游戏计时

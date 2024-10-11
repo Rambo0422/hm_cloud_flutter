@@ -218,9 +218,6 @@ class RouletteKeyView @JvmOverloads constructor(
 
     fun setKeyInfo(keyInfo: KeyInfo) {
 //        LogUtils.d("setKeyInfo:$keyInfo")
-        if (keyInfo.rouArr.isNullOrEmpty()) {
-            return
-        }
         this.keyInfoData = keyInfo
         thumbText = keyInfo.text
         keyInfo.rouArr?.let {
@@ -243,6 +240,8 @@ class RouletteKeyView @JvmOverloads constructor(
     fun getKeyInfo(): KeyInfo {
         return keyInfoData
     }
+
+    private var clickTime = 0L
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
@@ -338,7 +337,10 @@ class RouletteKeyView @JvmOverloads constructor(
                             (parent as GameController).clearLine()
                         }
                         if (!isDrag) {
-                            performClick()
+                            if (System.currentTimeMillis() - clickTime > 200) {
+                                clickTime = System.currentTimeMillis()
+                                performClick()
+                            }
                         }
                     } else if (controllerStatus == ControllerStatus.Normal) {
                         showRoulette = false

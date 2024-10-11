@@ -87,7 +87,7 @@ class GameErrorDialog : DialogFragment() {
         windowParams?.gravity = Gravity.CENTER
         windowParams?.width = ViewGroup.LayoutParams.WRAP_CONTENT
         windowParams?.height = ViewGroup.LayoutParams.WRAP_CONTENT
-        windowParams?.dimAmount = 0.01f
+        windowParams?.dimAmount = 0.8f
         windowParams?.flags  = windowParams?.flags?.or(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         window?.attributes = windowParams
     }

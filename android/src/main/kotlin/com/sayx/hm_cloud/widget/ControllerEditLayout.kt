@@ -82,7 +82,7 @@ class ControllerEditLayout @JvmOverloads constructor(
         // 缩小按键
         dataBinding.btnReduceKeySize.setOnClickListener {
             keyInfo?.let {
-                if (it.zoom > 40) {
+                if (it.zoom > 10) {
                     it.changeZoom(it.zoom - 10)
                     dataBinding.tvKeySize.text = String.format("%s", "${it.zoom}%")
                     callback?.onReduceKeySize()

@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:background="@drawable/img_common_dialog_bg"
-            android:minHeight="200dp"
+            android:minHeight="240dp"
             android:focusable="true"
             android:paddingHorizontal="25dp">
 
