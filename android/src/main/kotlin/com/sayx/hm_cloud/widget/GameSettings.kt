@@ -88,7 +88,6 @@ class GameSettings @JvmOverloads constructor(
             gameSettingChangeListener?.onAddAvailableTime()
         }
         dataBinding.btnRecharge.setOnClickListener {
-            hideLayout()
             gameSettingChangeListener?.onAddAvailableTime()
         }
         // 调试码点击，复制调试码到剪切板

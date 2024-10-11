@@ -220,7 +220,7 @@ class EditCombineKey @JvmOverloads constructor(
             }
         }
         if (keyInfoList.size < 2) {
-            ToastUtils.showLong(R.string.save_at_least)
+            ToastUtils.showLong(R.string.save_at_least_two)
             return
         }
         if (keyInfo == null) {

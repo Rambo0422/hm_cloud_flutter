@@ -1127,9 +1127,9 @@ class GameController @JvmOverloads constructor(
         for (index in 0..<childCount) {
             when (val childView = viewGroup.getChildAt(index)) {
                 is KeyView, is RockerView, is CombineKeyView, is RouletteKeyView -> {
-                    LogUtils.d("childView:{tag:${childView.tag}}, keyInfo:{id:${keyInfo.id}}")
+//                    LogUtils.d("childView:{tag:${childView.tag}}, keyInfo:{id:${keyInfo.id}}")
                     if (childView.tag == keyInfo.id) {
-                        LogUtils.d("findKeyView:${childView.tag}, $keyInfo")
+//                        LogUtils.d("findKeyView:${childView.tag}, $keyInfo")
                         return childView
                     }
                 }
