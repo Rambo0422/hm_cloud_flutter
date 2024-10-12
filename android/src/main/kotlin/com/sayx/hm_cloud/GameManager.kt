@@ -291,27 +291,24 @@ object GameManager : HmcpPlayerListener, OnContronListener {
                 // 输入法类型 0：表示云端键盘 1：表示本地键盘
 //                it.putInt(HmcpVideoView.IME_TYPE, 1)
                 // 存档上传
-                val specificArchive = SpecificArchive()
-                specificArchive.uploadArchive = true
-                if (gameParam?.custodian != null) {
-                    if (gameParam?.custodian == "hm") {
-                        specificArchive.uploadArchive = false
+                if (gameParam?.custodian == "3a") {
+                    val specificArchive = SpecificArchive()
+                    specificArchive.uploadArchive = true
+                    specificArchive.gameId = gameParam?.gameId ?: ""
+                    if (gameParam?.specificArchive != null) {
+                        specificArchive.isThirdParty = true
+                        specificArchive.downloadUrl = gameParam?.specificArchive!!.downloadUrl
+                        specificArchive.md5 = gameParam?.specificArchive!!.md5
+                        // 注意这里的cid，是 long 类型
+                        specificArchive.cid = gameParam?.specificArchive!!.cid
+                    } else {
+                        specificArchive.isThirdParty = false
                     }
+                    val hashMap = HashMap<String, Serializable>()
+                    hashMap["specificArchive"] = specificArchive
+                    val data = SerializableMap(hashMap)
+                    it.putSerializable(HmcpVideoView.TRANSMISSION_DATA_TO_SAAS, data)
                 }
-                specificArchive.gameId = gameParam?.gameId ?: ""
-                if (gameParam?.specificArchive != null) {
-                    specificArchive.isThirdParty = true
-                    specificArchive.downloadUrl = gameParam?.specificArchive!!.downloadUrl
-                    specificArchive.md5 = gameParam?.specificArchive!!.md5
-                    // 注意这里的cid，是 long 类型
-                    specificArchive.cid = gameParam?.specificArchive!!.cid
-                } else {
-                    specificArchive.isThirdParty = false
-                }
-                val hashMap = HashMap<String, Serializable>()
-                hashMap["specificArchive"] = specificArchive
-                val data = SerializableMap(hashMap)
-                it.putSerializable(HmcpVideoView.TRANSMISSION_DATA_TO_SAAS, data)
             }
             LogUtils.d("prepareGame->bundle:$bundle")
             playGame(bundle)
