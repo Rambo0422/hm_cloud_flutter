@@ -30,10 +30,15 @@
 }
 
 - (void)handleMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
-    if ([call.method isEqualToString:MethodStart]) {
+    if ([call.method isEqualToString:MethodInit]) {
         [[HmCloudTool share] configWithParams:call.arguments];
 
         [[HmCloudTool share] registWithDelegate:self];
+    }
+
+    if ([call.method isEqualToString:MethodStart]) {
+        [[HmCloudTool share] configWithParams:call.arguments];
+        [[HmCloudTool share] startGame];
     }
 
     if ([call.method isEqualToString:MethodExitQueue]) {
@@ -51,6 +56,25 @@
 
     if ([call.method isEqualToString:MethodUpdatePlayInfo]) {
         [[HmCloudTool share] updatePlayInfo:call.arguments];
+    }
+
+    if ([call.method isEqualToString:MethodGetUnReleaseGame]) {
+        [[HmCloudTool share] getUnReleaseGame:^(NSDictionary *_Nonnull dict) {
+            result(dict);
+        }];
+    }
+
+    if ([call.method isEqualToString:MethodGetArchiveProgress]) {
+        [[HmCloudTool share] getArchiveResult:^(BOOL isSucc) {
+            result(@(isSucc));
+        }];
+    }
+
+    if ([call.method isEqualToString:MethodReleaseGame]) {
+        [[HmCloudTool share] releaseGame:^(BOOL isSucc) {
+            result(@(isSucc));
+        }
+                              withParams:call.arguments];
     }
 }
 

@@ -636,9 +636,10 @@
     [gesture setTranslation:CGPointZero inView:self];
 
     if (self.tapCallback) {
-        self.tapCallback(draggedView.model);
+        draggedView.backgroundColor = [kColor(0xC6EC4B) colorWithAlphaComponent:0.6];
+        self.tapCallback(draggedView.model,draggedView);
     }
-
+    
     // 检测是否对齐
     [self checkForAlignmentWithView:draggedView];
 

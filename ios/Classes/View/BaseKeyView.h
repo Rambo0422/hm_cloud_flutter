@@ -22,7 +22,7 @@ typedef void (^TouchDownCallback)(NSArray<NSDictionary *> *keyList);
 
 @property (nonatomic, assign) BOOL isEdit;
 
-@property (nonatomic, strong) void (^ tapCallback)(KeyModel *m);
+@property (nonatomic, strong) void (^ tapCallback)(KeyModel *m, UIView *v);
 
 
 @property (nonatomic, strong) TouchUpCallback upCallback;

@@ -72,7 +72,7 @@ KeyType KeyTypeFromString(NSString *string) {
             @"height": @(_height),
             @"text": _text ? : @"",
             @"editIndex": @(_editIndex),
-            @"isRou": @(_isRou),
+//            @"isRou": @(_isRou),
         }.mutableCopy;
 
     if (self.rouArr) {

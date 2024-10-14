@@ -17,6 +17,8 @@
 @property (nonatomic, strong)  CloudPreViewController *vc;
 
 
+@property (nonatomic, assign) BOOL isInit;
+
 @end
 
 @implementation HmCloudTool
@@ -109,6 +111,7 @@
 
     self.vc = nil;
     self.gameVC = nil;
+    self.isInit = NO;
 
     if (self.delegate) {
         [self.delegate sendToFlutter:ActionExitGame params:@{ @"action": @1 }];
@@ -142,6 +145,52 @@
 
 - (BOOL)convertToPcMouseModel:(BOOL)model {
     return [[HMCloudPlayer sharedCloudPlayer] convertToPcMouseModel:model];
+}
+
+- (void)getUnReleaseGame:(DataBlock)block {
+
+    [[HMCloudPlayer sharedCloudPlayer] getReservedInstance:@{ CloudGameOptionKeyUserId: self.userId,
+                                                              CloudGameOptionKeyUserToken: self.userToken, CloudGameOptionKeyAccessKeyId: self.accessKeyId }
+                                         ReservedIncetance:^(NSArray<HMCloudPlayerReservedSingleIncetance *> *list) {
+        NSArray *data = [list mapUsingBlock:^id _Nullable (HMCloudPlayerReservedSingleIncetance *_Nonnull obj, NSUInteger idx) {
+            return @{ @"cid": obj.cid ? : @"",
+                      @"pkgName": obj.pkgName ? : @"",
+                      @"gameName": obj.gameName ? : @"",
+                      @"appChannel": obj.appChannel ? : @"" };
+        }];
+
+        block(@{ @"isSucc": @1, @"data": data });
+    }];
+}
+
+- (void)getArchiveResult:(BoolBlock)block {
+    [[HMCloudPlayer sharedCloudPlayer] gameArchiveQuery:self.userId
+                                              userToken:self.userToken
+                                                pkgName:self.gamePkName
+                                             appChannel:self.channelName
+                                            accessKeyId:self.accessKeyId
+                                                success:^(BOOL finished) {
+        block(finished);
+    }
+                                                   fail:^(NSString *errorCode) {
+        block(NO);
+    }];
+}
+
+- (void)releaseGame:(BoolBlock)block withParams:(nonnull NSDictionary *)params {
+    [[HMCloudPlayer sharedCloudPlayer] gameReleaseInstanceWithCid:params[@"cid"]
+                                                           ctoken:params[@"cToken"]
+                                                           userId:params[@"userId"]
+                                                        userToken:params[@"userToken"]
+                                                          pkgName:params[@"gamePkName"]
+                                                       appChannel:params[@"channelName"]
+                                                      accessKeyId:params[@"accessKeyId"]
+                                                          success:^(BOOL released) {
+        block(released);
+    }
+                                                             fail:^(NSString *errorCode) {
+        block(NO);
+    }];
 }
 
 - (void)pushPreView {
@@ -324,7 +373,7 @@
     NSString *state = [info objectForKey:@"state"];
 
     if ([state isEqualToString:@"success"]) {
-        [self initGameVC];
+        self.isInit = YES;
     } else if ([state isEqualToString:@"failed"]) {
         NSString *errorCode = [info objectForKey:@"errorCode"];
 
@@ -383,6 +432,8 @@
 
     if ([state isEqualToString:@"videoVisible"]) {
         [[HMCloudPlayer sharedCloudPlayer] cloudSetTouchModel:self.touchMode];
+
+        [self.delegate sendToFlutter:ActionFirstFrameArrival params:nil];
 
         if (!self.isVip && !self.liveRoomId.length) {
             [self startLiving];
@@ -567,7 +618,11 @@
 }
 
 // MARK: 初始化gameVC
-- (void)initGameVC {
+- (void)startGame {
+    if (!self.isInit) {
+        return;
+    }
+
     dispatch_async(dispatch_get_main_queue(), ^{
         NSDictionary *dict = @{
                 @"uid": self.userId,

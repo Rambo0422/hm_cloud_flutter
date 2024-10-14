@@ -11,17 +11,25 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// MARK: call method
 static NSString *MethodStart = @"startCloudGame";
+static NSString *MethodInit = @"initSDK";
 static NSString *MethodExitQueue = @"exitQueue";
 static NSString *MethodClosePage = @"closePage";
 static NSString *MethodBuySuccess = @"buySuccess";
 static NSString *MethodUpdatePlayInfo = @"updatePlayInfo";
-
+static NSString *MethodGetUnReleaseGame = @"getUnReleaseGame";
+static NSString *MethodGetArchiveProgress = @"getArchiveProgress";
+static NSString *MethodReleaseGame = @"releaseGame";
 
 /// MARK: action name
 static NSString *ActionExitGame = @"exitGame";
 static NSString *ActionQueueInfo = @"queueInfo";
 static NSString *ActionOpenPage = @"openPage";
 static NSString *ActionUpdateTime = @"updateTime";
+static NSString *ActionFirstFrameArrival = @"firstFrameArrival";
+
+
+typedef void (^DataBlock)(NSDictionary *dict);
+typedef void (^BoolBlock)(BOOL isSucc);
 
 @protocol HmCloudToolDelegate <NSObject>
 
@@ -110,6 +118,8 @@ static NSString *ActionUpdateTime = @"updateTime";
 - (void)configWithParams:(NSDictionary *)params;
 - (void)registWithDelegate:(id<HmCloudToolDelegate>)delegate;
 
+- (void)startGame;
+
 // 是否是vip
 - (BOOL)isVip;
 
@@ -152,6 +162,19 @@ static NSString *ActionUpdateTime = @"updateTime";
    @param model true pc模式  false 移动端模式
  */
 - (BOOL)convertToPcMouseModel:(BOOL)model;
+
+
+/// 获取未释放的实力
+/// @param block 数据回调
+- (void)getUnReleaseGame:(nullable DataBlock)block;
+
+/// 存档进度查询
+/// @param block 成功失败回调
+- (void)getArchiveResult:(nullable BoolBlock)block;
+
+/// 释放游戏实例
+/// @param block 成功失败回调
+- (void)releaseGame:(nullable BoolBlock)block withParams:(NSDictionary *)params;
 
 @end
 

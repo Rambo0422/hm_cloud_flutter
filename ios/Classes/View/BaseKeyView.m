@@ -24,7 +24,7 @@
         [self addSubview:self.contentView];
 
 
-        self.hidden = self.model.isRou;
+//        self.hidden = self.model.isRou;
         self.frame = CGRectMake(self.model.left, self.model.top, self.model.width, self.model.height);
 
         if (self.isEdit) {
@@ -33,6 +33,10 @@
             tap.delaysTouchesBegan = YES;
             tap.delaysTouchesEnded = YES;
             [self addGestureRecognizer:tap];
+            
+            
+            self.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:0.3];
+            
         }
 
         @weakify(self);
@@ -43,7 +47,7 @@
 
         [RACObserve(self.model, opacity) subscribeNext:^(id _Nullable x) {
             @strongify(self);
-            self.alpha = self.model.opacity / 100.0;
+            self.contentView.alpha = self.model.opacity / 100.0;
         }];
     }
 
@@ -52,7 +56,8 @@
 
 - (void)tap:(UITapGestureRecognizer *)tap {
     if (self.tapCallback) {
-        self.tapCallback(self.model);
+        self.backgroundColor = [kColor(0xC6EC4B) colorWithAlphaComponent:0.6];
+        self.tapCallback(self.model,self);
     }
 }
 
