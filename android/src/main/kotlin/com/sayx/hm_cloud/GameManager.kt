@@ -198,11 +198,12 @@ object GameManager : HmcpPlayerListener, OnContronListener {
             it.userToken = this.gameParam?.userToken
         }, object : OnGameIsAliveListener {
             override fun success(list: MutableList<CheckCloudServiceResult.ChannelInfo>?) {
-                LogUtils.d("checkPlayingGame:$list")
+//                LogUtils.d("checkPlayingGame:$list")
                 var cid: String? = null
                 if (!list.isNullOrEmpty()) {
                     // 有未释放的游戏实例
                     val channelInfo = list[0]
+//                    LogUtils.d("checkPlayingGame->cid:${channelInfo.cid}, pkgName:${channelInfo.pkgName}, appChannel:${channelInfo.appChannel}")
                     // 未释放的游戏实例与本次开启的游戏实例相同，连接实例
                     if (channelInfo.pkgName.equals(gameParam?.gamePkName)) {
                         cid = channelInfo.cid
@@ -783,10 +784,11 @@ object GameManager : HmcpPlayerListener, OnContronListener {
             it.userToken = gameParam.userToken
         }, object : OnGameIsAliveListener {
             override fun success(list: MutableList<CheckCloudServiceResult.ChannelInfo>?) {
-                LogUtils.d("checkPlayingGame:$list")
+//                LogUtils.d("checkPlayingGame:$list")
                 if (!list.isNullOrEmpty()) {
                     // 有未释放的游戏实例
                     val channelInfo = list[0]
+//                    LogUtils.d("checkPlayingGame->cid:${channelInfo.cid}, pkgName:${channelInfo.pkgName}, appChannel:${channelInfo.appChannel}")
                     HmcpManager.getInstance().setReleaseCid(
                         gameParam.gamePkName, channelInfo.cid, gameParam.cToken, gameParam.channelName,
                         UserInfo2().also {
