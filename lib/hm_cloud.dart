@@ -21,7 +21,14 @@ class HmCloudController {
     methodChannel.setMethodCallHandler(platformCallHandler);
   }
 
-  /// 开始云游戏
+  ///MARK: 初始化sdk
+  void initSdk(Map<String, dynamic> params) {
+    print('init sdk $params');
+
+    methodChannel.invokeMethod("initSDK", params);
+  }
+
+  ///MARK: 开始云游戏
   void startCloudGame(Map<String, dynamic> params) {
     methodChannel.invokeMethod(HMCloudConstants.startCloudGame, params);
   }
@@ -112,11 +119,19 @@ class HmCloudController {
     methodChannel.invokeMethod('updatePlayInfo', params);
   }
 
-  Future<dynamic> releaseGame(Map<String, String?> params) {
+  Future<dynamic> releaseGame(Map params) {
     return methodChannel.invokeMethod("releaseGame", params);
   }
 
   void getPinCode() {
     methodChannel.invokeMethod("getPinCode", null);
+  }
+
+  Future<dynamic> getUnReleaseGame() async {
+    return await methodChannel.invokeMethod("getUnReleaseGame");
+  }
+
+  Future<dynamic> getArchiveProgress() async {
+    return await methodChannel.invokeMethod("getArchiveProgress");
   }
 }
