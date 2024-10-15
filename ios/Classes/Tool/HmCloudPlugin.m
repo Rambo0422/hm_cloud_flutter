@@ -42,7 +42,7 @@
     }
 
     if ([call.method isEqualToString:MethodExitQueue]) {
-        [[HmCloudTool share] stop];
+        [[HmCloudTool share] onlyStop];
     }
 
     if ([call.method isEqualToString:MethodClosePage]) {

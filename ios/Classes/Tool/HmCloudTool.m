@@ -89,7 +89,7 @@
                                    title:@"特殊错误，请联系客服!"
                                  content:nil
                         dissMissCallback:^{
-            [self stop];
+            [self stopWithBack];
             [[UIViewController topViewController] dismissViewControllerAnimated:YES
                                                                      completion:^{
             }];
@@ -104,7 +104,15 @@
     [[HMCloudPlayer sharedCloudPlayer] registCloudPlayer:self.accessKeyId channelId:self.channelName options:nil];
 }
 
-- (void)stop {
+- (void)stopWithBack {
+    [self onlyStop];
+
+    if (self.delegate) {
+        [self.delegate sendToFlutter:ActionExitGame params:@{ @"action": @1 }];
+    }
+}
+
+- (void)onlyStop {
     if (self.vc) {
         [self.vc stopTimer];
     }
@@ -112,10 +120,6 @@
     self.vc = nil;
     self.gameVC = nil;
     self.isInit = NO;
-
-    if (self.delegate) {
-        [self.delegate sendToFlutter:ActionExitGame params:@{ @"action": @1 }];
-    }
 
     [[HMCloudPlayer sharedCloudPlayer] stop:10 withReason:HMCloudAppStopReasonNormal];
 }
@@ -148,7 +152,6 @@
 }
 
 - (void)getUnReleaseGame:(DataBlock)block {
-
     [[HMCloudPlayer sharedCloudPlayer] getReservedInstance:@{ CloudGameOptionKeyUserId: self.userId,
                                                               CloudGameOptionKeyUserToken: self.userToken, CloudGameOptionKeyAccessKeyId: self.accessKeyId }
                                          ReservedIncetance:^(NSArray<HMCloudPlayerReservedSingleIncetance *> *list) {
@@ -204,7 +207,7 @@
         self.vc.didDismiss = ^{
             @strongify(self);
 
-            [self stop];
+            [self stopWithBack];
         };
 
         self.vc.pushFlutter = ^(FlutterPageType pageType) {
@@ -383,7 +386,7 @@
                                    title:@"初始化失败！"
                                  content:nil
                         dissMissCallback:^{
-            [self stop];
+            [self stopWithBack];
             [[UIViewController topViewController] dismissViewControllerAnimated:YES
                                                                      completion:^{
             }];
@@ -469,7 +472,7 @@
                                    title:title
                                  content:nil
                         dissMissCallback:^{
-            [self stop];
+            [self stopWithBack];
             [[UIViewController topViewController] dismissViewControllerAnimated:YES
                                                                      completion:^{
             }];
@@ -619,8 +622,9 @@
 
 // MARK: 初始化gameVC
 - (void)startGame {
-    if (!self.isInit) {
-        return;
+
+    if (self.gameVC) {
+        [[HMCloudPlayer sharedCloudPlayer] stop:10 withReason:HMCloudAppStopReasonNormal];
     }
 
     dispatch_async(dispatch_get_main_queue(), ^{

@@ -123,7 +123,9 @@ typedef void (^BoolBlock)(BOOL isSucc);
 // 是否是vip
 - (BOOL)isVip;
 
-- (void)stop;
+- (void)stopWithBack;
+- (void)onlyStop;
+
 /// 推出flutter 页面后，回到游戏页面的方法
 - (void)restart;
 
