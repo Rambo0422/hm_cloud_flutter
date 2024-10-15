@@ -81,7 +81,17 @@ dependencies {
     implementation 'com.geyifeng.immersionbar:immersionbar-ktx:3.2.2'
     // 屏幕适配
     implementation 'com.github.JessYanCoding:AndroidAutoSize:v1.2.1'
-
+    // 按键绑定
+    implementation 'androidx.databinding:databinding-runtime:8.7.0'
+    // 网络请求
+    implementation 'io.reactivex.rxjava3:rxandroid:3.0.2'
+    implementation 'io.reactivex.rxjava3:rxjava:3.1.8'
+    implementation 'com.squareup.retrofit2:retrofit:2.11.0'
+    implementation 'com.squareup.retrofit2:adapter-rxjava3:2.11.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.11.0'
+    implementation 'com.squareup.retrofit2:converter-scalars:2.11.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
+    // 游戏相关
     implementation 'com.alibaba:fastjson:1.2.83'
 
     implementation 'com.android.support:support-v4:28.0.0'
@@ -89,7 +99,6 @@ dependencies {
     implementation('io.socket:socket.io-client:1.0.0') {
         exclude group: 'org.json', module: 'json'
     }
-    implementation 'androidx.databinding:databinding-runtime:8.5.0'
     implementation 'com.github.JavaNoober.BackgroundLibrary:library:1.7.6'
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation("de.hdodenhof:circleimageview:3.1.0")

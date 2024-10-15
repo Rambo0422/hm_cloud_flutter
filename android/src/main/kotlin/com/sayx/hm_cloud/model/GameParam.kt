@@ -26,11 +26,28 @@ data class GameParam(
     var accountInfo: Any?,
     var isPeakChannel: Boolean,
     var isPartyGame: Boolean,
-    var specificArchive: SpecificArchive?,
-    var custodian: String,
 ) {
     fun isVip(): Boolean {
         return vipExpiredTime > realTime
+    }
+
+    override fun toString(): String {
+        return "GameParam(accessKeyId='$accessKeyId', " +
+                "gamePkName='$gamePkName', " +
+                "gameName='$gameName', " +
+                "cToken='$cToken', " +
+                "userToken='$userToken', " +
+                "playTime=$playTime, " +
+                "peakTime=$peakTime, " +
+                "realTime=$realTime, " +
+                "priority=$priority, " +
+                "userId='$userId', " +
+                "channelName='$channelName', " +
+                "vipExpiredTime=$vipExpiredTime, " +
+                "gameId='$gameId', " +
+                "accountInfo=$accountInfo, " +
+                "isPeakChannel=$isPeakChannel, " +
+                "isPartyGame=$isPartyGame)"
     }
 
     companion object {
@@ -52,24 +69,7 @@ data class GameParam(
                 arguments["accountInfo"],
                 arguments["isPeakChannel"] as Boolean? ?: false,
                 arguments["isPartyGame"] as Boolean? ?: false,
-                getSpecificArchive(arguments["specificArchive"]),
-                arguments["custodian"] as String? ?: "",
             )
-        }
-
-        private fun getSpecificArchive(data: Any?): SpecificArchive? {
-            if (data is Map<*, *>) {
-                return SpecificArchive().also {
-                    it.gameId = data["gameId"] as String? ?: ""
-                    val cid = data["cid"] as String?
-                    it.cid = cid?.toLong() ?: 0L
-                    it.md5 = data["fileMD5"] as String? ?: ""
-                    it.downloadUrl = data["downLoadUrl"] as String? ?: ""
-                    it.format = data["format"] as String? ?: ""
-                    it.source = data["source"] as String? ?: ""
-                }
-            }
-            return null
         }
 
         private fun getTimeValue(any: Any?): Long {

@@ -62,6 +62,18 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
 //        Log.e("CloudGame", "onMethodCall:${call.method}, param:$arguments")
         LogUtils.d("onMethodCall:${call.method}, param:$arguments")
         when (call.method) {
+            "initSDK" -> {
+                if (arguments is Map<*, *>) {
+                    val gameParam = GameParam.formGson(arguments)
+                    GameManager.initSDK(gameParam)
+                }
+            }
+            "getUnReleaseGame" -> {
+                GameManager.getUnReleaseGame(callback)
+            }
+            "getArchiveProgress" -> {
+                GameManager.getArchiveProgress(callback)
+            }
             // 游戏启动
             GameViewConstants.startCloudGame -> {
                 if (arguments is Map<*, *>) {
@@ -92,7 +104,7 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
             "setPCMouseMode" -> {
                 GameManager.setPCMouseMode(arguments)
             }
-
+            // 释放游戏
             "releaseGame" -> {
                 if (arguments is Map<*, *>) {
                     val gameParam = GameParam.formGson(arguments)
