@@ -49,6 +49,8 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import io.reactivex.rxjava3.core.Observer
 import io.reactivex.rxjava3.disposables.Disposable
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.greenrobot.eventbus.EventBus
 import org.json.JSONArray
 import org.json.JSONObject
@@ -89,6 +91,8 @@ object GameManager : HmcpPlayerListener, OnContronListener {
 
     var needReattach = false
 
+    var initState = false
+
     // 是否是派对吧
     var isPartyPlay = false
     var isPartyPlayOwner = false
@@ -106,7 +110,7 @@ object GameManager : HmcpPlayerListener, OnContronListener {
         this.gameParam = gameParam
         val config: Bundle = Bundle().also {
             it.putString(HmcpManager.ACCESS_KEY_ID, gameParam.accessKeyId)
-            it.putString(HmcpManager.CHANNEL_ID, "app_cloud_game")
+            it.putString(HmcpManager.CHANNEL_ID, gameParam.channelName)
         }
         Constants.IS_DEBUG = false
         Constants.IS_ERROR = false
@@ -125,6 +129,7 @@ object GameManager : HmcpPlayerListener, OnContronListener {
         HmcpManager.getInstance().init(config, activity, object : OnInitCallBackListener {
             override fun success() {
                 LogUtils.d("haiMaSDK success:${HmcpManager.getInstance().sdkVersion}")
+                initState = true
             }
 
             override fun fail(msg: String?) {
@@ -167,9 +172,9 @@ object GameManager : HmcpPlayerListener, OnContronListener {
             )
         )
         HmcpManager.getInstance().checkPlayingGame(UserInfo().also {
-            it.userId = this.gameParam?.userId
-            it.userToken = this.gameParam?.userToken
-        }, object : OnGameIsAliveListener {
+            it.userId = gameParam?.userId
+            it.userToken = gameParam?.userToken
+        }, gameParam?.accessKeyId, object : OnGameIsAliveListener {
             override fun success(list: MutableList<CheckCloudServiceResult.ChannelInfo>?) {
                 LogUtils.d("checkPlayingGame:$list")
                 val map = mutableMapOf<String, Any>(
@@ -352,7 +357,14 @@ object GameManager : HmcpPlayerListener, OnContronListener {
                 }
             }
             LogUtils.d("prepareGame->bundle:$bundle")
-            playGame(bundle)
+            if (initState) {
+                playGame(bundle)
+            } else {
+                runBlocking {
+                    delay(10 * 1000L)
+                    playGame(bundle)
+                }
+            }
         } catch (e: Exception) {
             LogUtils.e("game error:${e.message}")
             // 数据错误，退出游戏
@@ -651,6 +663,14 @@ object GameManager : HmcpPlayerListener, OnContronListener {
 
     override fun onPlayerError(errorCode: String?, errorMsg: String?) {
         LogUtils.e("onPlayerError->errorCode:$errorCode, errorMsg:$errorMsg")
+        channel.invokeMethod(
+            "errorInfo",
+            mapOf(
+                Pair("errorCode", errorCode),
+                Pair("errorMsg", errorMsg),
+            )
+        )
+
     }
 
     override fun onInputMessage(msg: String?) {
@@ -697,18 +717,6 @@ object GameManager : HmcpPlayerListener, OnContronListener {
         }
     }
 
-    fun statGameTime(time: Long) {
-        channel.invokeMethod("statGameTime", mapOf(Pair("time", time)))
-    }
-
-    fun gameStat(page: String, action: String, arg: Map<String, Any>? = null, type: String = "event") {
-        channel.invokeMethod("gameStat", mapOf(Pair("page", page), Pair("action", action), Pair("arguments", arg), Pair("type", type)))
-    }
-
-    fun statGamePlay() {
-        channel.invokeMethod("statGamePlay", null)
-    }
-
     fun openBuyVip() {
         Intent().apply {
             putExtra("route", "/rechargeCenter")
@@ -720,6 +728,18 @@ object GameManager : HmcpPlayerListener, OnContronListener {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             activity.startActivity(this)
         }
+    }
+
+    fun statGameTime(time: Long) {
+        channel.invokeMethod("statGameTime", mapOf(Pair("time", time)))
+    }
+
+    fun gameStat(page: String, action: String, arg: Map<String, Any>? = null, type: String = "event") {
+        channel.invokeMethod("gameStat", mapOf(Pair("page", page), Pair("action", action), Pair("arguments", arg), Pair("type", type)))
+    }
+
+    fun statGamePlay() {
+        channel.invokeMethod("statGamePlay", null)
     }
 
     fun openFlutterPage(route: String?, arguments: Map<String, Any>?) {
@@ -773,92 +793,28 @@ object GameManager : HmcpPlayerListener, OnContronListener {
         channel.invokeMethod("exitGame", mapOf(Pair("action", "0")))
     }
 
-    fun releasePlayingGame(gameParam: GameParam, callback: MethodChannel.Result) {
-        val config: Bundle = Bundle().also {
-            it.putString(HmcpManager.ACCESS_KEY_ID, gameParam.accessKeyId)
-            it.putString(HmcpManager.CHANNEL_ID, "app_cloud_game")
-        }
-        HmcpManager.getInstance().releaseRequestManager()
-        HmcpManager.getInstance().init(config, activity, object : OnInitCallBackListener {
-            override fun success() {
-                LogUtils.d("haiMaSDK success:${HmcpManager.getInstance().sdkVersion}")
-                // 检查是否有在游戏中的实例
-                checkPlayingGame(gameParam, callback)
-            }
-
-            override fun fail(msg: String?) {
-                LogUtils.e("haiMaSDK fail:$msg")
-                var errorCode = GameError.gameInitErrorCode
-                var errorMsg = GameError.gameInitErrorMsg
-                if (msg is String && !TextUtils.isEmpty(msg)) {
-                    val resultData = gson.fromJson(msg, Map::class.java)
-                    var errorCodeWithoutCid = ""
-                    try {
-                        errorCodeWithoutCid =
-                            if (resultData["errorCodeWithoutCid"].toString() == "null") GameError.gameInitErrorCode else resultData["errorCodeWithoutCid"].toString()
-                    } catch (e: Exception) {
-                        LogUtils.e("${e.message}")
-                    }
-                    errorCode =
-                        if (TextUtils.isEmpty(errorCodeWithoutCid)) GameError.gameInitErrorCode else errorCodeWithoutCid
-                    try {
-                        errorMsg =
-                            if (resultData["errorMessage"].toString() == "null") resultData["errorMsg"].toString() else resultData["errorMessage"].toString()
-                    } catch (e: Exception) {
-                        LogUtils.e("${e.message}")
-                    }
+    fun releaseGame(gameParam: GameParam, callback: MethodChannel.Result) {
+        HmcpManager.getInstance().setReleaseCid(
+            gameParam.gamePkName, gameParam.cid, gameParam.cToken, gameParam.channelName,
+            UserInfo2().also {
+                it.userId = gameParam.userId
+                it.userToken = gameParam.userToken
+            },
+            gameParam.accessKeyId,
+            object : OnSaveGameCallBackListener {
+                override fun success(result: Boolean) {
+                    // 游戏释放成功
+                    LogUtils.d("releaseGame:$result")
+                    callback.success(result)
                 }
-                EventBus.getDefault().post(GameErrorEvent(errorCode, errorMsg))
-                channel.invokeMethod(
-                    "errorInfo",
-                    mapOf(Pair("errorCode", errorCode), Pair("errorMsg", errorMsg))
-                )
-                callback.success(false)
-            }
-        }, true)
-    }
 
-    fun checkPlayingGame(gameParam: GameParam, callback: MethodChannel.Result) {
-        HmcpManager.getInstance().checkPlayingGame(UserInfo().also {
-            it.userId = gameParam.userId
-            it.userToken = gameParam.userToken
-        }, object : OnGameIsAliveListener {
-            override fun success(list: MutableList<CheckCloudServiceResult.ChannelInfo>?) {
-                LogUtils.d("checkPlayingGame:$list")
-                if (!list.isNullOrEmpty()) {
-                    // 有未释放的游戏实例
-                    val channelInfo = list[0]
-                    LogUtils.d("checkPlayingGame->cid:${channelInfo.cid}, pkgName:${channelInfo.pkgName}, appChannel:${channelInfo.appChannel}")
-                    HmcpManager.getInstance().setReleaseCid(
-                        gameParam.gamePkName, channelInfo.cid, gameParam.cToken, gameParam.channelName,
-                        UserInfo2().also {
-                            it.userId = gameParam.userId
-                            it.userToken = gameParam.userToken
-                        },
-                        object : OnSaveGameCallBackListener {
-                            override fun success(result: Boolean) {
-                                callback.success(result)
-                                // 游戏释放成功
-                                LogUtils.d("releaseGame:$result")
-                            }
-
-                            override fun fail(error: String?) {
-                                // 游戏释放失败
-                                LogUtils.e("releaseGame:$error")
-                                callback.success(false)
-                            }
-                        }
-                    )
-                } else {
-                    callback.success(true)
+                override fun fail(error: String?) {
+                    // 游戏释放失败
+                    LogUtils.e("releaseGame:$error")
+                    callback.success(false)
                 }
             }
-
-            override fun fail(msg: String?) {
-                LogUtils.d("checkPlayingGameFail->Msg:$msg")
-                callback.success(false)
-            }
-        })
+        )
     }
 
     /// 游戏释放
@@ -1002,8 +958,6 @@ object GameManager : HmcpPlayerListener, OnContronListener {
     fun queryControlUsers() {
         gameView?.queryControlPermitUsers(this)
     }
-
-    var initState = false
     var roomIndex = -1
     var userId = ""
 
@@ -1016,7 +970,7 @@ object GameManager : HmcpPlayerListener, OnContronListener {
         isPartyPlayOwner = false
 
         val accessKeyId = arguments["accessKeyId"]?.toString() ?: ""
-        val channel = arguments["channel"]?.toString() ?: "android"
+        val channelName = arguments["channelName"]?.toString() ?: ""
         val cid = arguments["cid"]?.toString() ?: ""
         val pinCode = arguments["pinCode"]?.toString() ?: ""
         val userId = arguments["userId"]?.toString() ?: ""
@@ -1031,7 +985,7 @@ object GameManager : HmcpPlayerListener, OnContronListener {
         } else {
             val config = Bundle().apply {
                 putString(HmcpManager.ACCESS_KEY_ID, accessKeyId)
-                putString(HmcpManager.CHANNEL_ID, "app_cloud_game")
+                putString(HmcpManager.CHANNEL_ID, channelName)
             }
             HmcpManager.getInstance().init(config, activity, object : OnInitCallBackListener {
                 override fun success() {

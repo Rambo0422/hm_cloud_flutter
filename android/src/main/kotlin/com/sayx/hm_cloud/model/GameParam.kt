@@ -23,6 +23,7 @@ data class GameParam(
     var channelName: String,
     var vipExpiredTime: Long,
     var gameId: String,
+    var cid: String,
     var accountInfo: Any?,
     var isPeakChannel: Boolean,
     var isPartyGame: Boolean,
@@ -45,6 +46,7 @@ data class GameParam(
                 "channelName='$channelName', " +
                 "vipExpiredTime=$vipExpiredTime, " +
                 "gameId='$gameId', " +
+                "cid='$cid', " +
                 "accountInfo=$accountInfo, " +
                 "isPeakChannel=$isPeakChannel, " +
                 "isPartyGame=$isPartyGame)"
@@ -66,6 +68,7 @@ data class GameParam(
                 arguments["channelName"] as String? ?: "",
                 getTimeValue(arguments["vipExpiredTime"]),
                 arguments["gameId"] as String? ?: "",
+                arguments["cid"] as String? ?: "",
                 arguments["accountInfo"],
                 arguments["isPeakChannel"] as Boolean? ?: false,
                 arguments["isPartyGame"] as Boolean? ?: false,

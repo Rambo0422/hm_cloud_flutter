@@ -108,7 +108,7 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
             "releaseGame" -> {
                 if (arguments is Map<*, *>) {
                     val gameParam = GameParam.formGson(arguments)
-                    GameManager.releasePlayingGame(gameParam, callback)
+                    GameManager.releaseGame(gameParam, callback)
                 }
             }
 

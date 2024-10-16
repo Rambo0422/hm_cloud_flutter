@@ -23,7 +23,7 @@ class HmCloudController {
 
   ///MARK: 初始化sdk
   void initSdk(Map<String, dynamic> params) {
-    print('init sdk $params');
+    // print('init sdk $params');
 
     methodChannel.invokeMethod("initSDK", params);
   }
