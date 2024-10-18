@@ -900,6 +900,7 @@ object GameManager : HmcpPlayerListener, OnContronListener {
     }
 
     fun releasePlayPartyGame() {
+        gameView?.release()
         gameView?.onDestroy()
         gameView = null
         isPlaying = false
