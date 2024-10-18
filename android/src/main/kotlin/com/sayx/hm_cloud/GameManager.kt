@@ -97,6 +97,8 @@ object GameManager : HmcpPlayerListener, OnContronListener {
     var isPartyPlay = false
     var isPartyPlayOwner = false
 
+    var disposable: Disposable? = null
+
     fun init(channel: MethodChannel, context: Activity) {
         this.channel = channel
         this.activity = context
@@ -244,6 +246,7 @@ object GameManager : HmcpPlayerListener, OnContronListener {
             params,
             object : Observer<HttpResponse<ArchiveData>> {
                 override fun onSubscribe(d: Disposable) {
+                    disposable = d
                 }
 
                 override fun onError(e: Throwable) {
@@ -820,6 +823,7 @@ object GameManager : HmcpPlayerListener, OnContronListener {
     /// 游戏释放
     fun releaseGame(finish: String, bundle: Bundle? = null) {
         LogUtils.d("releaseGame:$finish")
+        disposable?.dispose()
         val cloudId = HmcpManager.getInstance().cloudId
         channel.invokeMethod(
             "gameStatusStat", mapOf(
@@ -839,6 +843,7 @@ object GameManager : HmcpPlayerListener, OnContronListener {
         }
         if (TextUtils.isEmpty(cloudId)) {
             LogUtils.d("undo releaseGame, cid is empty")
+            gameView?.release()
             gameView?.onDestroy()
             gameView = null
             isPlaying = false
@@ -861,6 +866,7 @@ object GameManager : HmcpPlayerListener, OnContronListener {
                 override fun success(result: Boolean) {
                     // 游戏释放成功
                     LogUtils.d("releaseGame:$result")
+                    gameView?.release()
                     gameView?.onDestroy()
                     gameView = null
                     isPlaying = false
@@ -875,6 +881,7 @@ object GameManager : HmcpPlayerListener, OnContronListener {
                 override fun fail(error: String?) {
                     // 游戏释放失败
                     LogUtils.e("releaseGame:$error")
+                    gameView?.release()
                     gameView?.onDestroy()
                     gameView = null
                     isPlaying = false

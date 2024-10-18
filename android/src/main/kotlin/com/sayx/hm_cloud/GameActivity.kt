@@ -237,7 +237,7 @@ class GameActivity : AppCompatActivity() {
         initGameSettings()
 
         // 展示存档提示
-        showSaveTips()
+//        showSaveTips()
 
         if (GameManager.isPartyPlay) {
             if (GameManager.isPartyPlayOwner) {
@@ -464,7 +464,8 @@ class GameActivity : AppCompatActivity() {
 
             override fun onExitGame() {
                 LogUtils.d("onExitGame")
-                checkArchiveStatus()
+                showExitGameDialog()
+//                checkArchiveStatus()
             }
 
             override fun onCustomSettings() {
@@ -1234,6 +1235,30 @@ class GameActivity : AppCompatActivity() {
             return true
         }
         return !(keyCode == KeyEvent.KEYCODE_VOLUME_DOWN || keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_MUTE)
+    }
+
+    var needShowNotice = false
+
+    override fun onPause() {
+        super.onPause()
+        needShowNotice = true
+    }
+
+    override fun onResume() {
+        super.onResume()
+        dataBinding.root.post {
+            if (needShowNotice) {
+                needShowNotice = false
+                AppCommonDialog.Builder(this)
+                    .setTitle("温馨提示")
+                    .setSubTitle("游戏过程中请勿切换应用或刷新页面，会导致无法运行游戏", Color.parseColor("#FF555A69"))
+                    .setRightButton("知道了") {
+                        AppCommonDialog.hideDialog(this)
+                    }
+                    .build()
+                    .show()
+            }
+        }
     }
 
     override fun onDestroy() {
