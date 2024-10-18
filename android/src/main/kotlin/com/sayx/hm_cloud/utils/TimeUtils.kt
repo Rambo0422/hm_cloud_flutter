@@ -1,5 +1,10 @@
 package com.sayx.hm_cloud.utils
 
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
+
 object TimeUtils {
 
     // 可玩时间
@@ -22,5 +27,16 @@ object TimeUtils {
         val minutes = seconds / 60
         seconds %= 60
         return "${if (minutes < 10) "0$minutes" else "$minutes"}:${if (seconds < 10) "0$seconds" else "$seconds"}"
+    }
+
+    fun isSameDay(time1: Any?, time2: Long): Boolean {
+        if (time1 is Number) {
+            val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
+            dateFormat.timeZone = TimeZone.getTimeZone("UTC")
+            val date1 = Date(time1.toLong())
+            val date2 = Date(time2)
+            return dateFormat.format(date1) == dateFormat.format(date2)
+        }
+        return false
     }
 }

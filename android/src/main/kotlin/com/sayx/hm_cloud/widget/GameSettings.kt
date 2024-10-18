@@ -399,7 +399,7 @@ class GameSettings @JvmOverloads constructor(
     }
 
     // 显示可用高峰时长
-    private fun updateAvailableTime(time: Long) {
+    fun updateAvailableTime(time: Long) {
         LogUtils.d("updateAvailableTime:$time")
         dataBinding.tvAvailableTime.text = TimeUtils.getTimeString(time)
     }
@@ -428,7 +428,6 @@ class GameSettings @JvmOverloads constructor(
 
     fun updatePlayTime(time: Long) {
         currentPlayTime = time / 1000
-        updateAvailableTime(currentPlayTime)
     }
 
     // 游戏计时

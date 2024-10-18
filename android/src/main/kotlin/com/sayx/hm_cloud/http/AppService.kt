@@ -2,8 +2,10 @@ package com.sayx.hm_cloud.http
 
 import com.sayx.hm_cloud.http.bean.HttpResponse
 import com.sayx.hm_cloud.model.ArchiveData
+import com.sayx.hm_cloud.model.GameConfig
 import io.reactivex.rxjava3.core.Observable
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.POST
 
 interface AppService {
@@ -12,4 +14,7 @@ interface AppService {
     fun requestArchiveData(
         @Body body: HashMap<String, Any>
     ) : Observable<HttpResponse<ArchiveData>>
+
+    @GET("/api/config/get?key=GAME_CONFIG")
+    fun requestGameConfig() : Observable<HttpResponse<GameConfig>>
 }

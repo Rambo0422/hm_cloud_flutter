@@ -138,8 +138,10 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
                 ToastUtils.showShort("编辑保存失败")
             }
 
-            "updatePlayTime" -> {
-                GameManager.updatePlayTime((arguments as Int).toLong())
+            "updatePlayInfo" -> {
+                if (arguments is Map<*, *>) {
+                GameManager.updatePlayInfo(arguments)
+                }
             }
 
             "showToast" -> {

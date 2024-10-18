@@ -1,5 +1,7 @@
 package com.sayx.hm_cloud.model
 
+import com.sayx.hm_cloud.utils.TimeUtils
+
 data class GameParam(
     // 密钥id
     var accessKeyId: String,
@@ -29,7 +31,7 @@ data class GameParam(
     var isPartyGame: Boolean,
 ) {
     fun isVip(): Boolean {
-        return vipExpiredTime > realTime
+        return vipExpiredTime > System.currentTimeMillis()
     }
 
     override fun toString(): String {
@@ -75,7 +77,7 @@ data class GameParam(
             )
         }
 
-        private fun getTimeValue(any: Any?): Long {
+        fun getTimeValue(any: Any?): Long {
             if (any is Number) {
                 return any.toLong()
             }

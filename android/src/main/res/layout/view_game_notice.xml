@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#D9121212">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_bg"
+            android:layout_width="0dp"
+            android:layout_height="152dp"
+            android:src="@drawable/img_game_notice_bg"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="402:152"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/game_notice_title"
+            android:textColor="#FFC6EC4B"
+            android:textSize="17sp"
+            android:layout_marginTop="30dp"
+            app:layout_constraintEnd_toEndOf="@id/iv_bg"
+            app:layout_constraintStart_toStartOf="@id/iv_bg"
+            app:layout_constraintTop_toTopOf="@id/iv_bg"
+            app:layout_constraintVertical_chainStyle="spread" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_subtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:textSize="13sp"
+            android:textColor="@android:color/white"
+            android:layout_marginHorizontal="20dp"
+            app:layout_constraintEnd_toEndOf="@id/iv_bg"
+            app:layout_constraintStart_toStartOf="@id/iv_bg"
+            app:layout_constraintTop_toBottomOf="@id/tv_title"
+            tools:text="本游戏极易奔溃，建议较少刷新和启切应操作…本游戏极易奔溃，建议较少刷新和启切应操作…" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="6dp"
+            android:layout_height="6dp"
+            android:layout_marginEnd="4dp"
+            app:layout_constraintEnd_toStartOf="@id/tv_notice"
+            app:layout_constraintTop_toTopOf="@id/tv_notice"
+            app:layout_constraintBottom_toBottomOf="@id/tv_notice"
+            android:src="@drawable/ic_triangle"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_notice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:textSize="12sp"
+            android:textColor="#8CFFFFFF"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="20dp"
+            android:text="@string/hint_hide_notice"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

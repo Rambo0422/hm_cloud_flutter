@@ -168,4 +168,6 @@
     <string name="join_vip">我要开通</string>
     <string name="game_time_lack">剩余游玩时间不足5分钟</string>
     <string name="recharge">充值</string>
+    <string name="game_notice_title">温馨提示</string>
+    <string name="hint_hide_notice">点击任意地方隐藏展示</string>
 </resources>

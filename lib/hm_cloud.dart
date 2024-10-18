@@ -105,10 +105,6 @@ class HmCloudController {
     );
   }
 
-  void updatePlayTime(int playTime) {
-    methodChannel.invokeMethod('updatePlayTime', playTime);
-  }
-
 // 购买成功通知
   void buySuccess() {
     methodChannel.invokeMethod('buySuccess', null);

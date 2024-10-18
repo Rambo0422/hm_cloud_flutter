@@ -61,11 +61,15 @@ import com.sayx.hm_cloud.databinding.ActivityGameBinding
 import com.sayx.hm_cloud.dialog.AppCommonDialog
 import com.sayx.hm_cloud.dialog.ControllerTypeDialog
 import com.sayx.hm_cloud.dialog.GameErrorDialog
+import com.sayx.hm_cloud.http.AppRepository
+import com.sayx.hm_cloud.http.HttpManager
+import com.sayx.hm_cloud.http.bean.HttpResponse
 import com.sayx.hm_cloud.model.ControllerChangeEvent
 import com.sayx.hm_cloud.model.ControllerConfigEvent
 import com.sayx.hm_cloud.model.ControllerEditEvent
 import com.sayx.hm_cloud.model.ExitGameEvent
 import com.sayx.hm_cloud.model.GameErrorEvent
+import com.sayx.hm_cloud.model.GameParam
 import com.sayx.hm_cloud.model.KeyInfo
 import com.sayx.hm_cloud.model.PCMouseEvent
 import com.sayx.hm_cloud.model.PartyPlayWantPlay
@@ -85,12 +89,18 @@ import com.sayx.hm_cloud.widget.PlayPartyGameView
 import com.sayx.hm_cloud.widget.PlayPartyPermissionView
 import com.sayx.hm_cloud.widget.PlayPartyUserAvatarView
 import com.sayx.hm_cloud.widget.PlayPartyWantPlayView
+import io.reactivex.rxjava3.core.Observer
+import io.reactivex.rxjava3.disposables.Disposable
 import me.jessyan.autosize.utils.AutoSizeUtils
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.util.Timer
 import java.util.TimerTask
+import com.sayx.hm_cloud.model.GameConfig
+import com.sayx.hm_cloud.model.GameNotice
+import com.sayx.hm_cloud.utils.TimeUtils
+import com.sayx.hm_cloud.widget.GameNoticeView
 
 class GameActivity : AppCompatActivity() {
 
@@ -124,8 +134,13 @@ class GameActivity : AppCompatActivity() {
         getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     }
 
+    private val appRepository: AppRepository by lazy {
+        AppRepository()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        GameManager.openGame = false
         // 全屏
         immersionBar {
             fullScreen(true)
@@ -175,8 +190,11 @@ class GameActivity : AppCompatActivity() {
                 dataBinding.guideMaskView.visibility = View.GONE
                 dataBinding.layoutGuide.clearAnimation()
                 SPUtils.getInstance().put(GameConstants.showGuide, true)
+
+                checkTipsShow()
+            } else {
+                showGameSetting()
             }
-            showGameSetting()
         }
         dataBinding.btnVirtualKeyboard.setOnClickListener {
             LogUtils.d("显示游戏输入法键盘")
@@ -286,6 +304,8 @@ class GameActivity : AppCompatActivity() {
         val showGuide = SPUtils.getInstance().getBoolean(GameConstants.showGuide)
         if (!showGuide) {
             showGuideView()
+        } else {
+            checkTipsShow()
         }
     }
 
@@ -374,6 +394,57 @@ class GameActivity : AppCompatActivity() {
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.MATCH_PARENT
         )
+        dataBinding.layoutGame.post {
+            dataBinding.layoutGame.addView(tipsView, layoutParams)
+        }
+    }
+
+    private fun checkTipsShow() {
+        val string = SPUtils.getInstance().getString("showNoticeGame")
+        if (!string.isNullOrEmpty()) {
+            val gameRecord = GameManager.gson.fromJson(string, Map::class.java)
+            val gameId = gameRecord["gameId"]
+            val time = gameRecord["time"]
+            // 同一游戏，同一天不重复展示
+            if (gameId == GameManager.getGameParam()?.gameId && TimeUtils.isSameDay(time, System.currentTimeMillis())) {
+                return
+            }
+        }
+        appRepository.requestGameConfig(object : Observer<HttpResponse<GameConfig>> {
+            override fun onSubscribe(d: Disposable) {
+
+            }
+
+            override fun onError(e: Throwable) {
+                LogUtils.e("requestGameConfig:${e.message}")
+            }
+
+            override fun onComplete() {
+
+            }
+
+            override fun onNext(response: HttpResponse<GameConfig>) {
+                response.data?.let {
+                    val gameNotice = it.list.findLast { item -> item.gameId == GameManager.getGameParam()?.gameId }
+                    gameNotice?.let { info ->
+                        showGameNotice(info)
+                    }
+                }
+            }
+        })
+    }
+
+    private fun showGameNotice(info: GameNotice) {
+        val tipsView = GameNoticeView(this)
+        val layoutParams = FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+        tipsView.setNoticeData(info)
+        tipsView.setOnClickListener {
+            dataBinding.layoutGame.removeView(tipsView)
+        }
+        SPUtils.getInstance().put("showNoticeGame", GameManager.gson.toJson(mapOf("gameId" to info.gameId, "time" to System.currentTimeMillis())))
         dataBinding.layoutGame.post {
             dataBinding.layoutGame.addView(tipsView, layoutParams)
         }
@@ -550,7 +621,8 @@ class GameActivity : AppCompatActivity() {
                 LogUtils.d("exitGameByUser")
                 GameManager.releaseGame(finish = "1", bundle = null)
                 gameSettings?.release()
-                finish() }
+                finish()
+            }
             .setRightButton("继续等待") {
                 GameManager.gameStat("游戏界面-正在存档-继续等待", "click")
                 AppCommonDialog.hideDialog(this@GameActivity)
@@ -1129,12 +1201,12 @@ class GameActivity : AppCompatActivity() {
             }
 
             val content = StringBuilder()
-                    .append("游戏名称:")
-                    .append(GameManager.getGameParam()?.gameName).append("\n")
-                    .append("CID:")
-                    .append(HmcpManager.getInstance().cloudId).append("\n")
-                    .append("UID:")
-                    .append(GameManager.getGameParam()?.userId).append("\n")
+                .append("游戏名称:")
+                .append(GameManager.getGameParam()?.gameName).append("\n")
+                .append("CID:")
+                .append(HmcpManager.getInstance().cloudId).append("\n")
+                .append("UID:")
+                .append(GameManager.getGameParam()?.userId).append("\n")
             GameErrorDialog.Builder(this)
                 .setTitle(title.toString())
                 .setSubTitle(content.toString())
@@ -1282,7 +1354,9 @@ class GameActivity : AppCompatActivity() {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onTimeUpdateEvent(event: TimeUpdateEvent) {
-        gameSettings?.updatePlayTime(event.time)
+        val params: GameParam = event.param
+        gameSettings?.updatePlayTime(params.playTime)
+        gameSettings?.updateAvailableTime(params.peakTime)
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

@@ -87,6 +87,10 @@ object GameManager : HmcpPlayerListener, OnContronListener {
 
     var isVideoShowed = false
 
+    var openGame = false
+
+    var resume = false
+
     var inQueue = false
 
     var needReattach = false
@@ -423,6 +427,20 @@ object GameManager : HmcpPlayerListener, OnContronListener {
         }
     }
 
+    fun onActivityResumed(activity: Activity) {
+        resume = true
+        if (openGame) {
+            Intent().apply {
+                setClass(GameManager.activity, GameActivity::class.java)
+                GameManager.activity.startActivityForResult(this, 200)
+            }
+        }
+    }
+
+    fun onActivityPaused(activity: Activity) {
+        resume = false
+    }
+
     override fun HmcpPlayerStatusCallback(statusData: String?) {
         LogUtils.d("playerStatusCallback:$statusData, cid:${HmcpManager.getInstance().cloudId}")
         statusData?.let {
@@ -443,7 +461,11 @@ object GameManager : HmcpPlayerListener, OnContronListener {
                 }
                 // sdk反馈需选择是否进入排队，直接进入排队
                 Constants.STATUS_WAIT_CHOOSE -> {
-                    gameView?.entryQueue()
+                    if (resume) {
+                        gameView?.entryQueue()
+                    } else {
+
+                    }
                 }
 
                 Constants.STATUS_START_PLAY -> {
@@ -480,6 +502,7 @@ object GameManager : HmcpPlayerListener, OnContronListener {
                                 Pair("cid", HmcpManager.getInstance().cloudId)
                             )
                         )
+                        openGame = true
                         // 打开新的页面展示游戏画面
                         Intent().apply {
                             setClass(activity, GameActivity::class.java)
@@ -757,9 +780,15 @@ object GameManager : HmcpPlayerListener, OnContronListener {
         channel.invokeMethod("updateTime", null)
     }
 
-    fun updatePlayTime(time: Long) {
+    fun updatePlayInfo(arguments: Map<*, *>) {
+        val playTime = (arguments["playTime"] as Number?)?.toLong() ?: 0L
+        val peakTime = GameParam.getTimeValue(arguments["peakTime"])
+        val vipExpiredTime = GameParam.getTimeValue(arguments["vipExpiredTime"])
+        gameParam?.playTime = playTime
+        gameParam?.peakTime = peakTime
+        gameParam?.vipExpiredTime = vipExpiredTime
         val bundle = Bundle().apply {
-            putLong(HmcpVideoView.PLAY_TIME, time)
+            putLong(HmcpVideoView.PLAY_TIME, playTime)
             putString(HmcpVideoView.USER_ID, gameParam?.userId)
             putString(HmcpVideoView.TIPS_MSG, "");
             putString(
@@ -778,7 +807,7 @@ object GameManager : HmcpPlayerListener, OnContronListener {
             override fun success(result: Boolean) {
                 LogUtils.v("updateGameUID->success:$result")
                 if (result) {
-                    EventBus.getDefault().post(TimeUpdateEvent(time))
+                    EventBus.getDefault().post(TimeUpdateEvent(gameParam!!))
                 }
             }
 
