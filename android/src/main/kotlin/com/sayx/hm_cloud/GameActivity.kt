@@ -6,21 +6,15 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.view.KeyEvent
 import android.view.MotionEvent
-import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
+import com.antong.keyboard.sa.constants.HMInputOpData
 import com.blankj.utilcode.util.LogUtils
-import com.blankj.utilcode.util.ToastUtils
 import com.gyf.immersionbar.BarHide
-import com.gyf.immersionbar.ImmersionBar.hasNavigationBar
 import com.gyf.immersionbar.ktx.immersionBar
-import com.haima.hmcp.HmcpManager
-//import com.haima.hmcp.widgets.beans.VirtualOperateType
 import com.sayx.hm_cloud.callback.NoOperateListener
 import com.sayx.hm_cloud.databinding.ActivityGameBinding
 import com.sayx.hm_cloud.dialog.AppCommonDialog
@@ -28,6 +22,8 @@ import com.sayx.hm_cloud.dialog.GameErrorDialog
 import com.sayx.hm_cloud.dialog.NoOperateOfflineDialog
 import com.sayx.hm_cloud.model.GameErrorEvent
 import com.sayx.hm_cloud.model.GameOverEvent
+import com.sayx.hm_cloud.utils.handler.GameController
+import com.sayx.hm_cloud.utils.handler.GameControllerDelegate
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -36,16 +32,20 @@ import java.util.TimerTask
 
 class GameActivity : AppCompatActivity() {
 
-    private val noOperateTime = 240 * 1000L
+    // 未操作的时间
+    private val NO_OPERATE_TIME = 240 * 1000L
 
     private lateinit var dataBinding: ActivityGameBinding
 
     private var gameTimer: Timer? = null
 
-    private var countTime = noOperateTime
+    private var countTime = NO_OPERATE_TIME
+    private var gameControllerDelegate: GameControllerDelegate? = null
+    private var lastDelay = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        LogUtils.d("GameActivity onCreate")
         // 全屏
         immersionBar {
             fullScreen(true)
@@ -64,10 +64,12 @@ class GameActivity : AppCompatActivity() {
             }
         })
         initView()
+        initGameController()
     }
 
+
     private fun initView() {
-        GameManager.gameView?.let { gameView ->
+        AnTongSDK.anTongVideoView?.let { gameView ->
             val parent = gameView.parent
             parent?.let {
                 (it as ViewGroup).removeView(gameView)
@@ -81,6 +83,7 @@ class GameActivity : AppCompatActivity() {
                 )
             )
         }
+
         initGameSettings()
         startTimer()
     }
@@ -92,12 +95,13 @@ class GameActivity : AppCompatActivity() {
      * 3，设置为超清
      */
     private fun initGameSettings() {
-        LogUtils.d("initGameSettings:${GameManager.gameView?.resolutionList}");
+        // LogUtils.d("initGameSettings:${GameManager.gameView?.resolutionList}");
     }
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        countTime = noOperateTime
+        countTime = NO_OPERATE_TIME
+        LogUtils.d("GameActivity onNewIntent")
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this)
         }
@@ -137,11 +141,10 @@ class GameActivity : AppCompatActivity() {
         }
     }
 
-    private var lastDelay = 0
-
     @SuppressLint("SetTextI18n")
     private fun updateNetDelay() {
-        val latencyInfo = GameManager.gameView?.clockDiffVideoLatencyInfo
+        val latencyInfo = AnTongSDK.anTongVideoView?.clockDiffVideoLatencyInfo
+//        val latencyInfo = GameManager.gameView?.clockDiffVideoLatencyInfo
 //        LogUtils.d("updateNetDelay:${latencyInfo}")
         val delay = latencyInfo?.netDelay ?: 999
         val netDelay = if (delay > 450) 450 else delay
@@ -173,10 +176,10 @@ class GameActivity : AppCompatActivity() {
 //                    "receivedBitrate:${latencyInfo?.receivedBitrate}\n" +
 //                    "audioBitrate:${latencyInfo?.audioBitrate}\n"
 
-        val cloudId = HmcpManager.getInstance().cloudId
-        if (!TextUtils.isEmpty(cloudId)) {
-            dataBinding.tvCid.text = cloudId
-        }
+//        val cloudId = HmcpManager.getInstance().cloudId
+//        if (!TextUtils.isEmpty(cloudId)) {
+//            dataBinding.tvCid.text = cloudId
+//        }
     }
 
     private fun showNoOperateDialog() {
@@ -195,7 +198,7 @@ class GameActivity : AppCompatActivity() {
 
             override fun continuePlay() {
                 // 继续游戏，刷新无操作时间,重新开始计时
-                countTime = noOperateTime
+                countTime = NO_OPERATE_TIME
                 startTimer()
             }
         })
@@ -223,8 +226,9 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun showErrorDialog(errorCode: String, errorMsg: String? = null) {
-        GameManager.gameView?.onDestroy()
-        GameManager.gameView = null
+//        GameManager.gameView?.onDestroy()
+//        GameManager.gameView = null
+        AnTongSDK.onDestroy()
         GameManager.isPlaying = false
         try {
             val title = StringBuilder()
@@ -240,7 +244,7 @@ class GameActivity : AppCompatActivity() {
             val content =
                 StringBuilder().append("游戏名称:").append(GameManager.getGameParam()?.gameName)
                     .append("\n")
-                    .append("CID:").append(HmcpManager.getInstance().cloudId).append("\n")
+//                    .append("CID:").append(HmcpManager.getInstance().cloudId).append("\n")
                     .append("UID:").append(GameManager.getGameParam()?.userId).append("\n")
                     .append("无法重连可截图联系客服QQ:3107321871")
             GameErrorDialog.Builder(this)
@@ -269,29 +273,34 @@ class GameActivity : AppCompatActivity() {
     }
 
     override fun onStart() {
-        GameManager.gameView?.onStart()
+        // GameManager.gameView?.onStart()
+        AnTongSDK.anTongVideoView?.onStart()
         super.onStart()
     }
 
     override fun onResume() {
-        GameManager.gameView?.onResume()
+        AnTongSDK.anTongVideoView?.onResume()
         super.onResume()
     }
 
     override fun onRestart() {
-        GameManager.gameView?.onRestart(0)
+        AnTongSDK.anTongVideoView?.onRestart(0)
+        LogUtils.d("onRestart")
         super.onRestart()
     }
 
     override fun onPause() {
-        GameManager.gameView?.onPause()
         super.onPause()
+        AnTongSDK.anTongVideoView?.onPause()
+        LogUtils.d("onPause")
+//        AnTongSDK.anTongVideoView?.stopGame()
+        finish()
     }
 
     override fun onStop() {
         super.onStop()
         EventBus.getDefault().unregister(this)
-        GameManager.gameView?.onStop()
+        AnTongSDK.anTongVideoView?.onStop()
         GameManager.isPlaying = false
         try {
             gameTimer?.purge()
@@ -302,26 +311,27 @@ class GameActivity : AppCompatActivity() {
         }
     }
 
-    override fun dispatchGenericMotionEvent(event: MotionEvent?): Boolean {
-//        LogUtils.v("dispatchGenericMotionEvent:$event")
-        countTime = noOperateTime
-        return super.dispatchGenericMotionEvent(event)
-    }
+//    override fun dispatchGenericMotionEvent(event: MotionEvent?): Boolean {
+////        LogUtils.v("dispatchGenericMotionEvent:$event")
+//        countTime = noOperateTime
+//        return super.dispatchGenericMotionEvent(event)
+//    }
 
     override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
 //        LogUtils.v("dispatchTouchEvent:$event")
-        countTime = noOperateTime
+        countTime = NO_OPERATE_TIME
         return super.dispatchTouchEvent(event)
     }
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
 //        LogUtils.v("dispatchKeyEvent:$event")
-        countTime = noOperateTime
-        return super.dispatchKeyEvent(event)
+        countTime = NO_OPERATE_TIME
+        val handled = gameControllerDelegate?.dispatchKeyEvent(event) ?: false
+        return handled || super.dispatchKeyEvent(event)
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
-//        LogUtils.v("onKeyDown:$event")
+        LogUtils.v("onKeyDown:$event")
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             return true
         }
@@ -329,7 +339,7 @@ class GameActivity : AppCompatActivity() {
     }
 
     override fun onKeyUp(keyCode: Int, event: KeyEvent): Boolean {
-//        LogUtils.v("onKeyUp:$event")
+        LogUtils.v("onKeyUp:$event")
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             return true
         }
@@ -338,5 +348,87 @@ class GameActivity : AppCompatActivity() {
 
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
+    }
+
+    private fun initGameController() {
+        gameControllerDelegate = GameController()
+        gameControllerDelegate?.setControllerEventListener(object :
+            GameControllerDelegate.ControllerEventListener() {
+            override fun onControllerInput(
+                vendorName: String?,
+                controller: Int,
+                buttonFlags: Int,
+                leftTrigger: Float,
+                rightTrigger: Float,
+                leftStickX: Float,
+                leftStickY: Float,
+                rightStickX: Float,
+                rightStickY: Float
+            ) {
+                // 发送手柄事件
+                val inputOpData = HMInputOpData()
+
+                inputOpData.opListArray.add(HMInputOpData.HMOneInputOPData().apply {
+                    inputOp =
+                        HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpXinputButtons
+                    value = buttonFlags
+                })
+
+                inputOpData.opListArray.add(HMInputOpData.HMOneInputOPData().apply {
+                    inputOp =
+                        HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpXinputThumbLx
+                    value = (leftStickX * 0x7FFE).toInt()
+                })
+
+                inputOpData.opListArray.add(HMInputOpData.HMOneInputOPData().apply {
+                    inputOp =
+                        HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpXinputThumbLy
+                    value = (leftStickY * 0x7FFE).toInt()
+                })
+
+                inputOpData.opListArray.add(HMInputOpData.HMOneInputOPData().apply {
+                    inputOp =
+                        HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpXinputThumbRx
+                    value = (rightStickX * 0x7FFE).toInt()
+                })
+
+                inputOpData.opListArray.add(HMInputOpData.HMOneInputOPData().apply {
+                    inputOp =
+                        HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpXinputThumbRy
+                    value = (rightStickY * 0x7FFE).toInt()
+                })
+
+                inputOpData.opListArray.add(HMInputOpData.HMOneInputOPData().apply {
+                    inputOp =
+                        HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpXinputLeftTrigger
+                    value = leftTrigger.toInt()
+                })
+
+                inputOpData.opListArray.add(HMInputOpData.HMOneInputOPData().apply {
+                    inputOp =
+                        HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpXinputRightTrigger
+                    value = rightTrigger.toInt()
+                })
+
+                AnTongSDK.anTongVideoView?.cmdToCloud(inputOpData)
+            }
+        })
+    }
+
+    override fun dispatchGenericMotionEvent(event: MotionEvent): Boolean {
+        countTime = NO_OPERATE_TIME
+        val handled = gameControllerDelegate?.dispatchGenericMotionEvent(event) ?: false
+        return handled || super.dispatchGenericMotionEvent(event)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        gameControllerDelegate?.onDestroy()
+        AnTongSDK.anTongVideoView?.onDestroy()
+    }
+
+    override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+        LogUtils.d("onUserLeaveHint")
     }
 }

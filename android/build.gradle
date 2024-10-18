@@ -52,7 +52,7 @@ android {
 
     defaultConfig {
         namespace 'com.sayx.hm_cloud'
-        minSdkVersion 21
+        minSdkVersion 23
         consumerProguardFiles 'proguard.pro'
 
         multiDexEnabled true
@@ -61,6 +61,7 @@ android {
 
 dependencies {
     compileOnly fileTree(include: ['*.jar', '*.aar'], dir: 'libs')
+    implementation files('libs/AT202410181616.aar')
     implementation 'androidx.appcompat:appcompat:1.6.1'
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
