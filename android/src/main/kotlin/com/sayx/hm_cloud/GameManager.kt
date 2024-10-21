@@ -169,6 +169,13 @@ object GameManager : HmcpPlayerListener, OnContronListener {
     }
 
     fun getUnReleaseGame(callback: MethodChannel.Result?) {
+        if (!initState) {
+            runBlocking {
+                delay(3000)
+                getUnReleaseGame(callback)
+            }
+            return
+        }
         channel.invokeMethod(
             "gameStatusStat", mapOf(
                 Pair("type", "game_prepare"),
