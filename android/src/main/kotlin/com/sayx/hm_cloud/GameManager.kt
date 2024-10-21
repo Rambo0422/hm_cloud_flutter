@@ -3,7 +3,10 @@ package com.sayx.hm_cloud
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.TextUtils
 import com.blankj.utilcode.util.LogUtils
 import com.google.gson.Gson
@@ -33,6 +36,7 @@ import com.haima.hmcp.utils.StatusCallbackUtil
 import com.haima.hmcp.widgets.HmcpVideoView
 import com.haima.hmcp.widgets.beans.VirtualOperateType
 import com.sayx.hm_cloud.constants.AppVirtualOperateType
+import com.sayx.hm_cloud.dialog.AppCommonDialog
 import com.sayx.hm_cloud.http.AppRepository
 import com.sayx.hm_cloud.http.bean.HttpResponse
 import com.sayx.hm_cloud.http.bean.HttpStatusConstants
@@ -49,8 +53,6 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import io.reactivex.rxjava3.core.Observer
 import io.reactivex.rxjava3.disposables.Disposable
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import org.greenrobot.eventbus.EventBus
 import org.json.JSONArray
 import org.json.JSONObject
@@ -89,11 +91,13 @@ object GameManager : HmcpPlayerListener, OnContronListener {
 
     var openGame = false
 
-    var resume = false
+    private var resume = false
 
     var inQueue = false
 
-    var needReattach = false
+    private var needReattach = false
+
+    private var needShowNotice = false
 
     var initState = false
 
@@ -168,12 +172,15 @@ object GameManager : HmcpPlayerListener, OnContronListener {
         }, true)
     }
 
+    private val handler: Handler by lazy {
+        Handler(Looper.getMainLooper())
+    }
+
     fun getUnReleaseGame(callback: MethodChannel.Result?) {
         if (!initState) {
-            runBlocking {
-                delay(3000)
+            handler.postDelayed({
                 getUnReleaseGame(callback)
-            }
+            }, 3000L)
             return
         }
         channel.invokeMethod(
@@ -238,6 +245,7 @@ object GameManager : HmcpPlayerListener, OnContronListener {
     }
 
     fun startGame(gameParam: GameParam) {
+        needShowNotice = false
         this.gameParam = gameParam
         channel.invokeMethod(
             "gameStatusStat", mapOf(
@@ -374,10 +382,9 @@ object GameManager : HmcpPlayerListener, OnContronListener {
             if (initState) {
                 playGame(bundle)
             } else {
-                runBlocking {
-                    delay(10 * 1000L)
+                handler.postDelayed({
                     playGame(bundle)
-                }
+                }, 3000L)
             }
         } catch (e: Exception) {
             LogUtils.e("game error:${e.message}")
@@ -442,10 +449,24 @@ object GameManager : HmcpPlayerListener, OnContronListener {
                 GameManager.activity.startActivityForResult(this, 200)
             }
         }
+        if (activity is GameActivity && needShowNotice) {
+            needShowNotice = false
+            AppCommonDialog.Builder(activity)
+                .setTitle("温馨提示")
+                .setSubTitle("游戏过程中请勿切换应用或刷新页面，会导致无法运行游戏", Color.parseColor("#FF555A69"))
+                .setRightButton("知道了") {
+                    AppCommonDialog.hideDialog(activity)
+                }
+                .build()
+                .show()
+        }
     }
 
     fun onActivityPaused(activity: Activity) {
         resume = false
+        if (activity is GameActivity) {
+            needShowNotice = true
+        }
     }
 
     override fun HmcpPlayerStatusCallback(statusData: String?) {

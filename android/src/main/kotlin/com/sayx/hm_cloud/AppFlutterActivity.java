@@ -7,6 +7,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.blankj.utilcode.util.LogUtils;
+import com.gyf.immersionbar.BarHide;
+import com.gyf.immersionbar.ImmersionBar;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +22,11 @@ public class AppFlutterActivity extends FlutterActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ImmersionBar.with(this)
+                .fullScreen(true)
+                .hideBar(BarHide.FLAG_HIDE_BAR)
+                .reset()
+                .init();
         GameManager.INSTANCE.setFlutterActivity(this);
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -46,5 +53,9 @@ public class AppFlutterActivity extends FlutterActivity {
     @Override
     public FlutterEngine provideFlutterEngine(@NonNull Context context) {
         return GameManager.flutterEngine;
+    }
+
+    @Override
+    public void onBackPressed() {
     }
 }
