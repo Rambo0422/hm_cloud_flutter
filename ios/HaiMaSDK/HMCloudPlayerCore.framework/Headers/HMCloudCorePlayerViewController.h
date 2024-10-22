@@ -227,6 +227,15 @@ typedef NS_ENUM (NSInteger,CloudCorePlayerIMEResponseStatus) {
     CloudCorePlayerIMEResponseStatusRomReject,//切换失败
 };
 
+typedef NS_ENUM(NSInteger, CloudCorePlayerInputSource) {
+    CloudCorePlayerInputSourceScreen           =  0, //屏幕触控
+    CloudCorePlayerInputSourceMouse            =  1, //鼠标输入
+    CloudCorePlayerInputSourceKeyboard         =  2, //键盘输入
+    CloudCorePlayerInputSourceGamepad          =  3, //手柄输入
+    CloudCorePlayerInputSourceVirtualKeypad    =  4, //虚拟键位输入
+};
+
+
 typedef void (^CloudCorePlayerScreenshotBlock)(BOOL result,NSData *data,CloudCorePlayerScreenshotStatus status,NSString *errorMsg);
 
 typedef void (^CloudCorePlayerUploadResponseBlock)(BOOL result, CloudCorePlayerUploadResponseStatus status ,NSString *errorMsg, HMStreamingFileModel *file);
@@ -300,13 +309,6 @@ typedef void (^CloudCorePlayerIMECompletion)(CloudCorePlayerIMEResponseStatus st
  点击事件触发
  */
 - (void) cloudCorePlayerTouchBegan;
-
-/**
- 点击事件触发
- 
- @param touches 触摸事件的集合
- */
-- (void) cloudCorePlayerTouchBegan:(NSSet<UITouch *> *)touches;
 
 /**
  有事件需要上报
@@ -394,6 +396,12 @@ typedef void (^CloudCorePlayerIMECompletion)(CloudCorePlayerIMEResponseStatus st
  @param hostUrl 解析地址
  */
 - (void)cloudCorePlayerDNSTimeout:(NSString *)hostUrl;
+
+/**
+ 当前输入源发生变化
+ @param inputSource 输入源类型
+ */
+- (void)cloudCorePlayerInputSourceDidChanged:(CloudCorePlayerInputSource)inputSource;
 
 @end
 
@@ -869,5 +877,11 @@ openCameraPermissionCheckByServer:(BOOL)openCameraPermissionCheckByServer
  @param completion 设置结果
  */
 - (void)switchImeType:(CloudCorePlayerIMEType)type completion:(CloudCorePlayerIMECompletion)completion;
+
+
+/**
+ 画面最终可见通知
+ */
+- (void) playerVisibleNotification;
 
 @end

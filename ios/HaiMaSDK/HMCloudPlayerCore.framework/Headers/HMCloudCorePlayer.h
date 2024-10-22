@@ -148,6 +148,14 @@ typedef NS_ENUM(NSInteger, CloudInstanceType) {
     CloudInstanceTypeX86            =  1, //x86
 };
 
+typedef NS_ENUM(NSInteger, CloudPlayerInputSource) {
+    CloudPlayerInputSourceScreen           =  0, //屏幕触控
+    CloudPlayerInputSourceMouse            =  1, //鼠标输入
+    CloudPlayerInputSourceKeyboard         =  2, //键盘输入
+    CloudPlayerInputSourceGamepad          =  3, //手柄输入
+    CloudPlayerInputSourceVirtualKeypad    =  4, //虚拟键位输入
+};
+
 typedef void (^HMCloudScreenshotBlock)(BOOL result,NSData *data,CloudPlayerScreenshotStatus status,NSString *errorMsg);
 typedef void (^HMCloudFileImageListBlock)(BOOL result, NSArray *imageList,NSString *errorMsg);
 
@@ -227,6 +235,7 @@ const extern NSString *CloudGameOptionKeyStretch;                 //是否拉伸
 @property (nonatomic, assign)           BOOL openMultiConnect;
 @property (nonatomic, assign)           long long saasLinkTimestamp;
 @property (nonatomic, assign)           CloudInstanceType instanceType;
+@property (nonatomic, assign)           IMEType cloudImeType;
 
 
 - (NSString *) getFinalCountlyUrl;
@@ -676,6 +685,10 @@ const extern NSString *CloudGameOptionKeyStretch;                 //是否拉伸
  @param completion 设置结果
  */
 - (void)switchImeType:(IMEType)type completion:(void (^)(IMEResponseStatus))completion;
+
+- (void)setCloudCorePlayerIMEType:(IMEType)type;
+
+- (void)playerVisibleNotification;
 
 @end
 

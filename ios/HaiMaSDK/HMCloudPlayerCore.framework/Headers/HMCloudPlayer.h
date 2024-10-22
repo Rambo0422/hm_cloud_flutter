@@ -71,6 +71,8 @@ typedef NS_ENUM(NSInteger, ELivingCapabilityStatus) {
     LivingSupported   = 1,    //支持直播
 };
 
+
+
 typedef void (^HMReservedIncetanceCallback)(NSArray <HMCloudPlayerReservedSingleIncetance*>*);
 
 const extern NSString *CLOUDGAME_SDK_VERSION;
@@ -241,6 +243,13 @@ IDC路由查询
  @param resolutionId 目标清晰度ID
  */
 - (void) switchResolution:(NSInteger)resolutionId;
+/**
+ 手动切换清晰度
+
+ @param resolutionId 目标清晰度ID
+ @param ratio 设置像素比
+ */
+- (void) switchResolution:(NSInteger)resolutionId devicePixelRatio:(NSInteger)ratio;
 
 /**
  确认进入排队队列
@@ -610,10 +619,9 @@ typedef void (^HMAssignControlCallback)(NSArray<HMCloudPlayerControlInfo *>*);
 
 
 @protocol HMCloudPlayerDelegate <NSObject>
-
+@optional
 - (void) cloudPlayerSceneChangedCallback:(NSDictionary *)dict;
 - (void) cloudPlayerTouchBegan;
-- (void) cloudPlayerTouchBegan:(NSSet<UITouch *> *)touches;
 - (void) cloudPlayerUsageAuthorization:(HMCloudPlayerUsageAuthorization)type success:(void (^)(BOOL authorization))success;
 - (void) cloudPlayerDidReceiveWSMessage:(HMCloudPlayerWSMessage *)msg;
 - (void) cloudPlayerKeyboardStatusChanged:(CloudPlayerKeyboardStatus)status;
@@ -627,4 +635,6 @@ typedef void (^HMAssignControlCallback)(NSArray<HMCloudPlayerControlInfo *>*);
 - (void) cloudPlayerPrivacy:(CloudPlayerPrivacyType)privacyType;
 - (void) cloudPlayerDownloadFile:(CloudPlayerDownlodFileEventStatus)status dataDict:(NSDictionary *)dataDict;
 - (void) cloudPlayerDelayInfoCallBack:(HMDelayInfoModel *)delayModel;
+- (void) cloudPlayerInputSourceDidChanged:(CloudPlayerInputSource)inputSource;
+
 @end

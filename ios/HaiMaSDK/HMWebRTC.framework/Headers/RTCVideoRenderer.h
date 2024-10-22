@@ -41,6 +41,12 @@ RTC_OBJC_EXPORT
 
 /// Render fps, following up anroid func name. 
 - (int)getEglRenderFps;
+
+/// RenderFrameTimesStamp record by caller
+- (void)setLastRtcVideoViewdidRenderFrameTimeStamp:(int64_t)ts;
+
+/// RenderFrameTimesStamp get by caller
+- (int64_t)getLastRtcVideoViewdidRenderFrameTimeStamp;
 @end
 
 RTC_OBJC_EXPORT
