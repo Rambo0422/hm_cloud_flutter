@@ -31,6 +31,9 @@ object AnTongSDK {
                         anTongVideoView?.setHmcpPlayerListener(null)
                         // 跳转远程页面
                         mRequestDeviceSuccess?.onRequestDeviceSuccess()
+
+                        // 首帧出现，修改码率
+                        anTongVideoView?.onSwitchResolution(1)
                     }
 
                     Constants.STATUS_APP_ID_ERROR, Constants.STATUS_NOT_FOND_GAME, Constants.STATUS_SIGN_FAILED -> {
