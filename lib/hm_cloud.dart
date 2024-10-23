@@ -57,8 +57,8 @@ class HmCloudController {
     return methodChannel.invokeMethod('queryControlUsers', null);
   }
 
-  Future<dynamic> checkUnReleaseGame() {
-    return methodChannel.invokeMethod("checkUnReleaseGame", "");
+  Future<dynamic> checkUnReleaseGame(String userId) {
+    return methodChannel.invokeMethod("checkUnReleaseGame", userId);
   }
 
   void releaseGame() {

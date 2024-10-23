@@ -216,7 +216,7 @@ class GameActivity : AppCompatActivity() {
 
     private fun exitGame(errorCode: String = "0", errorMsg: String? = null) {
         val str =
-            "cid:${GameManager.cid},uid:${GameManager.getGameParam()?.userId}"
+            "uid:${GameManager.getGameParam()?.userId}"
         LogUtils.d("exitGame:$str")
         if (errorCode != "0") {
             showErrorDialog(errorCode, errorMsg)

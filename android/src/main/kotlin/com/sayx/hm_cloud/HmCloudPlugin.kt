@@ -59,12 +59,15 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
                     GameManager.startGame(gameParam)
                 }
             }
+
             "checkUnReleaseGame" -> {
-                GameManager.checkPlayingGame(callback)
+                GameManager.checkPlayingGame(callback, arguments.toString())
             }
+
             "releaseGame" -> {
                 GameManager.releaseGame("1", null)
             }
+
             else -> {
                 callback.notImplemented()
             }

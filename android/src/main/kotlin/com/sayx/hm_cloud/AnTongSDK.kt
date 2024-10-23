@@ -106,7 +106,8 @@ object AnTongSDK {
         bundle.putString(AnTongVideoView.PIN_CODE, "")
         bundle.putString(AnTongVideoView.PLAY_TOKEN, "")
         bundle.putString(AnTongVideoView.APP_CHANNEL, APP_CHANNEL)
-        bundle.putBoolean(AnTongVideoView.IS_PORTRAIT, true)
+        bundle.putBoolean(AnTongVideoView.IS_PORTRAIT, false)
+        bundle.putString(AnTongVideoView.BUSINESS_GAME_ID, gameId)
         bundle.putString(AnTongVideoView.SIGN, sign)
         bundle.putInt(AnTongVideoView.NO_INPUT_TIMEOUT, 5 * 60)
         bundle.putString(AnTongVideoView.PKG_NAME, anTongPackageName)
@@ -125,5 +126,9 @@ object AnTongSDK {
         val toString = protoJSONObject.toString()
         val byteArray = toString.toByteArray()
         return Base64.encodeToString(byteArray, Base64.DEFAULT)
+    }
+
+    fun stopGame() {
+        anTongVideoView?.stopGame()
     }
 }
