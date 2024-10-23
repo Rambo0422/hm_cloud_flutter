@@ -12,6 +12,7 @@ import com.google.gson.GsonBuilder
 import com.media.atkit.AnTongManager
 import com.media.atkit.beans.ChannelInfo
 import com.media.atkit.listeners.OnGameIsAliveListener
+import com.media.atkit.listeners.OnSaveGameCallBackListener
 import com.sayx.hm_cloud.callback.RequestDeviceSuccess
 import com.sayx.hm_cloud.model.GameParam
 import io.flutter.plugin.common.MethodChannel
@@ -144,5 +145,19 @@ object GameManager {
 
     fun exitGame(data: Map<*, *>) {
         channel.invokeMethod("exitGame", data)
+    }
+
+    fun releaseOldGame(callback: MethodChannel.Result, userId: String) {
+        AnTongManager.getInstance().setReleaseByUserId(userId, object : OnSaveGameCallBackListener {
+            override fun success(result: Boolean) {
+                LogUtils.d("setReleaseByUserId success: ${result}")
+                callback.success(true)
+            }
+
+            override fun fail(msg: String?) {
+                callback.success(false)
+                LogUtils.d("setReleaseByUserId fail: ${msg}")
+            }
+        })
     }
 }

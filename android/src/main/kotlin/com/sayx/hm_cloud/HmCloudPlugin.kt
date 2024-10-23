@@ -68,6 +68,10 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
                 GameManager.releaseGame("1", null)
             }
 
+            "releaseOldGame" -> {
+                GameManager.releaseOldGame(callback, arguments.toString())
+            }
+
             else -> {
                 callback.notImplemented()
             }

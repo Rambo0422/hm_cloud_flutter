@@ -36,7 +36,10 @@ object AnTongSDK {
                         anTongVideoView?.onSwitchResolution(1)
                     }
 
-                    Constants.STATUS_APP_ID_ERROR, Constants.STATUS_NOT_FOND_GAME, Constants.STATUS_SIGN_FAILED -> {
+                    Constants.STATUS_APP_ID_ERROR,
+                    Constants.STATUS_NOT_FOND_GAME,
+                    Constants.STATUS_SIGN_FAILED,
+                    Constants.STATUS_5001000024 -> {
                         val errorMessage =
                             jsonObject.optString(StatusCallbackUtil.DATA, "服务器异常")
                         mRequestDeviceSuccess?.onRequestDeviceFailed(errorMessage)
@@ -61,7 +64,7 @@ object AnTongSDK {
     }
 
     fun initSdk(context: Context, channelName: String, accessKeyId: String) {
-        LogUtils.d("initSdk: channelName: $channelName accessKeyId: $accessKeyId")
+        LogUtils.d("initSdk channelName: $channelName accessKeyId: $accessKeyId")
         Constants.IS_DEBUG = BuildConfig.DEBUG
         Constants.IS_ERROR = BuildConfig.DEBUG
         Constants.IS_INFO = BuildConfig.DEBUG
