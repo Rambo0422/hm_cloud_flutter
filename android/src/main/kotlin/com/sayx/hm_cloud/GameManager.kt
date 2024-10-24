@@ -3,7 +3,6 @@ package com.sayx.hm_cloud
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import com.blankj.utilcode.util.LogUtils
@@ -22,6 +21,7 @@ object GameManager {
 
     private lateinit var channel: MethodChannel
     private var handler: Handler? = null
+    private var userId = ""
 
     val gson: Gson by lazy {
         GsonBuilder().disableHtmlEscaping().create()
@@ -36,7 +36,7 @@ object GameManager {
         this.channel = channel
         this.context = context
         LogUtils.getConfig().also {
-            it.isLogSwitch = true
+            it.isLogSwitch = BuildConfig.DEBUG
             it.globalTag = "GameManager"
         }
     }
@@ -52,6 +52,8 @@ object GameManager {
         AnTongSDK.initSdk(context, channelName, accessKeyId)
 
         val userId = this.gameParam?.userId ?: ""
+        this.userId = userId
+
         val userToken = this.gameParam?.userToken ?: ""
         val gameId = this.gameParam?.gameId ?: ""
         val anTongPackageName = this.gameParam?.gamePkName ?: ""
@@ -124,11 +126,21 @@ object GameManager {
         })
     }
 
+    private var startReleaseTime = 0L
+
     fun onBackHome() {
         channel.invokeMethod("homeShow", null)
+
+        // 3s 内只允许调用一次
+        val currentTime = System.currentTimeMillis()
+        if ((currentTime - startReleaseTime) >= 3000) {
+            startReleaseTime = currentTime
+            // 检测设备，如果有游戏，直接下机
+            releaseOldGame(null, this.userId)
+        }
     }
 
-    fun releaseGame(finish: String, bundle: Bundle?) {
+    fun releaseGame(finish: String) {
         if (!isPlaying) {
             return
         }
@@ -139,24 +151,25 @@ object GameManager {
         }
         isPlaying = false
         gameParam = null
-
-        AnTongSDK.stopGame()
+        userId = ""
+        // AnTongSDK.stopGame()
     }
 
     fun exitGame(data: Map<*, *>) {
         channel.invokeMethod("exitGame", data)
     }
 
-    fun releaseOldGame(callback: MethodChannel.Result, userId: String) {
+    fun releaseOldGame(callback: MethodChannel.Result?, userId: String) {
         AnTongManager.getInstance().setReleaseByUserId(userId, object : OnSaveGameCallBackListener {
             override fun success(result: Boolean) {
-                LogUtils.d("setReleaseByUserId success: ${result}")
-                callback.success(true)
+                callback?.success(true)
+                isPlaying = false
+                gameParam = null
             }
 
             override fun fail(msg: String?) {
-                callback.success(false)
-                LogUtils.d("setReleaseByUserId fail: ${msg}")
+                this@GameManager.userId = ""
+                callback?.success(false)
             }
         })
     }

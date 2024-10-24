@@ -65,7 +65,7 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
             }
 
             "releaseGame" -> {
-                GameManager.releaseGame("1", null)
+                GameManager.releaseGame("1")
             }
 
             "releaseOldGame" -> {

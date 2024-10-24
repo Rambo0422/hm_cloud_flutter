@@ -191,7 +191,7 @@ class GameActivity : AppCompatActivity() {
                     gameTimer?.purge()
                     gameTimer?.cancel()
                     gameTimer = null
-                    GameManager.releaseGame(finish = "1", bundle = null)
+                    GameManager.releaseGame(finish = "1")
                     finish()
                 }
             }
@@ -266,7 +266,7 @@ class GameActivity : AppCompatActivity() {
             .setLeftButton(getString(R.string.continue_game)) { AppCommonDialog.hideDialog(this@GameActivity) }
             .setRightButton(getString(R.string.confirm)) {
                 LogUtils.d("exitGameByUser")
-                GameManager.releaseGame(finish = "1", bundle = null)
+                GameManager.releaseGame(finish = "1")
                 finish()
             }
             .build().show()
