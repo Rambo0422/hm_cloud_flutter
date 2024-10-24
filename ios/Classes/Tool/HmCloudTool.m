@@ -196,6 +196,10 @@
     }];
 }
 
+- (void)getPinCode {
+    [[HMCloudPlayer sharedCloudPlayer] getAuthCode];
+}
+
 - (void)pushPreView {
     if (!self.vc) {
         self.vc = [[CloudPreViewController alloc] initWithNibName:@"CloudPreViewController" bundle:k_SanABundle];
@@ -231,6 +235,8 @@
 
 
         [[UIViewController topViewController] presentViewController:self.vc animated:YES completion:nil];
+
+        [self getPinCode];
     }
 }
 
@@ -305,6 +311,8 @@
             [self processMaintanceInfo:extraInfo];
         } else if ([scene isEqualToString:@"living"]) {
             [self processLivingInfo:extraInfo];
+        } else if ([scene isEqualToString:@"control"]) {
+            [self processControlInfo:extraInfo];
         }
     });
 }
@@ -620,9 +628,22 @@
     }
 }
 
+- (void)processControlInfo:(NSDictionary *)info {
+    if (!info || ![info isKindOfClass:[NSDictionary class]]) {
+        return;
+    }
+
+    NSString *state = [info objectForKey:@"state"];
+
+    if ([state isEqualToString:@"authcodeSuccess"]) {
+        [self.delegate sendToFlutter:ActionPinCodeResult
+                              params:@{ @"cid": [NSString stringWithFormat:@"%@", info[@"masterCid"]],
+                                        @"pinCode": [NSString stringWithFormat:@"%@", info[@"authcode"]] }];
+    }
+}
+
 // MARK: 初始化gameVC
 - (void)startGame {
-
     if (self.gameVC) {
         [[HMCloudPlayer sharedCloudPlayer] stop:10 withReason:HMCloudAppStopReasonNormal];
     }

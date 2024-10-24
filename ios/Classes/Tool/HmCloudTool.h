@@ -26,6 +26,7 @@ static NSString *ActionQueueInfo = @"queueInfo";
 static NSString *ActionOpenPage = @"openPage";
 static NSString *ActionUpdateTime = @"updateTime";
 static NSString *ActionFirstFrameArrival = @"firstFrameArrival";
+static NSString *ActionPinCodeResult = @"pinCodeResult";
 
 
 typedef void (^DataBlock)(NSDictionary *dict);
@@ -82,6 +83,9 @@ typedef void (^BoolBlock)(BOOL isSucc);
 
 /// 当前服务器时间
 @property (nonatomic, strong)   NSNumber *realTime;
+
+/// 是否使用的高峰通道
+@property (nonatomic, assign)   BOOL isPartyGame;
 
 // 上号助手相关
 @property (nonatomic, strong)   NSString *account;
@@ -177,6 +181,10 @@ typedef void (^BoolBlock)(BOOL isSucc);
 /// 释放游戏实例
 /// @param block 成功失败回调
 - (void)releaseGame:(nullable BoolBlock)block withParams:(NSDictionary *)params;
+
+
+/// 获取授权码
+- (void)getPinCode;
 
 @end
 
