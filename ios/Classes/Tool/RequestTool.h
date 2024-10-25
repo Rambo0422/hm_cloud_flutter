@@ -9,6 +9,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+#define k_archives_host                @"https://archives.3ayx.net/getLast"
+
 #define k_api_host                     @"https://api-cgfc.3ayx.net"
 
 /// 获取云游戏虚拟键盘
@@ -96,6 +98,8 @@ typedef enum : NSUInteger {
 + (RequestTool *)share;
 
 - (void)requestUrl:(NSString *)uri methodType:(RequestMethodType)methodType params:(NSDictionary *_Nullable)param faildCallBack:(nullable void (^)(void))faildCallBack successCallBack:(nullable void (^)(id obj))successCallBack;
+
+- (void)requestHost:(NSString *)host methodType:(RequestMethodType)methodType params:(NSDictionary *_Nullable)param faildCallBack:(nullable void (^)(void))faildCallBack successCallBack:(nullable void (^)(id obj))successCallBack;
 
 @end
 
