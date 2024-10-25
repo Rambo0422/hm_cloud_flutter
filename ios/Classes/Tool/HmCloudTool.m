@@ -236,7 +236,9 @@
 
         [[UIViewController topViewController] presentViewController:self.vc animated:YES completion:nil];
 
-        [self getPinCode];
+        if (self.isPartyGame) {
+            [self getPinCode];
+        }
     }
 }
 
