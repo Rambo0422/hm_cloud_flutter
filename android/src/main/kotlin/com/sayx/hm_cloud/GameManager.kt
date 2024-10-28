@@ -80,6 +80,12 @@ object GameManager : HmcpPlayerListener, OnContronListener {
     private lateinit var activity: Activity
 
     var flutterActivity: AppFlutterActivity? = null
+        set(value) {
+            field = value
+            if (value != null) {
+                needShowNotice = false
+            }
+        }
 
     lateinit var flutterEngine: FlutterEngine
 
@@ -308,10 +314,7 @@ object GameManager : HmcpPlayerListener, OnContronListener {
                 // 可玩时间
                 val playTime: Long = gameParam?.playTime ?: 0L
 //                val playTime: Long = 20 * 1000L
-                it.putInt(
-                    HmcpVideoView.PLAY_TIME,
-                    if (playTime > Int.MAX_VALUE) Int.MAX_VALUE else playTime.toInt()
-                )
+                it.putInt(HmcpVideoView.PLAY_TIME, 99999999)
                 // 排队优先级
                 it.putInt(HmcpVideoView.PRIORITY, gameParam?.priority ?: 0)
                 // 游戏名称
@@ -435,6 +438,7 @@ object GameManager : HmcpPlayerListener, OnContronListener {
             gameView?.hmcpPlayerListener = this
             gameView?.virtualDeviceType = VirtualOperateType.NONE
             gameView?.play(bundle)
+
             // 默认静音启动，隐藏虚拟操作按钮
 //            gameView?.setAudioMute(true)
             gameView?.virtualDeviceType = VirtualOperateType.NONE
@@ -486,6 +490,7 @@ object GameManager : HmcpPlayerListener, OnContronListener {
                 // 游戏准备完成，可以启动游戏
                 Constants.STATUS_PLAY_INTERNAL -> {
                     gameView?.play()
+                    channel.invokeMethod("gamePlay", null)
                 }
                 // sdk反馈需选择是否进入排队，直接进入排队
                 Constants.STATUS_WAIT_CHOOSE -> {
@@ -717,14 +722,28 @@ object GameManager : HmcpPlayerListener, OnContronListener {
 
     override fun onPlayerError(errorCode: String?, errorMsg: String?) {
         LogUtils.e("onPlayerError->errorCode:$errorCode, errorMsg:$errorMsg")
-        channel.invokeMethod(
-            "errorInfo",
-            mapOf(
-                Pair("errorCode", errorCode),
-                Pair("errorMsg", errorMsg),
+        if (errorMsg != "网络请求超时") {
+            channel.invokeMethod(
+                "errorInfo",
+                mapOf(
+                    Pair("errorCode", errorCode),
+                    Pair("errorMsg", errorMsg),
+                )
             )
-        )
-
+        } else {
+            channel.invokeMethod(
+                "errorInfo",
+                mapOf(
+                    Pair("errorCode", errorCode?.replace("[", "")
+                        ?.replace("]", "")
+                        ?.replace("网络请求超时", "")
+                        ?.split("-")
+                        ?.get(0)
+                    ),
+                    Pair("errorMsg", errorMsg),
+                )
+            )
+        }
     }
 
     override fun onInputMessage(msg: String?) {

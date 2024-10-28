@@ -25,7 +25,6 @@ public class AppFlutterActivity extends FlutterActivity {
         ImmersionBar.with(this)
                 .fullScreen(true)
                 .hideBar(BarHide.FLAG_HIDE_BAR)
-                .reset()
                 .init();
         GameManager.INSTANCE.setFlutterActivity(this);
         Bundle extras = getIntent().getExtras();
@@ -35,6 +34,11 @@ public class AppFlutterActivity extends FlutterActivity {
             LogUtils.v("route:" + route + ", arguments:" + arguments);
             GameManager.INSTANCE.openFlutterPage(route, bundleToMap(arguments));
         }
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("api-platform", "海马云");
+        map.put("gamepage-type", "充值中心");
+        GameManager.INSTANCE.gameStat("游戏界面", "show", map, "event");
     }
 
     public Map<String, Object> bundleToMap(@Nullable Bundle bundle) {
