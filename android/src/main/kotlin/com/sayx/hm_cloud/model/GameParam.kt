@@ -29,6 +29,7 @@ data class GameParam(
     var accountInfo: Any?,
     var isPeakChannel: Boolean,
     var isPartyGame: Boolean,
+    var gameType: String,
 ) {
     fun isVip(): Boolean {
         return vipExpiredTime > System.currentTimeMillis()
@@ -51,7 +52,8 @@ data class GameParam(
                 "cid='$cid', " +
                 "accountInfo=$accountInfo, " +
                 "isPeakChannel=$isPeakChannel, " +
-                "isPartyGame=$isPartyGame)"
+                "isPartyGame=$isPartyGame," +
+                "gameType=$gameType)"
     }
 
     companion object {
@@ -74,6 +76,7 @@ data class GameParam(
                 arguments["accountInfo"],
                 arguments["isPeakChannel"] as Boolean? ?: false,
                 arguments["isPartyGame"] as Boolean? ?: false,
+                arguments["gameType"] as String? ?: "",
             )
         }
 
