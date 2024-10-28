@@ -2,9 +2,11 @@ package com.sayx.hm_cloud
 
 import android.animation.Animator
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.media.AudioManager
 import android.os.Bundle
@@ -29,16 +31,10 @@ import com.google.gson.JsonObject
 import com.gyf.immersionbar.BarHide
 import com.gyf.immersionbar.ktx.immersionBar
 import com.gyf.immersionbar.ktx.navigationBarHeight
-import com.haima.hmcp.HmcpManager
 import com.haima.hmcp.beans.ResolutionInfo
 import com.haima.hmcp.beans.VideoDelayInfo
-import com.haima.hmcp.listeners.OnLivingListener
 import com.haima.hmcp.rtc.widgets.beans.RtcVideoDelayInfo
 import com.haima.hmcp.widgets.beans.VirtualOperateType
-import com.media.atkit.AnTongManager
-import com.sayx.hm_cloud.BuildConfig
-import com.sayx.hm_cloud.GameManager
-import com.sayx.hm_cloud.R
 import com.sayx.hm_cloud.callback.AddKeyListenerImp
 import com.sayx.hm_cloud.callback.AnimatorListenerImp
 import com.sayx.hm_cloud.callback.ControllerEventCallback
@@ -110,6 +106,13 @@ class AtGameActivity : AppCompatActivity() {
         AppRepository()
     }
 
+    companion object {
+        fun startActivityForResult(activity: Activity) {
+            val intent = Intent(activity, AtGameActivity::class.java)
+            activity.startActivityForResult(intent, 200)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         GameManager.openGame = false
@@ -137,6 +140,14 @@ class AtGameActivity : AppCompatActivity() {
 
     private fun initView() {
         // TODO 挂载GameView
+
+        val anTongVideoView = AnTongSDK.anTongVideoView
+        val layoutParams = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+        dataBinding.gameController.addView(anTongVideoView, 0, layoutParams)
+
         // 游戏设置
         dataBinding.btnGameSettings.setOnClickListener {
             val showGuide = SPUtils.getInstance().getBoolean(GameConstants.showGuide)
@@ -211,10 +222,12 @@ class AtGameActivity : AppCompatActivity() {
 
         // 展示存档提示
 //        showSaveTips()
-        GameManager.gameStat("游戏界面", "show", mapOf(
-            "api-platform" to "安通",
-            "gamepage-type" to "游戏界面",
-        ))
+        GameManager.gameStat(
+            "游戏界面", "show", mapOf(
+                "api-platform" to "安通",
+                "gamepage-type" to "游戏界面",
+            )
+        )
     }
 
     private fun checkGuideShow() {
@@ -309,7 +322,11 @@ class AtGameActivity : AppCompatActivity() {
             val gameId = gameRecord["gameId"]
             val time = gameRecord["time"]
             // 同一游戏，同一天不重复展示
-            if (gameId == GameManager.getGameParam()?.gameId && TimeUtils.isSameDay(time, System.currentTimeMillis())) {
+            if (gameId == GameManager.getGameParam()?.gameId && TimeUtils.isSameDay(
+                    time,
+                    System.currentTimeMillis()
+                )
+            ) {
                 return
             }
         }
@@ -328,7 +345,8 @@ class AtGameActivity : AppCompatActivity() {
 
             override fun onNext(response: HttpResponse<GameConfig>) {
                 response.data?.let {
-                    val gameNotice = it.list.findLast { item -> item.gameId == GameManager.getGameParam()?.gameId }
+                    val gameNotice =
+                        it.list.findLast { item -> item.gameId == GameManager.getGameParam()?.gameId }
                     gameNotice?.let { info ->
                         showGameNotice(info)
                     }
@@ -347,17 +365,27 @@ class AtGameActivity : AppCompatActivity() {
         tipsView.setOnClickListener {
             dataBinding.layoutGame.removeView(tipsView)
         }
-        SPUtils.getInstance().put("showNoticeGame", GameManager.gson.toJson(mapOf("gameId" to info.gameId, "time" to System.currentTimeMillis())))
+        SPUtils.getInstance().put(
+            "showNoticeGame",
+            GameManager.gson.toJson(
+                mapOf(
+                    "gameId" to info.gameId,
+                    "time" to System.currentTimeMillis()
+                )
+            )
+        )
         dataBinding.layoutGame.post {
             dataBinding.layoutGame.addView(tipsView, layoutParams)
         }
     }
 
     private fun showGameSetting() {
-        GameManager.gameStat("游戏界面", "show", mapOf(
-            "api-platform" to "安通",
-            "gamepage-type" to "设置页面",
-        ))
+        GameManager.gameStat(
+            "游戏界面", "show", mapOf(
+                "api-platform" to "安通",
+                "gamepage-type" to "设置页面",
+            )
+        )
         dataBinding.btnGameSettings.visibility = View.INVISIBLE
         dataBinding.btnVirtualKeyboard.visibility = View.INVISIBLE
         gameSettings?.showLayout()
@@ -504,15 +532,22 @@ class AtGameActivity : AppCompatActivity() {
     private fun showExitGameDialog() {
         AppCommonDialog.Builder(this)
             .setTitle(getString(R.string.title_exit_game))
-            .setLeftButton(getString(R.string.continue_game)) { AppCommonDialog.hideDialog(this, "hideExitGameDialog") }
+            .setLeftButton(getString(R.string.continue_game)) {
+                AppCommonDialog.hideDialog(
+                    this,
+                    "hideExitGameDialog"
+                )
+            }
             .setRightButton(getString(R.string.confirm)) {
                 LogUtils.d("exitGameByUser")
 //                GameManager.releaseGame(finish = "1", bundle = null)
                 gameSettings?.release()
                 finish()
-                GameManager.gameStat("结束游戏", "click", mapOf(
-                    "api-platform" to "安通",
-                ))
+                GameManager.gameStat(
+                    "结束游戏", "click", mapOf(
+                        "api-platform" to "安通",
+                    )
+                )
             }
             .build().show("hideExitGameDialog")
     }

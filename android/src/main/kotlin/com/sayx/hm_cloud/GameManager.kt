@@ -30,6 +30,7 @@ import com.haima.hmcp.listeners.OnUpdataGameUIDListener
 import com.haima.hmcp.utils.StatusCallbackUtil
 import com.haima.hmcp.widgets.HmcpVideoView
 import com.haima.hmcp.widgets.beans.VirtualOperateType
+import com.sayx.hm_cloud.callback.RequestDeviceSuccess
 import com.sayx.hm_cloud.constants.AppVirtualOperateType
 import com.sayx.hm_cloud.dialog.AppCommonDialog
 import com.sayx.hm_cloud.http.AppRepository
@@ -127,7 +128,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         Constants.IS_DEBUG = false
         Constants.IS_ERROR = false
         Constants.IS_INFO = false
-
         channel.invokeMethod(
             "gameStatusStat", mapOf(
                 Pair("type", "game_init"),
@@ -136,6 +136,15 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                 Pair("arguments", gameParam.toString())
             )
         )
+
+        // 初始化安通 SDK
+        val gameType = gameParam.gameType
+        if (gameType == AnTongSDK.TYPE) {
+            AnTongSDK.initSdk(activity, gameParam)
+            initState = true
+            return
+        }
+
         HmcpManager.getInstance().releaseRequestManager()
 
         HmcpManager.getInstance().init(config, activity, object : OnInitCallBackListener {
@@ -193,6 +202,25 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                 Pair("arguments", gameParam?.toString())
             )
         )
+
+        // 判断是否是安通
+        if (this.gameParam?.gameType == AnTongSDK.TYPE) {
+            // TODO: 这里暂时先不做处理!!! 延后再处理
+            val userId = this.gameParam?.userId ?: ""
+//            AnTongSDK.checkPlayingGame(userId)
+//            val map = mutableMapOf<String, Any>(
+//                Pair("isSucc", 1)
+//            )
+//            map["data"] = emptyList<Map<String, Any>>()
+//            callback?.success(map)
+            val map = mutableMapOf<String, Any>(
+                Pair("isSucc", 1)
+            )
+            map["data"] = emptyList<Map<String, Any>>()
+            callback?.success(map)
+            return
+        }
+
         HmcpManager.getInstance().checkPlayingGame(UserInfo().also {
             it.userId = gameParam?.userId
             it.userToken = gameParam?.userToken
@@ -229,6 +257,13 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
     }
 
     fun getArchiveProgress(callback: MethodChannel.Result) {
+        // 安通没有这部分逻辑，所以直接跳过
+        // 判断是否是安通
+        if (this.gameParam?.gameType == AnTongSDK.TYPE) {
+            callback.success(true)
+            return
+        }
+
         HmcpManager.getInstance()
             .getGameArchiveStatus(gameParam?.gamePkName, UserInfo().apply {
                 userId = gameParam?.userId
@@ -304,6 +339,37 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                 Pair("arguments", gameParam?.toString())
             )
         )
+
+        val userId = this.gameParam?.userId ?: ""
+        val userToken = this.gameParam?.userToken ?: ""
+        val gameId = this.gameParam?.gameId ?: ""
+        val gamePkName = this.gameParam?.gamePkName ?: ""
+        val cToken = this.gameParam?.cToken ?: ""
+
+        // 进入安通页面
+        if (this.gameParam?.gameType == AnTongSDK.TYPE) {
+            AnTongSDK.play(
+                activity,
+                userId,
+                userToken,
+                gameId,
+                gamePkName,
+                cToken,
+                archiveData,
+                object : RequestDeviceSuccess {
+                    override fun onRequestDeviceSuccess() {
+                        LogUtils.d("onRequestDeviceSuccess")
+                        // 跳转activity
+                        AtGameActivity.startActivityForResult(activity)
+                    }
+
+                    override fun onRequestDeviceFailed(errorMessage: String) {
+                        LogUtils.d("onRequestDeviceFailed errorMessage: $errorMessage")
+                    }
+                })
+            return
+        }
+
         try {
             val bundle = Bundle().also {
                 // 横屏
@@ -458,7 +524,10 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             needShowNotice = false
             AppCommonDialog.Builder(activity)
                 .setTitle("温馨提示")
-                .setSubTitle("游戏过程中请勿切换应用或刷新页面，会导致无法运行游戏", Color.parseColor("#FF555A69"))
+                .setSubTitle(
+                    "游戏过程中请勿切换应用或刷新页面，会导致无法运行游戏",
+                    Color.parseColor("#FF555A69")
+                )
                 .setRightButton("知道了") {
                     AppCommonDialog.hideDialog(activity)
                 }
@@ -696,11 +765,12 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             channel.invokeMethod(
                 "errorInfo",
                 mapOf(
-                    Pair("errorCode", errorCode?.replace("[", "")
-                        ?.replace("]", "")
-                        ?.replace("网络请求超时", "")
-                        ?.split("-")
-                        ?.get(0)
+                    Pair(
+                        "errorCode", errorCode?.replace("[", "")
+                            ?.replace("]", "")
+                            ?.replace("网络请求超时", "")
+                            ?.split("-")
+                            ?.get(0)
                     ),
                     Pair("errorMsg", errorMsg),
                 )
@@ -738,8 +808,21 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         channel.invokeMethod("statGameTime", mapOf(Pair("time", time)))
     }
 
-    fun gameStat(page: String, action: String, arg: Map<String, Any>? = null, type: String = "event") {
-        channel.invokeMethod("gameStat", mapOf(Pair("page", page), Pair("action", action), Pair("arguments", arg), Pair("type", type)))
+    fun gameStat(
+        page: String,
+        action: String,
+        arg: Map<String, Any>? = null,
+        type: String = "event"
+    ) {
+        channel.invokeMethod(
+            "gameStat",
+            mapOf(
+                Pair("page", page),
+                Pair("action", action),
+                Pair("arguments", arg),
+                Pair("type", type)
+            )
+        )
     }
 
     fun statGamePlay() {
