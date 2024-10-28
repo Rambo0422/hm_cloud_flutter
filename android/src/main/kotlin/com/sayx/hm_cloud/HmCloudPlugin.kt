@@ -72,6 +72,11 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
                 GameManager.releaseOldGame(callback, arguments.toString())
             }
 
+            "leaveQueue" -> {
+                // 离开队列
+                AnTongSDK.leaveQueue()
+            }
+
             else -> {
                 callback.notImplemented()
             }

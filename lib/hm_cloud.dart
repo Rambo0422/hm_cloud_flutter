@@ -68,4 +68,8 @@ class HmCloudController {
   Future<dynamic> releaseOldGame(String userId) {
     return methodChannel.invokeMethod("releaseOldGame", userId);
   }
+
+  Future<dynamic> leaveQueue() {
+    return methodChannel.invokeMethod("leaveQueue", "");
+  }
 }

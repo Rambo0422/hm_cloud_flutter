@@ -11,7 +11,6 @@ import android.view.WindowManager
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import com.antong.keyboard.sa.constants.HMInputOpData
 import com.blankj.utilcode.util.LogUtils
 import com.gyf.immersionbar.BarHide
 import com.gyf.immersionbar.ktx.immersionBar
@@ -22,8 +21,6 @@ import com.sayx.hm_cloud.dialog.GameErrorDialog
 import com.sayx.hm_cloud.dialog.NoOperateOfflineDialog
 import com.sayx.hm_cloud.model.GameErrorEvent
 import com.sayx.hm_cloud.model.GameOverEvent
-import com.sayx.hm_cloud.utils.handler.GameController
-import com.sayx.hm_cloud.utils.handler.GameControllerDelegate
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -40,7 +37,6 @@ class GameActivity : AppCompatActivity() {
     private var gameTimer: Timer? = null
 
     private var countTime = NO_OPERATE_TIME
-    private var gameControllerDelegate: GameControllerDelegate? = null
     private var lastDelay = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,7 +60,6 @@ class GameActivity : AppCompatActivity() {
             }
         })
         initView()
-        initGameController()
     }
 
 
@@ -166,20 +161,19 @@ class GameActivity : AppCompatActivity() {
             }
         }
         lastDelay = netDelay
-//        dataBinding.tvLossPacket.text =
-//            "netDelay:${latencyInfo?.netDelay}\n" +
-//                    "decodeDelay:${latencyInfo?.decodeDelay}\n" +
-//                    "renderDelay:${latencyInfo?.renderDelay}\n" +
-//                    "videoFps:${latencyInfo?.videoFps}\n" +
-//                    "bitRate:${latencyInfo?.bitRate}\n" +
-//                    "packetsLostRate:${latencyInfo?.packetsLostRate}\n" +
-//                    "receivedBitrate:${latencyInfo?.receivedBitrate}\n" +
-//                    "audioBitrate:${latencyInfo?.audioBitrate}\n"
+        dataBinding.tvLossPacket.text =
+            "netDelay:${latencyInfo?.netDelay}\n" +
+                    "decodeDelay:${latencyInfo?.decodeDelay}\n" +
+                    "renderDelay:${latencyInfo?.renderDelay}\n" +
+                    "videoFps:${latencyInfo?.videoFps}\n" +
+                    "bitRate:${latencyInfo?.bitrate}\n" +
+                    "decodeDelayAvg:${latencyInfo?.decodeDelayAvg}\n" +
+                    "packetsLostRate:${latencyInfo?.packetsLostRate}\n"
 
-//        val cloudId = HmcpManager.getInstance().cloudId
-//        if (!TextUtils.isEmpty(cloudId)) {
-//            dataBinding.tvCid.text = cloudId
-//        }
+        val userId = GameManager.getGameParam()?.userId
+        if (!TextUtils.isEmpty(userId)) {
+            dataBinding.tvCid.text = userId
+        }
     }
 
     private fun showNoOperateDialog() {
@@ -311,12 +305,6 @@ class GameActivity : AppCompatActivity() {
         }
     }
 
-//    override fun dispatchGenericMotionEvent(event: MotionEvent?): Boolean {
-////        LogUtils.v("dispatchGenericMotionEvent:$event")
-//        countTime = noOperateTime
-//        return super.dispatchGenericMotionEvent(event)
-//    }
-
     override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
 //        LogUtils.v("dispatchTouchEvent:$event")
         countTime = NO_OPERATE_TIME
@@ -326,8 +314,7 @@ class GameActivity : AppCompatActivity() {
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
 //        LogUtils.v("dispatchKeyEvent:$event")
         countTime = NO_OPERATE_TIME
-        val handled = gameControllerDelegate?.dispatchKeyEvent(event) ?: false
-        return handled || super.dispatchKeyEvent(event)
+        return super.dispatchKeyEvent(event)
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
@@ -350,80 +337,13 @@ class GameActivity : AppCompatActivity() {
     override fun onBackPressed() {
     }
 
-    private fun initGameController() {
-        gameControllerDelegate = GameController()
-        gameControllerDelegate?.setControllerEventListener(object :
-            GameControllerDelegate.ControllerEventListener() {
-            override fun onControllerInput(
-                vendorName: String?,
-                controller: Int,
-                buttonFlags: Int,
-                leftTrigger: Float,
-                rightTrigger: Float,
-                leftStickX: Float,
-                leftStickY: Float,
-                rightStickX: Float,
-                rightStickY: Float
-            ) {
-                // 发送手柄事件
-                val inputOpData = HMInputOpData()
-
-                inputOpData.opListArray.add(HMInputOpData.HMOneInputOPData().apply {
-                    inputOp =
-                        HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpXinputButtons
-                    value = buttonFlags
-                })
-
-                inputOpData.opListArray.add(HMInputOpData.HMOneInputOPData().apply {
-                    inputOp =
-                        HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpXinputThumbLx
-                    value = (leftStickX * 0x7FFE).toInt()
-                })
-
-                inputOpData.opListArray.add(HMInputOpData.HMOneInputOPData().apply {
-                    inputOp =
-                        HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpXinputThumbLy
-                    value = (leftStickY * 0x7FFE).toInt()
-                })
-
-                inputOpData.opListArray.add(HMInputOpData.HMOneInputOPData().apply {
-                    inputOp =
-                        HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpXinputThumbRx
-                    value = (rightStickX * 0x7FFE).toInt()
-                })
-
-                inputOpData.opListArray.add(HMInputOpData.HMOneInputOPData().apply {
-                    inputOp =
-                        HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpXinputThumbRy
-                    value = (rightStickY * 0x7FFE).toInt()
-                })
-
-                inputOpData.opListArray.add(HMInputOpData.HMOneInputOPData().apply {
-                    inputOp =
-                        HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpXinputLeftTrigger
-                    value = leftTrigger.toInt()
-                })
-
-                inputOpData.opListArray.add(HMInputOpData.HMOneInputOPData().apply {
-                    inputOp =
-                        HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpXinputRightTrigger
-                    value = rightTrigger.toInt()
-                })
-
-                AnTongSDK.anTongVideoView?.cmdToCloud(inputOpData)
-            }
-        })
-    }
-
     override fun dispatchGenericMotionEvent(event: MotionEvent): Boolean {
         countTime = NO_OPERATE_TIME
-        val handled = gameControllerDelegate?.dispatchGenericMotionEvent(event) ?: false
-        return handled || super.dispatchGenericMotionEvent(event)
+        return super.dispatchGenericMotionEvent(event)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        gameControllerDelegate?.onDestroy()
         AnTongSDK.anTongVideoView?.onDestroy()
     }
 

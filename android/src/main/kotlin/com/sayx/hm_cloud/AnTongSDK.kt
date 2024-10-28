@@ -63,13 +63,18 @@ object AnTongSDK {
         anTongVideoView = null
     }
 
+    private var isInit = false
+
     fun initSdk(context: Context, channelName: String, accessKeyId: String) {
-        LogUtils.d("initSdk channelName: $channelName accessKeyId: $accessKeyId")
-        Constants.IS_DEBUG = BuildConfig.DEBUG
-        Constants.IS_ERROR = BuildConfig.DEBUG
-        Constants.IS_INFO = BuildConfig.DEBUG
-        ACCESS_KEY_ID = accessKeyId
-        AnTongManager.getInstance().init(context, channelName, accessKeyId)
+        if (!isInit) {
+            isInit = true
+            Constants.IS_DEBUG = BuildConfig.DEBUG
+            Constants.IS_ERROR = BuildConfig.DEBUG
+            Constants.IS_INFO = BuildConfig.DEBUG
+            Constants.IS_TV = true
+            ACCESS_KEY_ID = accessKeyId
+            AnTongManager.getInstance().init(context, channelName, accessKeyId)
+        }
     }
 
     fun play(
@@ -133,5 +138,12 @@ object AnTongSDK {
 
     fun stopGame() {
         anTongVideoView?.stopGame()
+    }
+
+    fun leaveQueue() {
+        val leaveQueue = anTongVideoView?.leaveQueue() ?: true
+        if (leaveQueue) {
+            onDestroy()
+        }
     }
 }
