@@ -6,10 +6,10 @@
 //
 
 
+#import "ArchiveRichDataModel.h"
 #import "CloudPreViewController.h"
 #import "HmCloudTool.h"
 #import "SanA_Macro.h"
-
 
 @interface HmCloudTool ()
 
@@ -650,6 +650,50 @@
         [[HMCloudPlayer sharedCloudPlayer] stop:10 withReason:HMCloudAppStopReasonNormal];
     }
 
+    [[RequestTool share] requestHost:k_archives_host
+                          methodType:Request_POST
+                              params:@{ @"userId": self.userId, @"gameId": self.gameId, @"isNew": @0, @"bid": self.accessKeyId }
+                       faildCallBack:^{
+        [self initGameVcWithRichData:@{  }
+                     isUploadArchive:NO];
+    }
+                     successCallBack:^(id _Nonnull obj) {
+        if ([obj[@"data"][@"code"] isKindOfClass:[NSNumber class]]) {
+            NSNumber *code = obj[@"data"][@"code"];
+
+            if (code.integerValue == 200) {
+                ArchiveRichDataModel *model;
+
+                NSString *custodian = obj[@"data"][@"custodian"];
+
+                BOOL is3a = [custodian isEqualToString:@"3a"];
+
+                if ([obj[@"data"][@"list"] isKindOfClass:[NSArray class]]) {
+                    NSArray *arr = obj[@"data"][@"list"];
+
+                    model = [ArchiveRichDataModel mj_objectWithKeyValues:arr.firstObject];
+                    model.gameId = self.gameId;
+                    model.thirdParty = YES;
+                    model.uploadArchive = is3a;
+                } else {
+                    model = [[ArchiveRichDataModel alloc] init];
+                    model.gameId = self.gameId;
+                    model.downloadUrl = @"";
+                    model.md5 = @"";
+                    model.format = @"";
+                    model.thirdParty = NO;
+                    model.uploadArchive = YES;
+                }
+
+                
+                [self initGameVcWithRichData:@{ @"specificArchive": [model mj_JSONObject] }
+                             isUploadArchive:is3a];
+            }
+        }
+    }];
+}
+
+- (void)initGameVcWithRichData:(NSDictionary *)richData isUploadArchive:(BOOL)isUpload {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSDictionary *dict = @{
                 @"uid": self.userId,
@@ -683,6 +727,10 @@
                 CloudGameOptionKeyPriority: self.priority,
             }.mutableCopy;
 
+        if (isUpload) {
+            [gameOptions setObject:richData forKey:CloudGameOptionKeyRichData];
+        }
+
         if (self.account.length || self.password.length || self.key.length || self.accountToken.length || self.accountGameid.length || self.accountUserid.length) {
             HMIntentExtraData *extraData = [[HMIntentExtraData alloc] init];
             extraData.stringExtra = [self stringExtraDataDict];
@@ -690,6 +738,8 @@
             [gameOptions setObject:extraData forKey:CloudGameOptionKeyIntentExtraData];
             [gameOptions setObject:@(CloudPlayerComponentTypeActivity) forKey:CloudGameOptionKeyComponentType];
         }
+
+        NSLog(@"%@", gameOptions);
 
         self.gameVC = [[HMCloudPlayer sharedCloudPlayer] prepare:gameOptions];
     });

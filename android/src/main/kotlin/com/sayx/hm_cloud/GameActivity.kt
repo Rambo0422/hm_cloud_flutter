@@ -265,6 +265,10 @@ class GameActivity : AppCompatActivity() {
             GameManager.sendCurrentCid()
             initPlayPartyView()
         }
+        GameManager.gameStat("游戏界面", "show", mapOf(
+            "api-platform" to "海马云",
+            "gamepage-type" to "游戏界面",
+        ))
     }
 
     private var playPartyGameView: PlayPartyGameView? = null
@@ -631,6 +635,10 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun showGameSetting() {
+        GameManager.gameStat("游戏界面", "show", mapOf(
+            "api-platform" to "海马云",
+            "gamepage-type" to "设置页面",
+        ))
         dataBinding.btnGameSettings.visibility = View.INVISIBLE
         dataBinding.btnVirtualKeyboard.visibility = View.INVISIBLE
         gameSettings?.showLayout()
@@ -1221,7 +1229,6 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun showExitGameDialog() {
-        GameManager.gameStat("游戏界面-关闭游戏退出提醒", "show")
         AppCommonDialog.Builder(this)
             .setTitle(getString(R.string.title_exit_game))
             .setLeftButton(getString(R.string.continue_game)) { AppCommonDialog.hideDialog(this@GameActivity) }
@@ -1230,6 +1237,9 @@ class GameActivity : AppCompatActivity() {
                 GameManager.releaseGame(finish = "1", bundle = null)
                 gameSettings?.release()
                 finish()
+                GameManager.gameStat("结束游戏", "click", mapOf(
+                    "api-platform" to "海马云",
+                ))
             }
             .build().show()
     }
@@ -1307,30 +1317,6 @@ class GameActivity : AppCompatActivity() {
             return true
         }
         return !(keyCode == KeyEvent.KEYCODE_VOLUME_DOWN || keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_MUTE)
-    }
-
-    var needShowNotice = false
-
-    override fun onPause() {
-        super.onPause()
-        needShowNotice = true
-    }
-
-    override fun onResume() {
-        super.onResume()
-        dataBinding.root.post {
-            if (needShowNotice) {
-                needShowNotice = false
-                AppCommonDialog.Builder(this)
-                    .setTitle("温馨提示")
-                    .setSubTitle("游戏过程中请勿切换应用或刷新页面，会导致无法运行游戏", Color.parseColor("#FF555A69"))
-                    .setRightButton("知道了") {
-                        AppCommonDialog.hideDialog(this)
-                    }
-                    .build()
-                    .show()
-            }
-        }
     }
 
     override fun onDestroy() {

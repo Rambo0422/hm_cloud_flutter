@@ -42,8 +42,13 @@
 }
 
 - (void)requestUrl:(NSString *)uri methodType:(RequestMethodType)methodType params:(NSDictionary *_Nullable)param faildCallBack:(nullable void (^)(void))faildCallBack successCallBack:(nullable void (^)(id obj))successCallBack {
-    NSString *token = [HmCloudTool share].userToken;
     NSString *host = [k_api_host stringByAppendingString:uri];
+
+    [self requestHost:host methodType:methodType params:param faildCallBack:faildCallBack successCallBack:successCallBack];
+}
+
+- (void)requestHost:(NSString *)host methodType:(RequestMethodType)methodType params:(NSDictionary *_Nullable)param faildCallBack:(nullable void (^)(void))faildCallBack successCallBack:(nullable void (^)(id obj))successCallBack {
+    NSString *token = [HmCloudTool share].userToken;
 
     [self.s.requestSerializer setValue:token forHTTPHeaderField:@"token"];
     [self.s.requestSerializer setValue:@"ios" forHTTPHeaderField:@"platform"];
