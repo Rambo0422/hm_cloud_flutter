@@ -38,7 +38,15 @@
 
     if ([call.method isEqualToString:MethodStart]) {
         [[HmCloudTool share] configWithParams:call.arguments];
+        [HmCloudTool share].isAudience = NO;
         [[HmCloudTool share] startGame];
+    }
+
+    if ([call.method isEqualToString:MethodControlPlay]) {
+        [[HmCloudTool share] configWithParams:call.arguments];
+        [HmCloudTool share].isAudience = YES;
+        [[HmCloudTool share] registWithDelegate:self];
+//        [[HmCloudTool share] startGame];
     }
 
     if ([call.method isEqualToString:MethodExitQueue]) {

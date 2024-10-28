@@ -386,7 +386,9 @@
     NSString *state = [info objectForKey:@"state"];
 
     if ([state isEqualToString:@"success"]) {
-        self.isInit = YES;
+        if (self.isAudience) {
+            [self startGame];
+        }
     } else if ([state isEqualToString:@"failed"]) {
         NSString *errorCode = [info objectForKey:@"errorCode"];
 
@@ -428,7 +430,11 @@
     NSString *state = [info objectForKey:@"state"];
 
     if ([state isEqualToString:@"success"]) {
-        [[HMCloudPlayer sharedCloudPlayer] play];
+        if (self.isAudience) {
+            [[HMCloudPlayer sharedCloudPlayer] gainControlWithMasterCid:self.cid authCode:self.pinCode frameRenderCallback:YES];
+        } else {
+            [[HMCloudPlayer sharedCloudPlayer] play];
+        }
     } else if ([state isEqualToString:@"failed"]) {
     }
 }
@@ -685,7 +691,6 @@
                     model.uploadArchive = YES;
                 }
 
-                
                 [self initGameVcWithRichData:@{ @"specificArchive": [model mj_JSONObject] }
                              isUploadArchive:is3a];
             }
@@ -711,32 +716,52 @@
         NSString *base64String = [data base64EncodedStringWithOptions:0];
 
 
-        NSMutableDictionary *gameOptions = @{
-                CloudGameOptionKeyId: self.gamePkName,
-                CloudGameOptionKeyOrientation: @(0),
-                CloudGameOptionKeyUserId: self.userId,
-                CloudGameOptionKeyUserToken: self.userToken,
-                CloudGameOptionKeyConfigInfo: @"config",
-                CloudGameOptionKeyCToken: self.cToken,
-                CloudGameOptionKeyPlayingTime: self.playTime,
-                CloudGameOptionKeyExtraId: @"",
-                CloudGameOptionKeyArchive: @(0),
-                CloudGameOptionKeyProtoData: base64String,
-                CloudGameOptionKeyAppChannel: self.channelName,
-                CloudGameOptionKeyStreamType: @(CloudCoreStreamingTypeRTC),
-                CloudGameOptionKeyPriority: self.priority,
-            }.mutableCopy;
+        NSMutableDictionary *gameOptions;
 
-        if (isUpload) {
+        if (self.isAudience) {
+            gameOptions = @{
+                    CloudGameOptionKeyId: self.gamePkName,
+                    CloudGameOptionKeyOrientation: @(0),
+                    CloudGameOptionKeyUserId: self.userId,
+                    CloudGameOptionKeyUserToken: self.userToken,
+                    CloudGameOptionKeyConfigInfo: @"config",
+                    CloudGameOptionKeyCToken: @"partyRoom",
+                    CloudGameOptionKeyPlayingTime: @"",
+                    CloudGameOptionKeyExtraId: @"",
+                    CloudGameOptionKeyArchive: @(0),
+                    CloudGameOptionKeyAppChannel: self.channelName,
+                    CloudGameOptionKeyStreamType: @(CloudCoreStreamingTypeRTC),
+                }.mutableCopy;
+        } else {
+            gameOptions = @{
+                    CloudGameOptionKeyId: self.gamePkName,
+                    CloudGameOptionKeyOrientation: @(0),
+                    CloudGameOptionKeyUserId: self.userId,
+                    CloudGameOptionKeyUserToken: self.userToken,
+                    CloudGameOptionKeyConfigInfo: @"config",
+                    CloudGameOptionKeyCToken: self.cToken,
+                    CloudGameOptionKeyPlayingTime: self.playTime,
+                    CloudGameOptionKeyExtraId: @"",
+                    CloudGameOptionKeyArchive: @(0),
+                    CloudGameOptionKeyProtoData: base64String,
+                    CloudGameOptionKeyAppChannel: self.channelName,
+                    CloudGameOptionKeyStreamType: @(CloudCoreStreamingTypeRTC),
+                    CloudGameOptionKeyPriority: self.priority,
+                }.mutableCopy;
+        }
+
+        if (isUpload && !self.isAudience) {
             [gameOptions setObject:richData forKey:CloudGameOptionKeyRichData];
         }
 
         if (self.account.length || self.password.length || self.key.length || self.accountToken.length || self.accountGameid.length || self.accountUserid.length) {
-            HMIntentExtraData *extraData = [[HMIntentExtraData alloc] init];
-            extraData.stringExtra = [self stringExtraDataDict];
+            if (!self.isAudience) {
+                HMIntentExtraData *extraData = [[HMIntentExtraData alloc] init];
+                extraData.stringExtra = [self stringExtraDataDict];
 
-            [gameOptions setObject:extraData forKey:CloudGameOptionKeyIntentExtraData];
-            [gameOptions setObject:@(CloudPlayerComponentTypeActivity) forKey:CloudGameOptionKeyComponentType];
+                [gameOptions setObject:extraData forKey:CloudGameOptionKeyIntentExtraData];
+                [gameOptions setObject:@(CloudPlayerComponentTypeActivity) forKey:CloudGameOptionKeyComponentType];
+            }
         }
 
         NSLog(@"%@", gameOptions);

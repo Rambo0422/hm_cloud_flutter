@@ -25,6 +25,7 @@ typedef enum : NSUInteger {
 @interface CloudPreViewController ()
 
 @property (weak, nonatomic) IBOutlet UIButton *setBtn;
+@property (weak, nonatomic) IBOutlet UIButton *showKeyboardBtn;
 @property (weak, nonatomic) IBOutlet UIView *bgView;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *topCos;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *rightCos;
@@ -476,7 +477,12 @@ typedef enum : NSUInteger {
 
     [[RACObserve(self, showKeyboard) merge:RACObserve(self, isConnectGameControl)] subscribeNext:^(id _Nullable x) {
         @strongify(self);
-        self.keyView.hidden = (self.showKeyboard || self.isConnectGameControl);
+
+        if ([HmCloudTool share].isAudience) {
+            self.keyView.hidden = YES;
+        } else {
+            self.keyView.hidden = (self.showKeyboard || self.isConnectGameControl);
+        }
     }];
 }
 
@@ -534,7 +540,13 @@ typedef enum : NSUInteger {
     self.countDownLab.text = countDownTime;
 
     // 初始化倒计时
-    [self configTimer];
+
+    if ([HmCloudTool share].isAudience) {
+        self.showKeyboard = YES;
+        self.showKeyboardBtn.hidden = YES;
+    } else {
+        [self configTimer];
+    }
 
     self.topupBtn.layer.cornerRadius = 10;
     self.topupBtn.layer.borderColor = kColor(0x58652B).CGColor;

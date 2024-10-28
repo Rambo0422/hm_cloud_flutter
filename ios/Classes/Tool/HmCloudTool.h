@@ -19,6 +19,9 @@ static NSString *MethodUpdatePlayInfo = @"updatePlayInfo";
 static NSString *MethodGetUnReleaseGame = @"getUnReleaseGame";
 static NSString *MethodGetArchiveProgress = @"getArchiveProgress";
 static NSString *MethodReleaseGame = @"releaseGame";
+/// MARK: 派对吧房客开启游戏画面
+static NSString *MethodControlPlay = @"controlPlay";
+
 
 /// MARK: action name
 static NSString *ActionExitGame = @"exitGame";
@@ -84,8 +87,16 @@ typedef void (^BoolBlock)(BOOL isSucc);
 /// 当前服务器时间
 @property (nonatomic, strong)   NSNumber *realTime;
 
-/// 是否使用的高峰通道
+/// 是否派对吧
 @property (nonatomic, assign)   BOOL isPartyGame;
+
+/// 是否派对吧观众（从控）
+@property (nonatomic, assign)   BOOL isAudience;
+
+/// 派对吧 cid
+@property (nonatomic, strong)   NSString *cid;
+/// 派对吧 pinCode
+@property (nonatomic, strong)   NSString *pinCode;
 
 // 上号助手相关
 @property (nonatomic, strong)   NSString *account;
