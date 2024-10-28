@@ -14,6 +14,7 @@ import com.media.atkit.utils.StatusCallbackUtil
 import com.media.atkit.widgets.AnTongVideoView
 import com.sayx.hm_cloud.callback.RequestDeviceSuccess
 import com.sayx.hm_cloud.model.ArchiveData
+import com.sayx.hm_cloud.model.ArchiveInfo
 import com.sayx.hm_cloud.model.GameParam
 import org.json.JSONObject
 
@@ -83,8 +84,38 @@ object AnTongSDK {
         bundle.putString(AnTongVideoView.SIGN, sign)
         bundle.putInt(AnTongVideoView.NO_INPUT_TIMEOUT, 5 * 60)
         bundle.putString(AnTongVideoView.PKG_NAME, anTongPackageName)
-        anTongVideoView?.play(bundle)
 
+        if (archiveData.custodian == "3a") {
+            val archiveInfo = archiveData.list?.firstOrNull()
+            val richDataBundle = richDataBundle(gameId, archiveInfo)
+            // 添加 richData，主要是附带的存档数据
+            bundle.putBundle(AnTongVideoView.RICH_DATA, richDataBundle)
+        }
+
+        anTongVideoView?.play(bundle)
+    }
+
+    private fun richDataBundle(gameId: String, archiveData: ArchiveInfo?): Bundle {
+        val richDataBundle = Bundle()
+        val specificArchiveBundle = Bundle()
+        specificArchiveBundle.putString("gameId", gameId)
+        specificArchiveBundle.putBoolean("uploadArchive", true)
+        specificArchiveBundle.putBoolean("thirdParty", archiveData != null)
+
+        if (archiveData != null) {
+            kotlin.runCatching {
+                archiveData.cid.toInt()
+            }.onSuccess { cid ->
+                specificArchiveBundle.putInt("cid", cid)
+            }.onFailure {
+                specificArchiveBundle.putInt("cid", 0)
+            }
+            specificArchiveBundle.putString("downloadUrl", archiveData.downLoadUrl)
+            specificArchiveBundle.putString("md5", archiveData.fileMD5)
+            specificArchiveBundle.putString("format", archiveData.format)
+            richDataBundle.putBundle("specificArchive", specificArchiveBundle)
+        }
+        return richDataBundle
     }
 
     private fun getProtoData(userId: String, gameId: String): String {
