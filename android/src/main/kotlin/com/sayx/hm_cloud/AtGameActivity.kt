@@ -34,7 +34,6 @@ import com.gyf.immersionbar.ktx.navigationBarHeight
 import com.haima.hmcp.beans.ResolutionInfo
 import com.haima.hmcp.beans.VideoDelayInfo
 import com.haima.hmcp.rtc.widgets.beans.RtcVideoDelayInfo
-import com.haima.hmcp.widgets.beans.VirtualOperateType
 import com.sayx.hm_cloud.callback.AddKeyListenerImp
 import com.sayx.hm_cloud.callback.AnimatorListenerImp
 import com.sayx.hm_cloud.callback.ControllerEventCallback
@@ -139,8 +138,6 @@ class AtGameActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-        // TODO 挂载GameView
-
         val anTongVideoView = AnTongSDK.anTongVideoView
         val layoutParams = ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -285,23 +282,23 @@ class AtGameActivity : AppCompatActivity() {
         // 创建设置面板控件
         gameSettings = GameSettings(this)
         configSettingCallback()
-//        gameSettings?.initSettings(
-//            GameManager.gameView,
-//            volume,
-//            maxVolume,
-//            light,
-//            AppVirtualOperateType.NONE,
-//            // 用户高峰时长
-//            GameManager.getGameParam()?.peakTime ?: 0L,
-//            // 本次游戏开始时间（重连获取游戏记录可获取本次游戏开始时间，目前重连存在问题，待完善）
-//            0,
-//            // 本次游戏可玩时长
-//            GameManager.getGameParam()?.playTime ?: 0L,
-//            // 本次是否使用高峰通道进入
-//            GameManager.getGameParam()?.isPeakChannel ?: false,
-//            // 当前是否海马手游
-//            false
-//        )
+        gameSettings?.initSettings(
+            GameManager.gameView,
+            volume,
+            maxVolume,
+            light,
+            AppVirtualOperateType.NONE,
+            // 用户高峰时长
+            GameManager.getGameParam()?.peakTime ?: 0L,
+            // 本次游戏开始时间（重连获取游戏记录可获取本次游戏开始时间，目前重连存在问题，待完善）
+            0,
+            // 本次游戏可玩时长
+            GameManager.getGameParam()?.playTime ?: 0L,
+            // 本次是否使用高峰通道进入
+            GameManager.getGameParam()?.isPeakChannel ?: false,
+            // 当前是否海马手游
+            false
+        )
         // 将设置面板控件加入主面板
         val layoutParams = FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -525,6 +522,17 @@ class AtGameActivity : AppCompatActivity() {
                         dataBinding.tvInfo.text = "Fps:${delayInfo.videoFps}"
                     }
                 }
+            }
+
+            override fun getNetDelay(): Int {
+                val netDelay = AnTongSDK.anTongVideoView?.clockDiffVideoLatencyInfo?.netDelay
+                return netDelay ?: 999
+            }
+
+            override fun getPacketsLostRate(): String {
+                val packetsLostRate =
+                    AnTongSDK.anTongVideoView?.clockDiffVideoLatencyInfo?.packetsLostRate?.toString()
+                return packetsLostRate ?: ""
             }
         }
     }

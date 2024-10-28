@@ -582,6 +582,14 @@ class GameActivity : AppCompatActivity() {
                     }
                 }
             }
+
+            override fun getNetDelay(): Int {
+                return GameManager.gameView?.clockDiffVideoLatencyInfo?.netDelay ?: 999
+            }
+
+            override fun getPacketsLostRate(): String {
+                return GameManager.gameView?.clockDiffVideoLatencyInfo?.packetsLostRate ?: ""
+            }
         }
     }
 
