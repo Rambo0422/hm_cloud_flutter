@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Bundle
 import android.util.Base64
 import android.view.ViewGroup
-import com.blankj.utilcode.util.LogUtils
 import com.media.atkit.AnTongManager
 import com.media.atkit.Constants
 import com.media.atkit.beans.UserInfo
@@ -106,7 +105,7 @@ object AnTongSDK {
         bundle.putInt(AnTongVideoView.VIEW_RESOLUTION_HEIGHT, 1080)
         bundle.putBoolean(AnTongVideoView.IS_ARCHIVE, false)
 
-        val protoData = getProtoData(userId, userToken, gameId)
+        val protoData = getProtoData(userId, gameId)
         bundle.putString(AnTongVideoView.PROTO_DATA, protoData)
         bundle.putBoolean(AnTongVideoView.AUTO_PLAY_AUDIO, true)
         bundle.putInt(AnTongVideoView.RESOLUTION_ID, 1)
@@ -122,14 +121,10 @@ object AnTongSDK {
         anTongVideoView?.play(bundle)
     }
 
-    private fun getProtoData(userId: String, userToken: String, gameId: String): String {
+    private fun getProtoData(userId: String, gameId: String): String {
         val protoJSONObject = JSONObject()
-        protoJSONObject.put("user_id", userId)
-        protoJSONObject.put("game_id", gameId)
-        protoJSONObject.put("token", userToken)
-        protoJSONObject.put("bid", ACCESS_KEY_ID)
-        protoJSONObject.put("platform", "android")
-        protoJSONObject.put("cid", "99999")
+        protoJSONObject.put("uid", userId)
+        protoJSONObject.put("gameId", gameId)
         protoJSONObject.put("type", 2)
         val toString = protoJSONObject.toString()
         val byteArray = toString.toByteArray()
