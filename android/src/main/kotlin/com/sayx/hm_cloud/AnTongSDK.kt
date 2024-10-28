@@ -33,7 +33,6 @@ object AnTongSDK {
             Constants.IS_DEBUG = BuildConfig.DEBUG
             Constants.IS_ERROR = BuildConfig.DEBUG
             Constants.IS_INFO = BuildConfig.DEBUG
-            Constants.IS_TV = true
             ACCESS_KEY_ID = gameParam.accessKeyId
             val channelName = gameParam.channelName
             AnTongManager.getInstance().init(context, channelName, ACCESS_KEY_ID)
