@@ -99,7 +99,7 @@ enum class AppVirtualOperateType {
 
 
 
-abstract class OnRockerOperationListenerImp() : OnRockerOperationListener {
+abstract class OnRockerOperationListenerImp : OnRockerOperationListener {
     // 摇杆移动
     override fun onRockerMove(keyInfo: KeyInfo, moveX: Float, moveY: Float) {
         val pointX: Int = (moveX * GameConstants.rockerOffsetMul).toInt()
@@ -814,8 +814,7 @@ abstract class OnRockerOperationListenerImp() : OnRockerOperationListener {
     }
 }
 
-abstract class OnKeyEventListenerImp() : OnKeyEventListener {
-
+abstract class OnKeyEventListenerImp : OnKeyEventListener {
     // 按钮按压
     override fun onButtonPress(keyInfo: KeyInfo, press: Boolean) {
         when (keyInfo.type) {

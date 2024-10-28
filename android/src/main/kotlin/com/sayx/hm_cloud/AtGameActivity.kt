@@ -34,7 +34,6 @@ import com.gyf.immersionbar.ktx.navigationBarHeight
 import com.haima.hmcp.beans.ResolutionInfo
 import com.haima.hmcp.beans.VideoDelayInfo
 import com.haima.hmcp.rtc.widgets.beans.RtcVideoDelayInfo
-import com.haima.hmcp.widgets.beans.VirtualOperateType
 import com.sayx.hm_cloud.callback.AddKeyListenerImp
 import com.sayx.hm_cloud.callback.AnimatorListenerImp
 import com.sayx.hm_cloud.callback.ControllerEventCallback
@@ -47,14 +46,13 @@ import com.sayx.hm_cloud.constants.AppVirtualOperateType
 import com.sayx.hm_cloud.constants.ControllerStatus
 import com.sayx.hm_cloud.constants.GameConstants
 import com.sayx.hm_cloud.constants.KeyType
-import com.sayx.hm_cloud.constants.OnKeyEventListenerImp
-import com.sayx.hm_cloud.constants.OnRockerOperationListenerImp
 import com.sayx.hm_cloud.constants.controllerStatus
 import com.sayx.hm_cloud.databinding.ActivityGameBinding
 import com.sayx.hm_cloud.dialog.AppCommonDialog
 import com.sayx.hm_cloud.dialog.ControllerTypeDialog
 import com.sayx.hm_cloud.http.AppRepository
 import com.sayx.hm_cloud.http.bean.HttpResponse
+import com.sayx.hm_cloud.model.ControllerChangeEvent
 import com.sayx.hm_cloud.model.ControllerConfigEvent
 import com.sayx.hm_cloud.model.ControllerEditEvent
 import com.sayx.hm_cloud.model.GameConfig
@@ -139,9 +137,10 @@ class AtGameActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-        // TODO 挂载GameView
-
         val anTongVideoView = AnTongSDK.anTongVideoView
+        if (anTongVideoView?.parent != null && anTongVideoView.parent is ViewGroup) {
+            (anTongVideoView.parent as ViewGroup).removeView(anTongVideoView)
+        }
         val layoutParams = ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.MATCH_PARENT
@@ -165,7 +164,7 @@ class AtGameActivity : AppCompatActivity() {
         dataBinding.btnVirtualKeyboard.setOnClickListener {
             LogUtils.d("显示游戏输入法键盘")
             try {
-//                GameManager.gameView?.switchKeyboard(true)
+                anTongVideoView?.fullKeyboardState = true
             } catch (e: Exception) {
                 LogUtils.e(e.message)
             }
@@ -285,23 +284,23 @@ class AtGameActivity : AppCompatActivity() {
         // 创建设置面板控件
         gameSettings = GameSettings(this)
         configSettingCallback()
-//        gameSettings?.initSettings(
-//            GameManager.gameView,
-//            volume,
-//            maxVolume,
-//            light,
-//            AppVirtualOperateType.NONE,
-//            // 用户高峰时长
-//            GameManager.getGameParam()?.peakTime ?: 0L,
-//            // 本次游戏开始时间（重连获取游戏记录可获取本次游戏开始时间，目前重连存在问题，待完善）
-//            0,
-//            // 本次游戏可玩时长
-//            GameManager.getGameParam()?.playTime ?: 0L,
-//            // 本次是否使用高峰通道进入
-//            GameManager.getGameParam()?.isPeakChannel ?: false,
-//            // 当前是否海马手游
-//            false
-//        )
+        gameSettings?.initSettings(
+            GameManager.gameView,
+            volume,
+            maxVolume,
+            light,
+            AppVirtualOperateType.NONE,
+            // 用户高峰时长
+            GameManager.getGameParam()?.peakTime ?: 0L,
+            // 本次游戏开始时间（重连获取游戏记录可获取本次游戏开始时间，目前重连存在问题，待完善）
+            0,
+            // 本次游戏可玩时长
+            GameManager.getGameParam()?.playTime ?: 0L,
+            // 本次是否使用高峰通道进入
+            GameManager.getGameParam()?.isPeakChannel ?: false,
+            // 当前是否海马手游
+            false
+        )
         // 将设置面板控件加入主面板
         val layoutParams = FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -540,7 +539,8 @@ class AtGameActivity : AppCompatActivity() {
             }
             .setRightButton(getString(R.string.confirm)) {
                 LogUtils.d("exitGameByUser")
-//                GameManager.releaseGame(finish = "1", bundle = null)
+                AnTongSDK.stopGame()
+                GameManager.releaseGame(finish = "1")
                 gameSettings?.release()
                 finish()
                 GameManager.gameStat(
@@ -1002,6 +1002,26 @@ class AtGameActivity : AppCompatActivity() {
     fun onControllerEditEvent(event: ControllerEditEvent) {
         dataBinding.gameController.controllerChange(event.type)
         exitCustom()
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onControllerChangeEvent(event: ControllerChangeEvent) {
+        when (event.type) {
+            0 -> {
+                dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
+                gameSettings?.controllerType = AppVirtualOperateType.NONE
+            }
+
+            1 -> {
+                dataBinding.gameController.controllerType = AppVirtualOperateType.APP_KEYBOARD
+                gameSettings?.controllerType = AppVirtualOperateType.APP_KEYBOARD
+            }
+
+            2 -> {
+                dataBinding.gameController.controllerType = AppVirtualOperateType.APP_STICK_XBOX
+                gameSettings?.controllerType = AppVirtualOperateType.APP_STICK_XBOX
+            }
+        }
     }
 
     override fun dispatchTouchEvent(event: MotionEvent?): Boolean {

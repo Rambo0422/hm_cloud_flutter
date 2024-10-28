@@ -121,13 +121,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
 
     fun initSDK(gameParam: GameParam) {
         this.gameParam = gameParam
-        val config: Bundle = Bundle().also {
-            it.putString(HmcpManager.ACCESS_KEY_ID, gameParam.accessKeyId)
-            it.putString(HmcpManager.CHANNEL_ID, gameParam.channelName)
-        }
-        Constants.IS_DEBUG = false
-        Constants.IS_ERROR = false
-        Constants.IS_INFO = false
         channel.invokeMethod(
             "gameStatusStat", mapOf(
                 Pair("type", "game_init"),
@@ -144,6 +137,14 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             initState = true
             return
         }
+
+        val config: Bundle = Bundle().also {
+            it.putString(HmcpManager.ACCESS_KEY_ID, gameParam.accessKeyId)
+            it.putString(HmcpManager.CHANNEL_ID, gameParam.channelName)
+        }
+        Constants.IS_DEBUG = false
+        Constants.IS_ERROR = false
+        Constants.IS_INFO = false
 
         HmcpManager.getInstance().releaseRequestManager()
 
@@ -340,26 +341,20 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             )
         )
 
-        val userId = this.gameParam?.userId ?: ""
-        val userToken = this.gameParam?.userToken ?: ""
-        val gameId = this.gameParam?.gameId ?: ""
-        val gamePkName = this.gameParam?.gamePkName ?: ""
-        val cToken = this.gameParam?.cToken ?: ""
-
         // 进入安通页面
         if (this.gameParam?.gameType == AnTongSDK.TYPE) {
             AnTongSDK.play(
                 activity,
-                userId,
-                userToken,
-                gameId,
-                gamePkName,
-                cToken,
+                gameParam!!,
                 archiveData,
                 object : RequestDeviceSuccess {
                     override fun onRequestDeviceSuccess() {
                         LogUtils.d("onRequestDeviceSuccess")
                         // 跳转activity
+                        activity.runOnUiThread {
+                            channel.invokeMethod(GameViewConstants.firstFrameArrival, null)
+                            openGame = true
+                        }
                         AtGameActivity.startActivityForResult(activity)
                     }
 
