@@ -205,7 +205,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         )
 
         // 判断是否是安通
-        if (this.gameParam?.gameType == AnTongSDK.TYPE) {
+        if (isAnTong()) {
             // TODO: 这里暂时先不做处理!!! 延后再处理
             val userId = this.gameParam?.userId ?: ""
 //            AnTongSDK.checkPlayingGame(userId)
@@ -260,7 +260,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
     fun getArchiveProgress(callback: MethodChannel.Result) {
         // 安通没有这部分逻辑，所以直接跳过
         // 判断是否是安通
-        if (this.gameParam?.gameType == AnTongSDK.TYPE) {
+        if (isAnTong()) {
             callback.success(true)
             return
         }
@@ -342,7 +342,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         )
 
         // 进入安通页面
-        if (this.gameParam?.gameType == AnTongSDK.TYPE) {
+        if (isAnTong()) {
             AnTongSDK.play(
                 activity,
                 gameParam!!,
@@ -909,7 +909,13 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
     fun releaseGame(finish: String, bundle: Bundle? = null) {
         LogUtils.d("releaseGame:$finish")
         disposable?.dispose()
-        val cloudId = HmcpManager.getInstance().cloudId
+        val isAnTong = isAnTong()
+        // 安通没有 cid，安通使用 userId
+        val cloudId = if (isAnTong) {
+            this.gameParam?.userId
+        } else {
+            HmcpManager.getInstance().cloudId
+        }
         channel.invokeMethod(
             "gameStatusStat", mapOf(
                 Pair("type", "game_release"),
@@ -934,12 +940,17 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             isPlaying = false
             inQueue = false
             isVideoShowed = false
-            if (finish == "0") {
+            if (finish == "0" && !isAnTong) {
                 // 切换队列
                 playGame(bundle)
             }
             return
         }
+
+        if (isAnTong) {
+            return
+        }
+
         HmcpManager.getInstance().setReleaseCid(
             gameParam?.gamePkName, cloudId, gameParam?.cToken, gameParam?.channelName,
             UserInfo2().also {
@@ -1051,6 +1062,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
     fun queryControlUsers() {
         gameView?.queryControlPermitUsers(this)
     }
+
     var roomIndex = -1
     var userId = ""
 
@@ -1188,5 +1200,9 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
 
     fun kickOutUser(arguments: String) {
         channel.invokeMethod("kickOutUser", arguments)
+    }
+
+    private fun isAnTong(): Boolean {
+        return this.gameParam?.gameType == AnTongSDK.TYPE
     }
 }

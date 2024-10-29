@@ -22,6 +22,7 @@ import com.sayx.hm_cloud.constants.calStickValue
 import com.sayx.hm_cloud.constants.resetDirectionMap
 import com.sayx.hm_cloud.constants.stickKeyMaps
 import com.sayx.hm_cloud.model.ArchiveData
+import com.sayx.hm_cloud.model.ArchiveInfo
 import com.sayx.hm_cloud.model.Direction
 import com.sayx.hm_cloud.model.GameParam
 import com.sayx.hm_cloud.model.KeyInfo
@@ -43,7 +44,6 @@ object AnTongSDK {
             Constants.IS_DEBUG = BuildConfig.DEBUG
             Constants.IS_ERROR = BuildConfig.DEBUG
             Constants.IS_INFO = BuildConfig.DEBUG
-//            Constants.IS_TV = true
             ACCESS_KEY_ID = gameParam.accessKeyId
             val channelName = gameParam.channelName
             AnTongManager.getInstance().init(context, channelName, ACCESS_KEY_ID)
@@ -94,8 +94,39 @@ object AnTongSDK {
         bundle.putString(AnTongVideoView.BUSINESS_GAME_ID, gameParam.gameId)
         bundle.putString(AnTongVideoView.SIGN, gameParam.cToken)
         bundle.putInt(AnTongVideoView.NO_INPUT_TIMEOUT, 5 * 60)
+
+        if (archiveData.custodian == "3a") {
+            val archiveInfo = archiveData.list?.firstOrNull()
+            val richDataBundle = richDataBundle(gameId, archiveInfo)
+            // 添加 richData，主要是附带的存档数据
+            bundle.putBundle(AnTongVideoView.RICH_DATA, richDataBundle)
+        }
+
         bundle.putString(AnTongVideoView.PKG_NAME, gameParam.gamePkName)
         anTongVideoView?.play(bundle)
+    }
+
+    private fun richDataBundle(gameId: String, archiveData: ArchiveInfo?): Bundle {
+        val richDataBundle = Bundle()
+        val specificArchiveBundle = Bundle()
+        specificArchiveBundle.putString("gameId", gameId)
+        specificArchiveBundle.putBoolean("uploadArchive", true)
+        specificArchiveBundle.putBoolean("thirdParty", archiveData != null)
+
+        if (archiveData != null) {
+            kotlin.runCatching {
+                archiveData.cid.toInt()
+            }.onSuccess { cid ->
+                specificArchiveBundle.putInt("cid", cid)
+            }.onFailure {
+                specificArchiveBundle.putInt("cid", 0)
+            }
+            specificArchiveBundle.putString("downloadUrl", archiveData.downLoadUrl)
+            specificArchiveBundle.putString("md5", archiveData.fileMD5)
+            specificArchiveBundle.putString("format", archiveData.format)
+            richDataBundle.putBundle("specificArchive", specificArchiveBundle)
+        }
+        return richDataBundle
     }
 
     fun stopGame() {

@@ -529,12 +529,10 @@ class GameSettings @JvmOverloads constructor(
 
     @SuppressLint("SetTextI18n")
     private fun updateNetDelay() {
-        val latencyInfo = gameView?.clockDiffVideoLatencyInfo
-        gameSettingChangeListener?.onDelayChange(latencyInfo)
-//        LogUtils.d("updateNetDelay:${latencyInfo}")
-        val delay = latencyInfo?.netDelay ?: 999
+        val delay = gameSettingChangeListener?.getNetDelay() ?: 999
+
+
         val netDelay = if (delay > 450) 450 else delay
-//        val netDelay = (40..400).random()
         // 延迟在0~60，展示满信号
         if (netDelay <= 60) {
             if (lastDelay > 60) {
@@ -559,8 +557,9 @@ class GameSettings @JvmOverloads constructor(
         }
         lastDelay = netDelay
         dataBinding.tvNetDelay.text = "${netDelay}ms"
-        val packetsLostRate = latencyInfo?.packetsLostRate
-        if (packetsLostRate?.isEmpty() != false) {
+        val packetsLostRate = gameSettingChangeListener?.getPacketsLostRate() ?: ""
+
+        if (packetsLostRate.isEmpty()) {
             return
         }
         val lostRate = packetsLostRate.toDouble()

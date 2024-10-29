@@ -34,6 +34,9 @@ import com.gyf.immersionbar.ktx.navigationBarHeight
 import com.haima.hmcp.beans.ResolutionInfo
 import com.haima.hmcp.beans.VideoDelayInfo
 import com.haima.hmcp.rtc.widgets.beans.RtcVideoDelayInfo
+import com.media.atkit.Constants
+import com.media.atkit.listeners.AnTongPlayerListener
+import com.media.atkit.utils.StatusCallbackUtil
 import com.sayx.hm_cloud.callback.AddKeyListenerImp
 import com.sayx.hm_cloud.callback.AnimatorListenerImp
 import com.sayx.hm_cloud.callback.ControllerEventCallback
@@ -73,6 +76,7 @@ import io.reactivex.rxjava3.disposables.Disposable
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
+import org.json.JSONObject
 
 class AtGameActivity : AppCompatActivity() {
 
@@ -146,6 +150,26 @@ class AtGameActivity : AppCompatActivity() {
             ViewGroup.LayoutParams.MATCH_PARENT
         )
         dataBinding.gameController.addView(anTongVideoView, 0, layoutParams)
+        anTongVideoView?.setHmcpPlayerListener(object : AnTongPlayerListener {
+            override fun antongPlayerStatusCallback(callback: String?) {
+                callback?.let {
+                    val jsonObject = JSONObject(it)
+                    val status = jsonObject.getInt(StatusCallbackUtil.STATUS)
+                    when (status) {
+                        // 结束游戏，finish
+                        Constants.STATUS_STOP_PLAY -> {
+                            runOnUiThread {
+                                finish()
+                            }
+                        }
+                    }
+                }
+            }
+
+            override fun onPlayerError(errorCode: String?, errorInfo: String?) {
+                LogUtils.d("onPlayerError errorCode: ${errorCode} errorInfo: $errorInfo")
+            }
+        })
 
         // 游戏设置
         dataBinding.btnGameSettings.setOnClickListener {
@@ -525,6 +549,17 @@ class AtGameActivity : AppCompatActivity() {
                     }
                 }
             }
+
+            override fun getNetDelay(): Int {
+                val netDelay = AnTongSDK.anTongVideoView?.clockDiffVideoLatencyInfo?.netDelay
+                return netDelay ?: 999
+            }
+
+            override fun getPacketsLostRate(): String {
+                val packetsLostRate =
+                    AnTongSDK.anTongVideoView?.clockDiffVideoLatencyInfo?.packetsLostRate?.toString()
+                return packetsLostRate ?: ""
+            }
         }
     }
 
@@ -542,7 +577,6 @@ class AtGameActivity : AppCompatActivity() {
                 AnTongSDK.stopGame()
                 GameManager.releaseGame(finish = "1")
                 gameSettings?.release()
-                finish()
                 GameManager.gameStat(
                     "结束游戏", "click", mapOf(
                         "api-platform" to "安通",
@@ -1108,6 +1142,7 @@ class AtGameActivity : AppCompatActivity() {
 //            LogUtils.e("exitCustom:${e.message}")
 //        }
 
+        AnTongSDK.onDestroy()
         EventBus.getDefault().unregister(this)
 //        GameManager.gameView?.onDestroy()
 //        if (GameManager.isPlaying) {
@@ -1115,5 +1150,4 @@ class AtGameActivity : AppCompatActivity() {
 //        }
         super.onDestroy()
     }
-
 }
