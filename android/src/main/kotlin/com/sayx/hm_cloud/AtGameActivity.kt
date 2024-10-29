@@ -459,31 +459,6 @@ class AtGameActivity : AppCompatActivity() {
 
             override fun onLiveInteractionChange(status: Boolean) {
                 LogUtils.d("onLiveInteractionChange:$status")
-//                val cloudId = HmcpManager.getInstance().cloudId
-//                if (status) {
-//                    if (live) {
-//                        GameManager.openInteraction(cloudId, true)
-//                    } else {
-//                        // 开启直播
-//                        val liveUrl = "rtmp://push-cg.3ayx.net/live/$cloudId"
-//                        GameManager.gameView
-//                            ?.startLiving(cloudId, liveUrl, object : OnLivingListener {
-//                                override fun start(success: Boolean, msg: String?) {
-//                                    LogUtils.d("startLiving:$success, $msg, url:$liveUrl")
-//                                    live = true
-//                                    GameManager.openInteraction(cloudId, true)
-//                                }
-//
-//                                override fun stop(success: Boolean, msg: String?) {
-//                                    live = false
-//                                    LogUtils.d("startLiving:$success, $msg")
-//                                }
-//                            })
-//                    }
-//                } else {
-//                    // 停止直播
-//                    GameManager.openInteraction(cloudId, false)
-//                }
             }
 
             override fun onImageQualityChange(resolution: ResolutionInfo) {

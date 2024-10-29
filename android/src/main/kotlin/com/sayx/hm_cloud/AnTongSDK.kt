@@ -174,7 +174,11 @@ object AnTongSDK {
                         mRequestDeviceSuccess?.onRequestDeviceSuccess()
 
                         // 首帧出现，修改码率
-                        anTongVideoView?.onSwitchResolution(1)
+                        if (GameManager.getGameParam()?.isVip() == true) {
+                            anTongVideoView?.onSwitchResolution(1)
+                        } else {
+                            anTongVideoView?.onSwitchResolution(4)
+                        }
                     }
 
                     Constants.STATUS_APP_ID_ERROR,
