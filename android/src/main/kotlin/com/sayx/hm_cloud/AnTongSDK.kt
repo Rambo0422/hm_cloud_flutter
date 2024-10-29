@@ -97,7 +97,7 @@ object AnTongSDK {
 
         if (archiveData.custodian == "3a") {
             val archiveInfo = archiveData.list?.firstOrNull()
-            val richDataBundle = richDataBundle(gameId, archiveInfo)
+            val richDataBundle = richDataBundle(gameParam.gameId, archiveInfo)
             // 添加 richData，主要是附带的存档数据
             bundle.putBundle(AnTongVideoView.RICH_DATA, richDataBundle)
         }
