@@ -959,7 +959,7 @@ open class OnKeyEventListenerImp : OnKeyEventListener {
                 inputOp.opListArray.add(oneInputOpData)
                 AnTongSDK.anTongVideoView?.cmdToCloud(inputOp)
 //                val result = AnTongSDK.anTongVideoView?.cmdToCloud(inputOp)
-//                LogUtils.d("key:${keyInfo.text}, inputOp:${oneInputOpData.inputOp}, value:${oneInputOpData.inputState}, result:$result")
+                LogUtils.d("key:${keyInfo.text}, inputOp:${oneInputOpData.inputOp}, value:${oneInputOpData.inputState}")
             }
             // 鼠标滑轮向上短触发
             KeyType.KEYBOARD_MOUSE_UP -> {

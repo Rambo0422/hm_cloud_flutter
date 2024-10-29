@@ -22,6 +22,7 @@ import com.blankj.utilcode.util.SPUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.haima.hmcp.enums.TouchMode
 import com.haima.hmcp.widgets.HmcpVideoView
+import com.media.atkit.widgets.AnTongVideoView
 import com.sayx.hm_cloud.GameManager
 import com.sayx.hm_cloud.R
 import com.sayx.hm_cloud.callback.AnimatorListenerImp
@@ -50,7 +51,7 @@ class GameSettings @JvmOverloads constructor(
         Timer()
     }
 
-    private var gameView: HmcpVideoView? = null
+    private var gameView: View? = null
 
     // 用户当前可用高峰时长（单位：秒）
     private var playTime: Long = 0
@@ -155,7 +156,11 @@ class GameSettings @JvmOverloads constructor(
             ))
             val value = !it.isSelected
             it.isSelected = value
-            gameView?.setAudioMute(!value)
+            if (gameView is HmcpVideoView) {
+                (gameView as HmcpVideoView).setAudioMute(!value)
+            } else if (gameView is AnTongVideoView) {
+                (gameView as AnTongVideoView).setAudioMute(value)
+            }
             SPUtils.getInstance().put(GameConstants.volumeSwitch, value)
         }
         // 画质选择
@@ -174,8 +179,12 @@ class GameSettings @JvmOverloads constructor(
             ))
             dataBinding.layoutQuality.visibility = INVISIBLE
             dataBinding.tvQuality.text = context.getString(R.string.standard_quality)
-            gameView?.resolutionList?.let { list ->
-                gameSettingChangeListener?.onImageQualityChange(list.last())
+            if (gameView is HmcpVideoView) {
+                (gameView as HmcpVideoView).resolutionList?.let { list ->
+                    gameSettingChangeListener?.onImageQualityChange(list.last())
+                }
+            } else if (gameView is AnTongVideoView) {
+                (gameView as AnTongVideoView).onSwitchResolution(4)
             }
         }
         dataBinding.tvBlueRay.setOnClickListener {
@@ -186,8 +195,12 @@ class GameSettings @JvmOverloads constructor(
             dataBinding.layoutQuality.visibility = INVISIBLE
             if (GameManager.getGameParam()?.isVip() == true) {
                 dataBinding.tvQuality.text = context.getString(R.string.blue_ray)
-                gameView?.resolutionList?.let { list ->
-                    gameSettingChangeListener?.onImageQualityChange(list.first())
+                if (gameView is HmcpVideoView) {
+                    (gameView as HmcpVideoView).resolutionList?.let { list ->
+                        gameSettingChangeListener?.onImageQualityChange(list.first())
+                    }
+                } else if (gameView is AnTongVideoView) {
+                    (gameView as AnTongVideoView).onSwitchResolution(1)
                 }
             } else {
                 hideLayout()
@@ -224,7 +237,6 @@ class GameSettings @JvmOverloads constructor(
             } else if (!it.isSelected) {
                 it.isSelected = true
                 currentTouchMode = TouchMode.TOUCH_MODE_MOUSE
-                gameView?.touchMode = TouchMode.TOUCH_MODE_MOUSE
                 updateMouseMode(currentTouchMode)
             }
         }
@@ -239,7 +251,6 @@ class GameSettings @JvmOverloads constructor(
             } else if (!it.isSelected) {
                 it.isSelected = true
                 currentTouchMode = TouchMode.TOUCH_MODE_SCREEN
-                gameView?.touchMode = TouchMode.TOUCH_MODE_SCREEN
                 updateMouseMode(currentTouchMode)
             }
         }
@@ -254,7 +265,6 @@ class GameSettings @JvmOverloads constructor(
             } else if (!it.isSelected) {
                 it.isSelected = true
                 currentTouchMode = TouchMode.TOUCH_MODE_SCREEN_SLIDE
-                gameView?.touchMode = TouchMode.TOUCH_MODE_SCREEN_SLIDE
                 updateMouseMode(currentTouchMode)
             }
         }
@@ -275,7 +285,7 @@ class GameSettings @JvmOverloads constructor(
 
     // 初始化设置展示
     fun initSettings(
-        gameView: HmcpVideoView?,
+        gameView: View?,
         volume: Int,
         maxVolume: Int,
         light: Float,
@@ -286,7 +296,7 @@ class GameSettings @JvmOverloads constructor(
         peakChannel: Boolean,
         mobileGame: Boolean
     ) {
-        LogUtils.d("initSettings")
+//        LogUtils.d("initSettings")
         this.gameView = gameView
         // 控制方法
         this.controllerType = virtualOperateType
@@ -311,13 +321,21 @@ class GameSettings @JvmOverloads constructor(
         // 非VIP用户默认使用标清，VIP用户默认蓝光
         if (GameManager.getGameParam()?.isVip() != true) {
             dataBinding.tvQuality.text = context.getString(R.string.standard_quality)
-            gameView?.resolutionList?.let { list ->
-                gameSettingChangeListener?.onImageQualityChange(list.last())
+            if (gameView is HmcpVideoView) {
+                gameView.resolutionList?.let { list ->
+                    gameSettingChangeListener?.onImageQualityChange(list.last())
+                }
+            } else if (gameView is AnTongVideoView) {
+                gameView.onSwitchResolution(4)
             }
         } else {
             dataBinding.tvQuality.text = context.getString(R.string.blue_ray)
-            gameView?.resolutionList?.let { list ->
-                gameSettingChangeListener?.onImageQualityChange(list.first())
+            if (gameView is HmcpVideoView) {
+                gameView.resolutionList?.let { list ->
+                    gameSettingChangeListener?.onImageQualityChange(list.first())
+                }
+            } else if (gameView is AnTongVideoView) {
+                gameView.onSwitchResolution(1)
             }
         }
 
@@ -344,14 +362,32 @@ class GameSettings @JvmOverloads constructor(
     private fun initStatusListener() {
         // 鼠标设置
         dataBinding.switchMouseConfig.setOnCheckedChangeListener { _, isChecked ->
-            LogUtils.v("MouseMode change:$isChecked, touchMode:${gameView?.touchMode}, currentTouchMode:$currentTouchMode, mouseModeEditable:$mouseModeEditable")
+//            LogUtils.v("MouseMode change:$isChecked, touchMode:${gameView?.touchMode}, currentTouchMode:$currentTouchMode, mouseModeEditable:$mouseModeEditable")
             if (mouseModeEditable) {
                 if (isChecked) {
-                    gameView?.touchMode = currentTouchMode
                     updateMouseMode(currentTouchMode)
                 } else {
-                    currentTouchMode = gameView?.touchMode ?: currentTouchMode
-                    gameView?.touchMode = TouchMode.TOUCH_MODE_NONE
+                    if (gameView is HmcpVideoView) {
+                        currentTouchMode = (gameView as HmcpVideoView).touchMode
+                    } else if (gameView is AnTongVideoView) {
+                        when((gameView as AnTongVideoView).touchMode) {
+                            com.media.atkit.enums.TouchMode.TOUCH_MODE_MOUSE -> {
+                                currentTouchMode = TouchMode.TOUCH_MODE_MOUSE
+                            }
+                            com.media.atkit.enums.TouchMode.TOUCH_MODE_SCREEN -> {
+                                currentTouchMode = TouchMode.TOUCH_MODE_SCREEN
+                            }
+                            com.media.atkit.enums.TouchMode.TOUCH_MODE_SCREEN_SLIDE -> {
+                                currentTouchMode = TouchMode.TOUCH_MODE_SCREEN_SLIDE
+                            }
+                            com.media.atkit.enums.TouchMode.TOUCH_MODE_NONE -> {
+                                currentTouchMode = TouchMode.TOUCH_MODE_NONE
+                            }
+                            else -> {
+
+                            }
+                        }
+                    }
                     updateMouseMode(TouchMode.TOUCH_MODE_NONE)
                 }
                 dataBinding.sbSensitivity.isEnabled = isChecked
@@ -369,7 +405,11 @@ class GameSettings @JvmOverloads constructor(
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
 //                LogUtils.d("onProgressChanged->voice=$progress, fromUser=$fromUser")
                 gameSettingChangeListener?.onVoiceChange(progress)
-                gameView?.setAudioMute(false)
+                if (gameView is HmcpVideoView) {
+                    (gameView as HmcpVideoView).setAudioMute(false)
+                } else if (gameView is AnTongVideoView) {
+                    (gameView as AnTongVideoView).setAudioMute(true)
+                }
                 dataBinding.btnMute.isSelected = true
                 SPUtils.getInstance().put(GameConstants.volumeSwitch, true)
             }
@@ -379,7 +419,11 @@ class GameSettings @JvmOverloads constructor(
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
 //                LogUtils.d("onProgressChanged->sensitivity=$progress, fromUser=$fromUser")
                 if (fromUser) {
-                    gameView?.mouseSensitivity = progress / 10f
+                    if (gameView is HmcpVideoView) {
+                        (gameView as HmcpVideoView).mouseSensitivity = progress / 10f
+                    } else if (gameView is AnTongVideoView) {
+                        (gameView as AnTongVideoView).setMouseSensitivity(progress / 10f)
+                    }
                     SPUtils.getInstance().put(GameConstants.mouseSensitivity, progress)
                 }
             }
@@ -387,10 +431,17 @@ class GameSettings @JvmOverloads constructor(
     }
 
     private fun initSensitivity() {
-        val sensitivity = SPUtils.getInstance().getInt(GameConstants.mouseSensitivity, 10)
-        dataBinding.sbSensitivity.max = 20
-        dataBinding.sbSensitivity.progress = sensitivity
-        gameView?.mouseSensitivity = sensitivity / 10f
+        if (gameView is HmcpVideoView) {
+            val sensitivity = SPUtils.getInstance().getInt(GameConstants.mouseSensitivity, 10)
+            dataBinding.sbSensitivity.max = 20
+            dataBinding.sbSensitivity.progress = sensitivity
+            (gameView as HmcpVideoView).mouseSensitivity = sensitivity / 10f
+        } else if (gameView is AnTongVideoView) {
+            val sensitivity = SPUtils.getInstance().getInt(GameConstants.mouseSensitivity, 30)
+            dataBinding.sbSensitivity.max = 60
+            dataBinding.sbSensitivity.progress = sensitivity
+            (gameView as AnTongVideoView).setMouseSensitivity(sensitivity / 10f)
+        }
     }
 
     private fun updateControllerMethod(visibility: Int) {
@@ -402,10 +453,7 @@ class GameSettings @JvmOverloads constructor(
         dataBinding.btnMouseClick.isSelected = true
         dataBinding.switchMouseConfig.isChecked = true
         currentTouchMode = TouchMode.TOUCH_MODE_MOUSE
-        gameView?.touchMode = currentTouchMode
-        gameView?.touchMode?.let {
-            LogUtils.d("initTouchMode:$it")
-        }
+        updateMouseMode(currentTouchMode)
     }
 
     fun setPCMouseMode(enable: Boolean) {
@@ -423,6 +471,12 @@ class GameSettings @JvmOverloads constructor(
                 if (!dataBinding.switchMouseConfig.isChecked) {
                     dataBinding.switchMouseConfig.isChecked = true
                 }
+
+                if (gameView is HmcpVideoView) {
+                    (gameView as HmcpVideoView).touchMode = TouchMode.TOUCH_MODE_MOUSE
+                } else if (gameView is AnTongVideoView) {
+                    (gameView as AnTongVideoView).touchMode = com.media.atkit.enums.TouchMode.TOUCH_MODE_MOUSE
+                }
             }
 
             TouchMode.TOUCH_MODE_SCREEN -> {
@@ -432,6 +486,12 @@ class GameSettings @JvmOverloads constructor(
                 if (!dataBinding.switchMouseConfig.isChecked) {
                     dataBinding.switchMouseConfig.isChecked = true
                 }
+
+                if (gameView is HmcpVideoView) {
+                    (gameView as HmcpVideoView).touchMode = TouchMode.TOUCH_MODE_SCREEN
+                } else if (gameView is AnTongVideoView) {
+                    (gameView as AnTongVideoView).touchMode = com.media.atkit.enums.TouchMode.TOUCH_MODE_SCREEN
+                }
             }
 
             TouchMode.TOUCH_MODE_SCREEN_SLIDE -> {
@@ -440,6 +500,12 @@ class GameSettings @JvmOverloads constructor(
                 dataBinding.btnTouchAttack.isSelected = true
                 if (!dataBinding.switchMouseConfig.isChecked) {
                     dataBinding.switchMouseConfig.isChecked = true
+                }
+
+                if (gameView is HmcpVideoView) {
+                    (gameView as HmcpVideoView).touchMode = TouchMode.TOUCH_MODE_SCREEN_SLIDE
+                } else if (gameView is AnTongVideoView) {
+                    (gameView as AnTongVideoView).touchMode = com.media.atkit.enums.TouchMode.TOUCH_MODE_SCREEN_SLIDE
                 }
             }
 
@@ -451,6 +517,12 @@ class GameSettings @JvmOverloads constructor(
                 dataBinding.sbSensitivity.isEnabled = false
                 if (dataBinding.switchMouseConfig.isChecked) {
                     dataBinding.switchMouseConfig.isChecked = false
+                }
+
+                if (gameView is HmcpVideoView) {
+                    (gameView as HmcpVideoView).touchMode = TouchMode.TOUCH_MODE_NONE
+                } else if (gameView is AnTongVideoView) {
+                    (gameView as AnTongVideoView).touchMode = com.media.atkit.enums.TouchMode.TOUCH_MODE_NONE
                 }
             }
 
@@ -482,7 +554,11 @@ class GameSettings @JvmOverloads constructor(
         val volumeSwitch = SPUtils.getInstance().getBoolean(GameConstants.volumeSwitch, true)
         LogUtils.d("updateVoice->maxValue=$maxValue, value=$value, volumeSwitch=$volumeSwitch")
         dataBinding.btnMute.isSelected = volumeSwitch
-        gameView?.setAudioMute(!volumeSwitch)
+        if (gameView is HmcpVideoView) {
+            (gameView as HmcpVideoView).setAudioMute(!volumeSwitch)
+        } else if (gameView is AnTongVideoView) {
+            (gameView as AnTongVideoView).setAudioMute(volumeSwitch)
+        }
     }
 
     private fun updateLight(value: Int) {

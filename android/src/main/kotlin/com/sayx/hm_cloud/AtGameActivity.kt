@@ -167,7 +167,7 @@ class AtGameActivity : AppCompatActivity() {
             }
 
             override fun onPlayerError(errorCode: String?, errorInfo: String?) {
-                LogUtils.d("onPlayerError errorCode: ${errorCode} errorInfo: $errorInfo")
+                LogUtils.d("onPlayerError errorCode: $errorCode errorInfo: $errorInfo")
             }
         })
 
@@ -309,7 +309,7 @@ class AtGameActivity : AppCompatActivity() {
         gameSettings = GameSettings(this)
         configSettingCallback()
         gameSettings?.initSettings(
-            GameManager.gameView,
+            AnTongSDK.anTongVideoView,
             volume,
             maxVolume,
             light,
@@ -463,7 +463,6 @@ class AtGameActivity : AppCompatActivity() {
 
             override fun onImageQualityChange(resolution: ResolutionInfo) {
                 LogUtils.d("onImageQualityChange:$resolution")
-//                GameManager.gameView?.onSwitchResolution(0, resolution, 0)
             }
 
             override fun onLightChange(light: Int) {
