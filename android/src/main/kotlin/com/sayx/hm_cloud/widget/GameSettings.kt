@@ -159,7 +159,7 @@ class GameSettings @JvmOverloads constructor(
             if (gameView is HmcpVideoView) {
                 (gameView as HmcpVideoView).setAudioMute(!value)
             } else if (gameView is AnTongVideoView) {
-                (gameView as AnTongVideoView).setAudioMute(value)
+                (gameView as AnTongVideoView).setAudioMute(!value)
             }
             SPUtils.getInstance().put(GameConstants.volumeSwitch, value)
         }
@@ -213,6 +213,9 @@ class GameSettings @JvmOverloads constructor(
                 "gamepage-type" to "设置页面",
                 "clickdpopup-content" to "云游互动",
             ))
+            if (gameView is AnTongVideoView) {
+                return@setOnClickListener
+            }
             if (GameManager.getGameParam()?.isVip() == true) {
                 val value = !dataBinding.btnInteraction.isSelected
                 dataBinding.btnInteraction.isSelected = value
@@ -314,8 +317,15 @@ class GameSettings @JvmOverloads constructor(
         initSensitivity()
         // 鼠标模式
         initMouseMode()
-        // 默认开启云游互动
-        dataBinding.btnInteraction.isSelected = true
+        if (gameView is HmcpVideoView) {
+            // 默认开启云游互动
+            dataBinding.btnInteraction.isSelected = true
+        } else {
+            dataBinding.btnInteraction.setDrawableTop(R.drawable.icon_interaction_normal)
+            dataBinding.btnInteraction.setTextColor(Color.parseColor("#FF444855"))
+            dataBinding.ivInteractionSign.visibility = View.INVISIBLE
+            dataBinding.tvInteractionSign.visibility = View.VISIBLE
+        }
         gameSettingChangeListener?.onLiveInteractionChange(true)
         // 非VIP用户，无法自定义控制方法，切换清晰度，关闭云互动
         // 非VIP用户默认使用标清，VIP用户默认蓝光
@@ -362,7 +372,7 @@ class GameSettings @JvmOverloads constructor(
     private fun initStatusListener() {
         // 鼠标设置
         dataBinding.switchMouseConfig.setOnCheckedChangeListener { _, isChecked ->
-//            LogUtils.v("MouseMode change:$isChecked, touchMode:${gameView?.touchMode}, currentTouchMode:$currentTouchMode, mouseModeEditable:$mouseModeEditable")
+//            LogUtils.d("MouseMode change:$isChecked, touchMode:${gameView?.touchMode}, currentTouchMode:$currentTouchMode, mouseModeEditable:$mouseModeEditable")
             if (mouseModeEditable) {
                 if (isChecked) {
                     updateMouseMode(currentTouchMode)
@@ -396,19 +406,19 @@ class GameSettings @JvmOverloads constructor(
         // 亮度状态变更
         dataBinding.sbLight.setOnSeekBarChangeListener(object : SeekBarChangListenerImp() {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-//                LogUtils.d("onProgressChanged->light=$progress, fromUser=$fromUser")
+                LogUtils.d("onProgressChanged->light=$progress, fromUser=$fromUser")
                 gameSettingChangeListener?.onLightChange(progress)
             }
         })
         // 声音状态变更
         dataBinding.sbVoice.setOnSeekBarChangeListener(object : SeekBarChangListenerImp() {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-//                LogUtils.d("onProgressChanged->voice=$progress, fromUser=$fromUser")
+                LogUtils.d("onProgressChanged->voice=$progress, fromUser=$fromUser")
                 gameSettingChangeListener?.onVoiceChange(progress)
                 if (gameView is HmcpVideoView) {
                     (gameView as HmcpVideoView).setAudioMute(false)
                 } else if (gameView is AnTongVideoView) {
-                    (gameView as AnTongVideoView).setAudioMute(true)
+                    (gameView as AnTongVideoView).setAudioMute(false)
                 }
                 dataBinding.btnMute.isSelected = true
                 SPUtils.getInstance().put(GameConstants.volumeSwitch, true)
@@ -417,7 +427,7 @@ class GameSettings @JvmOverloads constructor(
         // 鼠标灵敏度状态变更
         dataBinding.sbSensitivity.setOnSeekBarChangeListener(object : SeekBarChangListenerImp() {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-//                LogUtils.d("onProgressChanged->sensitivity=$progress, fromUser=$fromUser")
+                LogUtils.d("onProgressChanged->sensitivity=$progress, fromUser=$fromUser")
                 if (fromUser) {
                     if (gameView is HmcpVideoView) {
                         (gameView as HmcpVideoView).mouseSensitivity = progress / 10f
@@ -463,6 +473,7 @@ class GameSettings @JvmOverloads constructor(
     }
 
     private fun updateMouseMode(touchMode: TouchMode) {
+        LogUtils.d("updateMouseMode:$touchMode")
         when (touchMode) {
             TouchMode.TOUCH_MODE_MOUSE -> {
                 dataBinding.btnMouseClick.isSelected = true
@@ -557,7 +568,7 @@ class GameSettings @JvmOverloads constructor(
         if (gameView is HmcpVideoView) {
             (gameView as HmcpVideoView).setAudioMute(!volumeSwitch)
         } else if (gameView is AnTongVideoView) {
-            (gameView as AnTongVideoView).setAudioMute(volumeSwitch)
+            (gameView as AnTongVideoView).setAudioMute(!volumeSwitch)
         }
     }
 

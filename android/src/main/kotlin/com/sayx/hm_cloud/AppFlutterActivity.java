@@ -31,7 +31,7 @@ public class AppFlutterActivity extends FlutterActivity {
         if (extras != null) {
             String route = extras.getString("route");
             Bundle arguments = extras.getBundle("arguments");
-            LogUtils.v("route:" + route + ", arguments:" + arguments);
+            LogUtils.d("route:" + route + ", arguments:" + arguments);
             GameManager.INSTANCE.openFlutterPage(route, bundleToMap(arguments));
         }
 

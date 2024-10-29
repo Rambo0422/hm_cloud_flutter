@@ -118,7 +118,7 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
                     Map::class.java
                 )
                 val controllerInfo = ControllerInfo.fromData(data)
-                LogUtils.v("setControllerData:$controllerInfo")
+                LogUtils.d("setControllerData:$controllerInfo")
                 EventBus.getDefault().post(ControllerConfigEvent(controllerInfo))
             }
             // 操作方式编辑成功

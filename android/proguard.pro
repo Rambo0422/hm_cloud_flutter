@@ -63,3 +63,17 @@
 -keepclassmembers class * {
     public static final *;
 }
+
+-keep class org.webrtc.**{*;}
+-keep class com.media.sdk.**{*;}
+-keep class com.media.atkit.**{*;}
+-keep class com.antong.keyboard.**{*;}
+
+-dontwarn com.tencent.bugly.**
+-keep public class com.tencent.bugly.** { *; }
+-keep class com.tencent.bugly.crashreport.** { *; }
+-keep class com.tencent.bugly.proguard.** { *; }
+-keep class com.tencent.bugly.** { *; }
+
+-keepattributes *Annotation*
+-keep class com.tencent.bugly.** { *; }

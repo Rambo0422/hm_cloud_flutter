@@ -266,7 +266,7 @@ class RockerView @JvmOverloads constructor(
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         event?.let {
-//            LogUtils.v("onTouchEvent:$event")
+//            LogUtils.d("onTouchEvent:$event")
             when (it.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
                     isPressed = true

@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
+import androidx.fragment.app.FragmentActivity
 import com.blankj.utilcode.util.LogUtils
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -271,12 +272,12 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                 userToken = gameParam?.userToken
             }, gameParam?.accessKeyId, gameParam?.channelName, object : OnSaveGameCallBackListener {
                 override fun success(result: Boolean) {
-                    LogUtils.v("getArchiveProgress->success:$result")
+                    LogUtils.d("getArchiveProgress->success:$result")
                     callback.success(result)
                 }
 
                 override fun fail(msg: String?) {
-                    LogUtils.v("getArchiveProgress->fail:$msg")
+                    LogUtils.d("getArchiveProgress->fail:$msg")
                     callback.success(false)
                 }
             })
@@ -510,14 +511,18 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
     fun onActivityResumed(activity: Activity) {
         resume = true
         if (openGame) {
-            Intent().apply {
-                setClass(GameManager.activity, GameActivity::class.java)
-                GameManager.activity.startActivityForResult(this, 200)
+            if (isAnTong()) {
+                AtGameActivity.startActivityForResult(activity)
+            } else {
+                Intent().apply {
+                    setClass(GameManager.activity, GameActivity::class.java)
+                    GameManager.activity.startActivityForResult(this, 200)
+                }
             }
         }
-        if (activity is GameActivity && needShowNotice) {
+        if ((activity is GameActivity || activity is AtGameActivity) && needShowNotice) {
             needShowNotice = false
-            AppCommonDialog.Builder(activity)
+            AppCommonDialog.Builder(activity as FragmentActivity)
                 .setTitle("温馨提示")
                 .setSubTitle(
                     "游戏过程中请勿切换应用或刷新页面，会导致无法运行游戏",
@@ -533,7 +538,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
 
     fun onActivityPaused(activity: Activity) {
         resume = false
-        if (activity is GameActivity) {
+        if (activity is GameActivity || activity is AtGameActivity) {
             needShowNotice = true
         }
     }
@@ -861,14 +866,14 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         LogUtils.d("updatePlayTime:$bundle")
         gameView?.updateGameUID(bundle, object : OnUpdataGameUIDListener {
             override fun success(result: Boolean) {
-                LogUtils.v("updateGameUID->success:$result")
+                LogUtils.d("updateGameUID->success:$result")
                 if (result) {
                     EventBus.getDefault().post(TimeUpdateEvent(gameParam!!))
                 }
             }
 
             override fun fail(result: String?) {
-                LogUtils.v("updateGameUID->fail:$result")
+                LogUtils.d("updateGameUID->fail:$result")
             }
         })
     }

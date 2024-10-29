@@ -41,9 +41,9 @@ object AnTongSDK {
     fun initSdk(context: Context, gameParam: GameParam) {
         if (!isInit) {
             isInit = true
-            Constants.IS_DEBUG = BuildConfig.DEBUG
-            Constants.IS_ERROR = BuildConfig.DEBUG
-            Constants.IS_INFO = BuildConfig.DEBUG
+            Constants.IS_DEBUG = false
+            Constants.IS_ERROR = false
+            Constants.IS_INFO = false
             ACCESS_KEY_ID = gameParam.accessKeyId
             val channelName = gameParam.channelName
             AnTongManager.getInstance().init(context, channelName, ACCESS_KEY_ID)
