@@ -151,6 +151,7 @@
     return [[HMCloudPlayer sharedCloudPlayer] convertToPcMouseModel:model];
 }
 
+/// MARK: 获取未释放的游戏
 - (void)getUnReleaseGame:(DataBlock)block {
     [[HMCloudPlayer sharedCloudPlayer] getReservedInstance:@{ CloudGameOptionKeyUserId: self.userId,
                                                               CloudGameOptionKeyUserToken: self.userToken, CloudGameOptionKeyAccessKeyId: self.accessKeyId }
@@ -166,6 +167,7 @@
     }];
 }
 
+/// MARK: 获取存档结果
 - (void)getArchiveResult:(BoolBlock)block {
     [[HMCloudPlayer sharedCloudPlayer] gameArchiveQuery:self.userId
                                               userToken:self.userToken
@@ -180,6 +182,7 @@
     }];
 }
 
+/// MARK: 释放游戏
 - (void)releaseGame:(BoolBlock)block withParams:(nonnull NSDictionary *)params {
     [[HMCloudPlayer sharedCloudPlayer] gameReleaseInstanceWithCid:params[@"cid"]
                                                            ctoken:params[@"cToken"]
