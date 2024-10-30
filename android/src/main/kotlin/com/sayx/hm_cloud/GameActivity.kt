@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
+import android.view.InputDevice
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.ViewGroup
@@ -330,6 +331,19 @@ class GameActivity : AppCompatActivity() {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             return true
         }
+
+        val eventSource = event.source
+        if (((eventSource and InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD)
+            || ((eventSource and InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK)
+        ) {
+            // 判断是手柄，且 keyCode 是home
+            if (keyCode == KeyEvent.KEYCODE_BUTTON_MODE && event.scanCode == 316) {
+                toTVHome()
+                return true
+            }
+        }
+
+
         return !(keyCode == KeyEvent.KEYCODE_VOLUME_DOWN || keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_MUTE)
     }
 
@@ -350,5 +364,15 @@ class GameActivity : AppCompatActivity() {
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
         LogUtils.d("onUserLeaveHint")
+    }
+
+    /**
+     * 写这个的目的是，有些手柄点击home键是不会自动跳转的，所以这里单独进行处理跳转
+     */
+    private fun toTVHome() {
+        val intent = Intent(Intent.ACTION_MAIN)
+        intent.addCategory(Intent.CATEGORY_HOME)
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
     }
 }
