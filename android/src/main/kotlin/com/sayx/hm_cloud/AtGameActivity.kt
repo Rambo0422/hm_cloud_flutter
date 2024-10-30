@@ -152,6 +152,7 @@ class AtGameActivity : AppCompatActivity() {
         dataBinding.gameController.addView(anTongVideoView, 0, layoutParams)
         anTongVideoView?.setHmcpPlayerListener(object : AnTongPlayerListener {
             override fun antongPlayerStatusCallback(callback: String?) {
+                LogUtils.d("antongPlayerStatusCallback:$callback")
                 callback?.let {
                     val jsonObject = JSONObject(it)
                     val status = jsonObject.getInt(StatusCallbackUtil.STATUS)

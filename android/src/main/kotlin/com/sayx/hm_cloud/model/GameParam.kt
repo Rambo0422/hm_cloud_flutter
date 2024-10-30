@@ -4,6 +4,8 @@ import com.sayx.hm_cloud.utils.TimeUtils
 
 data class GameParam(
     // 密钥id
+    var channel: String,
+    // 密钥id
     var accessKeyId: String,
     // 游戏包名
     var gamePkName: String,
@@ -36,7 +38,9 @@ data class GameParam(
     }
 
     override fun toString(): String {
-        return "GameParam(accessKeyId='$accessKeyId', " +
+        return "GameParam(" +
+                "channel='$channel', " +
+                "accessKeyId='$accessKeyId', " +
                 "gamePkName='$gamePkName', " +
                 "gameName='$gameName', " +
                 "cToken='$cToken', " +
@@ -59,6 +63,7 @@ data class GameParam(
     companion object {
         fun formGson(arguments: Map<*, *>): GameParam {
             return GameParam(
+                arguments["channel"] as String? ?: "",
                 arguments["accessKeyId"] as String? ?: "",
                 arguments["gamePkName"] as String? ?: "",
                 arguments["gameName"] as String? ?: "",

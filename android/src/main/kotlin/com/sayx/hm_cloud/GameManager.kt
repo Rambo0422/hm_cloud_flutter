@@ -132,8 +132,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         )
 
         // 初始化安通 SDK
-        val gameType = gameParam.gameType
-        if (gameType == AnTongSDK.TYPE) {
+        if (isAnTong()) {
             AnTongSDK.initSdk(activity, gameParam)
             initState = true
             return
@@ -879,7 +878,11 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
     }
 
     fun exitQueue() {
-        releaseGame("-1")
+        if (isAnTong()) {
+            AnTongSDK.leaveQueue()
+        } else {
+            releaseGame("-1")
+        }
     }
 
     fun exitGame() {
@@ -1208,6 +1211,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
     }
 
     private fun isAnTong(): Boolean {
-        return this.gameParam?.gameType == AnTongSDK.TYPE
+        return this.gameParam?.channel == AnTongSDK.TYPE
     }
 }

@@ -31,7 +31,7 @@ import org.json.JSONObject
 
 object AnTongSDK {
 
-    const val TYPE = "at_pc"
+    const val TYPE = "at"
     var anTongVideoView: AnTongVideoView? = null
     private var mRequestDeviceSuccess: RequestDeviceSuccess? = null
     private var ACCESS_KEY_ID = ""
