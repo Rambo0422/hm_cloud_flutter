@@ -31,7 +31,8 @@ import org.json.JSONObject
 
 object AnTongSDK {
 
-    const val TYPE = "at"
+    const val TYPE = "at_pc"
+    const val CHANNEL_TYPE = "at"
     var anTongVideoView: AnTongVideoView? = null
     private var mRequestDeviceSuccess: RequestDeviceSuccess? = null
     private var ACCESS_KEY_ID = ""
@@ -54,7 +55,7 @@ object AnTongSDK {
     fun play(
         context: Context,
         gameParam: GameParam,
-        archiveData: ArchiveData,
+        archiveData: ArchiveData?,
         requestDeviceSuccess: RequestDeviceSuccess
     ) {
         this.mRequestDeviceSuccess = requestDeviceSuccess
@@ -93,9 +94,9 @@ object AnTongSDK {
         bundle.putBoolean(AnTongVideoView.IS_PORTRAIT, false)
         bundle.putString(AnTongVideoView.BUSINESS_GAME_ID, gameParam.gameId)
         bundle.putString(AnTongVideoView.SIGN, gameParam.cToken)
-        bundle.putInt(AnTongVideoView.NO_INPUT_TIMEOUT, 5 * 60)
+        bundle.putInt(AnTongVideoView.NO_INPUT_TIMEOUT, 10 * 60)
 
-        if (archiveData.custodian == "3a") {
+        if (archiveData?.custodian == "3a") {
             val archiveInfo = archiveData.list?.firstOrNull()
             val richDataBundle = richDataBundle(gameParam.gameId, archiveInfo)
             // 添加 richData，主要是附带的存档数据

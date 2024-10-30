@@ -24,6 +24,7 @@ import android.widget.FrameLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import com.antong.keyboard.sa.constants.HMInputOpData
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.SPUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -60,7 +61,9 @@ import com.sayx.hm_cloud.model.ControllerConfigEvent
 import com.sayx.hm_cloud.model.ControllerEditEvent
 import com.sayx.hm_cloud.model.GameConfig
 import com.sayx.hm_cloud.model.GameNotice
+import com.sayx.hm_cloud.model.GameParam
 import com.sayx.hm_cloud.model.KeyInfo
+import com.sayx.hm_cloud.model.TimeUpdateEvent
 import com.sayx.hm_cloud.utils.AppSizeUtils
 import com.sayx.hm_cloud.utils.GameUtils
 import com.sayx.hm_cloud.utils.TimeUtils
@@ -77,6 +80,8 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import org.json.JSONObject
+import java.util.Timer
+import java.util.TimerTask
 
 class AtGameActivity : AppCompatActivity() {
 
@@ -107,6 +112,8 @@ class AtGameActivity : AppCompatActivity() {
     private val appRepository: AppRepository by lazy {
         AppRepository()
     }
+
+    private var inputTimer: Timer? = null
 
     companion object {
         fun startActivityForResult(activity: Activity) {
@@ -161,6 +168,11 @@ class AtGameActivity : AppCompatActivity() {
                         Constants.STATUS_STOP_PLAY -> {
                             runOnUiThread {
                                 finish()
+                            }
+                        }
+                        Constants.STATUS_NO_INPUT -> {
+                            runOnUiThread {
+                                showWarningDialog()
                             }
                         }
                     }
@@ -252,6 +264,20 @@ class AtGameActivity : AppCompatActivity() {
                 "gamepage-type" to "游戏界面",
             )
         )
+    }
+
+    private fun showWarningDialog() {
+        gameSettings?.release()
+        GameManager.isPlaying = false
+        GameManager.releaseGame(finish = "11")
+        AppCommonDialog.Builder(this)
+            .setTitle("游戏结束\n[11]")
+            .setSubTitle("游戏长时间无操作", Color.parseColor("#FF555A69"))
+            .setRightButton("退出游戏") {
+                LogUtils.d("exitGameForTime")
+                finish()
+            }
+            .build().show()
     }
 
     private fun checkGuideShow() {
@@ -356,7 +382,6 @@ class AtGameActivity : AppCompatActivity() {
         }
         appRepository.requestGameConfig(object : Observer<HttpResponse<GameConfig>> {
             override fun onSubscribe(d: Disposable) {
-
             }
 
             override fun onError(e: Throwable) {
@@ -612,7 +637,29 @@ class AtGameActivity : AppCompatActivity() {
             controllerStatus = ControllerStatus.Edit
             dataBinding.gameController.maskEnable = true
             // 进入编辑模式，防止操作过久，游戏出现无操作退出，每5分钟重置无操作时间，后台设置无操作下线时间为10分钟
-//            updateInputTimer()
+            updateInputTimer()
+        }
+    }
+
+    private fun updateInputTimer() {
+        try {
+            if (inputTimer != null) {
+                inputTimer?.cancel()
+                inputTimer = null
+            }
+            inputTimer = Timer()
+            inputTimer?.schedule(object : TimerTask() {
+                override fun run() {
+                    AnTongSDK.anTongVideoView?.cmdToCloud(HMInputOpData().apply {
+                        val oneInputOpData = HMInputOpData.HMOneInputOPData()
+                        oneInputOpData.inputState = HMInputOpData.HMOneInputOPData_InputState.HMOneInputOPData_InputState_OpStateUp
+                        oneInputOpData.inputOp = HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpMouseButtonMiddle
+                        opListArray.add(oneInputOpData)
+                    })
+                }
+            }, 0L, 5 * 60 * 1000L)
+        } catch (e: Exception) {
+            LogUtils.e("updateInputTimer:${e.message}")
         }
     }
 
@@ -984,13 +1031,13 @@ class AtGameActivity : AppCompatActivity() {
 
         dataBinding.gameController.maskEnable = false
 
-//        try {
-//            inputTimer?.cancel()
-//            inputTimer?.purge()
-//            inputTimer = null
-//        } catch (e: Exception) {
-//            LogUtils.e("exitCustom:${e.message}")
-//        }
+        try {
+            inputTimer?.cancel()
+            inputTimer?.purge()
+            inputTimer = null
+        } catch (e: Exception) {
+            LogUtils.e("exitCustom:${e.message}")
+        }
     }
 
     private fun hideKeyBoard() {
@@ -1031,6 +1078,13 @@ class AtGameActivity : AppCompatActivity() {
                 gameSettings?.controllerType = AppVirtualOperateType.APP_STICK_XBOX
             }
         }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onTimeUpdateEvent(event: TimeUpdateEvent) {
+        val params: GameParam = event.param
+        gameSettings?.updatePlayTime(params.playTime)
+        gameSettings?.updateAvailableTime(params.peakTime)
     }
 
     override fun dispatchTouchEvent(event: MotionEvent?): Boolean {

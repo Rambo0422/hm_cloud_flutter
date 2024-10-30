@@ -66,7 +66,7 @@ object HttpError {
                 httpResponse
             }
                 .map { response ->
-                    LogUtils.d("response:$response")
+//                    LogUtils.d("response:$response")
                     if (response.responseCode == 0) {
                         response
                     } else {

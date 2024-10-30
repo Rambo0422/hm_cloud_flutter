@@ -35,8 +35,8 @@ import com.sayx.hm_cloud.callback.RequestDeviceSuccess
 import com.sayx.hm_cloud.constants.AppVirtualOperateType
 import com.sayx.hm_cloud.dialog.AppCommonDialog
 import com.sayx.hm_cloud.http.AppRepository
+import com.sayx.hm_cloud.http.bean.AppHttpException
 import com.sayx.hm_cloud.http.bean.HttpResponse
-import com.sayx.hm_cloud.http.bean.HttpStatusConstants
 import com.sayx.hm_cloud.imp.HmcpPlayerListenerImp
 import com.sayx.hm_cloud.model.AccountInfo
 import com.sayx.hm_cloud.model.ArchiveData
@@ -81,7 +81,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         set(value) {
             field = value
             if (value != null) {
-                needShowNotice = false
+                activityPauseTime = 0
             }
         }
 
@@ -101,7 +101,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
 
     private var needReattach = false
 
-    private var needShowNotice = false
+    private var activityPauseTime = 0L
 
     var initState = false
 
@@ -145,6 +145,10 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         Constants.IS_DEBUG = false
         Constants.IS_ERROR = false
         Constants.IS_INFO = false
+
+        this.isPartyPlay = gameParam.isPartyGame
+        this.isPartyPlayOwner = isPartyPlay
+        this.roomIndex = 0
 
         HmcpManager.getInstance().releaseRequestManager()
 
@@ -283,7 +287,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
     }
 
     fun startGame(gameParam: GameParam) {
-        needShowNotice = false
+        activityPauseTime = 0
         this.gameParam = gameParam
         channel.invokeMethod(
             "gameStatusStat", mapOf(
@@ -305,24 +309,61 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             object : Observer<HttpResponse<ArchiveData>> {
                 override fun onSubscribe(d: Disposable) {
                     disposable = d
+                    channel.invokeMethod(
+                        "gameStatusStat", mapOf(
+                            Pair("type", "game_request"),
+                            Pair("page", "游戏请求"),
+                            Pair("action", "请求接口"),
+                            Pair("arguments", mapOf("uri" to "https://archives.3ayx.net/getLast", "body" to params.toString()).toString())
+                        )
+                    )
                 }
 
                 override fun onError(e: Throwable) {
-                    channel.invokeMethod(
-                        "errorInfo", mapOf(
-                            "errorCode" to "${HttpStatusConstants.serviceException}",
-                            "errorMsg" to "获取游戏存档数据发生错误"
+                    LogUtils.e("requestArchiveData:${e.message}")
+                    if (e is AppHttpException) {
+                        channel.invokeMethod(
+                            "errorInfo", mapOf(
+                                "errorCode" to "${e.errorCode}",
+                                "errorMsg" to e.errorMessage
+                            )
                         )
-                    )
+
+                        channel.invokeMethod(
+                            "gameStatusStat", mapOf(
+                                Pair("type", "game_request"),
+                                Pair("page", "游戏请求"),
+                                Pair("action", "请求失败"),
+                                Pair(
+                                    "arguments",
+                                    mapOf("uri" to "https://archives.3ayx.net/getLast", "errorCode" to "${e.errorCode}", "errMsg" to e.errorMessage).toString()
+                                )
+                            )
+                        )
+                    }
+                    prepareGame(null)
                 }
 
                 override fun onComplete() {
                 }
 
                 override fun onNext(response: HttpResponse<ArchiveData>) {
-                    response.data?.let {
-                        prepareGame(it)
-                    }
+                    channel.invokeMethod(
+                        "gameStatusStat", mapOf(
+                            Pair("type", "game_request"),
+                            Pair("page", "游戏请求"),
+                            Pair("action", "请求成功"),
+                            Pair(
+                                "arguments",
+                                mapOf(
+                                    "uri" to "https://archives.3ayx.net/getLast",
+                                    "code" to "${response.responseCode}",
+                                    "dataCode" to "${response.data?.code}"
+                                ).toString()
+                            )
+                        )
+                    )
+                    prepareGame(response.data)
                 }
             })
     }
@@ -330,7 +371,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
     /**
      * 准备进入游戏队列
      */
-    private fun prepareGame(archiveData: ArchiveData) {
+    private fun prepareGame(archiveData: ArchiveData?) {
         LogUtils.d("priority:${gameParam?.priority}")
         channel.invokeMethod(
             "gameStatusStat", mapOf(
@@ -423,7 +464,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                 // 输入法类型 0：表示云端键盘 1：表示本地键盘
 //                it.putInt(HmcpVideoView.IME_TYPE, 1)
                 // 存档上传
-                if (archiveData.custodian == "3a") {
+                if (archiveData?.custodian == "3a") {
                     val specificArchive = SpecificArchive()
                     specificArchive.uploadArchive = true
                     specificArchive.gameId = gameParam?.gameId ?: ""
@@ -498,12 +539,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             gameView?.setConfigInfo("configInfo")
             // 状态监听
             gameView?.hmcpPlayerListener = this
-            gameView?.virtualDeviceType = VirtualOperateType.NONE
             gameView?.play(bundle)
-
-            // 默认静音启动，隐藏虚拟操作按钮
-//            gameView?.setAudioMute(true)
-            gameView?.virtualDeviceType = VirtualOperateType.NONE
         }
     }
 
@@ -519,8 +555,10 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                 }
             }
         }
-        if ((activity is GameActivity || activity is AtGameActivity) && needShowNotice) {
-            needShowNotice = false
+        if ((activity is GameActivity || activity is AtGameActivity) &&
+            (activityPauseTime != 0L && System.currentTimeMillis() - activityPauseTime > 2000L)
+        ) {
+            activityPauseTime = 0
             AppCommonDialog.Builder(activity as FragmentActivity)
                 .setTitle("温馨提示")
                 .setSubTitle(
@@ -538,7 +576,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
     fun onActivityPaused(activity: Activity) {
         resume = false
         if (activity is GameActivity || activity is AtGameActivity) {
-            needShowNotice = true
+            activityPauseTime = System.currentTimeMillis()
         }
     }
 
@@ -730,8 +768,10 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
     // 根据设备连接，修改鼠标模式
     fun setPCMouseMode(arguments: Any?) {
         if (arguments is Boolean) {
-            gameView?.setPCMouseMode(arguments)
-            EventBus.getDefault().post(PCMouseEvent(arguments))
+            if (!isAnTong()) {
+                gameView?.setPCMouseMode(arguments)
+                EventBus.getDefault().post(PCMouseEvent(arguments))
+            }
         }
     }
 
@@ -847,6 +887,10 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         gameParam?.playTime = playTime
         gameParam?.peakTime = peakTime
         gameParam?.vipExpiredTime = vipExpiredTime
+        if (isAnTong()) {
+            EventBus.getDefault().post(TimeUpdateEvent(gameParam!!))
+            return
+        }
         val bundle = Bundle().apply {
             putLong(HmcpVideoView.PLAY_TIME, playTime)
             putString(HmcpVideoView.USER_ID, gameParam?.userId)
@@ -890,6 +934,10 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
     }
 
     fun releaseGame(gameParam: GameParam, callback: MethodChannel.Result) {
+        if (isAnTong()) {
+            callback.success(true)
+            return
+        }
         HmcpManager.getInstance().setReleaseCid(
             gameParam.gamePkName, gameParam.cid, gameParam.cToken, gameParam.channelName,
             UserInfo2().also {
@@ -1211,6 +1259,13 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
     }
 
     private fun isAnTong(): Boolean {
-        return this.gameParam?.channel == AnTongSDK.TYPE
+        val channel = gameParam?.channel
+        if (channel?.isEmpty() != false) {
+            // 未配置channel，根据游戏类型判断
+            return gameParam?.gameType == AnTongSDK.TYPE
+        } else {
+            // 配置了channel，根据channel判断
+            return channel == AnTongSDK.CHANNEL_TYPE
+        }
     }
 }
