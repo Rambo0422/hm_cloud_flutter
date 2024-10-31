@@ -577,6 +577,15 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             gameView?.setConfigInfo("configInfo")
             // 状态监听
             gameView?.hmcpPlayerListener = this
+
+            channel.invokeMethod(
+                "gameStatusStat", mapOf(
+                    Pair("type", "game_play"),
+                    Pair("page", "游戏开始"),
+                    Pair("action", "游戏启动"),
+                    Pair("arguments", bundle?.toString())
+                )
+            )
             gameView?.play(bundle)
         }
     }
@@ -681,6 +690,15 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                         )
                         openGame = true
                         // 打开新的页面展示游戏画面
+
+                        channel.invokeMethod(
+                            "gameStatusStat", mapOf(
+                                Pair("type", "game_play"),
+                                Pair("page", "游戏开始"),
+                                Pair("action", "首帧到达"),
+                                Pair("arguments", mapOf("gameParam" to gameParam?.toString(), "cid" to HmcpManager.getInstance().cloudId).toString())
+                            )
+                        )
                         Intent().apply {
                             setClass(activity, GameActivity::class.java)
                             activity.startActivityForResult(this, 200)
