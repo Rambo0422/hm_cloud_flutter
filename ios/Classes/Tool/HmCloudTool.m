@@ -120,6 +120,7 @@
     self.vc = nil;
     self.gameVC = nil;
     self.isInit = NO;
+    self.isAudience = NO;
 
     [[HMCloudPlayer sharedCloudPlayer] stop:10 withReason:HMCloudAppStopReasonNormal];
 }

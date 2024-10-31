@@ -21,6 +21,8 @@ static NSString *MethodGetArchiveProgress = @"getArchiveProgress";
 static NSString *MethodReleaseGame = @"releaseGame";
 /// MARK: 派对吧房客开启游戏画面
 static NSString *MethodControlPlay = @"controlPlay";
+/// 房间人员信息
+static NSString *MethodPlayPartyInfo = @"playPartyInfo";
 
 
 /// MARK: action name

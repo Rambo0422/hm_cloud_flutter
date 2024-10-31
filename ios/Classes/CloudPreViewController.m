@@ -13,6 +13,7 @@
 #import "GameDetailsModel.h"
 #import "GameKeyContainerView.h"
 #import "HmCloudTool.h"
+#import "PartyAvatarCollectionViewCell.h"
 #import "RequestTool.h"
 
 typedef enum : NSUInteger {
@@ -22,7 +23,7 @@ typedef enum : NSUInteger {
     Resolution_Low,
 } ResolutionType;
 
-@interface CloudPreViewController ()
+@interface CloudPreViewController ()<UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout>
 
 @property (weak, nonatomic) IBOutlet UIButton *setBtn;
 @property (weak, nonatomic) IBOutlet UIButton *showKeyboardBtn;
@@ -41,17 +42,18 @@ typedef enum : NSUInteger {
 @property (weak, nonatomic) IBOutlet UISlider *mouseSlider;
 
 @property (weak, nonatomic) IBOutlet UIView *sliderBgView1;
-@property (weak, nonatomic) IBOutlet UIView *sliderBgView2;
 @property (weak, nonatomic) IBOutlet UILabel *msLab;
 @property (weak, nonatomic) IBOutlet UILabel *packetLossLab;
 @property (weak, nonatomic) IBOutlet UIImageView *netImgView;
 
+@property (weak, nonatomic) IBOutlet UICollectionView *partyAvatarCollectionView;
 
 @property (weak, nonatomic) IBOutlet SPButton *joystickBtn;
 @property (weak, nonatomic) IBOutlet SPButton *keyboardBtn;
 @property (weak, nonatomic) IBOutlet SPButton *vibrationBtn;
 @property (weak, nonatomic) IBOutlet SPButton *customBtn;
 @property (weak, nonatomic) IBOutlet SPButton *liveBtn;
+@property (weak, nonatomic) IBOutlet SPButton *partyBtn;
 
 // 鼠标设置开关
 @property (weak, nonatomic) IBOutlet UISwitch *modeSwitch;
@@ -64,7 +66,6 @@ typedef enum : NSUInteger {
 
 
 @property (nonatomic, strong) CustomSlider *lightSlider;
-@property (nonatomic, strong) CustomSlider *soundSlider;
 
 @property (nonatomic, assign) NSInteger ms;
 @property (nonatomic, assign) float packetLoss;
@@ -396,6 +397,11 @@ typedef enum : NSUInteger {
     RAC(self.liveBtn, selected) = RACObserve(tool, isLiving);
 
 
+    [[self.partyBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
+        @strongify(self);
+        [self hideSetView];
+    }];
+
     [[self.vibrationBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
         @strongify(tool);
         tool.isVibration = !tool.isVibration;
@@ -491,7 +497,8 @@ typedef enum : NSUInteger {
         self.isConnectGameControl = YES;
     }
 
-//    [[HmCloudTool share] convertToPcMouseModel:YES];
+    [self.partyAvatarCollectionView registerNib:[UINib nibWithNibName:@"PartyAvatarCollectionViewCell" bundle:k_SanABundle] forCellWithReuseIdentifier:@"PartyAvatarCollectionViewCell"];
+    self.partyAvatarCollectionView.backgroundColor = [UIColor clearColor];
 
     // 初始化清晰度
     self.resolution = [HmCloudTool share].isVip ? Resolution_BD : Resolution_Low;
@@ -606,6 +613,7 @@ typedef enum : NSUInteger {
     }];
 }
 
+/// MARK: 网络请求
 - (void)request {
     [[RequestTool share] requestUrl:k_api_get_game_detail
                          methodType:Request_GET
@@ -628,6 +636,7 @@ typedef enum : NSUInteger {
     }];
 }
 
+/// MARK: 获取官方手柄 如果没有取本地配置
 - (void)getJoystickAndSet:(BOOL)set {
     // 获取手柄配置，如果获取失败 则取本地的默认配置
     [[RequestTool share] requestUrl:k_api_getKeyboard_v2
@@ -663,6 +672,7 @@ typedef enum : NSUInteger {
     }];
 }
 
+/// MARK: 获取自定义手柄
 - (void)getCustomJoystick:(BOOL)set {
     [[RequestTool share] requestUrl:k_api_getKeyboard_custom_v2
                          methodType:Request_GET
@@ -722,6 +732,7 @@ typedef enum : NSUInteger {
     }];
 }
 
+/// MARK: 获取自定义键盘
 - (void)getCustomKeyboard:(BOOL)set {
     [[RequestTool share] requestUrl:k_api_getKeyboard_custom_v2
                          methodType:Request_GET
@@ -766,6 +777,7 @@ typedef enum : NSUInteger {
     }];
 }
 
+/// MARK: 动画消失/显示 设置页
 - (void)hideSetView {
     self.resolutionBgView.hidden = YES;
 
@@ -783,6 +795,11 @@ typedef enum : NSUInteger {
     }];
 }
 
+/// MARK: 动画消失/显示 派对吧view
+- (void)hidePartyView {
+}
+
+/// MARK: 推出flutter页面
 - (void)pushToFlutterPage:(FlutterPageType)pagetype {
     if (self.pushFlutter) {
         self.pushFlutter(pagetype);
@@ -790,6 +807,7 @@ typedef enum : NSUInteger {
     }
 }
 
+/// MARK: 推出自定义键盘
 - (void)pushCustomKeyController {
     CustomSelectViewController *vc = [[CustomSelectViewController alloc] initWithNibName:@"CustomSelectViewController"
                                                                                   bundle:k_SanABundle];
@@ -822,20 +840,24 @@ typedef enum : NSUInteger {
                      completion:nil];
 }
 
+/// MARK: 点击背景消失设置
 - (IBAction)didTapSet:(id)sender {
     [self hideSetView];
 }
 
+/// MARK: 点击右下角键盘按钮
 - (IBAction)didTapShowKeyboard:(id)sender {
     self.showKeyboard = !self.showKeyboard;
 
     [[HMCloudPlayer sharedCloudPlayer] cloudSwitchKeyboard:self.showKeyboard];
 }
 
+/// MARK: 点击充值
 - (IBAction)didTapTopup:(id)sender {
     [self pushToFlutterPage:Flutter_rechartTime];
 }
 
+/// MARK: 点击结束游戏
 - (IBAction)didTapDismiss:(id)sender {
     [NormalAlertView showAlertWithTitle:@"是否结束游戏？"
                                 content:@""
@@ -853,6 +875,7 @@ typedef enum : NSUInteger {
                          cancelCallback:nil];
 }
 
+/// MARK: 刷新延迟信息
 - (void)refreshfps:(NSInteger)fps ms:(NSInteger)ms rate:(float)rate packetLoss:(float)packetLoss {
     self.ms = ms;
     self.packetLoss = packetLoss;
@@ -869,6 +892,21 @@ typedef enum : NSUInteger {
 
 - (void)dealloc {
     NSLog(@"CloudPreViewController dealloc");
+}
+
+/// MARK: collectionView delegate
+- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
+    return 4;
+}
+
+- (__kindof UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
+    PartyAvatarCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"PartyAvatarCollectionViewCell" forIndexPath:indexPath];
+
+    return cell;
+}
+
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
+    return CGSizeMake(40, 40);
 }
 
 @end

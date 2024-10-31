@@ -15,7 +15,7 @@
     CGRect defaultRect = [super trackRectForBounds:bounds];
 
     // 修改轨道的高度
-    CGRect customRect = CGRectMake(defaultRect.origin.x, (bounds.size.height - 10) / 2, defaultRect.size.width, 10); // 10 是自定义的高度
+    CGRect customRect = CGRectMake(defaultRect.origin.x, (bounds.size.height - 10) / 2, defaultRect.size.width, 10);   // 10 是自定义的高度
 
     return customRect;
 }

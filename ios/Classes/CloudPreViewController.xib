@@ -20,6 +20,7 @@
                 <outlet property="customBtn" destination="OK7-Xr-vEK" id="jRt-2U-leI"/>
                 <outlet property="fuzhiBtn" destination="S4y-td-g3Y" id="cpu-uG-Soh"/>
                 <outlet property="joystickBtn" destination="Cpz-fK-yJS" id="GBM-2E-WW9"/>
+                <outlet property="keyboardBtn" destination="rzU-eS-nbZ" id="yW6-23-Q28"/>
                 <outlet property="leftCos" destination="oRh-vF-pbq" id="sgB-GM-a37"/>
                 <outlet property="liveBtn" destination="9L1-fI-BVt" id="Ja3-qI-bHQ"/>
                 <outlet property="lowResolutionBtn" destination="o30-wm-R7o" id="hGV-2B-KAN"/>
@@ -35,6 +36,8 @@
                 <outlet property="operationView3" destination="xEp-vI-Yyi" id="eUx-aA-dNC"/>
                 <outlet property="operationView4" destination="oVj-Xd-FfY" id="GQL-WP-6mO"/>
                 <outlet property="packetLossLab" destination="RrI-IF-8ar" id="UDF-7E-DPl"/>
+                <outlet property="partyAvatarCollectionView" destination="IJH-x3-7sc" id="Afj-Ur-Hcr"/>
+                <outlet property="partyBtn" destination="yPG-0I-lZc" id="P7l-33-O83"/>
                 <outlet property="resolutionBgView" destination="a5v-DB-g2m" id="0sP-Jo-Ugx"/>
                 <outlet property="rightCos" destination="5iz-gY-tyF" id="xNw-o2-UaJ"/>
                 <outlet property="setBtn" destination="S4t-EA-PR2" id="PJo-jW-Qzl"/>
@@ -68,6 +71,24 @@
                         <action selector="didTapSet:" destination="-1" eventType="touchUpInside" id="yd9-NX-ntt"/>
                     </connections>
                 </button>
+                <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="IJH-x3-7sc">
+                    <rect key="frame" x="593" y="7" width="190" height="40"/>
+                    <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="40" id="ji0-Lq-inM"/>
+                        <constraint firstAttribute="width" constant="190" id="vIm-SN-4pX"/>
+                    </constraints>
+                    <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="kgs-BF-egc">
+                        <size key="itemSize" width="128" height="128"/>
+                        <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                        <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                        <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                    </collectionViewFlowLayout>
+                    <connections>
+                        <outlet property="dataSource" destination="-1" id="d1M-a0-M5e"/>
+                        <outlet property="delegate" destination="-1" id="715-Ul-Rmo"/>
+                    </connections>
+                </collectionView>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YMB-DP-pcs">
                     <rect key="frame" x="798" y="344" width="44" height="44"/>
                     <constraints>
@@ -263,24 +284,23 @@
                                                                         </userDefinedRuntimeAttribute>
                                                                     </userDefinedRuntimeAttributes>
                                                                 </button>
-                                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yPG-0I-lZc">
+                                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yPG-0I-lZc" customClass="SPButton">
                                                                     <rect key="frame" x="68" y="0.0" width="65" height="75"/>
-                                                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="width" constant="65" id="bUq-cZ-hK0"/>
                                                                         <constraint firstAttribute="height" constant="75" id="uUH-DJ-dMg"/>
                                                                     </constraints>
                                                                     <fontDescription key="fontDescription" type="system" pointSize="10"/>
                                                                     <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                                                    <state key="normal">
+                                                                    <state key="normal" title="派对吧" image="set_party.png">
                                                                         <color key="titleColor" red="0.61960784310000006" green="0.63529411759999999" blue="0.67843137249999996" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                                                     </state>
                                                                     <userDefinedRuntimeAttributes>
                                                                         <userDefinedRuntimeAttribute type="number" keyPath="imagePosition">
-                                                                            <integer key="value" value="3"/>
+                                                                            <integer key="value" value="2"/>
                                                                         </userDefinedRuntimeAttribute>
                                                                         <userDefinedRuntimeAttribute type="number" keyPath="imageTitleSpace">
-                                                                            <real key="value" value="3"/>
+                                                                            <real key="value" value="5"/>
                                                                         </userDefinedRuntimeAttribute>
                                                                     </userDefinedRuntimeAttributes>
                                                                 </button>
@@ -523,7 +543,7 @@
                     </constraints>
                 </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1AV-Tz-6cG">
-                    <rect key="frame" x="558.66666666666663" y="0.0" width="293.33333333333337" height="393"/>
+                    <rect key="frame" x="853.66666666666663" y="0.0" width="293.33333333333337" height="393"/>
                     <subviews>
                         <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ic_right_bg.png" translatesAutoresizingMaskIntoConstraints="NO" id="PSD-gk-a3Z">
                             <rect key="frame" x="0.0" y="0.0" width="293.33333333333331" height="393"/>
@@ -930,7 +950,7 @@
             <viewLayoutGuide key="safeArea" id="Q5M-cg-NOt"/>
             <color key="backgroundColor" systemColor="systemTealColor"/>
             <constraints>
-                <constraint firstAttribute="trailing" secondItem="1AV-Tz-6cG" secondAttribute="trailing" id="5iz-gY-tyF"/>
+                <constraint firstAttribute="trailing" secondItem="1AV-Tz-6cG" secondAttribute="trailing" constant="-295" id="5iz-gY-tyF"/>
                 <constraint firstItem="YMB-DP-pcs" firstAttribute="trailing" secondItem="S4t-EA-PR2" secondAttribute="trailing" id="8kf-M6-TvR"/>
                 <constraint firstAttribute="bottom" secondItem="sjq-0R-9BQ" secondAttribute="bottom" id="EiP-yR-OYT"/>
                 <constraint firstAttribute="bottom" secondItem="1AV-Tz-6cG" secondAttribute="bottom" id="GVW-Gc-5ln"/>
@@ -940,9 +960,11 @@
                 <constraint firstAttribute="trailing" secondItem="sjq-0R-9BQ" secondAttribute="trailing" id="OPR-ue-m7i"/>
                 <constraint firstAttribute="bottom" secondItem="tEf-wG-RYs" secondAttribute="bottom" id="VkP-eM-12m"/>
                 <constraint firstItem="sjq-0R-9BQ" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="au0-UO-miT"/>
+                <constraint firstItem="Q5M-cg-NOt" firstAttribute="trailing" secondItem="IJH-x3-7sc" secondAttribute="trailing" constant="10" id="bo4-zB-Rkr"/>
                 <constraint firstItem="qRc-3l-WBU" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="-50" id="fRZ-OU-SKB"/>
                 <constraint firstAttribute="trailing" secondItem="S4t-EA-PR2" secondAttribute="trailing" constant="10" id="hIE-92-4wX"/>
                 <constraint firstAttribute="bottom" secondItem="YMB-DP-pcs" secondAttribute="bottom" constant="5" id="hdr-ek-d7L"/>
+                <constraint firstItem="IJH-x3-7sc" firstAttribute="centerY" secondItem="S4t-EA-PR2" secondAttribute="centerY" id="jtS-Gw-Omh"/>
                 <constraint firstItem="sjq-0R-9BQ" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="mxY-Z9-OX4"/>
                 <constraint firstItem="tEf-wG-RYs" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="oRh-vF-pbq"/>
                 <constraint firstItem="1AV-Tz-6cG" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="uWt-pd-QHE"/>
@@ -979,6 +1001,7 @@
         <image name="set_mode3_off.png" width="40" height="40"/>
         <image name="set_mode3_on.png" width="40" height="40"/>
         <image name="set_not_open.png" width="28" height="12"/>
+        <image name="set_party.png" width="40" height="40"/>
         <image name="set_sound_off.png" width="40" height="40"/>
         <image name="set_vibration_off.png" width="40" height="40"/>
         <image name="set_vibration_on.png" width="40" height="40"/>

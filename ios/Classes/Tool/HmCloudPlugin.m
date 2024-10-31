@@ -49,6 +49,10 @@
 //        [[HmCloudTool share] startGame];
     }
 
+    if ([call.method isEqualToString:MethodPlayPartyInfo]) {
+        NSLog(@"123");
+    }
+
     if ([call.method isEqualToString:MethodExitQueue]) {
         [[HmCloudTool share] onlyStop];
     }
