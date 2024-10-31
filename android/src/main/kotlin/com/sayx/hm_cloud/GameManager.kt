@@ -285,6 +285,12 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
     fun startGame(gameParam: GameParam) {
         needShowNotice = false
         this.gameParam = gameParam
+
+        this.isPartyPlay = gameParam.isPartyGame
+        this.isPartyPlayOwner = isPartyPlay
+        this.roomIndex = 0
+        this.userId = gameParam.userId
+
         channel.invokeMethod(
             "gameStatusStat", mapOf(
                 Pair("type", "game_start"),
