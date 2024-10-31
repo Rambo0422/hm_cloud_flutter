@@ -3,7 +3,9 @@ package com.sayx.hm_cloud
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -309,6 +311,8 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             "isNew" to 0,
             "bid" to gameParam.accessKeyId,
             "clientType" to "Android",
+            "channel" to getChannel(),
+            "version" to getAppVersion()
         )
         AppRepository().requestArchiveData(
             params,
@@ -374,17 +378,45 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             })
     }
 
+    private fun getAppVersion(): String {
+        val packageInfo = activity.packageManager.getPackageInfo(activity.packageName, 0)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            "${packageInfo.versionName}-${packageInfo.longVersionCode}"
+        } else {
+            "${packageInfo.versionName}-${packageInfo.versionCode}"
+        }
+    }
+
+    private fun getChannel(): String {
+        return try {
+            val applicationInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                activity.packageManager.getApplicationInfo(
+                    activity.packageName,
+                    PackageManager.ApplicationInfoFlags.of(PackageManager.GET_META_DATA.toLong())
+                )
+            } else {
+                activity.packageManager.getApplicationInfo(activity.packageName, PackageManager.GET_META_DATA)
+            }
+            applicationInfo.metaData.getString("CHANNEL_NAME") ?: "unknown"
+        } catch (e: Exception) {
+            "unknown"
+        }
+    }
+
     /**
      * 准备进入游戏队列
      */
     private fun prepareGame(archiveData: ArchiveData?) {
         LogUtils.d("priority:${gameParam?.priority}")
+        val code = archiveData?.code
+        val custodian = archiveData?.custodian
+        val listEmpty = archiveData?.list?.isEmpty()
         channel.invokeMethod(
             "gameStatusStat", mapOf(
                 Pair("type", "game_prepare"),
                 Pair("page", "游戏准备"),
                 Pair("action", "游戏准备"),
-                Pair("arguments", gameParam?.toString())
+                Pair("arguments", mapOf("gameParam" to gameParam?.toString(), "code" to code, "custodian" to custodian, "listEmpty" to listEmpty).toString())
             )
         )
 
@@ -867,6 +899,23 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                 Pair("arguments", arg),
                 Pair("type", type)
             )
+        )
+    }
+
+    fun gameEsStat(
+        type: String,
+        page: String,
+        action: String,
+        arg: String?,
+    ) {
+        channel.invokeMethod(
+            "gameStatusStat",
+                    mapOf(
+                        "type" to type,
+                        "page" to page,
+                        "action" to action,
+                        "argument" to arg
+                    )
         )
     }
 
