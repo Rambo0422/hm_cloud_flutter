@@ -128,7 +128,7 @@ object AnTongSDK {
         protoJSONObject.put("type", 2)
         val toString = protoJSONObject.toString()
         val byteArray = toString.toByteArray()
-        return Base64.encodeToString(byteArray, Base64.DEFAULT)
+        return Base64.encodeToString(byteArray, Base64.NO_WRAP)
     }
 
     fun stopGame() {
