@@ -134,6 +134,12 @@
 }
 
 - (void)updateRoomInfo:(NSDictionary *)params {
+    
+    NSString *roomInfoStr =  [NSString stringWithFormat:@"%@", params[@"roomInfo"]];
+    self.roomInfo = [roomInfoStr mj_JSONObject];
+
+    self.controlInfos = params[@"controlInfos"];
+    
     if (self.vc) {
         NSString *roomInfoStr =  [NSString stringWithFormat:@"%@", params[@"roomInfo"]];
         NSDictionary *roomInfo = [roomInfoStr mj_JSONObject];

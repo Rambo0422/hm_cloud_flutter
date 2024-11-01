@@ -101,6 +101,9 @@ typedef void (^BoolBlock)(BOOL isSucc);
 /// 派对吧 pinCode
 @property (nonatomic, strong)   NSString *pinCode;
 
+@property (nonatomic, strong)   NSDictionary *roomInfo;
+@property (nonatomic, strong)   NSArray *controlInfos;
+
 // 上号助手相关
 @property (nonatomic, strong)   NSString *account;
 @property (nonatomic, strong)   NSString *password;

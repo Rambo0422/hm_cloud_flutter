@@ -14,6 +14,7 @@
 #import "GameKeyContainerView.h"
 #import "HmCloudTool.h"
 #import "PartyAvatarCollectionViewCell.h"
+#import "PartyAvatarTableViewCell.h"
 #import "RequestTool.h"
 
 typedef enum : NSUInteger {
@@ -23,7 +24,7 @@ typedef enum : NSUInteger {
     Resolution_Low,
 } ResolutionType;
 
-@interface CloudPreViewController ()<UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout>
+@interface CloudPreViewController ()<UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITableViewDelegate, UITableViewDataSource>
 
 @property (weak, nonatomic) IBOutlet UIButton *setBtn;
 @property (weak, nonatomic) IBOutlet UIButton *showKeyboardBtn;
@@ -31,6 +32,10 @@ typedef enum : NSUInteger {
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *topCos;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *rightCos;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *leftCos;
+@property (weak, nonatomic) IBOutlet UIButton *hidePartyBtn;
+
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *partyLeftCos;
+
 @property (weak, nonatomic) IBOutlet UILabel *timeLab;
 @property (weak, nonatomic) IBOutlet UIView *operationView1;
 @property (weak, nonatomic) IBOutlet UIView *operationView2;
@@ -106,6 +111,10 @@ typedef enum : NSUInteger {
 
 
 @property (nonatomic, strong) NSArray<PartyAvatarModel *> *collectionList;
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+
+@property (nonatomic, assign) BOOL isShowPartyView;
+@property (nonatomic, assign) BOOL isShowSetView;
 
 @end
 
@@ -401,7 +410,7 @@ typedef enum : NSUInteger {
 
     [[self.partyBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
         @strongify(self);
-        [self hideSetView];
+        [self hidePartyView];
     }];
 
     [[self.vibrationBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
@@ -483,6 +492,12 @@ typedef enum : NSUInteger {
     }];
 
 
+    [[self.hidePartyBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl *_Nullable x) {
+        @strongify(self);
+
+        self.isShowPartyView = NO;
+    }];
+
     [[RACObserve(self, showKeyboard) merge:RACObserve(self, isConnectGameControl)] subscribeNext:^(id _Nullable x) {
         @strongify(self);
 
@@ -491,6 +506,38 @@ typedef enum : NSUInteger {
         } else {
             self.keyView.hidden = (self.showKeyboard || self.isConnectGameControl);
         }
+    }];
+
+    [RACObserve(self, isShowSetView) subscribeNext:^(id _Nullable x) {
+        @strongify(self);
+
+        self.resolutionBgView.hidden = YES;
+
+        @weakify(self);
+        [UIView animateWithDuration:0.25
+                         animations:^{
+            @strongify(self);
+            self.topCos.constant = !self.isShowSetView ? -50 : 0;
+            self.leftCos.constant = !self.isShowSetView ? -kScreenH : 0;
+            self.rightCos.constant = !self.isShowSetView ? -kScreenH : 0;
+
+            self.bgView.alpha = !self.isShowSetView ? 0 : 0.6;
+
+            [self.view layoutIfNeeded];
+        }];
+    }];
+
+    [RACObserve(self, isShowPartyView) subscribeNext:^(id _Nullable x) {
+        [UIView animateWithDuration:0.25
+                         animations:^{
+            @strongify(self);
+
+            self.partyLeftCos.constant = !self.isShowPartyView ? -kScreenH : 0;
+
+            self.bgView.alpha = !self.isShowPartyView ? 0 : 0.6;
+
+            [self.view layoutIfNeeded];
+        }];
     }];
 }
 
@@ -502,9 +549,14 @@ typedef enum : NSUInteger {
     [self.partyAvatarCollectionView registerNib:[UINib nibWithNibName:@"PartyAvatarCollectionViewCell" bundle:k_SanABundle] forCellWithReuseIdentifier:@"PartyAvatarCollectionViewCell"];
     self.partyAvatarCollectionView.backgroundColor = [UIColor clearColor];
 
+    [self.tableView registerNib:[UINib nibWithNibName:@"PartyAvatarTableViewCell" bundle:k_SanABundle] forCellReuseIdentifier:@"PartyAvatarTableViewCell"];
+
     if ([HmCloudTool share].isPartyGame) {
         self.partyAvatarCollectionView.delegate = self;
         self.partyAvatarCollectionView.dataSource = self;
+
+        self.tableView.delegate = self;
+        self.tableView.dataSource = self;
     }
 
     // 初始化清晰度
@@ -573,6 +625,7 @@ typedef enum : NSUInteger {
 
     self.rightCos.constant = -kScreenH;
     self.leftCos.constant = -kScreenH;
+    self.partyLeftCos.constant = -kScreenH;
     self.topCos.constant = -50;
     self.bgView.alpha = 0;
 
@@ -597,6 +650,9 @@ typedef enum : NSUInteger {
     self.lightSlider.value = [UIScreen mainScreen].brightness;
 
     [self.sliderBgView1 addSubview:self.lightSlider];
+
+
+    [self updateRoomInfo:[HmCloudTool share].roomInfo controlInfos:[HmCloudTool share].controlInfos];
 }
 
 - (void)configTimer {
@@ -786,24 +842,21 @@ typedef enum : NSUInteger {
 
 /// MARK: 动画消失/显示 设置页
 - (void)hideSetView {
-    self.resolutionBgView.hidden = YES;
+    if (self.isShowPartyView) {
+        self.isShowPartyView = NO;
+        return;
+    }
 
-    @weakify(self);
-    [UIView animateWithDuration:0.25
-                     animations:^{
-        @strongify(self);
-        self.topCos.constant = (self.topCos.constant == 0) ? -50 : 0;
-        self.leftCos.constant = (self.leftCos.constant == 0) ? -kScreenH : 0;
-        self.rightCos.constant = (self.rightCos.constant == 0) ? -kScreenH : 0;
-
-        self.bgView.alpha = (self.rightCos.constant == 0) ? 0.6 : 0;
-
-        [self.view layoutIfNeeded];
-    }];
+    self.isShowSetView = !self.isShowSetView;
 }
 
 /// MARK: 动画消失/显示 派对吧view
 - (void)hidePartyView {
+    if (self.isShowSetView) {
+        self.isShowSetView = NO;
+    }
+
+    self.isShowPartyView = !self.isShowPartyView;
 }
 
 /// MARK: 推出flutter页面
@@ -847,7 +900,7 @@ typedef enum : NSUInteger {
                      completion:nil];
 }
 
-/// MARK: 点击背景消失设置
+/// MARK: 点击设置
 - (IBAction)didTapSet:(id)sender {
     [self hideSetView];
 }
@@ -894,7 +947,7 @@ typedef enum : NSUInteger {
 
 // MARK: 派对吧 更新房间信息
 - (void)updateRoomInfo:(NSDictionary *)roomInfo controlInfos:(NSArray *)controlInfos {
-    self.collectionList = [[PartyAvatarModel mj_objectArrayWithKeyValuesArray:roomInfo[@"room_status"]] mapUsingBlock:^id _Nullable (PartyAvatarModel *_Nonnull obj, NSUInteger idx) {
+    NSArray *tempArr = [[PartyAvatarModel mj_objectArrayWithKeyValuesArray:roomInfo[@"room_status"]] mapUsingBlock:^id _Nullable (PartyAvatarModel *_Nonnull obj, NSUInteger idx) {
         if ([obj.uid isEqualToString:[HmCloudTool share].userId]) {
             obj.isPermission = YES;
         }
@@ -911,7 +964,24 @@ typedef enum : NSUInteger {
         return obj;
     }];
 
-    [self.partyAvatarCollectionView reloadData];
+    BOOL refresh = NO;
+
+    if (tempArr.count != self.collectionList.count) {
+        self.collectionList = tempArr;
+        refresh = YES;
+    } else {
+        for (int a = 0; a < tempArr.count; a++) {
+            if (![tempArr[a] isEqual:self.collectionList[a]]) {
+                refresh = YES;
+                break;
+            }
+        }
+    }
+
+    if (refresh) {
+        [self.partyAvatarCollectionView reloadData];
+        [self.tableView reloadData];
+    }
 }
 
 - (void)stopTimer {
@@ -937,6 +1007,19 @@ typedef enum : NSUInteger {
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
     return CGSizeMake(40, 40);
+}
+
+// MARK: tableView delegate
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return self.collectionList.count;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    PartyAvatarTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"PartyAvatarTableViewCell" forIndexPath:indexPath];
+
+    [cell configViewWithModel:self.collectionList[indexPath.row] index:indexPath.row];
+
+    return cell;
 }
 
 @end
