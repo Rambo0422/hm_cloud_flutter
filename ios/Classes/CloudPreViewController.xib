@@ -84,10 +84,6 @@
                         <size key="footerReferenceSize" width="0.0" height="0.0"/>
                         <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                     </collectionViewFlowLayout>
-                    <connections>
-                        <outlet property="dataSource" destination="-1" id="d1M-a0-M5e"/>
-                        <outlet property="delegate" destination="-1" id="715-Ul-Rmo"/>
-                    </connections>
                 </collectionView>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YMB-DP-pcs">
                     <rect key="frame" x="798" y="344" width="44" height="44"/>
@@ -102,7 +98,7 @@
                     </connections>
                 </button>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tEf-wG-RYs">
-                    <rect key="frame" x="0.0" y="0.0" width="293.33333333333331" height="393"/>
+                    <rect key="frame" x="-295" y="0.0" width="293.33333333333331" height="393"/>
                     <subviews>
                         <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ic_left_bg.png" translatesAutoresizingMaskIntoConstraints="NO" id="gX4-kS-9gi">
                             <rect key="frame" x="0.0" y="0.0" width="293.33333333333331" height="393"/>
@@ -120,7 +116,7 @@
                                     <nil key="highlightedColor"/>
                                 </label>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="00:00:00" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="L3D-0s-HPj">
-                                    <rect key="frame" x="109.33333333333333" y="14.333333333333332" width="55.666666666666671" height="14.333333333333332"/>
+                                    <rect key="frame" x="109.33333333333336" y="14.333333333333332" width="55.666666666666671" height="14.333333333333332"/>
                                     <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="12"/>
                                     <color key="textColor" red="0.80599969630000001" green="0.9233255386" blue="0.40379226210000002" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                     <nil key="highlightedColor"/>
@@ -946,6 +942,13 @@
                         <constraint firstAttribute="bottom" secondItem="fZM-8t-GNQ" secondAttribute="bottom" id="cJf-Eo-kCp"/>
                     </constraints>
                 </view>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MVF-NK-7fz">
+                    <rect key="frame" x="0.0" y="0.0" width="240" height="393"/>
+                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="240" id="cII-ht-KsJ"/>
+                    </constraints>
+                </view>
             </subviews>
             <viewLayoutGuide key="safeArea" id="Q5M-cg-NOt"/>
             <color key="backgroundColor" systemColor="systemTealColor"/>
@@ -965,13 +968,16 @@
                 <constraint firstAttribute="trailing" secondItem="S4t-EA-PR2" secondAttribute="trailing" constant="10" id="hIE-92-4wX"/>
                 <constraint firstAttribute="bottom" secondItem="YMB-DP-pcs" secondAttribute="bottom" constant="5" id="hdr-ek-d7L"/>
                 <constraint firstItem="IJH-x3-7sc" firstAttribute="centerY" secondItem="S4t-EA-PR2" secondAttribute="centerY" id="jtS-Gw-Omh"/>
+                <constraint firstAttribute="bottom" secondItem="MVF-NK-7fz" secondAttribute="bottom" id="ldQ-fe-DE5"/>
                 <constraint firstItem="sjq-0R-9BQ" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="mxY-Z9-OX4"/>
-                <constraint firstItem="tEf-wG-RYs" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="oRh-vF-pbq"/>
+                <constraint firstItem="tEf-wG-RYs" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="-295" id="oRh-vF-pbq"/>
                 <constraint firstItem="1AV-Tz-6cG" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="uWt-pd-QHE"/>
                 <constraint firstItem="tEf-wG-RYs" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="v2g-On-Oxe"/>
+                <constraint firstItem="MVF-NK-7fz" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="wKG-zn-4pp"/>
                 <constraint firstItem="qDU-Le-tQw" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="y08-3v-5at"/>
+                <constraint firstItem="MVF-NK-7fz" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="z2B-5i-Q7o"/>
             </constraints>
-            <point key="canvasLocation" x="177.46478873239437" y="17.557251908396946"/>
+            <point key="canvasLocation" x="217" y="-4"/>
         </view>
     </objects>
     <resources>
@@ -1008,6 +1014,9 @@
         <image name="set_video_off.png" width="40" height="40"/>
         <image name="set_video_on.png" width="40" height="40"/>
         <image name="set_vip.png" width="15" height="15"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
         <systemColor name="systemTealColor">
             <color red="0.18823529410000001" green="0.69019607839999997" blue="0.78039215689999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>

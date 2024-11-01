@@ -38,6 +38,13 @@ typedef enum : NSUInteger {
 /// - Parameter status: 键盘状态
 - (void)refreshKeyboardStatus:(CloudPlayerKeyboardStatus)status;
 
+
+/// 派对吧 更新房间信息
+/// - Parameters:
+///   - roomInfo: 房间信息
+///   - controlInfos: 人员座位 uid position 集合
+- (void)updateRoomInfo:(NSDictionary *)roomInfo controlInfos:(NSArray *)controlInfos;
+
 @end
 
 NS_ASSUME_NONNULL_END

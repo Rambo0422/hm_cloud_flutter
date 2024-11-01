@@ -94,6 +94,7 @@ typedef void (^BoolBlock)(BOOL isSucc);
 
 /// 是否派对吧观众（从控）
 @property (nonatomic, assign)   BOOL isAudience;
+@property (nonatomic, assign)   BOOL isAnchor;
 
 /// 派对吧 cid
 @property (nonatomic, strong)   NSString *cid;
@@ -145,6 +146,8 @@ typedef void (^BoolBlock)(BOOL isSucc);
 
 /// 推出flutter 页面后，回到游戏页面的方法
 - (void)restart;
+
+- (void)updateRoomInfo:(NSDictionary *)params;
 
 - (void)startLiving;
 - (void)stopLiving;

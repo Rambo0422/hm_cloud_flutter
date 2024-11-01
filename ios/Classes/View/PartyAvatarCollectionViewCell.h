@@ -6,10 +6,13 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "PartyAvatarModel.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface PartyAvatarCollectionViewCell : UICollectionViewCell
+
+@property (nonatomic, strong, nullable) PartyAvatarModel *model;
 
 @end
 

@@ -121,6 +121,8 @@
     self.gameVC = nil;
     self.isInit = NO;
     self.isAudience = NO;
+    self.isAnchor = NO;
+    self.isPartyGame = NO;
 
     [[HMCloudPlayer sharedCloudPlayer] stop:10 withReason:HMCloudAppStopReasonNormal];
 }
@@ -131,10 +133,16 @@
     }
 }
 
+- (void)updateRoomInfo:(NSDictionary *)params {
+    if (self.vc) {
+        NSString *roomInfoStr =  [NSString stringWithFormat:@"%@", params[@"roomInfo"]];
+        NSDictionary *roomInfo = [roomInfoStr mj_JSONObject];
+        [self.vc updateRoomInfo:roomInfo controlInfos:params[@"controlInfos"]];
+    }
+}
+
 - (void)updatePlayInfo:(NSDictionary *)playInfo {
     [self configWithParams:playInfo];
-
-    NSLog(@"%@   %@", self.playTime, self.peakTime);
 
     [[HMCloudPlayer sharedCloudPlayer] updateGameUID:self.userId
                                            userToken:self.userToken

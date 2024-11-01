@@ -38,19 +38,25 @@
 
     if ([call.method isEqualToString:MethodStart]) {
         [[HmCloudTool share] configWithParams:call.arguments];
-        [HmCloudTool share].isAudience = NO;
+
+        if ([HmCloudTool share].isPartyGame) {
+            [HmCloudTool share].isAudience = NO;
+            [HmCloudTool share].isAnchor = YES;
+        }
+
         [[HmCloudTool share] startGame];
     }
 
     if ([call.method isEqualToString:MethodControlPlay]) {
         [[HmCloudTool share] configWithParams:call.arguments];
         [HmCloudTool share].isAudience = YES;
+        [HmCloudTool share].isAnchor = NO;
+        [HmCloudTool share].isPartyGame = YES;
         [[HmCloudTool share] registWithDelegate:self];
-//        [[HmCloudTool share] startGame];
     }
 
     if ([call.method isEqualToString:MethodPlayPartyInfo]) {
-        NSLog(@"123");
+        [[HmCloudTool share] updateRoomInfo:call.arguments];
     }
 
     if ([call.method isEqualToString:MethodExitQueue]) {

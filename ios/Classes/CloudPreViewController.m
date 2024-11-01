@@ -105,6 +105,8 @@ typedef enum : NSUInteger {
 @property (nonatomic, assign) BOOL isConnectGameControl;
 
 
+@property (nonatomic, strong) NSArray<PartyAvatarModel *> *collectionList;
+
 @end
 
 @implementation CloudPreViewController{
@@ -500,6 +502,11 @@ typedef enum : NSUInteger {
     [self.partyAvatarCollectionView registerNib:[UINib nibWithNibName:@"PartyAvatarCollectionViewCell" bundle:k_SanABundle] forCellWithReuseIdentifier:@"PartyAvatarCollectionViewCell"];
     self.partyAvatarCollectionView.backgroundColor = [UIColor clearColor];
 
+    if ([HmCloudTool share].isPartyGame) {
+        self.partyAvatarCollectionView.delegate = self;
+        self.partyAvatarCollectionView.dataSource = self;
+    }
+
     // 初始化清晰度
     self.resolution = [HmCloudTool share].isVip ? Resolution_BD : Resolution_Low;
     [[HmCloudTool share] switchResolution:self.resolution];
@@ -885,6 +892,28 @@ typedef enum : NSUInteger {
     self.showKeyboard = (status == CloudPlayerKeyboardStatusDidShow);
 }
 
+// MARK: 派对吧 更新房间信息
+- (void)updateRoomInfo:(NSDictionary *)roomInfo controlInfos:(NSArray *)controlInfos {
+    self.collectionList = [[PartyAvatarModel mj_objectArrayWithKeyValuesArray:roomInfo[@"room_status"]] mapUsingBlock:^id _Nullable (PartyAvatarModel *_Nonnull obj, NSUInteger idx) {
+        if ([obj.uid isEqualToString:[HmCloudTool share].userId]) {
+            obj.isPermission = YES;
+        }
+
+        for (NSDictionary *dict in controlInfos) {
+            NSString *uid = dict[@"uid"];
+            BOOL position = [dict[@"position"] boolValue];
+
+            if ([obj.uid isEqualToString:uid]) {
+                obj.isPermission = position;
+            }
+        }
+
+        return obj;
+    }];
+
+    [self.partyAvatarCollectionView reloadData];
+}
+
 - (void)stopTimer {
     [self.timer invalidate];
     self.timer = nil;
@@ -896,12 +925,13 @@ typedef enum : NSUInteger {
 
 /// MARK: collectionView delegate
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return 4;
+    return self.collectionList.count;
 }
 
 - (__kindof UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     PartyAvatarCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"PartyAvatarCollectionViewCell" forIndexPath:indexPath];
 
+    cell.model = self.collectionList[indexPath.row];
     return cell;
 }
 

@@ -32,21 +32,28 @@
                             </userDefinedRuntimeAttribute>
                         </userDefinedRuntimeAttributes>
                     </imageView>
+                    <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="party_quanxian.png" translatesAutoresizingMaskIntoConstraints="NO" id="484-Si-9kV">
+                        <rect key="frame" x="128" y="0.0" width="15" height="15"/>
+                    </imageView>
                 </subviews>
             </view>
             <viewLayoutGuide key="safeArea" id="SEy-5g-ep8"/>
             <constraints>
                 <constraint firstItem="dXc-Gf-KFE" firstAttribute="centerX" secondItem="gTV-IL-0wX" secondAttribute="centerX" id="cnX-22-bO9"/>
                 <constraint firstItem="dXc-Gf-KFE" firstAttribute="centerY" secondItem="gTV-IL-0wX" secondAttribute="centerY" id="u98-Su-5sL"/>
+                <constraint firstAttribute="trailing" secondItem="484-Si-9kV" secondAttribute="trailing" id="vz1-Ob-uzi"/>
+                <constraint firstItem="484-Si-9kV" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="yPp-1x-lTa"/>
             </constraints>
             <size key="customSize" width="143" height="155"/>
             <connections>
                 <outlet property="img" destination="dXc-Gf-KFE" id="UJi-lp-KW7"/>
+                <outlet property="permissionImg" destination="484-Si-9kV" id="UVz-wY-rx0"/>
             </connections>
             <point key="canvasLocation" x="106" y="45"/>
         </collectionViewCell>
     </objects>
     <resources>
         <image name="party_lock.png" width="10" height="10"/>
+        <image name="party_quanxian.png" width="15" height="15"/>
     </resources>
 </document>

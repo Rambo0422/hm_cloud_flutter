@@ -26,15 +26,15 @@
 #import "UIViewController+TopVc.h"
 
 
-#define k_FirstPlay         @"firstPlay"
-#define k_FirstInstall      @"firstInstall"
+#define k_FirstPlay    @"firstPlay"
+#define k_FirstInstall @"firstInstall"
 
-#define k_SanABundle        [NSBundle bundleWithPath:[[NSBundle bundleForClass:self.class] pathForResource:@"SanA_Game" ofType:@"bundle"]]
+#define k_SanABundle   [NSBundle bundleWithPath:[[NSBundle bundleForClass:self.class] pathForResource:@"SanA_Game" ofType:@"bundle"]]
 #define k_BundleImage(name) [UIImage imageNamed:name inBundle:k_SanABundle withConfiguration:nil]
 
 
-#define kScreenW            [UIScreen mainScreen].bounds.size.width
-#define kScreenH            [UIScreen mainScreen].bounds.size.height
+#define kScreenW       [UIScreen mainScreen].bounds.size.width
+#define kScreenH       [UIScreen mainScreen].bounds.size.height
 
 #define kColor(RGB)         [UIColor colorWithRed:((RGB >> 16) & 0x00FF) / 255. green:((RGB >> 8) & 0x00FF) / 255. blue:((RGB >> 0) & 0x00FF) / 255. alpha:1]
 
