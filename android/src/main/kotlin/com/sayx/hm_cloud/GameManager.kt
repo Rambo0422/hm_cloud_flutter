@@ -148,10 +148,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         Constants.IS_ERROR = false
         Constants.IS_INFO = false
 
-        this.isPartyPlay = gameParam.isPartyGame
-        this.isPartyPlayOwner = isPartyPlay
-        this.roomIndex = 0
-
         HmcpManager.getInstance().releaseRequestManager()
 
         HmcpManager.getInstance().init(config, activity, object : OnInitCallBackListener {
@@ -293,7 +289,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         this.gameParam = gameParam
 
         this.isPartyPlay = gameParam.isPartyGame
-        this.isPartyPlayOwner = isPartyPlay
+        this.isPartyPlayOwner = true
         this.roomIndex = 0
         this.userId = gameParam.userId
 
