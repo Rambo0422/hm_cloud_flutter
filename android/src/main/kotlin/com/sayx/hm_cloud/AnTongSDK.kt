@@ -49,7 +49,8 @@ object AnTongSDK {
             } ?: return
         }
 
-        override fun onPlayerError(errorCode: String?, errorInfo: String?) {
+        override fun onPlayerError(errorCode: String, errorInfo: String) {
+            mRequestDeviceSuccess?.onRequestDeviceFailed(errorInfo)
         }
     }
 
