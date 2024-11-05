@@ -464,9 +464,9 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                 // 是否使用存档
                 it.putBoolean(HmcpVideoView.ARCHIVED, true)
                 // cid
-//                if (gameParam?.cid?.isNotEmpty() == true) {
-//                    it.putString(HmcpVideoView.C_ID, gameParam?.cid)
-//                }
+                if (gameParam?.cid?.isNotEmpty() == true) {
+                    it.putString(HmcpVideoView.C_ID, gameParam?.cid)
+                }
                 // 业务参数
                 it.putString(
                     HmcpVideoView.PAY_PROTO_DATA,
