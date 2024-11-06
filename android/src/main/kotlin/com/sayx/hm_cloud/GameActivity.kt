@@ -358,7 +358,7 @@ class GameActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        AnTongSDK.anTongVideoView?.onDestroy()
+        AnTongSDK.onDestroy()
     }
 
     override fun onUserLeaveHint() {

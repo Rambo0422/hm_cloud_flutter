@@ -61,7 +61,7 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
             }
 
             "checkUnReleaseGame" -> {
-                GameManager.checkPlayingGame(callback, arguments.toString())
+                GameManager.checkPlayingGame(callback, arguments as HashMap<*, *>)
             }
 
             "releaseGame" -> {
@@ -74,7 +74,15 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
 
             "leaveQueue" -> {
                 // 离开队列
-                AnTongSDK.leaveQueue()
+                GameManager.leaveQueue()
+            }
+
+            "getOldGameInfo" -> {
+                // 获取旧游戏的信息
+                if (arguments is Map<*, *>) {
+                    val userId = arguments["userId"].toString()
+                    GameManager.getOldGameInfo(callback, userId)
+                }
             }
 
             else -> {

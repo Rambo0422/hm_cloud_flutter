@@ -54,27 +54,13 @@ object AnTongSDK {
         }
     }
 
-    fun onDestroy() {
-        anTongVideoView?.onDestroy()
-        val parentViewGroup = anTongVideoView?.parent as? ViewGroup
-        if (parentViewGroup != null && anTongVideoView != null) {
-            parentViewGroup.removeView(anTongVideoView)
-        }
-        anTongVideoView = null
-    }
-
-    private var isInit = false
-
     fun initSdk(context: Context, channelName: String, accessKeyId: String) {
-        if (!isInit) {
-            isInit = true
-            Constants.IS_DEBUG = BuildConfig.DEBUG
-            Constants.IS_ERROR = BuildConfig.DEBUG
-            Constants.IS_INFO = BuildConfig.DEBUG
-            Constants.IS_TV = true
-            ACCESS_KEY_ID = accessKeyId
-            AnTongManager.getInstance().init(context, channelName, accessKeyId)
-        }
+        Constants.IS_DEBUG = BuildConfig.DEBUG
+        Constants.IS_ERROR = BuildConfig.DEBUG
+        Constants.IS_INFO = BuildConfig.DEBUG
+        Constants.IS_TV = true
+        ACCESS_KEY_ID = accessKeyId
+        AnTongManager.getInstance().init(context, channelName, accessKeyId)
     }
 
     fun play(
@@ -134,6 +120,15 @@ object AnTongSDK {
 
     fun stopGame() {
         anTongVideoView?.stopGame()
+    }
+
+    fun onDestroy() {
+        anTongVideoView?.onDestroy()
+        val parentViewGroup = anTongVideoView?.parent as? ViewGroup
+        if (parentViewGroup != null && anTongVideoView != null) {
+            parentViewGroup.removeView(anTongVideoView)
+        }
+        anTongVideoView = null
     }
 
     fun leaveQueue() {

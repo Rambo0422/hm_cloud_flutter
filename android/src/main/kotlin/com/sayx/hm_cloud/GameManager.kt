@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Handler
 import android.os.Looper
+import com.blankj.utilcode.util.GsonUtils
 import com.blankj.utilcode.util.LogUtils
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -49,7 +50,7 @@ object GameManager {
         this.gameParam = gameParam
         val accessKeyId = this.gameParam?.accessKeyId ?: ""
         val channelName = this.gameParam?.channelName ?: ""
-        AnTongSDK.initSdk(context, channelName, accessKeyId)
+        AnTongSDK.initSdk(context.applicationContext, channelName, accessKeyId)
 
         val userId = this.gameParam?.userId ?: ""
         this.userId = userId
@@ -110,11 +111,22 @@ object GameManager {
         handler?.post(r)
     }
 
-    fun checkPlayingGame(callback: MethodChannel.Result, userId: String) {
+    fun checkPlayingGame(callback: MethodChannel.Result, arguments: HashMap<*, *>) {
+        // 先调用 init
+        val userId = arguments["userId"].toString()
+        val gameId = arguments["gameId"].toString()
+
         AnTongManager.getInstance().checkPlayingGame(userId, object : OnGameIsAliveListener {
             override fun success(channelInfo: ChannelInfo?) {
                 if (channelInfo != null) {
-                    callback.success(true)
+                    val businessGameId = channelInfo.businessGameId
+                    if (businessGameId == gameId) {
+                        // 代表连接的是同一个游戏，则重连
+                        callback.success(false)
+                    } else {
+                        // 代表连接的不是同一个游戏
+                        callback.success(true)
+                    }
                 } else {
                     callback.success(false)
                 }
@@ -126,18 +138,16 @@ object GameManager {
         })
     }
 
-    private var startReleaseTime = 0L
-
     fun onBackHome() {
         channel.invokeMethod("homeShow", null)
 
-        // 3s 内只允许调用一次
-        val currentTime = System.currentTimeMillis()
-        if ((currentTime - startReleaseTime) >= 3000) {
-            startReleaseTime = currentTime
-            // 检测设备，如果有游戏，直接下机
-            releaseOldGame(null, this.userId)
-        }
+//        // 3s 内只允许调用一次
+//        val currentTime = System.currentTimeMillis()
+//        if ((currentTime - startReleaseTime) >= 3000) {
+//            startReleaseTime = currentTime
+//            // 检测设备，如果有游戏，直接下机
+//            releaseOldGame(null, this.userId)
+//        }
     }
 
     fun releaseGame(finish: String) {
@@ -159,12 +169,17 @@ object GameManager {
         channel.invokeMethod("exitGame", data)
     }
 
+    private var releaseOldGameCallback: MethodChannel.Result? = null
+
     fun releaseOldGame(callback: MethodChannel.Result?, userId: String) {
+        releaseOldGameCallback = callback
         AnTongManager.getInstance().setReleaseByUserId(userId, object : OnSaveGameCallBackListener {
             override fun success(result: Boolean) {
-                callback?.success(true)
                 isPlaying = false
                 gameParam = null
+
+                // 每隔10s，检测一次机器是否释放
+                startReleaseCheckTimer(userId)
             }
 
             override fun fail(msg: String?) {
@@ -172,5 +187,77 @@ object GameManager {
                 callback?.success(false)
             }
         })
+    }
+
+    private var isTimerRunning = false
+    private var mCheckReleaseRunnable: CheckReleaseRunnable? = null
+
+    private fun startReleaseCheckTimer(userId: String) {
+        if (handler == null) {
+            handler = Handler(Looper.getMainLooper())
+        }
+        if (!isTimerRunning) {
+            isTimerRunning = true
+            if (mCheckReleaseRunnable == null) {
+                mCheckReleaseRunnable = CheckReleaseRunnable(userId)
+            }
+            handler?.postDelayed(mCheckReleaseRunnable!!, 5000)
+        }
+    }
+
+    private fun stopReleaseCheckTimer() {
+        handler?.removeCallbacksAndMessages(null)
+        isTimerRunning = false
+    }
+
+    class CheckReleaseRunnable(private val userId: String) : Runnable {
+        override fun run() {
+            checkIfReleased(userId)
+        }
+    }
+
+    private fun checkIfReleased(userId: String) {
+        AnTongManager.getInstance().checkPlayingGame(userId, object : OnGameIsAliveListener {
+            override fun success(deviceInfo: ChannelInfo?) {
+                if (deviceInfo == null) {
+                    // 说明机器释放成功了，
+                    stopReleaseCheckTimer()
+                    releaseOldGameCallback?.success(true)
+                    releaseOldGameCallback = null
+                } else {
+                    // 这里代表还没释放成功，继续检测
+                    // 每隔10秒再次执行
+                    handler?.postDelayed(mCheckReleaseRunnable!!, 5000)
+                }
+            }
+
+            override fun fail(msg: String?) {
+                // 失败了
+                stopReleaseCheckTimer()
+                releaseOldGameCallback?.success(true)
+                releaseOldGameCallback = null
+            }
+        })
+    }
+
+    fun getOldGameInfo(callback: MethodChannel.Result, userId: String) {
+        AnTongManager.getInstance().checkPlayingGame(userId, object : OnGameIsAliveListener {
+            override fun success(deviceInfo: ChannelInfo?) {
+                if (deviceInfo != null) {
+                    callback.success(GsonUtils.toJson(deviceInfo))
+                } else {
+                    callback.success(null)
+                }
+            }
+
+            override fun fail(msg: String?) {
+                callback.success(null)
+            }
+        })
+    }
+
+    fun leaveQueue() {
+        AnTongSDK.leaveQueue()
+        stopReleaseCheckTimer()
     }
 }

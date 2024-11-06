@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
@@ -57,8 +58,12 @@ class HmCloudController {
     return methodChannel.invokeMethod('queryControlUsers', null);
   }
 
-  Future<dynamic> checkUnReleaseGame(String userId) {
-    return methodChannel.invokeMethod("checkUnReleaseGame", userId);
+  Future<dynamic> checkUnReleaseGame(String userId, String gameId) {
+    Map<String, dynamic> params = {
+      "userId": userId,
+      "gameId": gameId,
+    };
+    return methodChannel.invokeMethod("checkUnReleaseGame", params);
   }
 
   void releaseGame() {
@@ -71,5 +76,12 @@ class HmCloudController {
 
   Future<dynamic> leaveQueue() {
     return methodChannel.invokeMethod("leaveQueue", "");
+  }
+
+  Future<dynamic> getOldGameInfo(String userId) {
+    Map<String, dynamic> params = {
+      "userId": userId,
+    };
+    return methodChannel.invokeMethod("getOldGameInfo", params);
   }
 }
