@@ -24,6 +24,16 @@ static NSString *MethodControlPlay = @"controlPlay";
 /// 房间人员信息
 static NSString *MethodPlayPartyInfo = @"playPartyInfo";
 
+/// 房主分发权限
+static NSString *MethodDistributeControl = @"distributeControl";
+
+/// 是否显示虚拟按键(应该是判断是否有权限)
+static NSString *MethodShowController = @"showController";
+static NSString *MethodExitGame = @"exitGame";
+
+static NSString *MethodRequestPermission = @"requestWantPlayPermission";
+
+
 
 /// MARK: action name
 static NSString *ActionExitGame = @"exitGame";
@@ -32,6 +42,15 @@ static NSString *ActionOpenPage = @"openPage";
 static NSString *ActionUpdateTime = @"updateTime";
 static NSString *ActionFirstFrameArrival = @"firstFrameArrival";
 static NSString *ActionPinCodeResult = @"pinCodeResult";
+static NSString *ActionCidArr = @"cidArr";
+// 我要玩
+static NSString *ActionWantPlay = @"wantPlay";
+// 让他玩
+static NSString *ActionLetPlay = @"letPlay";
+// 不让玩
+static NSString *ActionCloseUserPlay = @"closeUserPlay";
+// 踢走
+static NSString *ActionKickOutUser = @"kickOutUser";
 
 
 typedef void (^DataBlock)(NSDictionary *dict);
@@ -96,10 +115,18 @@ typedef void (^BoolBlock)(BOOL isSucc);
 @property (nonatomic, assign)   BOOL isAudience;
 @property (nonatomic, assign)   BOOL isAnchor;
 
+/// 是否有权限
+@property (nonatomic, assign)   BOOL isPermissions;
+
+/// 房间坐席标记
+@property (nonatomic, assign)   NSInteger roomIndex;
+
 /// 派对吧 cid
 @property (nonatomic, strong)   NSString *cid;
 /// 派对吧 pinCode
 @property (nonatomic, strong)   NSString *pinCode;
+
+
 
 @property (nonatomic, strong)   NSDictionary *roomInfo;
 @property (nonatomic, strong)   NSArray *controlInfos;
@@ -146,6 +173,8 @@ typedef void (^BoolBlock)(BOOL isSucc);
 
 - (void)stopWithBack;
 - (void)onlyStop;
+
+- (void)kickOut;
 
 /// 推出flutter 页面后，回到游戏页面的方法
 - (void)restart;
@@ -204,6 +233,14 @@ typedef void (^BoolBlock)(BOOL isSucc);
 
 /// 获取授权码
 - (void)getPinCode;
+
+- (void)letPlay;
+
+
+/// 房主分发权限
+- (void)distributeControl:(NSString *)controInfos;
+
+- (void)requestPermission:(NSDictionary *)dict;
 
 @end
 

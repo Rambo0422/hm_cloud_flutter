@@ -127,6 +127,23 @@
     [[HMCloudPlayer sharedCloudPlayer] stop:10 withReason:HMCloudAppStopReasonNormal];
 }
 
+- (void)kickOut {
+    if (self.vc) {
+        [self.vc dismissViewControllerAnimated:YES
+                                    completion:^{
+            self.vc = nil;
+            self.gameVC = nil;
+            self.isInit = NO;
+            self.isAudience = NO;
+            self.isAnchor = NO;
+            self.isPartyGame = NO;
+
+            [[HMCloudPlayer sharedCloudPlayer] stop:10
+                                         withReason:HMCloudAppStopReasonNormal];
+        }];
+    }
+}
+
 - (void)restart {
     if (self.vc) {
         [[UIViewController topViewController] presentViewController:self.vc animated:NO completion:nil];
@@ -134,12 +151,12 @@
 }
 
 - (void)updateRoomInfo:(NSDictionary *)params {
-    
     NSString *roomInfoStr =  [NSString stringWithFormat:@"%@", params[@"roomInfo"]];
+
     self.roomInfo = [roomInfoStr mj_JSONObject];
 
     self.controlInfos = params[@"controlInfos"];
-    
+
     if (self.vc) {
         NSString *roomInfoStr =  [NSString stringWithFormat:@"%@", params[@"roomInfo"]];
         NSDictionary *roomInfo = [roomInfoStr mj_JSONObject];
@@ -214,8 +231,41 @@
     }];
 }
 
+// MARK: 获取pinCode 授权码
 - (void)getPinCode {
     [[HMCloudPlayer sharedCloudPlayer] getAuthCode];
+}
+
+/// MARK: 从控请求控制权
+- (void)requestPermission:(NSDictionary *)dict {
+    if (self.vc) {
+        [self.vc showRequestPermissionView:dict];
+    }
+}
+
+/// MARK: 主控分配权限
+- (void)distributeControl:(NSString *)controInfos {
+    NSArray *infos = [controInfos mj_JSONObject];
+
+    if ([infos isKindOfClass:[NSArray class]]) {
+        for (NSDictionary *dict in infos) {
+            NSString *cid = dict[@"cid"];
+//            NSString *uid = dict[@"uid"];
+            NSNumber *position = dict[@"position"];
+
+
+            HMCloudPlayerControlInfo *info = [[HMCloudPlayerControlInfo alloc] init];
+
+            info.cid = cid;
+            info.position = position.integerValue;
+
+            [[HMCloudPlayer sharedCloudPlayer] assignGameControlWithControlInfos:@[info]
+                                                                         Success:^(NSArray<HMCloudPlayerControlInfo *> *list) {
+            }
+                                                                            Fail:^(NSString *errorCode, NSString *errorMsg) {
+            }];
+        }
+    }
 }
 
 - (void)pushPreView {
@@ -224,7 +274,15 @@
         self.vc.gameVC = self.gameVC;
 
 
+
         @weakify(self);
+
+        self.vc.sendToFlutter = ^(NSString *_Nullable action, id _Nullable params) {
+            @strongify(self);
+            [self.delegate sendToFlutter:action params:params];
+        };
+
+
 
         self.vc.didDismiss = ^{
             @strongify(self);
@@ -255,7 +313,12 @@
         [[UIViewController topViewController] presentViewController:self.vc animated:YES completion:nil];
 
         if (self.isPartyGame) {
-            [self getPinCode];
+            if (self.isAnchor) {
+                [self getPinCode];
+            }
+
+            [self.delegate sendToFlutter:ActionCidArr
+                                  params:[@{ @"index": @1, @"uid": self.userId, @"cid": [HMCloudCorePlayer sharedCloudPlayer].cloudId } mj_JSONString]];
         }
     }
 }
@@ -665,6 +728,12 @@
         [self.delegate sendToFlutter:ActionPinCodeResult
                               params:@{ @"cid": [NSString stringWithFormat:@"%@", info[@"masterCid"]],
                                         @"pinCode": [NSString stringWithFormat:@"%@", info[@"authcode"]] }];
+    }
+
+    if ([state isEqualToString:@"gainControlSuccess"]) {
+    }
+
+    if ([state isEqualToString:@"loseControl"]) {
     }
 }
 

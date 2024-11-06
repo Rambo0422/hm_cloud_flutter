@@ -22,6 +22,8 @@ typedef enum : NSUInteger {
 @property (nonatomic, strong) void (^ didDismiss)(void);
 @property (nonatomic, strong) void (^ pushFlutter)(FlutterPageType pageType);
 
+@property (nonatomic, strong) void (^ sendToFlutter)(NSString *_Nullable action, id _Nullable params);
+
 - (void)stopTimer;
 
 
@@ -44,6 +46,9 @@ typedef enum : NSUInteger {
 ///   - roomInfo: 房间信息
 ///   - controlInfos: 人员座位 uid position 集合
 - (void)updateRoomInfo:(NSDictionary *)roomInfo controlInfos:(NSArray *)controlInfos;
+
+
+- (void)showRequestPermissionView:(NSDictionary *)dict;
 
 @end
 

@@ -120,6 +120,9 @@
                                                         <integer key="value" value="4"/>
                                                     </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>
+                                                <connections>
+                                                    <action selector="didTapPlayBtn:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="bSB-ui-nKz"/>
+                                                </connections>
                                             </button>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="E4N-vt-T9c">
                                                 <rect key="frame" x="156" y="0.0" width="144" height="30"/>
@@ -137,6 +140,9 @@
                                                         <integer key="value" value="4"/>
                                                     </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>
+                                                <connections>
+                                                    <action selector="didTapKickoutBtn:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="ZYm-iQ-SNd"/>
+                                                </connections>
                                             </button>
                                         </subviews>
                                     </stackView>

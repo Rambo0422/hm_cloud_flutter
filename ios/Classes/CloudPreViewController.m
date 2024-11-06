@@ -15,6 +15,7 @@
 #import "HmCloudTool.h"
 #import "PartyAvatarCollectionViewCell.h"
 #import "PartyAvatarTableViewCell.h"
+#import "RequestPermissionView.h"
 #import "RequestTool.h"
 
 typedef enum : NSUInteger {
@@ -508,6 +509,12 @@ typedef enum : NSUInteger {
         }
     }];
 
+    [[RACObserve(tool, isPermissions) distinctUntilChanged] subscribeNext:^(id _Nullable x) {
+        @strongify(self);
+
+        self.keyView.hidden = !tool.isPermissions;
+    }];
+
     [RACObserve(self, isShowSetView) subscribeNext:^(id _Nullable x) {
         @strongify(self);
 
@@ -941,6 +948,15 @@ typedef enum : NSUInteger {
     self.packetLoss = packetLoss;
 }
 
+- (void)showRequestPermissionView:(NSDictionary *)dict {
+    @weakify(self);
+    [RequestPermissionView share].letPlayCallback = ^(NSString *_Nonnull uid) {
+        @strongify(self);
+        self.sendToFlutter(ActionLetPlay, uid);
+    };
+    [[RequestPermissionView share] showRequest:dict inView:self.view];
+}
+
 - (void)refreshKeyboardStatus:(CloudPlayerKeyboardStatus)status {
     self.showKeyboard = (status == CloudPlayerKeyboardStatusDidShow);
 }
@@ -948,7 +964,7 @@ typedef enum : NSUInteger {
 // MARK: 派对吧 更新房间信息
 - (void)updateRoomInfo:(NSDictionary *)roomInfo controlInfos:(NSArray *)controlInfos {
     NSArray *tempArr = [[PartyAvatarModel mj_objectArrayWithKeyValuesArray:roomInfo[@"room_status"]] mapUsingBlock:^id _Nullable (PartyAvatarModel *_Nonnull obj, NSUInteger idx) {
-        if ([obj.uid isEqualToString:[HmCloudTool share].userId]) {
+        if ([obj.uid isEqualToString:[HmCloudTool share].userId] && [HmCloudTool share].isAnchor) {
             obj.isPermission = YES;
         }
 
@@ -967,7 +983,6 @@ typedef enum : NSUInteger {
     BOOL refresh = NO;
 
     if (tempArr.count != self.collectionList.count) {
-        self.collectionList = tempArr;
         refresh = YES;
     } else {
         for (int a = 0; a < tempArr.count; a++) {
@@ -977,6 +992,8 @@ typedef enum : NSUInteger {
             }
         }
     }
+
+    self.collectionList = tempArr;
 
     if (refresh) {
         [self.partyAvatarCollectionView reloadData];
@@ -1016,6 +1033,25 @@ typedef enum : NSUInteger {
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     PartyAvatarTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"PartyAvatarTableViewCell" forIndexPath:indexPath];
+
+    @weakify(self);
+
+    cell.letPlayCallback = ^(NSString *_Nonnull uid) {
+        @strongify(self);
+        self.sendToFlutter(ActionLetPlay, uid);
+    };
+    cell.closeUserPlayCallback = ^(NSString *_Nonnull uid) {
+        @strongify(self);
+        self.sendToFlutter(ActionCloseUserPlay, uid);
+    };
+    cell.wantPlayCallback = ^(NSString *_Nonnull uid) {
+        @strongify(self);
+        self.sendToFlutter(ActionWantPlay, uid);
+    };
+    cell.kickoutCallback = ^(NSString *_Nonnull uid) {
+        @strongify(self);
+        self.sendToFlutter(ActionKickOutUser, uid);
+    };
 
     [cell configViewWithModel:self.collectionList[indexPath.row] index:indexPath.row];
 

@@ -1056,7 +1056,7 @@
                 <constraint firstItem="tEf-wG-RYs" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="v2g-On-Oxe"/>
                 <constraint firstItem="qDU-Le-tQw" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="y08-3v-5at"/>
             </constraints>
-            <point key="canvasLocation" x="217" y="-4"/>
+            <point key="canvasLocation" x="194" y="-5"/>
         </view>
     </objects>
     <resources>

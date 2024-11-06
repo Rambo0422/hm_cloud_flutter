@@ -43,11 +43,13 @@
 
     self.nameLab.textColor = [[HmCloudTool share].userId isEqualToString:model.uid] ? kColor(0xC6EC4B) : UIColor.whiteColor;
 
-    self.stackView.hidden = NO;
+    self.stackView.hidden = YES;
     self.kicoutBtn.hidden = NO;
 
     if ([HmCloudTool share].isAudience) {
-        self.stackView.hidden = ![[HmCloudTool share].userId isEqualToString:model.uid];
+        if ([[HmCloudTool share].userId isEqualToString:model.uid] && !model.isPermission) {
+            self.stackView.hidden = NO;
+        }
 
         self.kicoutBtn.hidden = YES;
 
@@ -57,17 +59,18 @@
     }
 
     if ([HmCloudTool share].isAnchor) {
+        self.stackView.hidden = NO;
+
         if ([[HmCloudTool share].userId isEqual:model.uid]) {
             self.kicoutBtn.hidden = YES;
 
-            [self.playBtn setTitle:@"不让玩" forState:UIControlStateNormal];
-
+            [self.playBtn setTitle:self.model.isPermission ? @"不让玩" : @"我要玩" forState:UIControlStateNormal];
             self.playBtn.backgroundColor = kColor(0xC6EC4B);
 
             [self.playBtn setTitleColor:kColor(0x222222) forState:UIControlStateNormal];
         } else {
             if (model.uid.length) {
-                [self.playBtn setTitle:@"让Ta玩" forState:UIControlStateNormal];
+                [self.playBtn setTitle:self.model.isPermission ? @"不让玩" : @"让Ta玩" forState:UIControlStateNormal];
 
                 self.playBtn.backgroundColor = kColor(0xC6EC4B);
                 [self.playBtn setTitleColor:kColor(0x222222) forState:UIControlStateNormal];
@@ -114,6 +117,38 @@
     } else {
         self.avatarImg.image = model.status == 1 ? k_BundleImage(@"party_unlock") : k_BundleImage(@"party_lock");
         self.avatarImg.contentMode = UIViewContentModeCenter;
+    }
+}
+
+- (IBAction)didTapPlayBtn:(id)sender {
+    // 房主
+    if ([HmCloudTool share].isAnchor) {
+        if (self.model.isPermission) {
+            // 有权限 - 不让玩
+            if (self.closeUserPlayCallback) {
+                self.closeUserPlayCallback(self.model.uid);
+            }
+        } else {
+            // 有权限 - 让他玩
+            if (self.letPlayCallback) {
+                self.letPlayCallback(self.model.uid);
+            }
+        }
+    }
+
+    // 从控
+    if ([HmCloudTool share].isAudience) {
+        // 让我玩
+
+        if (self.wantPlayCallback) {
+            self.wantPlayCallback(self.model.uid);
+        }
+    }
+}
+
+- (IBAction)didTapKickoutBtn:(id)sender {
+    if (self.kickoutCallback) {
+        self.kickoutCallback(self.model.uid);
     }
 }
 

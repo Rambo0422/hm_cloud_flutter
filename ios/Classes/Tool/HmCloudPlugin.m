@@ -59,8 +59,25 @@
         [[HmCloudTool share] updateRoomInfo:call.arguments];
     }
 
+    if ([call.method isEqualToString:MethodDistributeControl]) {
+        [[HmCloudTool share] distributeControl:call.arguments];
+    }
+
+    if ([call.method isEqualToString:MethodShowController]) {
+        NSNumber *isPermissions = call.arguments;
+        [HmCloudTool share].isPermissions = isPermissions.boolValue;
+    }
+
+    if ([call.method isEqualToString:MethodExitGame]) {
+        [[HmCloudTool share] kickOut];
+    }
+
     if ([call.method isEqualToString:MethodExitQueue]) {
         [[HmCloudTool share] onlyStop];
+    }
+
+    if ([call.method isEqualToString:MethodRequestPermission]) {
+        [[HmCloudTool share] requestPermission:call.arguments];
     }
 
     if ([call.method isEqualToString:MethodClosePage]) {
