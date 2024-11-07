@@ -260,8 +260,8 @@ class AtGameActivity : AppCompatActivity() {
 //        showSaveTips()
         GameManager.gameStat(
             "游戏界面", "show", mapOf(
-                "api-platform" to "安通",
-                "gamepage-type" to "游戏界面",
+                "sdk_platform" to "安通",
+                "gamepage_type" to "游戏界面",
             )
         )
     }
@@ -431,8 +431,8 @@ class AtGameActivity : AppCompatActivity() {
     private fun showGameSetting() {
         GameManager.gameStat(
             "游戏界面", "show", mapOf(
-                "api-platform" to "安通",
-                "gamepage-type" to "设置页面",
+                "sdk_platform" to "安通",
+                "gamepage_type" to "设置页面",
             )
         )
         dataBinding.btnGameSettings.visibility = View.INVISIBLE
@@ -579,7 +579,7 @@ class AtGameActivity : AppCompatActivity() {
                 gameSettings?.release()
                 GameManager.gameStat(
                     "结束游戏", "click", mapOf(
-                        "api-platform" to "安通",
+                        "sdk_platform" to "安通",
                     )
                 )
             }

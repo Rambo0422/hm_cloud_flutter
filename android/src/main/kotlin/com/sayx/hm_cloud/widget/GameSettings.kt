@@ -86,48 +86,48 @@ class GameSettings @JvmOverloads constructor(
         // 可用时长点击，添加可用时长
         dataBinding.tvAvailableTime.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
-                "gamepage-type" to "设置页面",
-                "clickdpopup-content" to "加号",
+                "gamepage_type" to "设置页面",
+                "clickdpopup_content" to "加号",
             ))
             hideLayout()
             gameSettingChangeListener?.onAddAvailableTime()
         }
         dataBinding.btnRecharge.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
-                "gamepage-type" to "设置页面",
-                "clickdpopup-content" to "充值",
+                "gamepage_type" to "设置页面",
+                "clickdpopup_content" to "充值",
             ))
             gameSettingChangeListener?.onAddAvailableTime()
         }
         // 调试码点击，复制调试码到剪切板
         dataBinding.tvDebugCode.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
-                "gamepage-type" to "设置页面",
-                "clickdpopup-content" to "调试码",
+                "gamepage_type" to "设置页面",
+                "clickdpopup_content" to "调试码",
             ))
             gameSettingChangeListener?.onDebugCodeClick()
         }
         // 控制方法
         dataBinding.btnGamepad.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
-                "gamepage-type" to "设置页面",
-                "clickdpopup-content" to "手柄",
+                "gamepage_type" to "设置页面",
+                "clickdpopup_content" to "手柄",
             ))
             controllerType = AppVirtualOperateType.APP_STICK_XBOX
             gameSettingChangeListener?.onControlMethodChange(AppVirtualOperateType.APP_STICK_XBOX)
         }
         dataBinding.btnKeyboard.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
-                "gamepage-type" to "设置页面",
-                "clickdpopup-content" to "键盘",
+                "gamepage_type" to "设置页面",
+                "clickdpopup_content" to "键盘",
             ))
             controllerType = AppVirtualOperateType.APP_KEYBOARD
             gameSettingChangeListener?.onControlMethodChange(AppVirtualOperateType.APP_KEYBOARD)
         }
         dataBinding.btnCustom.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
-                "gamepage-type" to "设置页面",
-                "clickdpopup-content" to "自定义",
+                "gamepage_type" to "设置页面",
+                "clickdpopup_content" to "自定义",
             ))
             hideLayout()
             if (GameManager.getGameParam()?.isVip() == true) {
@@ -139,8 +139,8 @@ class GameSettings @JvmOverloads constructor(
         // 震动开关
         dataBinding.btnVibrate.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
-                "gamepage-type" to "设置页面",
-                "clickdpopup-content" to "震动",
+                "gamepage_type" to "设置页面",
+                "clickdpopup_content" to "震动",
             ))
             it.isSelected = !it.isSelected
             if (it.isSelected) {
@@ -151,8 +151,8 @@ class GameSettings @JvmOverloads constructor(
         // 静音开关
         dataBinding.btnMute.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
-                "gamepage-type" to "设置页面",
-                "clickdpopup-content" to "静音",
+                "gamepage_type" to "设置页面",
+                "clickdpopup_content" to "静音",
             ))
             val value = !it.isSelected
             it.isSelected = value
@@ -166,16 +166,16 @@ class GameSettings @JvmOverloads constructor(
         // 画质选择
         dataBinding.tvQuality.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
-                "gamepage-type" to "设置页面",
-                "clickdpopup-content" to "画质切换",
+                "gamepage_type" to "设置页面",
+                "clickdpopup_content" to "画质切换",
             ))
             dataBinding.layoutQuality.visibility =
                 if (dataBinding.layoutQuality.visibility == INVISIBLE) VISIBLE else INVISIBLE
         }
         dataBinding.tvStandardQuality.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
-                "gamepage-type" to "设置页面",
-                "clickdpopup-content" to "画质切换-标清",
+                "gamepage_type" to "设置页面",
+                "clickdpopup_content" to "画质切换-标清",
             ))
             dataBinding.layoutQuality.visibility = INVISIBLE
             dataBinding.tvQuality.text = context.getString(R.string.standard_quality)
@@ -189,8 +189,8 @@ class GameSettings @JvmOverloads constructor(
         }
         dataBinding.tvBlueRay.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
-                "gamepage-type" to "设置页面",
-                "clickdpopup-content" to "画质切换-蓝光",
+                "gamepage_type" to "设置页面",
+                "clickdpopup_content" to "画质切换-蓝光",
             ))
             dataBinding.layoutQuality.visibility = INVISIBLE
             if (GameManager.getGameParam()?.isVip() == true) {
@@ -210,8 +210,8 @@ class GameSettings @JvmOverloads constructor(
         // 云游互动开关
         dataBinding.btnInteraction.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
-                "gamepage-type" to "设置页面",
-                "clickdpopup-content" to "云游互动",
+                "gamepage_type" to "设置页面",
+                "clickdpopup_content" to "云游互动",
             ))
             if (gameView is AnTongVideoView) {
                 return@setOnClickListener
@@ -232,8 +232,8 @@ class GameSettings @JvmOverloads constructor(
         // 鼠标点击
         dataBinding.btnMouseClick.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
-                "gamepage-type" to "设置页面",
-                "clickdpopup-content" to "鼠标点击",
+                "gamepage_type" to "设置页面",
+                "clickdpopup_content" to "鼠标点击",
             ))
             if (!mouseModeEditable) {
                 ToastUtils.showLong(R.string.mouse_editable_notice)
@@ -246,8 +246,8 @@ class GameSettings @JvmOverloads constructor(
         // 触控点击
         dataBinding.btnTouchClick.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
-                "gamepage-type" to "设置页面",
-                "clickdpopup-content" to "触控点击",
+                "gamepage_type" to "设置页面",
+                "clickdpopup_content" to "触控点击",
             ))
             if (!mouseModeEditable) {
                 ToastUtils.showLong(R.string.mouse_editable_notice)
@@ -260,8 +260,8 @@ class GameSettings @JvmOverloads constructor(
         // 触屏攻击
         dataBinding.btnTouchAttack.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
-                "gamepage-type" to "设置页面",
-                "clickdpopup-content" to "触屏不攻击",
+                "gamepage_type" to "设置页面",
+                "clickdpopup_content" to "触屏不攻击",
             ))
             if (!mouseModeEditable) {
                 ToastUtils.showLong(R.string.mouse_editable_notice)
@@ -274,8 +274,8 @@ class GameSettings @JvmOverloads constructor(
         // 退出游戏
         dataBinding.btnExitGame.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
-                "gamepage-type" to "设置页面",
-                "clickdpopup-content" to "退出游戏",
+                "gamepage_type" to "设置页面",
+                "clickdpopup_content" to "退出游戏",
             ))
             hideLayout()
             gameSettingChangeListener?.onExitGame()
@@ -679,8 +679,8 @@ class GameSettings @JvmOverloads constructor(
             return
         }
         GameManager.gameStat("游戏界面", "show", mapOf(
-            "api-platform" to "海马云",
-            "gamepage-type" to "时长不足",
+            "sdk_platform" to "海马云",
+            "gamepage_type" to "时长不足",
         ))
         val animatorSet = AnimatorSet()
         val translation = ObjectAnimator.ofFloat(
