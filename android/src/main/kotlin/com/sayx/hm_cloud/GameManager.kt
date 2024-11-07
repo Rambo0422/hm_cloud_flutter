@@ -924,12 +924,12 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
     ) {
         channel.invokeMethod(
             "gameStatusStat",
-                    mapOf(
-                        "type" to type,
-                        "page" to page,
-                        "action" to action,
-                        "argument" to arg
-                    )
+            mapOf(
+                "type" to type,
+                "page" to page,
+                "action" to action,
+                "arguments" to arg
+            )
         )
     }
 
