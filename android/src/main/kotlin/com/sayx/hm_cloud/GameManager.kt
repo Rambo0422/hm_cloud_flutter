@@ -42,6 +42,7 @@ import com.sayx.hm_cloud.http.bean.HttpResponse
 import com.sayx.hm_cloud.imp.HmcpPlayerListenerImp
 import com.sayx.hm_cloud.model.AccountInfo
 import com.sayx.hm_cloud.model.ArchiveData
+import com.sayx.hm_cloud.model.ErrorDialogConfig
 import com.sayx.hm_cloud.model.GameError
 import com.sayx.hm_cloud.model.GameErrorEvent
 import com.sayx.hm_cloud.model.GameParam
@@ -112,6 +113,9 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
     var isPartyPlayOwner = false
 
     var disposable: Disposable? = null
+
+    // 后台配置的错误弹窗信息
+    private var dialogConfig: ErrorDialogConfig? = null
 
     fun init(channel: MethodChannel, context: Activity) {
         this.channel = channel
@@ -1336,5 +1340,13 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             // 配置了channel，根据channel判断
             return channel == AnTongSDK.CHANNEL_TYPE
         }
+    }
+
+    fun setErrorDialogConfig(dialogConfig: ErrorDialogConfig?) {
+        this.dialogConfig = dialogConfig
+    }
+
+    fun getErrorDialogConfig(): ErrorDialogConfig? {
+        return this.dialogConfig
     }
 }

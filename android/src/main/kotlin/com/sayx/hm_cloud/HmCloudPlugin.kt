@@ -14,6 +14,7 @@ import com.sayx.hm_cloud.model.ControllerChangeEvent
 import com.sayx.hm_cloud.model.ControllerConfigEvent
 import com.sayx.hm_cloud.model.ControllerEditEvent
 import com.sayx.hm_cloud.model.ControllerInfo
+import com.sayx.hm_cloud.model.ErrorDialogConfig
 import com.sayx.hm_cloud.model.ExitGameEvent
 import com.sayx.hm_cloud.model.GameParam
 import com.sayx.hm_cloud.model.PartyPlayWantPlay
@@ -227,6 +228,15 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
                     val event = PlayPartyRoomSoundAndMicrophoneStateEvent(soundState, microphoneState)
                     EventBus.getDefault().post(event)
                 }
+            }
+
+            "error_dialog_config" -> {
+                // 配置错误弹框
+                val dialogConfig = GameManager.gson.fromJson(
+                    arguments.toString(),
+                    ErrorDialogConfig::class.java
+                )
+                GameManager.setErrorDialogConfig(dialogConfig)
             }
 
             else -> {
