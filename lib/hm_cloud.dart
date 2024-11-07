@@ -130,4 +130,8 @@ class HmCloudController {
   Future<dynamic> getArchiveProgress() async {
     return await methodChannel.invokeMethod("getArchiveProgress");
   }
+
+  void errorDialogConfig(String config) {
+    methodChannel.invokeMethod("error_dialog_config", config);
+  }
 }

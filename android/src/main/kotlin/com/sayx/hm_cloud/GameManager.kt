@@ -42,6 +42,7 @@ import com.sayx.hm_cloud.http.bean.HttpResponse
 import com.sayx.hm_cloud.imp.HmcpPlayerListenerImp
 import com.sayx.hm_cloud.model.AccountInfo
 import com.sayx.hm_cloud.model.ArchiveData
+import com.sayx.hm_cloud.model.ErrorDialogConfig
 import com.sayx.hm_cloud.model.GameError
 import com.sayx.hm_cloud.model.GameErrorEvent
 import com.sayx.hm_cloud.model.GameParam
@@ -113,6 +114,9 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
 
     var disposable: Disposable? = null
 
+    // 后台配置的错误弹窗信息
+    private var dialogConfig: ErrorDialogConfig? = null
+
     fun init(channel: MethodChannel, context: Activity) {
         this.channel = channel
         this.activity = context
@@ -147,10 +151,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         Constants.IS_DEBUG = false
         Constants.IS_ERROR = false
         Constants.IS_INFO = false
-
-        this.isPartyPlay = gameParam.isPartyGame
-        this.isPartyPlayOwner = isPartyPlay
-        this.roomIndex = 0
 
         HmcpManager.getInstance().releaseRequestManager()
 
@@ -293,7 +293,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         this.gameParam = gameParam
 
         this.isPartyPlay = gameParam.isPartyGame
-        this.isPartyPlayOwner = isPartyPlay
+        this.isPartyPlayOwner = true
         this.roomIndex = 0
         this.userId = gameParam.userId
 
@@ -722,6 +722,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                         LogUtils.e("gameTimeCountDown error:$dataStr")
                     }
                 }
+                // 401，异端登录
                 Constants.STATUS_INVALID_CONN_IN_MULTI_CONN -> {
                     EventBus.getDefault().post(GameErrorEvent("$status", ""))
                 }
@@ -1344,5 +1345,13 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             // 配置了channel，根据channel判断
             return channel == AnTongSDK.CHANNEL_TYPE
         }
+    }
+
+    fun setErrorDialogConfig(dialogConfig: ErrorDialogConfig?) {
+        this.dialogConfig = dialogConfig
+    }
+
+    fun getErrorDialogConfig(): ErrorDialogConfig? {
+        return this.dialogConfig
     }
 }

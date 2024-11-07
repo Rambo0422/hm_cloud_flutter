@@ -146,6 +146,7 @@
     <string name="interaction">云游互动</string>
     <string name="hang">挂机</string>
     <string name="exit_game">退出游戏</string>
+    <string name="exit">退出</string>
     <string name="debug_code">调试码</string>
     <string name="control_method">操作方式</string>
     <string name="custom">自定义</string>
