@@ -320,6 +320,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                             Pair("type", "game_request"),
                             Pair("page", "游戏请求"),
                             Pair("action", "请求接口"),
+                            Pair("force", true),
                             Pair("arguments", mapOf("uri" to "https://archives.3ayx.net/getLast", "body" to params.toString()).toString())
                         )
                     )
@@ -339,6 +340,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                             "gameStatusStat", mapOf(
                                 Pair("type", "game_request"),
                                 Pair("page", "游戏请求"),
+                                Pair("force", true),
                                 Pair("action", "请求失败"),
                                 Pair(
                                     "arguments",
@@ -358,13 +360,16 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                         "gameStatusStat", mapOf(
                             Pair("type", "game_request"),
                             Pair("page", "游戏请求"),
+                            Pair("force", true),
                             Pair("action", "请求成功"),
                             Pair(
                                 "arguments",
                                 mapOf(
                                     "uri" to "https://archives.3ayx.net/getLast",
                                     "code" to "${response.responseCode}",
-                                    "dataCode" to "${response.data?.code}"
+                                    "dataCode" to "${response.data?.code}",
+                                    "custodian" to "${response.data?.custodian}",
+                                    "listEmpty" to "${response.data?.list?.isEmpty() ?: true}",
                                 ).toString()
                             )
                         )
@@ -406,7 +411,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         LogUtils.d("priority:${gameParam?.priority}")
         val code = archiveData?.code
         val custodian = archiveData?.custodian
-        val listEmpty = archiveData?.list?.isEmpty()
+        val listEmpty = archiveData?.list?.isEmpty() ?: true
         channel.invokeMethod(
             "gameStatusStat", mapOf(
                 Pair("type", "game_prepare"),
@@ -460,9 +465,9 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                 // 是否使用存档
                 it.putBoolean(HmcpVideoView.ARCHIVED, true)
                 // cid
-//                if (gameParam?.cid?.isNotEmpty() == true) {
-//                    it.putString(HmcpVideoView.C_ID, gameParam?.cid)
-//                }
+                if (gameParam?.cid?.isNotEmpty() == true) {
+                    it.putString(HmcpVideoView.C_ID, gameParam?.cid)
+                }
                 // 业务参数
                 it.putString(
                     HmcpVideoView.PAY_PROTO_DATA,
@@ -713,6 +718,9 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                         LogUtils.e("gameTimeCountDown error:$dataStr")
                     }
                 }
+                Constants.STATUS_INVALID_CONN_IN_MULTI_CONN -> {
+                    EventBus.getDefault().post(GameErrorEvent("$status", ""))
+                }
                 // 9,连接失败
                 Constants.STATUS_CONNECTION_ERROR,
                     // 10,排队人数过多
@@ -776,10 +784,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             }
         }
         EventBus.getDefault().post(GameErrorEvent(errorCode, errorMsg))
-//        channel.invokeMethod(
-//            "reportError",
-//            mapOf(Pair("cid", HmcpManager.getInstance().cloudId), Pair("errorInfo", dataStr))
-//        )
         channel.invokeMethod(
             "errorInfo",
             mapOf(Pair("errorCode", errorCode), Pair("errorMsg", errorMsg))
@@ -928,7 +932,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                         "type" to type,
                         "page" to page,
                         "action" to action,
-                        "argument" to arg
+                        "arguments" to arg
                     )
         )
     }
@@ -1072,7 +1076,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             return
         }
 
-        if (isAnTong) {
+        if (isAnTong || finish == "401") {
             return
         }
 
