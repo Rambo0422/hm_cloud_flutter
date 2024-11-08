@@ -50,6 +50,8 @@ typedef enum : NSUInteger {
 
 - (void)showRequestPermissionView:(NSDictionary *)dict;
 
+- (void)refreshSound:(BOOL)isOpenSound mic:(BOOL)isOpenMic;
+
 @end
 
 NS_ASSUME_NONNULL_END

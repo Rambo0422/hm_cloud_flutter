@@ -40,6 +40,8 @@
                 <outlet property="partyAvatarCollectionView" destination="IJH-x3-7sc" id="Afj-Ur-Hcr"/>
                 <outlet property="partyBtn" destination="yPG-0I-lZc" id="P7l-33-O83"/>
                 <outlet property="partyLeftCos" destination="ejZ-8c-wG2" id="nqp-Y4-HxC"/>
+                <outlet property="partyMicBtn" destination="Aml-KA-lmY" id="7EG-so-ewI"/>
+                <outlet property="partySoundBtn" destination="NwW-SZ-VqW" id="8sx-LD-qOd"/>
                 <outlet property="resolutionBgView" destination="a5v-DB-g2m" id="0sP-Jo-Ugx"/>
                 <outlet property="rightCos" destination="5iz-gY-tyF" id="xNw-o2-UaJ"/>
                 <outlet property="setBtn" destination="S4t-EA-PR2" id="PJo-jW-Qzl"/>
@@ -977,6 +979,9 @@
                                                     <integer key="value" value="4"/>
                                                 </userDefinedRuntimeAttribute>
                                             </userDefinedRuntimeAttributes>
+                                            <connections>
+                                                <action selector="didTapSound:" destination="-1" eventType="touchUpInside" id="yLd-ao-qcP"/>
+                                            </connections>
                                         </button>
                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Aml-KA-lmY">
                                             <rect key="frame" x="127.66666666666666" y="0.0" width="112.33333333333334" height="35"/>
@@ -991,6 +996,9 @@
                                                     <integer key="value" value="4"/>
                                                 </userDefinedRuntimeAttribute>
                                             </userDefinedRuntimeAttributes>
+                                            <connections>
+                                                <action selector="didTapMic:" destination="-1" eventType="touchUpInside" id="osp-Ds-Owd"/>
+                                            </connections>
                                         </button>
                                     </subviews>
                                 </stackView>

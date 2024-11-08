@@ -33,6 +33,10 @@ static NSString *MethodExitGame = @"exitGame";
 
 static NSString *MethodRequestPermission = @"requestWantPlayPermission";
 
+static NSString *MethodUpdateSoundMic = @"updatePlayPartySoundAndMicrophoneState";
+
+
+
 
 
 /// MARK: action name
@@ -52,6 +56,10 @@ static NSString *ActionCloseUserPlay = @"closeUserPlay";
 // 踢走
 static NSString *ActionKickOutUser = @"kickOutUser";
 
+// 操作麦克风 声音
+static NSString *ActionSoundMic = @"playPartySoundAndMicrophone";
+
+static NSString *ActionUpdateRoomInfo = @"updatePlayPartyRoomInfo";
 
 typedef void (^DataBlock)(NSDictionary *dict);
 typedef void (^BoolBlock)(BOOL isSucc);
@@ -241,6 +249,8 @@ typedef void (^BoolBlock)(BOOL isSucc);
 - (void)distributeControl:(NSString *)controInfos;
 
 - (void)requestPermission:(NSDictionary *)dict;
+
+- (void)refreshSoundMic:(NSDictionary *)dict;
 
 @end
 

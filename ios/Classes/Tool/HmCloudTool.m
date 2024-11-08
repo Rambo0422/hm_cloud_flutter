@@ -243,6 +243,17 @@
     }
 }
 
+/// MARK: 更新声音 mic
+- (void)refreshSoundMic:(NSDictionary *)dict {
+    if (self.vc) {
+
+        BOOL sound = [dict[@"sound"] boolValue];
+        BOOL mic = [dict[@"microphone"] boolValue];
+
+        [self.vc refreshSound:sound mic:mic];
+    }
+}
+
 /// MARK: 主控分配权限
 - (void)distributeControl:(NSString *)controInfos {
     NSArray *infos = [controInfos mj_JSONObject];
@@ -319,6 +330,8 @@
 
             [self.delegate sendToFlutter:ActionCidArr
                                   params:[@{ @"index": @1, @"uid": self.userId, @"cid": [HMCloudCorePlayer sharedCloudPlayer].cloudId } mj_JSONString]];
+
+            [self.delegate sendToFlutter:ActionUpdateRoomInfo params:nil];
         }
     }
 }

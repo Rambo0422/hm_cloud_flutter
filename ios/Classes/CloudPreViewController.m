@@ -116,6 +116,11 @@ typedef enum : NSUInteger {
 
 @property (nonatomic, assign) BOOL isShowPartyView;
 @property (nonatomic, assign) BOOL isShowSetView;
+@property (weak, nonatomic) IBOutlet UIButton *partySoundBtn;
+@property (weak, nonatomic) IBOutlet UIButton *partyMicBtn;
+
+@property (nonatomic, assign) BOOL isOpenSound;
+@property (nonatomic, assign) BOOL isOpenMic;
 
 @end
 
@@ -267,6 +272,18 @@ typedef enum : NSUInteger {
 
     @weakify(self);
     @weakify(tool);
+
+    [RACObserve(self, isOpenSound) subscribeNext:^(id _Nullable x) {
+        [self.partySoundBtn setImage:self.isOpenSound ? k_BundleImage(@"sound_on") : k_BundleImage(@"sound_off")
+                            forState:UIControlStateNormal];
+    }];
+
+
+    [RACObserve(self, isOpenMic) subscribeNext:^(id _Nullable x) {
+        [self.partyMicBtn setImage:self.isOpenMic ? k_BundleImage(@"mic_on") : k_BundleImage(@"mic_off")
+                          forState:UIControlStateNormal];
+    }];
+
 
     [RACObserve(self, resolution) subscribeNext:^(id _Nullable x) {
         @strongify(self);
@@ -942,10 +959,29 @@ typedef enum : NSUInteger {
                          cancelCallback:nil];
 }
 
+- (IBAction)didTapSound:(id)sender {
+    self.isOpenSound = !self.isOpenSound;
+    [self updateSoundMic];
+}
+
+- (IBAction)didTapMic:(id)sender {
+    self.isOpenMic = !self.isOpenMic;
+    [self updateSoundMic];
+}
+
+- (void)updateSoundMic {
+    self.sendToFlutter(ActionSoundMic, [@{ @"sound": @(self.isOpenSound), @"microphone": @(self.isOpenMic) } mj_JSONString]);
+}
+
 /// MARK: 刷新延迟信息
 - (void)refreshfps:(NSInteger)fps ms:(NSInteger)ms rate:(float)rate packetLoss:(float)packetLoss {
     self.ms = ms;
     self.packetLoss = packetLoss;
+}
+
+- (void)refreshSound:(BOOL)isOpenSound mic:(BOOL)isOpenMic {
+    self.isOpenMic = isOpenMic;
+    self.isOpenSound = isOpenSound;
 }
 
 - (void)showRequestPermissionView:(NSDictionary *)dict {

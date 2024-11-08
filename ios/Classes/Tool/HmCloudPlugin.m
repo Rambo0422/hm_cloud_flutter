@@ -80,6 +80,10 @@
         [[HmCloudTool share] requestPermission:call.arguments];
     }
 
+    if ([call.method isEqualToString:MethodUpdateSoundMic]) {
+        [[HmCloudTool share] refreshSoundMic:call.arguments];
+    }
+
     if ([call.method isEqualToString:MethodClosePage]) {
         [[HmCloudTool share] restart];
     }
