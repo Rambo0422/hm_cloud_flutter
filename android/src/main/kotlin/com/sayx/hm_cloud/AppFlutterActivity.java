@@ -36,7 +36,7 @@ public class AppFlutterActivity extends FlutterActivity {
         }
 
         Map<String, Object> map = new HashMap<>();
-        map.put("sdk_platform", "海马云");
+        map.put("sdk_platform", GameManager.INSTANCE.isAnTong() ? "at" : "hmy");
         map.put("gamepage_type", "充值中心");
         GameManager.INSTANCE.gameStat("游戏界面", "show", map, "event");
     }

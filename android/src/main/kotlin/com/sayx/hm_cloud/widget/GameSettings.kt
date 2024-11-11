@@ -10,7 +10,6 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.LinearInterpolator
@@ -31,6 +30,7 @@ import com.sayx.hm_cloud.callback.SeekBarChangListenerImp
 import com.sayx.hm_cloud.constants.AppVirtualOperateType
 import com.sayx.hm_cloud.constants.GameConstants
 import com.sayx.hm_cloud.databinding.ViewGameSettingsBinding
+import com.sayx.hm_cloud.model.UserRechargeStatusEvent
 import com.sayx.hm_cloud.utils.AppVibrateUtils
 import com.sayx.hm_cloud.utils.TimeUtils
 import java.util.Timer
@@ -87,7 +87,7 @@ class GameSettings @JvmOverloads constructor(
         dataBinding.tvAvailableTime.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
                 "gamepage_type" to "设置页面",
-                "clickdpopup_content" to "加号",
+                "clickup_content" to "加号",
             ))
             hideLayout()
             gameSettingChangeListener?.onAddAvailableTime()
@@ -95,15 +95,28 @@ class GameSettings @JvmOverloads constructor(
         dataBinding.btnRecharge.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
                 "gamepage_type" to "设置页面",
-                "clickdpopup_content" to "充值",
+                "clickup_content" to dataBinding.btnRecharge.text,
             ))
-            gameSettingChangeListener?.onAddAvailableTime()
+            when (dataBinding.btnRecharge.text) {
+                context.getString(R.string.recharge) -> {
+                    GameManager.openBuyPeakTime()
+                }
+                context.getString(R.string.first_charge) -> {
+                    GameManager.openFirstCharge()
+                }
+                context.getString(R.string.limit_activity) -> {
+                    GameManager.openLimitActivity()
+                }
+                context.getString(R.string.limit_discount) -> {
+                    GameManager.openLimitDiscount()
+                }
+            }
         }
         // 调试码点击，复制调试码到剪切板
         dataBinding.tvDebugCode.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
                 "gamepage_type" to "设置页面",
-                "clickdpopup_content" to "调试码",
+                "clickup_content" to "调试码",
             ))
             gameSettingChangeListener?.onDebugCodeClick()
         }
@@ -111,7 +124,7 @@ class GameSettings @JvmOverloads constructor(
         dataBinding.btnGamepad.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
                 "gamepage_type" to "设置页面",
-                "clickdpopup_content" to "手柄",
+                "clickup_content" to "手柄",
             ))
             controllerType = AppVirtualOperateType.APP_STICK_XBOX
             gameSettingChangeListener?.onControlMethodChange(AppVirtualOperateType.APP_STICK_XBOX)
@@ -119,7 +132,7 @@ class GameSettings @JvmOverloads constructor(
         dataBinding.btnKeyboard.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
                 "gamepage_type" to "设置页面",
-                "clickdpopup_content" to "键盘",
+                "clickup_content" to "键盘",
             ))
             controllerType = AppVirtualOperateType.APP_KEYBOARD
             gameSettingChangeListener?.onControlMethodChange(AppVirtualOperateType.APP_KEYBOARD)
@@ -127,7 +140,7 @@ class GameSettings @JvmOverloads constructor(
         dataBinding.btnCustom.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
                 "gamepage_type" to "设置页面",
-                "clickdpopup_content" to "自定义",
+                "clickup_content" to "自定义",
             ))
             hideLayout()
             if (GameManager.getGameParam()?.isVip() == true) {
@@ -140,7 +153,7 @@ class GameSettings @JvmOverloads constructor(
         dataBinding.btnVibrate.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
                 "gamepage_type" to "设置页面",
-                "clickdpopup_content" to "震动",
+                "clickup_content" to "震动",
             ))
             it.isSelected = !it.isSelected
             if (it.isSelected) {
@@ -152,7 +165,7 @@ class GameSettings @JvmOverloads constructor(
         dataBinding.btnMute.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
                 "gamepage_type" to "设置页面",
-                "clickdpopup_content" to "静音",
+                "clickup_content" to "静音",
             ))
             val value = !it.isSelected
             it.isSelected = value
@@ -167,7 +180,7 @@ class GameSettings @JvmOverloads constructor(
         dataBinding.tvQuality.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
                 "gamepage_type" to "设置页面",
-                "clickdpopup_content" to "画质切换",
+                "clickup_content" to "画质切换",
             ))
             dataBinding.layoutQuality.visibility =
                 if (dataBinding.layoutQuality.visibility == INVISIBLE) VISIBLE else INVISIBLE
@@ -175,7 +188,7 @@ class GameSettings @JvmOverloads constructor(
         dataBinding.tvStandardQuality.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
                 "gamepage_type" to "设置页面",
-                "clickdpopup_content" to "画质切换-标清",
+                "clickup_content" to "画质切换-标清",
             ))
             dataBinding.layoutQuality.visibility = INVISIBLE
             dataBinding.tvQuality.text = context.getString(R.string.standard_quality)
@@ -190,7 +203,7 @@ class GameSettings @JvmOverloads constructor(
         dataBinding.tvBlueRay.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
                 "gamepage_type" to "设置页面",
-                "clickdpopup_content" to "画质切换-蓝光",
+                "clickup_content" to "画质切换-蓝光",
             ))
             dataBinding.layoutQuality.visibility = INVISIBLE
             if (GameManager.getGameParam()?.isVip() == true) {
@@ -211,7 +224,7 @@ class GameSettings @JvmOverloads constructor(
         dataBinding.btnInteraction.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
                 "gamepage_type" to "设置页面",
-                "clickdpopup_content" to "云游互动",
+                "clickup_content" to "云游互动",
             ))
             if (gameView is AnTongVideoView) {
                 return@setOnClickListener
@@ -233,7 +246,7 @@ class GameSettings @JvmOverloads constructor(
         dataBinding.btnMouseClick.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
                 "gamepage_type" to "设置页面",
-                "clickdpopup_content" to "鼠标点击",
+                "clickup_content" to "鼠标点击",
             ))
             if (!mouseModeEditable) {
                 ToastUtils.showLong(R.string.mouse_editable_notice)
@@ -247,7 +260,7 @@ class GameSettings @JvmOverloads constructor(
         dataBinding.btnTouchClick.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
                 "gamepage_type" to "设置页面",
-                "clickdpopup_content" to "触控点击",
+                "clickup_content" to "触控点击",
             ))
             if (!mouseModeEditable) {
                 ToastUtils.showLong(R.string.mouse_editable_notice)
@@ -261,7 +274,7 @@ class GameSettings @JvmOverloads constructor(
         dataBinding.btnTouchAttack.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
                 "gamepage_type" to "设置页面",
-                "clickdpopup_content" to "触屏不攻击",
+                "clickup_content" to "触屏不攻击",
             ))
             if (!mouseModeEditable) {
                 ToastUtils.showLong(R.string.mouse_editable_notice)
@@ -275,7 +288,7 @@ class GameSettings @JvmOverloads constructor(
         dataBinding.btnExitGame.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
                 "gamepage_type" to "设置页面",
-                "clickdpopup_content" to "退出游戏",
+                "clickup_content" to "退出游戏",
             ))
             hideLayout()
             gameSettingChangeListener?.onExitGame()
@@ -367,6 +380,7 @@ class GameSettings @JvmOverloads constructor(
             dataBinding.btnPlayParty.visibility = View.GONE
         }
         initStatusListener()
+        GameManager.getUserRechargeStatus()
     }
 
     private fun initStatusListener() {
@@ -701,6 +715,23 @@ class GameSettings @JvmOverloads constructor(
             }
         })
         animatorSet.start()
+    }
+
+    fun updateUserRechargeStatus(event: UserRechargeStatusEvent) {
+        when(event.type) {
+            "recharge" -> {
+                dataBinding.btnRecharge.text = context.getString(R.string.recharge)
+            }
+            "firstCharge" -> {
+                dataBinding.btnRecharge.text = context.getString(R.string.first_charge)
+            }
+            "limitActivity" -> {
+                dataBinding.btnRecharge.text = context.getString(R.string.limit_activity)
+            }
+            "limitCharge" -> {
+                dataBinding.btnRecharge.text = context.getString(R.string.limit_discount)
+            }
+        }
     }
 
     fun hideGameOffNotice() {

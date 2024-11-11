@@ -1,13 +1,15 @@
-package com.sayx.hm_cloud.http
+package com.sayx.hm_cloud.http.repository
 
+import com.sayx.hm_cloud.http.HttpManager
 import com.sayx.hm_cloud.http.bean.HttpResponse
+import com.sayx.hm_cloud.http.service.AppService
 import com.sayx.hm_cloud.http.transformer.HttpError
 import com.sayx.hm_cloud.http.transformer.RxSchedulers
 import com.sayx.hm_cloud.model.ArchiveData
 import com.sayx.hm_cloud.model.GameConfig
 import io.reactivex.rxjava3.core.Observer
 
-class AppRepository {
+object AppRepository {
 
     private val appService: AppService = HttpManager.createApi(AppService::class.java)
 

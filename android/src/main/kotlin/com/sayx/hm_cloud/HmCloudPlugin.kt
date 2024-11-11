@@ -8,6 +8,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ScreenUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.google.gson.reflect.TypeToken
+import com.haima.hmcp.utils.CryptoUtils
 import com.sayx.hm_cloud.constants.AppVirtualOperateType
 import com.sayx.hm_cloud.model.ControlInfo
 import com.sayx.hm_cloud.model.ControllerChangeEvent
@@ -66,7 +67,7 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
             "initSDK" -> {
                 if (arguments is Map<*, *>) {
                     val gameParam = GameParam.formGson(arguments)
-                    GameManager.initSDK(gameParam)
+                    GameManager.initSDK(gameParam, callback)
                 }
             }
             "getUnReleaseGame" -> {
@@ -237,6 +238,26 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
                     ErrorDialogConfig::class.java
                 )
                 GameManager.setErrorDialogConfig(dialogConfig)
+            }
+
+            "getCToken" -> {
+                if (arguments is Map<*, *>) {
+                    val cToken = CryptoUtils.generateCToken(
+                        arguments["pkgName"] as String,
+                        arguments["userId"] as String,
+                        arguments["userToken"] as String,
+                        arguments["bid"] as String,
+                        arguments["channelId"] as String,
+                        arguments["accessKey"] as String
+                    )
+                    callback.success(cToken)
+                }
+            }
+
+            "updateUserRechargeStatus" -> {
+                if (arguments is Map<*, *>) {
+                    GameManager.updateUserRechargeStatus(arguments)
+                }
             }
 
             else -> {

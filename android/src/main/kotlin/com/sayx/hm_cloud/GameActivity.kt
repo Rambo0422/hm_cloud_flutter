@@ -62,8 +62,8 @@ import com.sayx.hm_cloud.databinding.ActivityGameBinding
 import com.sayx.hm_cloud.dialog.AppCommonDialog
 import com.sayx.hm_cloud.dialog.ControllerTypeDialog
 import com.sayx.hm_cloud.dialog.GameErrorDialog
-import com.sayx.hm_cloud.http.AppRepository
 import com.sayx.hm_cloud.http.bean.HttpResponse
+import com.sayx.hm_cloud.http.repository.AppRepository
 import com.sayx.hm_cloud.model.ControllerChangeEvent
 import com.sayx.hm_cloud.model.ControllerConfigEvent
 import com.sayx.hm_cloud.model.ControllerEditEvent
@@ -79,6 +79,7 @@ import com.sayx.hm_cloud.model.PartyPlayWantPlay
 import com.sayx.hm_cloud.model.PlayPartyRoomInfoEvent
 import com.sayx.hm_cloud.model.PlayPartyRoomSoundAndMicrophoneStateEvent
 import com.sayx.hm_cloud.model.TimeUpdateEvent
+import com.sayx.hm_cloud.model.UserRechargeStatusEvent
 import com.sayx.hm_cloud.utils.AppSizeUtils
 import com.sayx.hm_cloud.utils.GameUtils
 import com.sayx.hm_cloud.utils.TimeUtils
@@ -135,10 +136,6 @@ class GameActivity : AppCompatActivity() {
     // 剪切板
     private val clipboardManager: ClipboardManager by lazy {
         getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-    }
-
-    private val appRepository: AppRepository by lazy {
-        AppRepository()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -417,7 +414,7 @@ class GameActivity : AppCompatActivity() {
                 return
             }
         }
-        appRepository.requestGameConfig(object : Observer<HttpResponse<GameConfig>> {
+        AppRepository.requestGameConfig(object : Observer<HttpResponse<GameConfig>> {
             override fun onSubscribe(d: Disposable) {
 
             }
@@ -1168,6 +1165,11 @@ class GameActivity : AppCompatActivity() {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onUpdateUserRechargeStatusEvent(event: UserRechargeStatusEvent) {
+        gameSettings?.updateUserRechargeStatus(event)
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
     fun onGameError(event: GameErrorEvent) {
         exitGame(errorCode = event.errorCode, errorMsg = event.errorMsg)
     }
@@ -1180,13 +1182,6 @@ class GameActivity : AppCompatActivity() {
         val str =
             "cid:${HmcpManager.getInstance().cloudId},uid:${GameManager.getGameParam()?.userId}"
         LogUtils.d("exitGame:$str")
-        if (errorCode == "11" || errorCode == "15" || errorCode == "42" || errorCode == "401") {
-            showWarningDialog(errorCode)
-        } else if (errorCode != "0") {
-            showErrorDialog(errorCode, errorMsg)
-        } else {
-            showExitGameDialog()
-
         if (!enable) {
             handleExitGameWithoutDialog(errorCode, errorMsg)
             return

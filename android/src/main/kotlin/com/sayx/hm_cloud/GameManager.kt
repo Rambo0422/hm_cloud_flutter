@@ -36,7 +36,7 @@ import com.haima.hmcp.widgets.beans.VirtualOperateType
 import com.sayx.hm_cloud.callback.RequestDeviceSuccess
 import com.sayx.hm_cloud.constants.AppVirtualOperateType
 import com.sayx.hm_cloud.dialog.AppCommonDialog
-import com.sayx.hm_cloud.http.AppRepository
+import com.sayx.hm_cloud.http.repository.AppRepository
 import com.sayx.hm_cloud.http.bean.AppHttpException
 import com.sayx.hm_cloud.http.bean.HttpResponse
 import com.sayx.hm_cloud.imp.HmcpPlayerListenerImp
@@ -49,6 +49,7 @@ import com.sayx.hm_cloud.model.GameParam
 import com.sayx.hm_cloud.model.PCMouseEvent
 import com.sayx.hm_cloud.model.SpecificArchive
 import com.sayx.hm_cloud.model.TimeUpdateEvent
+import com.sayx.hm_cloud.model.UserRechargeStatusEvent
 import com.sayx.hm_cloud.utils.GameUtils
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -126,7 +127,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         }
     }
 
-    fun initSDK(gameParam: GameParam) {
+    fun initSDK(gameParam: GameParam, callback: MethodChannel.Result) {
         this.gameParam = gameParam
         channel.invokeMethod(
             "gameStatusStat", mapOf(
@@ -141,6 +142,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         if (isAnTong()) {
             AnTongSDK.initSdk(activity, gameParam)
             initState = true
+            callback.success(true)
             return
         }
 
@@ -158,10 +160,12 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             override fun success() {
                 LogUtils.d("haiMaSDK success:${HmcpManager.getInstance().sdkVersion}")
                 initState = true
+                callback.success(true)
             }
 
             override fun fail(msg: String?) {
                 LogUtils.e("haiMaSDK fail:$msg")
+                callback.success(false)
                 var errorCode = GameError.gameInitErrorCode
                 var errorMsg = GameError.gameInitErrorMsg
                 if (msg is String && !TextUtils.isEmpty(msg)) {
@@ -314,7 +318,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             "channel" to getChannel(),
             "version" to getAppVersion()
         )
-        AppRepository().requestArchiveData(
+        AppRepository.requestArchiveData(
             params,
             object : Observer<HttpResponse<ArchiveData>> {
                 override fun onSubscribe(d: Disposable) {
@@ -883,7 +887,49 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             putExtra("route", "/rechargeCenter")
             putExtra("arguments", Bundle().also {
                 it.putString("type", "rechargeTime")
-                it.putString("from", "native")
+                it.putString("from", "游戏页面")
+            })
+            setClass(activity, AppFlutterActivity::class.java)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            activity.startActivity(this)
+        }
+    }
+
+    fun openFirstCharge() {
+        Intent().apply {
+            putExtra("route", "/webview")
+            putExtra("arguments", Bundle().also {
+                it.putString("url", "https://play.3ayx.net/pages/webView/firstCharge?landscape=true")
+                it.putString("gameId", "${gameParam?.gameId}")
+                it.putString("from", "游戏页面")
+            })
+            setClass(activity, AppFlutterActivity::class.java)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            activity.startActivity(this)
+        }
+    }
+
+    fun openLimitActivity() {
+        Intent().apply {
+            putExtra("route", "/webview")
+            putExtra("arguments", Bundle().also {
+                it.putString("url", activityUrl?.replace("activity", "webview"))
+                it.putString("gameId", "${gameParam?.gameId}")
+                it.putString("from", "游戏页面")
+            })
+            setClass(activity, AppFlutterActivity::class.java)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            activity.startActivity(this)
+        }
+    }
+
+    fun openLimitDiscount() {
+        Intent().apply {
+            putExtra("route", "/rechargeCenter")
+            putExtra("arguments", Bundle().also {
+                it.putString("type", "rechargeTime")
+                it.putString("from", "游戏页面")
+                it.putBoolean("discount", true)
             })
             setClass(activity, AppFlutterActivity::class.java)
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -896,7 +942,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             putExtra("route", "/rechargeCenter")
             putExtra("arguments", Bundle().also {
                 it.putString("type", "rechargeVip")
-                it.putString("from", "native")
+                it.putString("from", "游戏页面")
             })
             setClass(activity, AppFlutterActivity::class.java)
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -1336,7 +1382,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         channel.invokeMethod("kickOutUser", arguments)
     }
 
-    private fun isAnTong(): Boolean {
+    fun isAnTong(): Boolean {
         val channel = gameParam?.channel
         if (channel?.isEmpty() != false) {
             // 未配置channel，根据游戏类型判断
@@ -1353,5 +1399,19 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
 
     fun getErrorDialogConfig(): ErrorDialogConfig? {
         return this.dialogConfig
+    }
+
+    fun getUserRechargeStatus() {
+        channel.invokeMethod("getUserRechargeStatus", null)
+    }
+
+    private var activityUrl : String? = ""
+
+    fun updateUserRechargeStatus(arguments: Map<*, *>) {
+        val type = arguments["type"]
+        activityUrl = arguments["jumpUrl"] as String?
+        if (type is String) {
+            EventBus.getDefault().post(UserRechargeStatusEvent(type))
+        }
     }
 }
