@@ -31,13 +31,13 @@ public class AppFlutterActivity extends FlutterActivity {
         if (extras != null) {
             String route = extras.getString("route");
             Bundle arguments = extras.getBundle("arguments");
-            LogUtils.v("route:" + route + ", arguments:" + arguments);
+            LogUtils.d("route:" + route + ", arguments:" + arguments);
             GameManager.INSTANCE.openFlutterPage(route, bundleToMap(arguments));
         }
 
         Map<String, Object> map = new HashMap<>();
-        map.put("api-platform", "海马云");
-        map.put("gamepage-type", "充值中心");
+        map.put("sdk_platform", "海马云");
+        map.put("gamepage_type", "充值中心");
         GameManager.INSTANCE.gameStat("游戏界面", "show", map, "event");
     }
 

@@ -259,11 +259,28 @@
                     tools:visibility="visible" />
 
                 <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/iv_interaction_sign"
                     android:layout_width="15dp"
                     android:layout_height="15dp"
                     android:layout_marginTop="-5dp"
                     android:layout_marginEnd="-5dp"
                     android:src="@drawable/icon_vip_sign"
+                    app:layout_constraintEnd_toEndOf="@id/btn_interaction"
+                    app:layout_constraintTop_toTopOf="@id/btn_interaction" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_interaction_sign"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="-5dp"
+                    android:layout_marginEnd="-5dp"
+                    android:background="@drawable/shape_not_open_bg"
+                    android:enabled="false"
+                    android:text="@string/not_open"
+                    android:textColor="#FF959AA9"
+                    android:textSize="8sp"
+                    android:visibility="invisible"
+                    tools:visibility="visible"
                     app:layout_constraintEnd_toEndOf="@id/btn_interaction"
                     app:layout_constraintTop_toTopOf="@id/btn_interaction" />
 

@@ -31,6 +31,16 @@
             tools:ignore="DiscouragedApi" />
 
         <activity
+            android:name=".AtGameActivity"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true"
+            android:launchMode="singleTask"
+            android:screenOrientation="sensorLandscape"
+            android:theme="@style/GameTheme"
+            android:windowSoftInputMode="adjustResize|stateHidden"
+            tools:ignore="DiscouragedApi" />
+
+        <activity
             android:name=".AppFlutterActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
