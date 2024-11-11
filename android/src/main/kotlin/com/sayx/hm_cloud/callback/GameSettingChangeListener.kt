@@ -35,4 +35,8 @@ interface GameSettingChangeListener {
     fun onShowPlayParty()
 
     fun onDelayChange(delayInfo: VideoDelayInfo?)
+
+    fun getNetDelay(): Int
+
+    fun getPacketsLostRate(): String
 }

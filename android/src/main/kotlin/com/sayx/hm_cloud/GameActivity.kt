@@ -266,8 +266,8 @@ class GameActivity : AppCompatActivity() {
             initPlayPartyView()
         }
         GameManager.gameStat("游戏界面", "show", mapOf(
-            "api-platform" to "海马云",
-            "gamepage-type" to "游戏界面",
+            "sdk_platform" to "海马云",
+            "gamepage_type" to "游戏界面",
         ))
     }
 
@@ -582,6 +582,14 @@ class GameActivity : AppCompatActivity() {
                     }
                 }
             }
+
+            override fun getNetDelay(): Int {
+                return GameManager.gameView?.clockDiffVideoLatencyInfo?.netDelay ?: 999
+            }
+
+            override fun getPacketsLostRate(): String {
+                return GameManager.gameView?.clockDiffVideoLatencyInfo?.packetsLostRate ?: ""
+            }
         }
     }
 
@@ -636,8 +644,8 @@ class GameActivity : AppCompatActivity() {
 
     private fun showGameSetting() {
         GameManager.gameStat("游戏界面", "show", mapOf(
-            "api-platform" to "海马云",
-            "gamepage-type" to "设置页面",
+            "sdk_platform" to "海马云",
+            "gamepage_type" to "设置页面",
         ))
         dataBinding.btnGameSettings.visibility = View.INVISIBLE
         dataBinding.btnVirtualKeyboard.visibility = View.INVISIBLE
@@ -1165,7 +1173,7 @@ class GameActivity : AppCompatActivity() {
         val str =
             "cid:${HmcpManager.getInstance().cloudId},uid:${GameManager.getGameParam()?.userId}"
         LogUtils.d("exitGame:$str")
-        if (errorCode == "11" || errorCode == "15" || errorCode == "42") {
+        if (errorCode == "11" || errorCode == "15" || errorCode == "42" || errorCode == "401") {
             showWarningDialog(errorCode)
         } else if (errorCode != "0") {
             showErrorDialog(errorCode, errorMsg)
@@ -1178,13 +1186,28 @@ class GameActivity : AppCompatActivity() {
         gameSettings?.release()
         GameManager.isPlaying = false
         GameManager.releaseGame(finish = errorCode, bundle = null)
-        val subtitle = if (errorCode == "11") {
-            "游戏长时间无操作"
-        } else {
-            "游戏时间到"
+        val title = when (errorCode) {
+            "401" -> {
+                "设备限制"
+            }
+            else -> {
+                "游戏结束\n[$errorCode]"
+            }
         }
+        val subtitle = when (errorCode) {
+            "11" -> {
+                "游戏长时间无操作"
+            }
+            "401" -> {
+                "游戏已在其他设备运行"
+            }
+            else -> {
+                "游戏结束"
+            }
+        }
+
         AppCommonDialog.Builder(this)
-            .setTitle("游戏结束\n[$errorCode]")
+            .setTitle(title)
             .setSubTitle(subtitle, Color.parseColor("#FF555A69"))
             .setRightButton("退出游戏") {
                 LogUtils.d("exitGameForTime")
@@ -1238,7 +1261,7 @@ class GameActivity : AppCompatActivity() {
                 gameSettings?.release()
                 finish()
                 GameManager.gameStat("结束游戏", "click", mapOf(
-                    "api-platform" to "海马云",
+                    "sdk_platform" to "海马云",
                 ))
             }
             .build().show()

@@ -111,7 +111,6 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
                     GameManager.releaseGame(gameParam, callback)
                 }
             }
-
             // 操作方式数据
             "setControllerData" -> {
                 val data = GameManager.gson.fromJson(
@@ -119,10 +118,9 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
                     Map::class.java
                 )
                 val controllerInfo = ControllerInfo.fromData(data)
-                LogUtils.v("setControllerData:$controllerInfo")
+                LogUtils.d("setControllerData:$controllerInfo")
                 EventBus.getDefault().post(ControllerConfigEvent(controllerInfo))
             }
-
             // 操作方式编辑成功
             "controllerEditSuccess" -> {
                 ToastUtils.showShort("已保存")
@@ -132,7 +130,6 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
                 EventBus.getDefault()
                     .post(ControllerEditEvent(controllerInfo.type))
             }
-
             // 操作方式编辑失败
             "controllerEditFail" -> {
                 ToastUtils.showShort("编辑保存失败")
