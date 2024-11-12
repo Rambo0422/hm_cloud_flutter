@@ -54,7 +54,7 @@ import com.sayx.hm_cloud.constants.controllerStatus
 import com.sayx.hm_cloud.databinding.ActivityGameBinding
 import com.sayx.hm_cloud.dialog.AppCommonDialog
 import com.sayx.hm_cloud.dialog.ControllerTypeDialog
-import com.sayx.hm_cloud.http.AppRepository
+import com.sayx.hm_cloud.http.repository.AppRepository
 import com.sayx.hm_cloud.http.bean.HttpResponse
 import com.sayx.hm_cloud.model.ControllerChangeEvent
 import com.sayx.hm_cloud.model.ControllerConfigEvent
@@ -64,6 +64,7 @@ import com.sayx.hm_cloud.model.GameNotice
 import com.sayx.hm_cloud.model.GameParam
 import com.sayx.hm_cloud.model.KeyInfo
 import com.sayx.hm_cloud.model.TimeUpdateEvent
+import com.sayx.hm_cloud.model.UserRechargeStatusEvent
 import com.sayx.hm_cloud.utils.AppSizeUtils
 import com.sayx.hm_cloud.utils.GameUtils
 import com.sayx.hm_cloud.utils.TimeUtils
@@ -107,10 +108,6 @@ class AtGameActivity : AppCompatActivity() {
     // 剪切板
     private val clipboardManager: ClipboardManager by lazy {
         getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-    }
-
-    private val appRepository: AppRepository by lazy {
-        AppRepository()
     }
 
     private var inputTimer: Timer? = null
@@ -260,7 +257,7 @@ class AtGameActivity : AppCompatActivity() {
 //        showSaveTips()
         GameManager.gameStat(
             "游戏界面", "show", mapOf(
-                "sdk_platform" to "安通",
+                "sdk_platform" to GameManager.getGameParam()?.channel,
                 "gamepage_type" to "游戏界面",
             )
         )
@@ -380,7 +377,7 @@ class AtGameActivity : AppCompatActivity() {
                 return
             }
         }
-        appRepository.requestGameConfig(object : Observer<HttpResponse<GameConfig>> {
+        AppRepository.requestGameConfig(object : Observer<HttpResponse<GameConfig>> {
             override fun onSubscribe(d: Disposable) {
             }
 
@@ -431,7 +428,7 @@ class AtGameActivity : AppCompatActivity() {
     private fun showGameSetting() {
         GameManager.gameStat(
             "游戏界面", "show", mapOf(
-                "sdk_platform" to "安通",
+                "sdk_platform" to GameManager.getGameParam()?.channel,
                 "gamepage_type" to "设置页面",
             )
         )
@@ -552,7 +549,7 @@ class AtGameActivity : AppCompatActivity() {
 
             override fun getNetDelay(): Int {
                 val netDelay = AnTongSDK.anTongVideoView?.clockDiffVideoLatencyInfo?.netDelay
-                return netDelay ?: 999
+                return netDelay?.toInt() ?: 999
             }
 
             override fun getPacketsLostRate(): String {
@@ -579,7 +576,7 @@ class AtGameActivity : AppCompatActivity() {
                 gameSettings?.release()
                 GameManager.gameStat(
                     "结束游戏", "click", mapOf(
-                        "sdk_platform" to "安通",
+                        "sdk_platform" to GameManager.getGameParam()?.channel,
                     )
                 )
             }
@@ -1078,6 +1075,11 @@ class AtGameActivity : AppCompatActivity() {
                 gameSettings?.controllerType = AppVirtualOperateType.APP_STICK_XBOX
             }
         }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onUpdateUserRechargeStatusEvent(event: UserRechargeStatusEvent) {
+        gameSettings?.updateUserRechargeStatus(event)
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

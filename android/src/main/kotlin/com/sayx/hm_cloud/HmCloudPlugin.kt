@@ -8,12 +8,14 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ScreenUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.google.gson.reflect.TypeToken
+import com.haima.hmcp.utils.CryptoUtils
 import com.sayx.hm_cloud.constants.AppVirtualOperateType
 import com.sayx.hm_cloud.model.ControlInfo
 import com.sayx.hm_cloud.model.ControllerChangeEvent
 import com.sayx.hm_cloud.model.ControllerConfigEvent
 import com.sayx.hm_cloud.model.ControllerEditEvent
 import com.sayx.hm_cloud.model.ControllerInfo
+import com.sayx.hm_cloud.model.ErrorDialogConfig
 import com.sayx.hm_cloud.model.ExitGameEvent
 import com.sayx.hm_cloud.model.GameParam
 import com.sayx.hm_cloud.model.PartyPlayWantPlay
@@ -65,7 +67,7 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
             "initSDK" -> {
                 if (arguments is Map<*, *>) {
                     val gameParam = GameParam.formGson(arguments)
-                    GameManager.initSDK(gameParam)
+                    GameManager.initSDK(gameParam, callback)
                 }
             }
             "getUnReleaseGame" -> {
@@ -226,6 +228,21 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
                     val microphoneState = arguments["microphone"] as Boolean
                     val event = PlayPartyRoomSoundAndMicrophoneStateEvent(soundState, microphoneState)
                     EventBus.getDefault().post(event)
+                }
+            }
+
+            "error_dialog_config" -> {
+                // 配置错误弹框
+                val dialogConfig = GameManager.gson.fromJson(
+                    arguments.toString(),
+                    ErrorDialogConfig::class.java
+                )
+                GameManager.setErrorDialogConfig(dialogConfig)
+            }
+
+            "updateUserRechargeStatus" -> {
+                if (arguments is Map<*, *>) {
+                    GameManager.updateUserRechargeStatus(arguments)
                 }
             }
 

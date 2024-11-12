@@ -27,6 +27,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.SPUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -61,14 +62,16 @@ import com.sayx.hm_cloud.databinding.ActivityGameBinding
 import com.sayx.hm_cloud.dialog.AppCommonDialog
 import com.sayx.hm_cloud.dialog.ControllerTypeDialog
 import com.sayx.hm_cloud.dialog.GameErrorDialog
-import com.sayx.hm_cloud.http.AppRepository
-import com.sayx.hm_cloud.http.HttpManager
 import com.sayx.hm_cloud.http.bean.HttpResponse
+import com.sayx.hm_cloud.http.repository.AppRepository
 import com.sayx.hm_cloud.model.ControllerChangeEvent
 import com.sayx.hm_cloud.model.ControllerConfigEvent
 import com.sayx.hm_cloud.model.ControllerEditEvent
+import com.sayx.hm_cloud.model.ErrorConfigInfo
 import com.sayx.hm_cloud.model.ExitGameEvent
+import com.sayx.hm_cloud.model.GameConfig
 import com.sayx.hm_cloud.model.GameErrorEvent
+import com.sayx.hm_cloud.model.GameNotice
 import com.sayx.hm_cloud.model.GameParam
 import com.sayx.hm_cloud.model.KeyInfo
 import com.sayx.hm_cloud.model.PCMouseEvent
@@ -76,14 +79,17 @@ import com.sayx.hm_cloud.model.PartyPlayWantPlay
 import com.sayx.hm_cloud.model.PlayPartyRoomInfoEvent
 import com.sayx.hm_cloud.model.PlayPartyRoomSoundAndMicrophoneStateEvent
 import com.sayx.hm_cloud.model.TimeUpdateEvent
+import com.sayx.hm_cloud.model.UserRechargeStatusEvent
 import com.sayx.hm_cloud.utils.AppSizeUtils
 import com.sayx.hm_cloud.utils.GameUtils
+import com.sayx.hm_cloud.utils.TimeUtils
 import com.sayx.hm_cloud.widget.AddGamepadKey
 import com.sayx.hm_cloud.widget.AddKeyboardKey
 import com.sayx.hm_cloud.widget.ControllerEditLayout
 import com.sayx.hm_cloud.widget.EditCombineKey
 import com.sayx.hm_cloud.widget.EditRouletteKey
 import com.sayx.hm_cloud.widget.ExitNoticeView
+import com.sayx.hm_cloud.widget.GameNoticeView
 import com.sayx.hm_cloud.widget.GameSettings
 import com.sayx.hm_cloud.widget.PlayPartyGameView
 import com.sayx.hm_cloud.widget.PlayPartyPermissionView
@@ -91,16 +97,14 @@ import com.sayx.hm_cloud.widget.PlayPartyUserAvatarView
 import com.sayx.hm_cloud.widget.PlayPartyWantPlayView
 import io.reactivex.rxjava3.core.Observer
 import io.reactivex.rxjava3.disposables.Disposable
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import me.jessyan.autosize.utils.AutoSizeUtils
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.util.Timer
 import java.util.TimerTask
-import com.sayx.hm_cloud.model.GameConfig
-import com.sayx.hm_cloud.model.GameNotice
-import com.sayx.hm_cloud.utils.TimeUtils
-import com.sayx.hm_cloud.widget.GameNoticeView
 
 class GameActivity : AppCompatActivity() {
 
@@ -132,10 +136,6 @@ class GameActivity : AppCompatActivity() {
     // 剪切板
     private val clipboardManager: ClipboardManager by lazy {
         getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-    }
-
-    private val appRepository: AppRepository by lazy {
-        AppRepository()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -266,7 +266,7 @@ class GameActivity : AppCompatActivity() {
             initPlayPartyView()
         }
         GameManager.gameStat("游戏界面", "show", mapOf(
-            "sdk_platform" to "海马云",
+            "sdk_platform" to GameManager.getGameParam()?.channel,
             "gamepage_type" to "游戏界面",
         ))
     }
@@ -414,7 +414,7 @@ class GameActivity : AppCompatActivity() {
                 return
             }
         }
-        appRepository.requestGameConfig(object : Observer<HttpResponse<GameConfig>> {
+        AppRepository.requestGameConfig(object : Observer<HttpResponse<GameConfig>> {
             override fun onSubscribe(d: Disposable) {
 
             }
@@ -644,7 +644,7 @@ class GameActivity : AppCompatActivity() {
 
     private fun showGameSetting() {
         GameManager.gameStat("游戏界面", "show", mapOf(
-            "sdk_platform" to "海马云",
+            "sdk_platform" to GameManager.getGameParam()?.channel,
             "gamepage_type" to "设置页面",
         ))
         dataBinding.btnGameSettings.visibility = View.INVISIBLE
@@ -1165,20 +1165,56 @@ class GameActivity : AppCompatActivity() {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onUpdateUserRechargeStatusEvent(event: UserRechargeStatusEvent) {
+        gameSettings?.updateUserRechargeStatus(event)
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
     fun onGameError(event: GameErrorEvent) {
         exitGame(errorCode = event.errorCode, errorMsg = event.errorMsg)
     }
 
     private fun exitGame(errorCode: String = "0", errorMsg: String? = null) {
+        // 判断后台配置的弹窗是否开启
+        val errorDialogConfig = GameManager.getErrorDialogConfig()
+        val enable = errorDialogConfig?.enable ?: false
+
         val str =
             "cid:${HmcpManager.getInstance().cloudId},uid:${GameManager.getGameParam()?.userId}"
         LogUtils.d("exitGame:$str")
-        if (errorCode == "11" || errorCode == "15" || errorCode == "42" || errorCode == "401") {
-            showWarningDialog(errorCode)
-        } else if (errorCode != "0") {
-            showErrorDialog(errorCode, errorMsg)
-        } else {
-            showExitGameDialog()
+        if (!enable) {
+            handleExitGameWithoutDialog(errorCode, errorMsg)
+            return
+        }
+
+        // 判断对应的 errorCode 是否能够找到对应的弹窗配置
+        val configInfo = errorDialogConfig?.list?.find { it.androidCode == errorCode }
+
+        if (configInfo == null) {
+            handleExitGameWithoutDialog(errorCode, errorMsg)
+            return
+        }
+
+        // 找到了对应的配置，显示弹窗
+        showConfiguredDialog(configInfo)
+    }
+
+    /**
+     * 原来的弹窗逻辑，保留不做修改
+     */
+    private fun handleExitGameWithoutDialog(errorCode: String, errorMsg: String?) {
+        when {
+            errorCode == "11" || errorCode == "15" || errorCode == "42" || errorCode == "401" -> {
+                showWarningDialog(errorCode)
+            }
+
+            errorCode != "0" -> {
+                showErrorDialog(errorCode, errorMsg)
+            }
+
+            else -> {
+                showExitGameDialog()
+            }
         }
     }
 
@@ -1261,7 +1297,7 @@ class GameActivity : AppCompatActivity() {
                 gameSettings?.release()
                 finish()
                 GameManager.gameStat("结束游戏", "click", mapOf(
-                    "sdk_platform" to "海马云",
+                    "sdk_platform" to GameManager.getGameParam()?.channel,
                 ))
             }
             .build().show()
@@ -1442,5 +1478,51 @@ class GameActivity : AppCompatActivity() {
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onPlayPartyRoomSoundAndMicrophoneStateEvent(event: PlayPartyRoomSoundAndMicrophoneStateEvent) {
         playPartyGameView?.setSoundAndMicrophoneState(event.soundState, event.microphoneState)
+    }
+
+    private fun showConfiguredDialog(configInfo: ErrorConfigInfo) {
+        AppCommonDialog.Builder(this)
+            .setTitle(configInfo.title)
+            .setSubTitle(configInfo.subtitle, Color.parseColor("#FF555A69"))
+            .setLeftButton(getString(R.string.exit)) {
+                AppCommonDialog.hideDialog(this)
+                GameManager.releaseGame(finish = "1", bundle = null)
+                gameSettings?.release()
+                finish()
+            }
+            .setRightButton("吐槽一下") {
+                lifecycleScope.launch {
+                    AppCommonDialog.hideDialog(this@GameActivity)
+                    // 这里通过协程添加延时的原因是如果hide上一个弹窗的同时，马上去显示下一个弹窗
+                    // 会导致下一个弹窗无法显示，所以这里加一个延时
+                    delay(30)
+                    showFeedbackSubmissionSuccessAlert(configInfo)
+                }
+            }
+            .build().show()
+    }
+
+    /**
+     * 吐槽弹窗
+     */
+    private fun showFeedbackSubmissionSuccessAlert(configInfo: ErrorConfigInfo) {
+        val logMap = hashMapOf(
+            "ecode_content" to "${configInfo.title}+${configInfo.androidCode}"
+        )
+        GameManager.gameEsStat("game_error", "拦截报错弹窗", "show", logMap.toString())
+
+        AppCommonDialog.Builder(this)
+            .setTitle("提交成功")
+            .setSubTitle(
+                "已提交相关人员处理你的吐槽，如果在后续过程中有\r\n任何问题,不要犹豫，立即联系客服哦",
+                Color.parseColor("#FF555A69")
+            )
+            .setRightButton("知道了") {
+                AppCommonDialog.hideDialog(this)
+                GameManager.releaseGame(finish = "1", bundle = null)
+                gameSettings?.release()
+                finish()
+            }
+            .build().show()
     }
 }
