@@ -266,7 +266,7 @@ class GameActivity : AppCompatActivity() {
             initPlayPartyView()
         }
         GameManager.gameStat("游戏界面", "show", mapOf(
-            "sdk_platform" to "海马云",
+            "sdk_platform" to GameManager.getGameParam()?.channel,
             "gamepage_type" to "游戏界面",
         ))
     }
@@ -644,7 +644,7 @@ class GameActivity : AppCompatActivity() {
 
     private fun showGameSetting() {
         GameManager.gameStat("游戏界面", "show", mapOf(
-            "sdk_platform" to "海马云",
+            "sdk_platform" to GameManager.getGameParam()?.channel,
             "gamepage_type" to "设置页面",
         ))
         dataBinding.btnGameSettings.visibility = View.INVISIBLE
@@ -1297,7 +1297,7 @@ class GameActivity : AppCompatActivity() {
                 gameSettings?.release()
                 finish()
                 GameManager.gameStat("结束游戏", "click", mapOf(
-                    "sdk_platform" to "海马云",
+                    "sdk_platform" to GameManager.getGameParam()?.channel,
                 ))
             }
             .build().show()

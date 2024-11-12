@@ -257,7 +257,7 @@ class AtGameActivity : AppCompatActivity() {
 //        showSaveTips()
         GameManager.gameStat(
             "游戏界面", "show", mapOf(
-                "sdk_platform" to "安通",
+                "sdk_platform" to GameManager.getGameParam()?.channel,
                 "gamepage_type" to "游戏界面",
             )
         )
@@ -428,7 +428,7 @@ class AtGameActivity : AppCompatActivity() {
     private fun showGameSetting() {
         GameManager.gameStat(
             "游戏界面", "show", mapOf(
-                "sdk_platform" to "安通",
+                "sdk_platform" to GameManager.getGameParam()?.channel,
                 "gamepage_type" to "设置页面",
             )
         )
@@ -549,7 +549,7 @@ class AtGameActivity : AppCompatActivity() {
 
             override fun getNetDelay(): Int {
                 val netDelay = AnTongSDK.anTongVideoView?.clockDiffVideoLatencyInfo?.netDelay
-                return netDelay ?: 999
+                return netDelay?.toInt() ?: 999
             }
 
             override fun getPacketsLostRate(): String {
@@ -576,7 +576,7 @@ class AtGameActivity : AppCompatActivity() {
                 gameSettings?.release()
                 GameManager.gameStat(
                     "结束游戏", "click", mapOf(
-                        "sdk_platform" to "安通",
+                        "sdk_platform" to GameManager.getGameParam()?.channel,
                     )
                 )
             }

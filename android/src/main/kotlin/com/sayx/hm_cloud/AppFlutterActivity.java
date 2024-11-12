@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 import com.blankj.utilcode.util.LogUtils;
 import com.gyf.immersionbar.BarHide;
 import com.gyf.immersionbar.ImmersionBar;
+import com.sayx.hm_cloud.model.GameParam;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +37,10 @@ public class AppFlutterActivity extends FlutterActivity {
         }
 
         Map<String, Object> map = new HashMap<>();
-        map.put("sdk_platform", GameManager.INSTANCE.isAnTong() ? "at" : "hmy");
+        GameParam gameParam = GameManager.INSTANCE.getGameParam();
+        if (gameParam != null) {
+            map.put("sdk_platform", gameParam.getChannel());
+        }
         map.put("gamepage_type", "充值中心");
         GameManager.INSTANCE.gameStat("游戏界面", "show", map, "event");
     }

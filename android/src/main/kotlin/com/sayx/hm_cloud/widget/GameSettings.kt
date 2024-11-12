@@ -86,6 +86,7 @@ class GameSettings @JvmOverloads constructor(
         // 可用时长点击，添加可用时长
         dataBinding.tvAvailableTime.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
+                "sdk_platform" to GameManager.getGameParam()?.channel,
                 "gamepage_type" to "设置页面",
                 "clickup_content" to "加号",
             ))
@@ -94,6 +95,7 @@ class GameSettings @JvmOverloads constructor(
         }
         dataBinding.btnRecharge.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
+                "sdk_platform" to GameManager.getGameParam()?.channel,
                 "gamepage_type" to "设置页面",
                 "clickup_content" to dataBinding.btnRecharge.text,
             ))
@@ -115,6 +117,7 @@ class GameSettings @JvmOverloads constructor(
         // 调试码点击，复制调试码到剪切板
         dataBinding.tvDebugCode.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
+                "sdk_platform" to GameManager.getGameParam()?.channel,
                 "gamepage_type" to "设置页面",
                 "clickup_content" to "调试码",
             ))
@@ -123,6 +126,7 @@ class GameSettings @JvmOverloads constructor(
         // 控制方法
         dataBinding.btnGamepad.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
+                "sdk_platform" to GameManager.getGameParam()?.channel,
                 "gamepage_type" to "设置页面",
                 "clickup_content" to "手柄",
             ))
@@ -131,6 +135,7 @@ class GameSettings @JvmOverloads constructor(
         }
         dataBinding.btnKeyboard.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
+                "sdk_platform" to GameManager.getGameParam()?.channel,
                 "gamepage_type" to "设置页面",
                 "clickup_content" to "键盘",
             ))
@@ -139,6 +144,7 @@ class GameSettings @JvmOverloads constructor(
         }
         dataBinding.btnCustom.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
+                "sdk_platform" to GameManager.getGameParam()?.channel,
                 "gamepage_type" to "设置页面",
                 "clickup_content" to "自定义",
             ))
@@ -152,6 +158,7 @@ class GameSettings @JvmOverloads constructor(
         // 震动开关
         dataBinding.btnVibrate.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
+                "sdk_platform" to GameManager.getGameParam()?.channel,
                 "gamepage_type" to "设置页面",
                 "clickup_content" to "震动",
             ))
@@ -164,6 +171,7 @@ class GameSettings @JvmOverloads constructor(
         // 静音开关
         dataBinding.btnMute.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
+                "sdk_platform" to GameManager.getGameParam()?.channel,
                 "gamepage_type" to "设置页面",
                 "clickup_content" to "静音",
             ))
@@ -179,6 +187,7 @@ class GameSettings @JvmOverloads constructor(
         // 画质选择
         dataBinding.tvQuality.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
+                "sdk_platform" to GameManager.getGameParam()?.channel,
                 "gamepage_type" to "设置页面",
                 "clickup_content" to "画质切换",
             ))
@@ -187,6 +196,7 @@ class GameSettings @JvmOverloads constructor(
         }
         dataBinding.tvStandardQuality.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
+                "sdk_platform" to GameManager.getGameParam()?.channel,
                 "gamepage_type" to "设置页面",
                 "clickup_content" to "画质切换-标清",
             ))
@@ -202,6 +212,7 @@ class GameSettings @JvmOverloads constructor(
         }
         dataBinding.tvBlueRay.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
+                "sdk_platform" to GameManager.getGameParam()?.channel,
                 "gamepage_type" to "设置页面",
                 "clickup_content" to "画质切换-蓝光",
             ))
@@ -223,6 +234,7 @@ class GameSettings @JvmOverloads constructor(
         // 云游互动开关
         dataBinding.btnInteraction.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
+                "sdk_platform" to GameManager.getGameParam()?.channel,
                 "gamepage_type" to "设置页面",
                 "clickup_content" to "云游互动",
             ))
@@ -245,6 +257,7 @@ class GameSettings @JvmOverloads constructor(
         // 鼠标点击
         dataBinding.btnMouseClick.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
+                "sdk_platform" to GameManager.getGameParam()?.channel,
                 "gamepage_type" to "设置页面",
                 "clickup_content" to "鼠标点击",
             ))
@@ -259,6 +272,7 @@ class GameSettings @JvmOverloads constructor(
         // 触控点击
         dataBinding.btnTouchClick.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
+                "sdk_platform" to GameManager.getGameParam()?.channel,
                 "gamepage_type" to "设置页面",
                 "clickup_content" to "触控点击",
             ))
@@ -273,6 +287,7 @@ class GameSettings @JvmOverloads constructor(
         // 触屏攻击
         dataBinding.btnTouchAttack.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
+                "sdk_platform" to GameManager.getGameParam()?.channel,
                 "gamepage_type" to "设置页面",
                 "clickup_content" to "触屏不攻击",
             ))
@@ -287,6 +302,7 @@ class GameSettings @JvmOverloads constructor(
         // 退出游戏
         dataBinding.btnExitGame.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
+                "sdk_platform" to GameManager.getGameParam()?.channel,
                 "gamepage_type" to "设置页面",
                 "clickup_content" to "退出游戏",
             ))
@@ -461,7 +477,7 @@ class GameSettings @JvmOverloads constructor(
             dataBinding.sbSensitivity.progress = sensitivity
             (gameView as HmcpVideoView).mouseSensitivity = sensitivity / 10f
         } else if (gameView is AnTongVideoView) {
-            val sensitivity = SPUtils.getInstance().getInt(GameConstants.mouseSensitivity, 30)
+            val sensitivity = SPUtils.getInstance().getInt(GameConstants.mouseSensitivity, 10)
             dataBinding.sbSensitivity.max = 60
             dataBinding.sbSensitivity.progress = sensitivity
             (gameView as AnTongVideoView).setMouseSensitivity(sensitivity / 10f)
@@ -693,7 +709,7 @@ class GameSettings @JvmOverloads constructor(
             return
         }
         GameManager.gameStat("游戏界面", "show", mapOf(
-            "sdk_platform" to "海马云",
+            "sdk_platform" to GameManager.getGameParam()?.channel,
             "gamepage_type" to "时长不足",
         ))
         val animatorSet = AnimatorSet()

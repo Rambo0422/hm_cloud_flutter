@@ -240,20 +240,6 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
                 GameManager.setErrorDialogConfig(dialogConfig)
             }
 
-            "getCToken" -> {
-                if (arguments is Map<*, *>) {
-                    val cToken = CryptoUtils.generateCToken(
-                        arguments["pkgName"] as String,
-                        arguments["userId"] as String,
-                        arguments["userToken"] as String,
-                        arguments["bid"] as String,
-                        arguments["channelId"] as String,
-                        arguments["accessKey"] as String
-                    )
-                    callback.success(cToken)
-                }
-            }
-
             "updateUserRechargeStatus" -> {
                 if (arguments is Map<*, *>) {
                     GameManager.updateUserRechargeStatus(arguments)

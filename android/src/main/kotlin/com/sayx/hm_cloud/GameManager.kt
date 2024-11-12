@@ -957,7 +957,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
     fun gameStat(
         page: String,
         action: String,
-        arg: Map<String, Any>? = null,
+        arg: Map<String, Any?>? = null,
         type: String = "event"
     ) {
         channel.invokeMethod(
