@@ -84,6 +84,12 @@
                 android:src="@drawable/img_setting_guide_finger" />
         </LinearLayout>
 
+        <com.sayx.hm_cloud.widget.LoadingView
+            android:id="@+id/layout_loading"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+
         <!-- 游戏设置按钮 -->
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/btn_game_settings"

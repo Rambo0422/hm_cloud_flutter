@@ -8,6 +8,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.media.atkit.AnTongManager
 import com.media.atkit.Constants
 import com.media.atkit.beans.ChannelInfo
+import com.media.atkit.beans.IntentExtraData
 import com.media.atkit.beans.UserInfo
 import com.media.atkit.listeners.AnTongPlayerListener
 import com.media.atkit.listeners.OnGameIsAliveListener
@@ -21,6 +22,7 @@ import com.sayx.hm_cloud.constants.KeyType
 import com.sayx.hm_cloud.constants.calStickValue
 import com.sayx.hm_cloud.constants.resetDirectionMap
 import com.sayx.hm_cloud.constants.stickKeyMaps
+import com.sayx.hm_cloud.model.AccountInfo
 import com.sayx.hm_cloud.model.ArchiveData
 import com.sayx.hm_cloud.model.ArchiveInfo
 import com.sayx.hm_cloud.model.Direction
@@ -95,7 +97,14 @@ object AnTongSDK {
         bundle.putString(AnTongVideoView.BUSINESS_GAME_ID, gameParam.gameId)
         bundle.putString(AnTongVideoView.SIGN, gameParam.cToken)
         bundle.putInt(AnTongVideoView.NO_INPUT_TIMEOUT, 10 * 60)
-
+        gameParam.accountInfo?.let { accountInfo ->
+//            LogUtils.d("AccountInfo 1:${accountInfo.javaClass}")
+            val result = GameManager.gson.fromJson(GameManager.gson.toJson(accountInfo), AccountInfo::class.java)
+//            LogUtils.d("AccountInfo 2:${result.json}")
+            anTongVideoView?.setExtraData(IntentExtraData().also {
+                it.setStringExtra(GameUtils.getStringData(result))
+            })
+        }
         if (archiveData?.custodian == "3a") {
             val archiveInfo = archiveData.list?.firstOrNull()
             val richDataBundle = richDataBundle(gameParam.gameId, archiveInfo)
