@@ -75,6 +75,7 @@ import com.sayx.hm_cloud.widget.EditCombineKey
 import com.sayx.hm_cloud.widget.EditRouletteKey
 import com.sayx.hm_cloud.widget.GameNoticeView
 import com.sayx.hm_cloud.widget.GameSettings
+import com.sayx.hm_cloud.widget.LoadingView
 import io.reactivex.rxjava3.core.Observer
 import io.reactivex.rxjava3.disposables.Disposable
 import org.greenrobot.eventbus.EventBus
@@ -153,6 +154,7 @@ class AtGameActivity : AppCompatActivity() {
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.MATCH_PARENT
         )
+        anTongVideoView?.setAttachContext(this)
         dataBinding.gameController.addView(anTongVideoView, 0, layoutParams)
         anTongVideoView?.setHmcpPlayerListener(object : AnTongPlayerListener {
             override fun antongPlayerStatusCallback(callback: String?) {
@@ -425,6 +427,10 @@ class AtGameActivity : AppCompatActivity() {
         }
     }
 
+    private fun showLoading() {
+        dataBinding.layoutLoading.visibility = View.VISIBLE
+    }
+
     private fun showGameSetting() {
         GameManager.gameStat(
             "游戏界面", "show", mapOf(
@@ -571,6 +577,11 @@ class AtGameActivity : AppCompatActivity() {
             }
             .setRightButton(getString(R.string.confirm)) {
                 LogUtils.d("exitGameByUser")
+                AppCommonDialog.hideDialog(
+                    this,
+                    "hideExitGameDialog"
+                )
+                showLoading()
                 AnTongSDK.stopGame()
                 GameManager.releaseGame(finish = "1")
                 gameSettings?.release()

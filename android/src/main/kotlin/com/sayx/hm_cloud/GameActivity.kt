@@ -7,8 +7,11 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.hardware.input.InputManager
 import android.media.AudioManager
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
 import android.text.TextUtils
 import android.view.Gravity
@@ -136,6 +139,11 @@ class GameActivity : AppCompatActivity() {
     // 剪切板
     private val clipboardManager: ClipboardManager by lazy {
         getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    }
+
+    // 设备连接监听
+    private val inputManager : InputManager by lazy {
+        this.getSystemService(Context.INPUT_SERVICE) as InputManager
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -385,7 +393,7 @@ class GameActivity : AppCompatActivity() {
             dataBinding.layoutGame.addView(gameSettings, layoutParams)
         }
 
-        // 页面初始化完成，获取数据根据数据进行同步处理
+//        checkInputDevices()
         GameManager.getGameData()
         if (GameManager.isPartyPlay) {
             GameManager.updatePlayPartyRoomInfo()
@@ -1140,20 +1148,6 @@ class GameActivity : AppCompatActivity() {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onPCMouseEvent(event: PCMouseEvent) {
-        LogUtils.d("onPCMouseEvent:${event.open}")
-        if (event.open) {
-            dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
-            gameSettings?.controllerType = AppVirtualOperateType.NONE
-            // PC模式，关闭鼠标操作
-            gameSettings?.setPCMouseMode(false)
-        } else {
-            // 非PC模式，打开鼠标操作
-            gameSettings?.setPCMouseMode(true)
-        }
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
     fun onControllerConfigEvent(event: ControllerConfigEvent) {
         dataBinding.gameController.setControllerData(event.data)
     }
@@ -1524,5 +1518,67 @@ class GameActivity : AppCompatActivity() {
                 finish()
             }
             .build().show()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        inputManager.registerInputDeviceListener(inputDeviceListener, Handler(Looper.getMainLooper()))
+    }
+
+    override fun onStop() {
+        super.onStop()
+        inputManager.unregisterInputDeviceListener(inputDeviceListener)
+    }
+
+    private val inputDeviceListener = object : InputManager.InputDeviceListener {
+        override fun onInputDeviceAdded(deviceId: Int) {
+            checkInputDevices()
+        }
+
+        override fun onInputDeviceRemoved(deviceId: Int) {
+            LogUtils.v("检测到设备移除:$deviceId", "GameManager")
+            checkInputDevices()
+        }
+
+        override fun onInputDeviceChanged(deviceId: Int) {
+            checkInputDevices()
+        }
+    }
+
+    private fun checkInputDevices() {
+        val inputDeviceIds = inputManager.inputDeviceIds
+        var pcMouseMode = false
+        if (inputDeviceIds.isNotEmpty()) {
+            inputDeviceIds.forEach { deviceId ->
+                val inputDevice = inputManager.getInputDevice(deviceId)
+                inputDevice?.let {
+                    when {
+                        GameUtils.isGamePadController(it) -> {
+                            LogUtils.v("检测到外设手柄:$deviceId, device:${inputDevice.name}", "GameManager")
+                            pcMouseMode = true
+                        }
+
+                        GameUtils.isKeyBoardController(it) -> {
+                            LogUtils.v("检测到外设键盘:$deviceId, device:${inputDevice.name}", "GameManager")
+                            pcMouseMode = true
+                        }
+
+                        GameUtils.isMouseController(it) -> {
+                            LogUtils.v("检测到外设鼠标:$deviceId, device:${inputDevice.name}", "GameManager")
+                            pcMouseMode = true
+                        }
+
+                        else -> {
+//                    LogUtils.d("checkInputDevice->other:$inputDevice")
+                        }
+                    }
+                }
+            }
+        }
+        if (pcMouseMode) {
+            dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
+            gameSettings?.controllerType = AppVirtualOperateType.NONE
+        }
+        GameManager.gameView?.setPCMouseMode(pcMouseMode)
     }
 }
