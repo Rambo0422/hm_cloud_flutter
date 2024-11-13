@@ -45,7 +45,6 @@ import com.sayx.hm_cloud.callback.EditCallback
 import com.sayx.hm_cloud.callback.GameSettingChangeListener
 import com.sayx.hm_cloud.callback.HideListener
 import com.sayx.hm_cloud.callback.OnEditClickListener
-import com.sayx.hm_cloud.callback.OnTypeListener
 import com.sayx.hm_cloud.constants.AppVirtualOperateType
 import com.sayx.hm_cloud.constants.ControllerStatus
 import com.sayx.hm_cloud.constants.GameConstants
@@ -53,7 +52,6 @@ import com.sayx.hm_cloud.constants.KeyType
 import com.sayx.hm_cloud.constants.controllerStatus
 import com.sayx.hm_cloud.databinding.ActivityGameBinding
 import com.sayx.hm_cloud.dialog.AppCommonDialog
-import com.sayx.hm_cloud.dialog.ControllerTypeDialog
 import com.sayx.hm_cloud.http.repository.AppRepository
 import com.sayx.hm_cloud.http.bean.HttpResponse
 import com.sayx.hm_cloud.model.ControllerChangeEvent
@@ -75,7 +73,7 @@ import com.sayx.hm_cloud.widget.EditCombineKey
 import com.sayx.hm_cloud.widget.EditRouletteKey
 import com.sayx.hm_cloud.widget.GameNoticeView
 import com.sayx.hm_cloud.widget.GameSettings
-import com.sayx.hm_cloud.widget.LoadingView
+import com.sayx.hm_cloud.widget.KeyboardListView
 import io.reactivex.rxjava3.core.Observer
 import io.reactivex.rxjava3.disposables.Disposable
 import org.greenrobot.eventbus.EventBus
@@ -510,11 +508,10 @@ class AtGameActivity : AppCompatActivity() {
             override fun onExitGame() {
                 LogUtils.d("onExitGame")
                 showExitGameDialog()
-//                checkArchiveStatus()
             }
 
-            override fun onCustomSettings() {
-                showChooseControllerDialog()
+            override fun onMoreKeyboard() {
+                showKeyboardList()
             }
 
             override fun onShowVipDialog() {
@@ -611,18 +608,12 @@ class AtGameActivity : AppCompatActivity() {
             .build().show("hideJoinVipDialog")
     }
 
-    private fun showChooseControllerDialog() {
-        ControllerTypeDialog.showDialog(this, object : OnTypeListener {
-            override fun onKeyboardType() {
-                ControllerTypeDialog.hideDialog(this@AtGameActivity)
-                showControllerEdit(AppVirtualOperateType.APP_KEYBOARD)
-            }
-
-            override fun onGamepadType() {
-                ControllerTypeDialog.hideDialog(this@AtGameActivity)
-                showControllerEdit(AppVirtualOperateType.APP_STICK_XBOX)
-            }
-        })
+    private fun showKeyboardList() {
+        GameManager.gameStat("游戏界面", "show", mapOf(
+            "sdk_platform" to GameManager.getGameParam()?.channel,
+            "gamepage_type" to "按键列表",
+        ))
+        KeyboardListView.show(dataBinding.layoutGame)
     }
 
     private fun showControllerEdit(type: AppVirtualOperateType) {

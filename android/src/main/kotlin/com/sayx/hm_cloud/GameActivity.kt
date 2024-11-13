@@ -53,7 +53,6 @@ import com.sayx.hm_cloud.callback.EditCallback
 import com.sayx.hm_cloud.callback.GameSettingChangeListener
 import com.sayx.hm_cloud.callback.HideListener
 import com.sayx.hm_cloud.callback.OnEditClickListener
-import com.sayx.hm_cloud.callback.OnTypeListener
 import com.sayx.hm_cloud.constants.AppVirtualOperateType
 import com.sayx.hm_cloud.constants.ControllerStatus
 import com.sayx.hm_cloud.constants.GameConstants
@@ -63,7 +62,6 @@ import com.sayx.hm_cloud.constants.OnRockerOperationListenerImp
 import com.sayx.hm_cloud.constants.controllerStatus
 import com.sayx.hm_cloud.databinding.ActivityGameBinding
 import com.sayx.hm_cloud.dialog.AppCommonDialog
-import com.sayx.hm_cloud.dialog.ControllerTypeDialog
 import com.sayx.hm_cloud.dialog.GameErrorDialog
 import com.sayx.hm_cloud.http.bean.HttpResponse
 import com.sayx.hm_cloud.http.repository.AppRepository
@@ -77,7 +75,6 @@ import com.sayx.hm_cloud.model.GameErrorEvent
 import com.sayx.hm_cloud.model.GameNotice
 import com.sayx.hm_cloud.model.GameParam
 import com.sayx.hm_cloud.model.KeyInfo
-import com.sayx.hm_cloud.model.PCMouseEvent
 import com.sayx.hm_cloud.model.PartyPlayWantPlay
 import com.sayx.hm_cloud.model.PlayPartyRoomInfoEvent
 import com.sayx.hm_cloud.model.PlayPartyRoomSoundAndMicrophoneStateEvent
@@ -94,6 +91,7 @@ import com.sayx.hm_cloud.widget.EditRouletteKey
 import com.sayx.hm_cloud.widget.ExitNoticeView
 import com.sayx.hm_cloud.widget.GameNoticeView
 import com.sayx.hm_cloud.widget.GameSettings
+import com.sayx.hm_cloud.widget.KeyboardListView
 import com.sayx.hm_cloud.widget.PlayPartyGameView
 import com.sayx.hm_cloud.widget.PlayPartyPermissionView
 import com.sayx.hm_cloud.widget.PlayPartyUserAvatarView
@@ -548,11 +546,10 @@ class GameActivity : AppCompatActivity() {
             override fun onExitGame() {
                 LogUtils.d("onExitGame")
                 showExitGameDialog()
-//                checkArchiveStatus()
             }
 
-            override fun onCustomSettings() {
-                showChooseControllerDialog()
+            override fun onMoreKeyboard() {
+                showKeyboardList()
             }
 
             override fun onShowVipDialog() {
@@ -601,55 +598,6 @@ class GameActivity : AppCompatActivity() {
         }
     }
 
-    private fun checkArchiveStatus() {
-        HmcpManager.getInstance()
-            .getGameArchiveStatus(
-                GameManager.getGameParam()?.gamePkName,
-                UserInfo().also {
-                    it.userId = GameManager.getGameParam()?.userId
-                    it.userToken = GameManager.getGameParam()?.userToken
-                },
-                GameManager.getGameParam()?.accessKeyId,
-                GameManager.getGameParam()?.channelName,
-                object : OnSaveGameCallBackListener {
-                    override fun success(result: Boolean) {
-                        LogUtils.d("GameArchive->success:$result")
-                        if (result) {
-                            showExitGameDialog()
-                        } else {
-                            showSaveGameDialog()
-                        }
-                    }
-
-                    override fun fail(msg: String?) {
-                        LogUtils.d("GameArchive->fail:$msg")
-                        showExitGameDialog()
-                    }
-                })
-    }
-
-    private fun showSaveGameDialog() {
-        GameManager.gameStat("游戏界面-正在存档", "show")
-        AppCommonDialog.Builder(this)
-            .setTitle("正在存档中")
-            .setSubTitle(
-                "存档文件较大，正在上传，直接退出会导致存档丢失",
-                subTitleColor = Color.parseColor("#FFA3ACBD")
-            )
-            .setLeftButton("退出游戏") {
-                GameManager.gameStat("游戏界面-正在存档-退出游戏", "click")
-                LogUtils.d("exitGameByUser")
-                GameManager.releaseGame(finish = "1", bundle = null)
-                gameSettings?.release()
-                finish()
-            }
-            .setRightButton("继续等待") {
-                GameManager.gameStat("游戏界面-正在存档-继续等待", "click")
-                AppCommonDialog.hideDialog(this@GameActivity)
-            }
-            .build().show()
-    }
-
     private fun showGameSetting() {
         GameManager.gameStat("游戏界面", "show", mapOf(
             "sdk_platform" to GameManager.getGameParam()?.channel,
@@ -660,18 +608,12 @@ class GameActivity : AppCompatActivity() {
         gameSettings?.showLayout()
     }
 
-    private fun showChooseControllerDialog() {
-        ControllerTypeDialog.showDialog(this, object : OnTypeListener {
-            override fun onKeyboardType() {
-                ControllerTypeDialog.hideDialog(this@GameActivity)
-                showControllerEdit(AppVirtualOperateType.APP_KEYBOARD)
-            }
-
-            override fun onGamepadType() {
-                ControllerTypeDialog.hideDialog(this@GameActivity)
-                showControllerEdit(AppVirtualOperateType.APP_STICK_XBOX)
-            }
-        })
+    private fun showKeyboardList() {
+        GameManager.gameStat("游戏界面", "show", mapOf(
+            "sdk_platform" to GameManager.getGameParam()?.channel,
+            "gamepage_type" to "按键列表",
+        ))
+        KeyboardListView.show(dataBinding.layoutGame)
     }
 
     private fun showControllerEdit(type: AppVirtualOperateType) {

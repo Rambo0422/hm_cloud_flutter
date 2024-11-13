@@ -670,31 +670,19 @@
                     app:drawableTop="@drawable/selector_keyboard"
                     tools:visibility="visible" />
 
-                <FrameLayout
+                <com.sayx.hm_cloud.widget.DrawableTextView
+                    android:id="@+id/btn_more_keyboard"
                     android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:layout_height="64dp"
-                    android:layout_weight="1">
-
-                    <com.sayx.hm_cloud.widget.DrawableTextView
-                        android:id="@+id/btn_custom"
-                        android:layout_width="match_parent"
-                        android:layout_height="64dp"
-                        android:drawablePadding="5dp"
-                        android:gravity="center"
-                        android:text="@string/custom"
-                        android:textColor="#ADB5CD"
-                        android:textSize="10sp"
-                        app:drawableSize="40dp"
-                        app:drawableTop="@drawable/selector_custom"
-                        tools:visibility="visible" />
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:layout_width="15dp"
-                        android:layout_height="15dp"
-                        android:layout_gravity="end|top"
-                        android:layout_marginEnd="5dp"
-                        android:src="@drawable/icon_vip_sign" />
-                </FrameLayout>
+                    android:drawablePadding="5dp"
+                    android:gravity="center"
+                    android:text="@string/more_keyboard"
+                    android:textColor="#ADB5CD"
+                    android:textSize="10sp"
+                    app:drawableSize="40dp"
+                    app:drawableTop="@drawable/icon_more_keyboard"
+                    tools:visibility="visible" />
             </LinearLayout>
 
             <androidx.appcompat.widget.AppCompatTextView

@@ -149,7 +149,7 @@
     <string name="exit">退出</string>
     <string name="debug_code">调试码</string>
     <string name="control_method">操作方式</string>
-    <string name="custom">自定义</string>
+    <string name="more_keyboard">更多按键</string>
     <string name="gamepad_control">官方手柄</string>
     <string name="keyboard_control">官方键鼠</string>
     <string name="mouse_editable_notice">连接外设情况下，鼠标设置无法修改</string>
@@ -174,4 +174,6 @@
     <string name="limit_activity">限时活动</string>
     <string name="game_notice_title">温馨提示</string>
     <string name="hint_hide_notice">点击任意地方隐藏展示</string>
+    <string name="gamepad_config">手柄配置</string>
+    <string name="keyboard_config">键鼠配置</string>
 </resources>

@@ -142,18 +142,14 @@ class GameSettings @JvmOverloads constructor(
             controllerType = AppVirtualOperateType.APP_KEYBOARD
             gameSettingChangeListener?.onControlMethodChange(AppVirtualOperateType.APP_KEYBOARD)
         }
-        dataBinding.btnCustom.setOnClickListener {
+        dataBinding.btnMoreKeyboard.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
                 "sdk_platform" to GameManager.getGameParam()?.channel,
                 "gamepage_type" to "设置页面",
-                "clickup_content" to "自定义",
+                "clickup_content" to "更多按键",
             ))
             hideLayout()
-            if (GameManager.getGameParam()?.isVip() == true) {
-                gameSettingChangeListener?.onCustomSettings()
-            } else {
-                gameSettingChangeListener?.onShowVipDialog()
-            }
+            gameSettingChangeListener?.onMoreKeyboard()
         }
         // 震动开关
         dataBinding.btnVibrate.setOnClickListener {
