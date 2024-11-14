@@ -3,12 +3,15 @@ package com.sayx.hm_cloud.widget
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.GridLayoutManager
 import com.sayx.hm_cloud.R
-import com.sayx.hm_cloud.databinding.ViewGameSettingsBinding
+import com.sayx.hm_cloud.adapter.KeyboardAdapter
+import com.sayx.hm_cloud.callback.KeyboardClickListener
 import com.sayx.hm_cloud.databinding.ViewKeyboardListBinding
 
 class KeyboardListView @JvmOverloads constructor(
@@ -20,6 +23,50 @@ class KeyboardListView @JvmOverloads constructor(
     private var dataBinding: ViewKeyboardListBinding = DataBindingUtil
         .inflate(LayoutInflater.from(context), R.layout.view_keyboard_list, this, true)
 
+    private val gamepadAdapter: KeyboardAdapter by lazy {
+        KeyboardAdapter().apply {
+            keyboardClickListener = object : KeyboardClickListener {
+                override fun onAddClick() {
+
+                }
+
+                override fun onEditClick() {
+
+                }
+
+                override fun onDeleteClick() {
+
+                }
+
+                override fun onUseClick() {
+
+                }
+            }
+        }
+    }
+
+    private val keyboardAdapter: KeyboardAdapter by lazy {
+        KeyboardAdapter().apply {
+            keyboardClickListener = object : KeyboardClickListener {
+                override fun onAddClick() {
+
+                }
+
+                override fun onEditClick() {
+
+                }
+
+                override fun onDeleteClick() {
+
+                }
+
+                override fun onUseClick() {
+
+                }
+            }
+        }
+    }
+
     init {
         initView()
     }
@@ -28,6 +75,10 @@ class KeyboardListView @JvmOverloads constructor(
         dataBinding.ivBack.setOnClickListener {
             hide()
         }
+        dataBinding.rvGamepad.layoutManager = GridLayoutManager(context, 2)
+        dataBinding.rvGamepad.adapter = gamepadAdapter
+        dataBinding.rvKeyboard.layoutManager = GridLayoutManager(context, 2)
+        dataBinding.rvKeyboard.adapter = keyboardAdapter
     }
 
     companion object {

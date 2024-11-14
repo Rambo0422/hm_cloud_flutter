@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_keyboard_info"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:background="@drawable/selector_keyboard_bg"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:visibility="gone"
+            tools:visibility="visible"
+            android:padding="7.5dp"
+            tools:ignore="SmallSp">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iv_icon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:src="@drawable/icon_gamepad_item" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
+                android:ellipsize="end"
+                android:lines="1"
+                android:textColor="@android:color/white"
+                android:textSize="11sp"
+                app:layout_constraintEnd_toStartOf="@id/btn_edit"
+                app:layout_constraintStart_toEndOf="@id/iv_icon"
+                app:layout_constraintTop_toTopOf="@id/iv_icon"
+                tools:text="xxxx手柄按键" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iv_avatar"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                app:layout_constraintBottom_toBottomOf="@id/iv_icon"
+                app:layout_constraintStart_toStartOf="@id/tv_name"
+                tools:src="@drawable/icon_official" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_sharer_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="3dp"
+                android:layout_marginEnd="8dp"
+                android:ellipsize="end"
+                android:lines="1"
+                android:textColor="#FF787D8A"
+                android:textSize="10sp"
+                app:layout_constraintBottom_toBottomOf="@id/iv_avatar"
+                app:layout_constraintEnd_toStartOf="@id/btn_edit"
+                app:layout_constraintStart_toEndOf="@id/iv_avatar"
+                app:layout_constraintTop_toTopOf="@id/iv_avatar"
+                tools:text="xxxx分享" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/btn_delete"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_marginTop="-7.5dp"
+                android:layout_marginEnd="-7.5dp"
+                android:src="@drawable/icon_delete_keyboard"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/btn_use"
+                android:layout_width="50dp"
+                android:layout_height="25dp"
+                android:layout_marginEnd="15dp"
+                android:background="@drawable/selector_btn_use"
+                android:gravity="center"
+                android:text="@string/use"
+                android:textColor="@color/selector_switch_tab_color"
+                android:textSize="10sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iv_sign"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_marginTop="-5dp"
+                android:src="@drawable/icon_vip_sign"
+                android:visibility="invisible"
+                app:layout_constraintEnd_toEndOf="@id/btn_use"
+                app:layout_constraintTop_toTopOf="@id/btn_use"
+                tools:visibility="visible" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/btn_edit"
+                android:layout_width="50dp"
+                android:layout_height="25dp"
+                android:layout_marginEnd="7dp"
+                android:background="@drawable/selector_btn_use"
+                android:gravity="center"
+                android:text="@string/edit"
+                android:textColor="@color/selector_switch_tab_color"
+                android:textSize="10sp"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/btn_use"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="visible" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <FrameLayout
+            android:id="@+id/layout_empty"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:background="@drawable/shape_keyboard_empty">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:src="@drawable/icon_add_keyboard" />
+        </FrameLayout>
+    </FrameLayout>
+</layout>

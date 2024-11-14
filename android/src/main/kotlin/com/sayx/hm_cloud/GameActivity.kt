@@ -40,10 +40,8 @@ import com.gyf.immersionbar.ktx.immersionBar
 import com.gyf.immersionbar.ktx.navigationBarHeight
 import com.haima.hmcp.HmcpManager
 import com.haima.hmcp.beans.ResolutionInfo
-import com.haima.hmcp.beans.UserInfo
 import com.haima.hmcp.beans.VideoDelayInfo
 import com.haima.hmcp.listeners.OnLivingListener
-import com.haima.hmcp.listeners.OnSaveGameCallBackListener
 import com.haima.hmcp.rtc.widgets.beans.RtcVideoDelayInfo
 import com.haima.hmcp.widgets.beans.VirtualOperateType
 import com.sayx.hm_cloud.callback.AddKeyListenerImp
@@ -260,9 +258,6 @@ class GameActivity : AppCompatActivity() {
         // 初始化设置面板
         initGameSettings()
 
-        // 展示存档提示
-//        showSaveTips()
-
         if (GameManager.isPartyPlay) {
             if (GameManager.isPartyPlayOwner) {
                 GameManager.queryControlUsers()
@@ -271,10 +266,12 @@ class GameActivity : AppCompatActivity() {
             GameManager.sendCurrentCid()
             initPlayPartyView()
         }
-        GameManager.gameStat("游戏界面", "show", mapOf(
-            "sdk_platform" to GameManager.getGameParam()?.channel,
-            "gamepage_type" to "游戏界面",
-        ))
+        GameManager.gameStat(
+            "游戏界面", "show", mapOf(
+                "sdk_platform" to GameManager.getGameParam()?.channel,
+                "gamepage_type" to GameManager.getGameParam()?.gameType,
+            )
+        )
     }
 
     private var playPartyGameView: PlayPartyGameView? = null
@@ -390,12 +387,10 @@ class GameActivity : AppCompatActivity() {
         dataBinding.layoutGame.post {
             dataBinding.layoutGame.addView(gameSettings, layoutParams)
         }
-
-//        checkInputDevices()
-        GameManager.getGameData()
         if (GameManager.isPartyPlay) {
             GameManager.updatePlayPartyRoomInfo()
         }
+        checkInputDevices()
     }
 
     private fun showSaveTips() {
@@ -599,21 +594,13 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun showGameSetting() {
-        GameManager.gameStat("游戏界面", "show", mapOf(
-            "sdk_platform" to GameManager.getGameParam()?.channel,
-            "gamepage_type" to "设置页面",
-        ))
         dataBinding.btnGameSettings.visibility = View.INVISIBLE
         dataBinding.btnVirtualKeyboard.visibility = View.INVISIBLE
         gameSettings?.showLayout()
     }
 
     private fun showKeyboardList() {
-        GameManager.gameStat("游戏界面", "show", mapOf(
-            "sdk_platform" to GameManager.getGameParam()?.channel,
-            "gamepage_type" to "按键列表",
-        ))
-        KeyboardListView.show(dataBinding.layoutGame)
+        KeyboardListView.show(dataBinding.root as ViewGroup)
     }
 
     private fun showControllerEdit(type: AppVirtualOperateType) {
@@ -1326,10 +1313,6 @@ class GameActivity : AppCompatActivity() {
         stopUpdatePinCode()
 
         EventBus.getDefault().unregister(this)
-//        GameManager.gameView?.onDestroy()
-//        if (GameManager.isPlaying) {
-//            GameManager.exitGame(mutableMapOf(Pair("action", "")))
-//        }
         super.onDestroy()
     }
 
@@ -1496,17 +1479,17 @@ class GameActivity : AppCompatActivity() {
                 inputDevice?.let {
                     when {
                         GameUtils.isGamePadController(it) -> {
-                            LogUtils.v("检测到外设手柄:$deviceId, device:${inputDevice.name}", "GameManager")
+//                            LogUtils.v("检测到外设手柄:$deviceId, device:${inputDevice.name}", "GameManager")
                             pcMouseMode = true
                         }
 
                         GameUtils.isKeyBoardController(it) -> {
-                            LogUtils.v("检测到外设键盘:$deviceId, device:${inputDevice.name}", "GameManager")
+//                            LogUtils.v("检测到外设键盘:$deviceId, device:${inputDevice.name}", "GameManager")
                             pcMouseMode = true
                         }
 
                         GameUtils.isMouseController(it) -> {
-                            LogUtils.v("检测到外设鼠标:$deviceId, device:${inputDevice.name}", "GameManager")
+//                            LogUtils.v("检测到外设鼠标:$deviceId, device:${inputDevice.name}", "GameManager")
                             pcMouseMode = true
                         }
 
@@ -1517,10 +1500,23 @@ class GameActivity : AppCompatActivity() {
                 }
             }
         }
-        if (pcMouseMode) {
-            dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
-            gameSettings?.controllerType = AppVirtualOperateType.NONE
-        }
         GameManager.gameView?.setPCMouseMode(pcMouseMode)
+        var controllerType = AppVirtualOperateType.NONE
+        if (!pcMouseMode) {
+            if (GameManager.lastControllerType == AppVirtualOperateType.NONE) {
+                when(GameManager.getGameParam()?.defaultOperation ?: 2) {
+                    1 -> {
+                        controllerType = AppVirtualOperateType.APP_KEYBOARD
+                    }
+                    2 -> {
+                        controllerType = AppVirtualOperateType.APP_STICK_XBOX
+                    }
+                }
+            } else {
+                controllerType = GameManager.lastControllerType
+            }
+        }
+        dataBinding.gameController.controllerType = controllerType
+        gameSettings?.controllerType = controllerType
     }
 }

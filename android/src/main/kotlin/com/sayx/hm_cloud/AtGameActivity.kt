@@ -8,8 +8,11 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.hardware.input.InputManager
 import android.media.AudioManager
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
 import android.view.Gravity
 import android.view.KeyEvent
@@ -109,6 +112,11 @@ class AtGameActivity : AppCompatActivity() {
         getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     }
 
+    // 设备连接监听
+    private val inputManager : InputManager by lazy {
+        this.getSystemService(Context.INPUT_SERVICE) as InputManager
+    }
+
     private var inputTimer: Timer? = null
 
     companion object {
@@ -145,15 +153,21 @@ class AtGameActivity : AppCompatActivity() {
 
     private fun initView() {
         val anTongVideoView = AnTongSDK.anTongVideoView
-        if (anTongVideoView?.parent != null && anTongVideoView.parent is ViewGroup) {
-            (anTongVideoView.parent as ViewGroup).removeView(anTongVideoView)
+        anTongVideoView?.let {
+            val parent = it.parent
+            if (parent != null && parent is ViewGroup) {
+                parent.removeView(it)
+            }
+            dataBinding.gameController.addView(
+                it,
+                0,
+                ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                )
+            )
         }
-        val layoutParams = ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-        )
         anTongVideoView?.setAttachContext(this)
-        dataBinding.gameController.addView(anTongVideoView, 0, layoutParams)
         anTongVideoView?.setHmcpPlayerListener(object : AnTongPlayerListener {
             override fun antongPlayerStatusCallback(callback: String?) {
                 LogUtils.d("antongPlayerStatusCallback:$callback")
@@ -253,12 +267,10 @@ class AtGameActivity : AppCompatActivity() {
         // 初始化设置面板
         initGameSettings()
 
-        // 展示存档提示
-//        showSaveTips()
         GameManager.gameStat(
             "游戏界面", "show", mapOf(
                 "sdk_platform" to GameManager.getGameParam()?.channel,
-                "gamepage_type" to "游戏界面",
+                "gamepage_type" to GameManager.getGameParam()?.gameType,
             )
         )
     }
@@ -358,8 +370,7 @@ class AtGameActivity : AppCompatActivity() {
             dataBinding.layoutGame.addView(gameSettings, layoutParams)
         }
 
-        // 页面初始化完成，获取数据根据数据进行同步处理
-        GameManager.getGameData()
+        checkInputDevices()
     }
 
     private fun checkTipsShow() {
@@ -430,12 +441,6 @@ class AtGameActivity : AppCompatActivity() {
     }
 
     private fun showGameSetting() {
-        GameManager.gameStat(
-            "游戏界面", "show", mapOf(
-                "sdk_platform" to GameManager.getGameParam()?.channel,
-                "gamepage_type" to "设置页面",
-            )
-        )
         dataBinding.btnGameSettings.visibility = View.INVISIBLE
         dataBinding.btnVirtualKeyboard.visibility = View.INVISIBLE
         gameSettings?.showLayout()
@@ -609,11 +614,7 @@ class AtGameActivity : AppCompatActivity() {
     }
 
     private fun showKeyboardList() {
-        GameManager.gameStat("游戏界面", "show", mapOf(
-            "sdk_platform" to GameManager.getGameParam()?.channel,
-            "gamepage_type" to "按键列表",
-        ))
-        KeyboardListView.show(dataBinding.layoutGame)
+        KeyboardListView.show(dataBinding.root as ViewGroup)
     }
 
     private fun showControllerEdit(type: AppVirtualOperateType) {
@@ -1167,20 +1168,91 @@ class AtGameActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-//        try {
-//            inputTimer?.cancel()
-//            inputTimer?.purge()
-//            inputTimer = null
-//        } catch (e: Exception) {
-//            LogUtils.e("exitCustom:${e.message}")
-//        }
+        try {
+            inputTimer?.cancel()
+            inputTimer?.purge()
+            inputTimer = null
+        } catch (e: Exception) {
+            LogUtils.e("exitCustom:${e.message}")
+        }
 
         AnTongSDK.onDestroy()
         EventBus.getDefault().unregister(this)
-//        GameManager.gameView?.onDestroy()
-//        if (GameManager.isPlaying) {
-//            GameManager.exitGame(mutableMapOf(Pair("action", "")))
-//        }
         super.onDestroy()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        inputManager.registerInputDeviceListener(inputDeviceListener, Handler(Looper.getMainLooper()))
+    }
+
+    override fun onStop() {
+        super.onStop()
+        inputManager.unregisterInputDeviceListener(inputDeviceListener)
+    }
+
+    private val inputDeviceListener = object : InputManager.InputDeviceListener {
+        override fun onInputDeviceAdded(deviceId: Int) {
+            checkInputDevices()
+        }
+
+        override fun onInputDeviceRemoved(deviceId: Int) {
+            LogUtils.v("检测到设备移除:$deviceId", "GameManager")
+            checkInputDevices()
+        }
+
+        override fun onInputDeviceChanged(deviceId: Int) {
+            checkInputDevices()
+        }
+    }
+
+    private fun checkInputDevices() {
+        val inputDeviceIds = inputManager.inputDeviceIds
+        var pcMouseMode = false
+        if (inputDeviceIds.isNotEmpty()) {
+            inputDeviceIds.forEach { deviceId ->
+                val inputDevice = inputManager.getInputDevice(deviceId)
+                inputDevice?.let {
+                    when {
+                        GameUtils.isGamePadController(it) -> {
+                            LogUtils.v("检测到外设手柄:$deviceId, device:${inputDevice.name}", "GameManager")
+                            pcMouseMode = true
+                        }
+
+                        GameUtils.isKeyBoardController(it) -> {
+                            LogUtils.v("检测到外设键盘:$deviceId, device:${inputDevice.name}", "GameManager")
+                            pcMouseMode = true
+                        }
+
+                        GameUtils.isMouseController(it) -> {
+                            LogUtils.v("检测到外设鼠标:$deviceId, device:${inputDevice.name}", "GameManager")
+                            pcMouseMode = true
+                        }
+
+                        else -> {
+//                    LogUtils.d("checkInputDevice->other:$inputDevice")
+                        }
+                    }
+                }
+            }
+        }
+
+        var controllerType = AppVirtualOperateType.NONE
+        if (!pcMouseMode) {
+            if (GameManager.lastControllerType == AppVirtualOperateType.NONE) {
+                when(GameManager.getGameParam()?.defaultOperation ?: 2) {
+                    1 -> {
+                        controllerType = AppVirtualOperateType.APP_KEYBOARD
+                    }
+                    2 -> {
+                        controllerType = AppVirtualOperateType.APP_STICK_XBOX
+                    }
+                }
+            } else {
+                controllerType = GameManager.lastControllerType
+            }
+        }
+        dataBinding.gameController.controllerType = controllerType
+        gameSettings?.controllerType = controllerType
     }
 }

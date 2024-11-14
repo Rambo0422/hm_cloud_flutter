@@ -37,6 +37,7 @@ import com.haima.hmcp.widgets.beans.VirtualOperateType
 import com.sayx.hm_cloud.callback.RequestDeviceSuccess
 import com.sayx.hm_cloud.constants.AppVirtualOperateType
 import com.sayx.hm_cloud.dialog.AppCommonDialog
+import com.sayx.hm_cloud.http.HttpManager
 import com.sayx.hm_cloud.http.repository.AppRepository
 import com.sayx.hm_cloud.http.bean.AppHttpException
 import com.sayx.hm_cloud.http.bean.HttpResponse
@@ -47,7 +48,6 @@ import com.sayx.hm_cloud.model.ErrorDialogConfig
 import com.sayx.hm_cloud.model.GameError
 import com.sayx.hm_cloud.model.GameErrorEvent
 import com.sayx.hm_cloud.model.GameParam
-import com.sayx.hm_cloud.model.PCMouseEvent
 import com.sayx.hm_cloud.model.SpecificArchive
 import com.sayx.hm_cloud.model.TimeUpdateEvent
 import com.sayx.hm_cloud.model.UserRechargeStatusEvent
@@ -418,6 +418,8 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
      */
     private fun prepareGame(archiveData: ArchiveData?) {
         LogUtils.d("priority:${gameParam?.priority}")
+        AtGameActivity.startActivityForResult(activity)
+        return
         val code = archiveData?.code
         val custodian = archiveData?.custodian
         val listEmpty = archiveData?.list?.isEmpty() ?: true
@@ -769,7 +771,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         }
     }
 
-    fun statusOperationStateChangeReason(data: JSONObject, status: Int) {
+    private fun statusOperationStateChangeReason(data: JSONObject, status: Int) {
         // 各类游戏中断状态下，获取errorCode,errorMsg展示
         val dataStr = data.getString(StatusCallbackUtil.DATA)
         LogUtils.d("errorInfo:$dataStr")
@@ -807,42 +809,32 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
 
     // 获取默认虚拟键盘数据
     fun getDefaultKeyboardData() {
-        channel.invokeMethod("getDefaultKeyboardData", null)
+
     }
 
     // 获取虚拟键盘数据
     fun getKeyboardData() {
-        channel.invokeMethod("getKeyboardData", null)
+        if (gameParam?.isVip() == true) {
+
+        } else {
+            getDefaultKeyboardData()
+        }
     }
 
     // 获取默认虚拟手柄数据
     fun getDefaultGamepadData() {
-        channel.invokeMethod("getDefaultGamepadData", null)
+//        channel.invokeMethod("getDefaultGamepadData", null)
     }
 
     // 获取默认手柄数据
     fun getGamepadData() {
-        channel.invokeMethod("getGamepadData", null)
+//        channel.invokeMethod("getGamepadData", null)
     }
 
     // 更新虚拟操作数据
     fun updateKeyboardData(data: JsonObject) {
         data.addProperty("game_id", gameParam?.gameId)
-        channel.invokeMethod("updateKeyboardData", data.toString())
-    }
-
-    // 根据设备连接，修改鼠标模式
-    fun setPCMouseMode(arguments: Any?) {
-        if (arguments is Boolean) {
-            if (!isAnTong()) {
-                gameView?.setPCMouseMode(arguments)
-                EventBus.getDefault().post(PCMouseEvent(arguments))
-            }
-        }
-    }
-
-    fun getGameData() {
-        channel.invokeMethod("getGameData", null)
+//        channel.invokeMethod("updateKeyboardData", data.toString())
     }
 
     override fun onSceneChanged(sceneMessage: String?) {

@@ -704,10 +704,6 @@ class GameSettings @JvmOverloads constructor(
         if (dataBinding.layoutGameOffNotice.visibility == VISIBLE) {
             return
         }
-        GameManager.gameStat("游戏界面", "show", mapOf(
-            "sdk_platform" to GameManager.getGameParam()?.channel,
-            "gamepage_type" to "时长不足",
-        ))
         val animatorSet = AnimatorSet()
         val translation = ObjectAnimator.ofFloat(
             dataBinding.layoutGameOffNotice,

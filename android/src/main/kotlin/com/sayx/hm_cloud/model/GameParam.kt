@@ -32,9 +32,13 @@ data class GameParam(
     var isPeakChannel: Boolean,
     var isPartyGame: Boolean,
     var gameType: String,
+    // 默认按键类型 1:键盘，2:手柄
+    var defaultOperation: Int,
+    // 支持按键类型 1:键盘，2:手柄，3:两者 后台
+    var supportOperation: Int,
 ) {
     fun isVip(): Boolean {
-        return vipExpiredTime > System.currentTimeMillis()
+        return vipExpiredTime > TimeUtils.currentTime()
     }
 
     override fun toString(): String {
@@ -57,7 +61,10 @@ data class GameParam(
                 "accountInfo=$accountInfo, " +
                 "isPeakChannel=$isPeakChannel, " +
                 "isPartyGame=$isPartyGame," +
-                "gameType=$gameType)"
+                "gameType=$gameType," +
+                "defaultOperation=$defaultOperation," +
+                "supportOperation=$supportOperation," +
+                ")"
     }
 
     companion object {
@@ -82,6 +89,8 @@ data class GameParam(
                 arguments["isPeakChannel"] as Boolean? ?: false,
                 arguments["isPartyGame"] as Boolean? ?: false,
                 arguments["gameType"] as String? ?: "",
+                (arguments["defaultOperation"] as Number?)?.toInt() ?: 2,
+                (arguments["supportOperation"] as Number?)?.toInt() ?: 3,
             )
         }
 

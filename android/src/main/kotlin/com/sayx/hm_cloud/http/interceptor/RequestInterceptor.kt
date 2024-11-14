@@ -39,7 +39,9 @@ class RequestInterceptor : Interceptor {
                 requestBuilder.addHeader(it, httpHeader[it].toString())
             }
         }
-        return chain.proceed(requestBuilder.build())
+        val response = chain.proceed(requestBuilder.build())
+        response.headers["date"]
+        return response.newBuilder().build()
     }
 
     private fun rebuildPostRequest(request: Request): Request {

@@ -176,4 +176,6 @@
     <string name="hint_hide_notice">点击任意地方隐藏展示</string>
     <string name="gamepad_config">手柄配置</string>
     <string name="keyboard_config">键鼠配置</string>
+    <string name="use">使用</string>
+    <string name="using">使用中</string>
 </resources>
