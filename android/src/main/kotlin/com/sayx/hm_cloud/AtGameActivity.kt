@@ -1190,7 +1190,7 @@ class AtGameActivity : AppCompatActivity() {
             LogUtils.e("exitCustom:${e.message}")
         }
 
-        AnTongSDK.onDestroy()
+        // AnTongSDK.onDestroy()
         EventBus.getDefault().unregister(this)
 //        GameManager.gameView?.onDestroy()
 //        if (GameManager.isPlaying) {
