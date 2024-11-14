@@ -194,7 +194,7 @@ object AnTongSDK {
                     Constants.STATUS_APP_ID_ERROR,
                     Constants.STATUS_NOT_FOND_GAME,
                     Constants.STATUS_SIGN_FAILED,
-                    Constants.STATUS_201003 -> {
+                    Constants.STATUS_CONN_FAILED -> {
                         val errorMessage =
                             jsonObject.optString(StatusCallbackUtil.DATA, "服务器异常")
                         mRequestDeviceSuccess?.onRequestDeviceFailed(errorMessage)

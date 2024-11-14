@@ -147,15 +147,21 @@ class AtGameActivity : AppCompatActivity() {
 
     private fun initView() {
         val anTongVideoView = AnTongSDK.anTongVideoView
-        if (anTongVideoView?.parent != null && anTongVideoView.parent is ViewGroup) {
-            (anTongVideoView.parent as ViewGroup).removeView(anTongVideoView)
+        anTongVideoView?.let {
+            val parent = it.parent
+            if (parent != null && parent is ViewGroup) {
+                parent.removeView(it)
+            }
+            dataBinding.gameController.addView(
+                it,
+                0,
+                ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                )
+            )
         }
-        val layoutParams = ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-        )
         anTongVideoView?.setAttachContext(this)
-        dataBinding.gameController.addView(anTongVideoView, 0, layoutParams)
         anTongVideoView?.setHmcpPlayerListener(object : AnTongPlayerListener {
             override fun antongPlayerStatusCallback(callback: String?) {
                 LogUtils.d("antongPlayerStatusCallback:$callback")
@@ -1176,13 +1182,13 @@ class AtGameActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-//        try {
-//            inputTimer?.cancel()
-//            inputTimer?.purge()
-//            inputTimer = null
-//        } catch (e: Exception) {
-//            LogUtils.e("exitCustom:${e.message}")
-//        }
+        try {
+            inputTimer?.cancel()
+            inputTimer?.purge()
+            inputTimer = null
+        } catch (e: Exception) {
+            LogUtils.e("exitCustom:${e.message}")
+        }
 
         AnTongSDK.onDestroy()
         EventBus.getDefault().unregister(this)
