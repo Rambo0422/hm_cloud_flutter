@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
-import android.hardware.input.InputManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -37,7 +36,6 @@ import com.haima.hmcp.widgets.beans.VirtualOperateType
 import com.sayx.hm_cloud.callback.RequestDeviceSuccess
 import com.sayx.hm_cloud.constants.AppVirtualOperateType
 import com.sayx.hm_cloud.dialog.AppCommonDialog
-import com.sayx.hm_cloud.http.HttpManager
 import com.sayx.hm_cloud.http.repository.AppRepository
 import com.sayx.hm_cloud.http.bean.AppHttpException
 import com.sayx.hm_cloud.http.bean.HttpResponse
@@ -90,6 +88,18 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             }
         }
 
+    val gamepadList : MutableList<ControlInfo> by lazy {
+        mutableListOf()
+    }
+
+    val keyboardList : MutableList<ControlInfo> by lazy {
+        mutableListOf()
+    }
+
+    var defaultGamepad : ControlInfo? = null
+
+    var defaultKeyboard : ControlInfo? = null
+
     lateinit var flutterEngine: FlutterEngine
 
     var lastControllerType = AppVirtualOperateType.NONE
@@ -130,6 +140,10 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
 
     fun initSDK(gameParam: GameParam, callback: MethodChannel.Result) {
         this.gameParam = gameParam
+        gamepadList.clear()
+        keyboardList.clear()
+        defaultGamepad = null
+        defaultKeyboard = null
         channel.invokeMethod(
             "gameStatusStat", mapOf(
                 Pair("type", "game_init"),
@@ -809,11 +823,12 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
 
     // 获取默认虚拟键盘数据
     fun getDefaultKeyboardData() {
-
+        LogUtils.d("getDefaultKeyboardData")
     }
 
     // 获取虚拟键盘数据
     fun getKeyboardData() {
+        LogUtils.d("getKeyboardData")
         if (gameParam?.isVip() == true) {
 
         } else {
@@ -823,16 +838,23 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
 
     // 获取默认虚拟手柄数据
     fun getDefaultGamepadData() {
+        LogUtils.d("getDefaultGamepadData")
 //        channel.invokeMethod("getDefaultGamepadData", null)
     }
 
     // 获取默认手柄数据
     fun getGamepadData() {
-//        channel.invokeMethod("getGamepadData", null)
+        LogUtils.d("getGamepadData")
+        if (gameParam?.isVip() == true) {
+
+        } else {
+            getDefaultGamepadData()
+        }
     }
 
     // 更新虚拟操作数据
     fun updateKeyboardData(data: JsonObject) {
+        LogUtils.d("updateKeyboardData")
         data.addProperty("game_id", gameParam?.gameId)
 //        channel.invokeMethod("updateKeyboardData", data.toString())
     }

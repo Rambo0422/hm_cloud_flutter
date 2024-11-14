@@ -3,7 +3,6 @@ package com.sayx.hm_cloud.widget
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -13,6 +12,7 @@ import com.sayx.hm_cloud.R
 import com.sayx.hm_cloud.adapter.KeyboardAdapter
 import com.sayx.hm_cloud.callback.KeyboardClickListener
 import com.sayx.hm_cloud.databinding.ViewKeyboardListBinding
+import com.sayx.hm_cloud.model.ControllerInfo
 
 class KeyboardListView @JvmOverloads constructor(
     context: Context,
@@ -26,20 +26,16 @@ class KeyboardListView @JvmOverloads constructor(
     private val gamepadAdapter: KeyboardAdapter by lazy {
         KeyboardAdapter().apply {
             keyboardClickListener = object : KeyboardClickListener {
-                override fun onAddClick() {
-
+                override fun onAddClick(position: Int) {
                 }
 
-                override fun onEditClick() {
-
+                override fun onEditClick(info: ControllerInfo, position: Int) {
                 }
 
-                override fun onDeleteClick() {
-
+                override fun onDeleteClick(info: ControllerInfo, position: Int) {
                 }
 
-                override fun onUseClick() {
-
+                override fun onUseClick(info: ControllerInfo, position: Int) {
                 }
             }
         }
@@ -48,20 +44,16 @@ class KeyboardListView @JvmOverloads constructor(
     private val keyboardAdapter: KeyboardAdapter by lazy {
         KeyboardAdapter().apply {
             keyboardClickListener = object : KeyboardClickListener {
-                override fun onAddClick() {
-
+                override fun onAddClick(position: Int) {
                 }
 
-                override fun onEditClick() {
-
+                override fun onEditClick(info: ControllerInfo, position: Int) {
                 }
 
-                override fun onDeleteClick() {
-
+                override fun onDeleteClick(info: ControllerInfo, position: Int) {
                 }
 
-                override fun onUseClick() {
-
+                override fun onUseClick(info: ControllerInfo, position: Int) {
                 }
             }
         }
