@@ -460,6 +460,8 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                             channel.invokeMethod(GameViewConstants.firstFrameArrival, null)
                             openGame = true
                         }
+                        isPlaying = true
+                        inQueue = false
                         AtGameActivity.startActivityForResult(activity)
                     }
 
@@ -866,6 +868,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             when (sceneId) {
                 "play" -> {
                     isPlaying = true
+                    inQueue = false
                 }
             }
         }

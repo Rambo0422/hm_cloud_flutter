@@ -1176,7 +1176,7 @@ class AtGameActivity : AppCompatActivity() {
             LogUtils.e("exitCustom:${e.message}")
         }
 
-        AnTongSDK.onDestroy()
+        // AnTongSDK.onDestroy()
         EventBus.getDefault().unregister(this)
         super.onDestroy()
     }
