@@ -2,6 +2,7 @@ package com.sayx.hm_cloud
 
 import android.content.Context
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.ViewGroup
 import com.antong.keyboard.sa.constants.HMInputOpData
 import com.blankj.utilcode.util.LogUtils
@@ -189,8 +190,17 @@ object AnTongSDK {
                         } else {
                             anTongVideoView?.onSwitchResolution(4)
                         }
+                        anTongVideoView?.setVideoFps(60)
                     }
-
+                    Constants.STATUS_OPERATION_INTERVAL_TIME -> {
+                        val dataStr = jsonObject.getString(StatusCallbackUtil.DATA)
+                        if (dataStr is String && !TextUtils.isEmpty(dataStr)) {
+                            val resultData = GameManager.gson.fromJson(dataStr, Map::class.java)
+                            mRequestDeviceSuccess?.onQueueTime((resultData["avg_time"] as Number?)?.toInt() ?: 300)
+                        } else {
+                            LogUtils.e("queue info error:$dataStr")
+                        }
+                    }
                     Constants.STATUS_APP_ID_ERROR,
                     Constants.STATUS_NOT_FOND_GAME,
                     Constants.STATUS_SIGN_FAILED,

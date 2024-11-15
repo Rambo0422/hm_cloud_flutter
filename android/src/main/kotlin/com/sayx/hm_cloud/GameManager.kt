@@ -437,6 +437,18 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                 gameParam!!,
                 archiveData,
                 object : RequestDeviceSuccess {
+                    override fun onQueueTime(time: Int) {
+                        inQueue = true
+                        activity.runOnUiThread {
+                            channel.invokeMethod(
+                                "queueInfo",
+                                mapOf(
+                                    Pair("queueTime", time)
+                                )
+                            )
+                        }
+                    }
+
                     override fun onRequestDeviceSuccess() {
                         LogUtils.d("onRequestDeviceSuccess")
                         // 跳转activity
