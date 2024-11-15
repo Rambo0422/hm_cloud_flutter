@@ -317,21 +317,18 @@ class GameSettings @JvmOverloads constructor(
         volume: Int,
         maxVolume: Int,
         light: Float,
-        virtualOperateType: AppVirtualOperateType,
         userPeakTime: Long,
-        playStartTime: Long,
         gamePlayTime: Long,
         peakChannel: Boolean,
         mobileGame: Boolean
     ) {
 //        LogUtils.d("initSettings")
         this.gameView = gameView
-        // 控制方法
-        this.controllerType = virtualOperateType
         // 是否高峰通道
         this.peakChannel = peakChannel
         // 手游不展示控制方法
         updateControllerMethod(if (mobileGame) View.GONE else VISIBLE)
+        checkControllerSupport()
         // 配置声音/亮度
         updateVoice(maxVolume, volume)
         updateLight((light * 100).toInt())
@@ -345,33 +342,27 @@ class GameSettings @JvmOverloads constructor(
         if (gameView is HmcpVideoView) {
             // 默认开启云游互动
             dataBinding.btnInteraction.isSelected = true
+            gameSettingChangeListener?.onLiveInteractionChange(true)
         } else {
             dataBinding.btnInteraction.setDrawableTop(R.drawable.icon_interaction_normal)
             dataBinding.btnInteraction.setTextColor(Color.parseColor("#FF444855"))
-            dataBinding.ivInteractionSign.visibility = View.INVISIBLE
             dataBinding.tvInteractionSign.visibility = View.VISIBLE
         }
-        gameSettingChangeListener?.onLiveInteractionChange(true)
-        // 非VIP用户，无法自定义控制方法，切换清晰度，关闭云互动
-        // 非VIP用户默认使用标清，VIP用户默认蓝光
-        if (GameManager.getGameParam()?.isVip() != true) {
-            dataBinding.tvQuality.text = context.getString(R.string.standard_quality)
-            if (gameView is HmcpVideoView) {
-                gameView.resolutionList?.let { list ->
-                    gameSettingChangeListener?.onImageQualityChange(list.last())
-                }
-            } else if (gameView is AnTongVideoView) {
-                gameView.onSwitchResolution(4)
-            }
-        } else {
+
+        if (GameManager.getGameParam()?.isVip() == true) {
             dataBinding.tvQuality.text = context.getString(R.string.blue_ray)
-            if (gameView is HmcpVideoView) {
-                gameView.resolutionList?.let { list ->
-                    gameSettingChangeListener?.onImageQualityChange(list.first())
-                }
-            } else if (gameView is AnTongVideoView) {
-                gameView.onSwitchResolution(1)
-            }
+//            if (gameView is HmcpVideoView) {
+//                gameView.resolutionList?.let { list ->
+//                    gameSettingChangeListener?.onImageQualityChange(list.first())
+//                }
+//            }
+        } else {
+            dataBinding.tvQuality.text = context.getString(R.string.standard_quality)
+//            if (gameView is HmcpVideoView) {
+//                gameView.resolutionList?.let { list ->
+//                    gameSettingChangeListener?.onImageQualityChange(list.last())
+//                }
+//            }
         }
 
         // 时间处理
@@ -380,7 +371,6 @@ class GameSettings @JvmOverloads constructor(
         this.currentPlayTime = gamePlayTime / 1000L
         LogUtils.d("playTime=$userPeakTime, currentPlayTime=$currentPlayTime")
         // 如果是派对吧，且如果是游客，则不显示游戏倒计时
-
         if (GameManager.isPartyPlay) {
             if (GameManager.isPartyPlayOwner) {
                 startCountTime()
@@ -391,8 +381,27 @@ class GameSettings @JvmOverloads constructor(
             // 当前不是派对吧的情况下，隐藏派对吧条目
             dataBinding.btnPlayParty.visibility = View.GONE
         }
+        // 设置部分设置状态监听
         initStatusListener()
+        // 获取用户充值状态，当时长不足提示展示时，展示对应状态按钮文案
         GameManager.getUserRechargeStatus()
+    }
+
+    private fun checkControllerSupport() {
+        when(GameManager.getGameParam()?.supportOperation) {
+            1 -> {
+                // 只支持键鼠
+                dataBinding.btnGamepad.isEnabled = false
+                dataBinding.btnGamepad.setDrawableTop(R.drawable.icon_gamepad_close)
+                dataBinding.btnGamepad.setTextColor(Color.parseColor("#FF444855"))
+            }
+
+            2 -> {
+                dataBinding.btnKeyboard.isEnabled = false
+                dataBinding.btnKeyboard.setDrawableTop(R.drawable.icon_keyboard_close)
+                dataBinding.btnKeyboard.setTextColor(Color.parseColor("#FF444855"))
+            }
+        }
     }
 
     private fun initStatusListener() {

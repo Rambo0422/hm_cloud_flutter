@@ -6,48 +6,22 @@ import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
 data class ControllerInfo(
-    @Expose(serialize = true) val keyboard: List<KeyInfo>,
-    @SerializedName(value = "user_id")
-    @Expose(serialize = true) val userId: String,
     @SerializedName(value = "_id")
     @Expose(serialize = true) val id: String,
+    @SerializedName(value = "type")
     @Expose(serialize = true) val type: Int,
+    @SerializedName(value = "user_id")
+    @Expose(serialize = true) val userId: String,
     @SerializedName(value = "game_id")
-    @Expose(serialize = true) val gameId: String
+    @Expose(serialize = true) val gameId: String,
+    @SerializedName(value = "keyboard")
+    @Expose(serialize = true) var keyboard: List<KeyInfo>,
+    @SerializedName(value = "name")
+    @Expose(serialize = true) var name : String? = "",
+    @SerializedName(value = "use")
+    @Expose(serialize = true) var use : Int? = 0,
+    @Expose(serialize = false) var isOfficial : Boolean? = false,
 ) : Serializable {
-
-    companion object {
-        fun fromData(data: Map<*, *>) : ControllerInfo{
-            val keyboard = if (data["keyboard"] is ArrayList<*>) {
-                (data["keyboard"] as ArrayList<*>).map { item->
-                    KeyInfo.fromData(item)
-                }.toList()
-            } else {
-                listOf()
-            }
-            val userId = if (data["user_id"] is String) {
-                data["user_id"]
-            } else {
-                ""
-            }
-            val id = if (data["_id"] is String) {
-                data["_id"]
-            } else {
-                ""
-            }
-            val type = if (data["type"] is Number) {
-                (data["type"] as Number).toInt()
-            } else {
-                0
-            }
-            val gameId = if (data["game_id"] is String) {
-                data["game_id"]
-            } else {
-                ""
-            }
-            return ControllerInfo(keyboard, userId as String, id as String, type, gameId as String)
-        }
-    }
 
     override fun toString(): String {
         val gson = GsonBuilder()

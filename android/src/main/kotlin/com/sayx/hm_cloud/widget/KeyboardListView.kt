@@ -8,6 +8,7 @@ import android.widget.FrameLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
+import com.sayx.hm_cloud.GameManager
 import com.sayx.hm_cloud.R
 import com.sayx.hm_cloud.adapter.KeyboardAdapter
 import com.sayx.hm_cloud.callback.KeyboardClickListener
@@ -71,6 +72,17 @@ class KeyboardListView @JvmOverloads constructor(
         dataBinding.rvGamepad.adapter = gamepadAdapter
         dataBinding.rvKeyboard.layoutManager = GridLayoutManager(context, 2)
         dataBinding.rvKeyboard.adapter = keyboardAdapter
+        when(GameManager.getGameParam()?.supportOperation) {
+            1 -> {
+
+            }
+            2 -> {
+
+            }
+            3 -> {
+
+            }
+        }
     }
 
     companion object {

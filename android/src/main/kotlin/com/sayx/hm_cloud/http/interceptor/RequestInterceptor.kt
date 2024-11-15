@@ -34,6 +34,11 @@ class RequestInterceptor : Interceptor {
         }
         val requestBuilder = request.newBuilder()
         requestBuilder.headers(request.headers)
+        httpHeader.keys.forEach {
+            if (request.headers[it].isNullOrBlank()) {
+                requestBuilder.addHeader(it, httpHeader[it].toString())
+            }
+        }
         return chain.proceed(requestBuilder.build())
     }
 

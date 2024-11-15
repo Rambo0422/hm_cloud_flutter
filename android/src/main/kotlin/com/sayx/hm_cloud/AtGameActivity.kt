@@ -55,6 +55,7 @@ import com.sayx.hm_cloud.constants.KeyType
 import com.sayx.hm_cloud.constants.controllerStatus
 import com.sayx.hm_cloud.databinding.ActivityGameBinding
 import com.sayx.hm_cloud.dialog.AppCommonDialog
+import com.sayx.hm_cloud.http.bean.BaseObserver
 import com.sayx.hm_cloud.http.repository.AppRepository
 import com.sayx.hm_cloud.http.bean.HttpResponse
 import com.sayx.hm_cloud.model.ControllerChangeEvent
@@ -77,8 +78,6 @@ import com.sayx.hm_cloud.widget.EditRouletteKey
 import com.sayx.hm_cloud.widget.GameNoticeView
 import com.sayx.hm_cloud.widget.GameSettings
 import com.sayx.hm_cloud.widget.KeyboardListView
-import io.reactivex.rxjava3.core.Observer
-import io.reactivex.rxjava3.disposables.Disposable
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -230,24 +229,15 @@ class AtGameActivity : AppCompatActivity() {
         }
         // 游戏控制器数据反馈
         dataBinding.gameController.controllerCallback = object : ControllerEventCallback {
-            override fun getDefaultKeyboardData() {
-                // 需要默认键盘配置
-                GameManager.getDefaultKeyboardData()
-            }
 
             override fun getKeyboardData() {
                 // 需要键盘配置
-                GameManager.getKeyboardData()
-            }
-
-            override fun getDefaultGamepadData() {
-                // 需要默认手柄配置
-                GameManager.getDefaultGamepadData()
+                GameManager.initKeyboardData()
             }
 
             override fun getGamepadData() {
                 // 需要手柄配置
-                GameManager.getGamepadData()
+                GameManager.initGamepadData()
             }
 
             override fun updateKeyboardData(data: JsonObject) {
@@ -349,11 +339,8 @@ class AtGameActivity : AppCompatActivity() {
             volume,
             maxVolume,
             light,
-            AppVirtualOperateType.NONE,
             // 用户高峰时长
             GameManager.getGameParam()?.peakTime ?: 0L,
-            // 本次游戏开始时间（重连获取游戏记录可获取本次游戏开始时间，目前重连存在问题，待完善）
-            0,
             // 本次游戏可玩时长
             GameManager.getGameParam()?.playTime ?: 0L,
             // 本次是否使用高峰通道进入
@@ -388,17 +375,7 @@ class AtGameActivity : AppCompatActivity() {
                 return
             }
         }
-        AppRepository.requestGameConfig(object : Observer<HttpResponse<GameConfig>> {
-            override fun onSubscribe(d: Disposable) {
-            }
-
-            override fun onError(e: Throwable) {
-                LogUtils.e("requestGameConfig:${e.message}")
-            }
-
-            override fun onComplete() {
-
-            }
+        AppRepository.requestGameConfig(object : BaseObserver<HttpResponse<GameConfig>>() {
 
             override fun onNext(response: HttpResponse<GameConfig>) {
                 response.data?.let {

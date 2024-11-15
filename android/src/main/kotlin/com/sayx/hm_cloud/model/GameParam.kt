@@ -34,7 +34,7 @@ data class GameParam(
     var gameType: String,
     // 默认按键类型 1:键盘，2:手柄
     var defaultOperation: Int,
-    // 支持按键类型 1:键盘，2:手柄，3:两者 后台
+    // 支持按键类型 1:键盘，2:手柄，3:两者
     var supportOperation: Int,
 ) {
     fun isVip(): Boolean {

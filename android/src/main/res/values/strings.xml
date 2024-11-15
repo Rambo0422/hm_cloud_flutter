@@ -178,4 +178,5 @@
     <string name="keyboard_config">键鼠配置</string>
     <string name="use">使用</string>
     <string name="using">使用中</string>
+    <string name="request_keyboard_config_fail">获取按键配置失败</string>
 </resources>
