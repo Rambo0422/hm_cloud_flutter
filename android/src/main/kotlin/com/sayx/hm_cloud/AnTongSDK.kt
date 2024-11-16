@@ -183,14 +183,6 @@ object AnTongSDK {
                         anTongVideoView?.setHmcpPlayerListener(null)
                         // 跳转远程页面
                         mRequestDeviceSuccess?.onRequestDeviceSuccess()
-
-                        // 首帧出现，修改码率
-                        if (GameManager.getGameParam()?.isVip() == true) {
-                            anTongVideoView?.onSwitchResolution(1)
-                        } else {
-                            anTongVideoView?.onSwitchResolution(4)
-                        }
-                        anTongVideoView?.setVideoFps(60)
                     }
                     Constants.STATUS_OPERATION_INTERVAL_TIME -> {
                         val dataStr = jsonObject.getString(StatusCallbackUtil.DATA)

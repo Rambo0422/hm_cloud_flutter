@@ -360,8 +360,24 @@ class GameSettings @JvmOverloads constructor(
         // 非VIP用户默认使用标清，VIP用户默认蓝光
         if (GameManager.getGameParam()?.isVip() == true) {
             dataBinding.tvQuality.text = context.getString(R.string.blue_ray)
+            if (gameView is HmcpVideoView) {
+                gameView.resolutionList?.let { list ->
+                    gameSettingChangeListener?.onImageQualityChange(list.first())
+                }
+            } else if (gameView is AnTongVideoView) {
+                gameView.onSwitchResolution(1)
+                gameView.setVideoFps(60)
+            }
         } else {
             dataBinding.tvQuality.text = context.getString(R.string.standard_quality)
+            if (gameView is HmcpVideoView) {
+                gameView.resolutionList?.let { list ->
+                    gameSettingChangeListener?.onImageQualityChange(list.last())
+                }
+            } else if (gameView is AnTongVideoView) {
+                gameView.onSwitchResolution(4)
+                gameView.setVideoFps(60)
+            }
         }
 
         // 时间处理
