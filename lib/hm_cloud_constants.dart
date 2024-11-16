@@ -47,4 +47,7 @@ class HMCloudConstants {
 
   // 游戏退出
   static const exitGame = "exitGame";
+
+  // 游戏退出
+  static const getUserInfo = "get_user_info";
 }

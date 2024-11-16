@@ -11,6 +11,8 @@ import com.media.atkit.listeners.AnTongPlayerListener
 import com.media.atkit.utils.StatusCallbackUtil
 import com.media.atkit.widgets.AnTongVideoView
 import com.sayx.hm_cloud.callback.RequestDeviceSuccess
+import com.sayx.hm_cloud.callback.StopPlayEvent
+import org.greenrobot.eventbus.EventBus
 import org.json.JSONObject
 
 object AnTongSDK {
@@ -27,18 +29,25 @@ object AnTongSDK {
 
                 when (status) {
                     Constants.STATUS_FIRST_FRAME_ARRIVAL -> {
-                        anTongVideoView?.setHmcpPlayerListener(null)
+                        //anTongVideoView?.setHmcpPlayerListener(null)
                         // 跳转远程页面
                         mRequestDeviceSuccess?.onRequestDeviceSuccess()
 
                         // 首帧出现，修改码率
-                        anTongVideoView?.onSwitchResolution(1)
+                        anTongVideoView?.onSwitchResolution(20000)
+                        anTongVideoView?.setVideoResolution(1920, 1080)
+                        anTongVideoView?.setVideoFps(60)
+                    }
+
+                    Constants.STATUS_STOP_PLAY -> {
+                        val stopPlayEvent = StopPlayEvent()
+                        EventBus.getDefault().post(stopPlayEvent)
                     }
 
                     Constants.STATUS_APP_ID_ERROR,
                     Constants.STATUS_NOT_FOND_GAME,
                     Constants.STATUS_SIGN_FAILED,
-                    Constants.STATUS_201003 -> {
+                    Constants.STATUS_CONN_FAILED -> {
                         val errorMessage =
                             jsonObject.optString(StatusCallbackUtil.DATA, "服务器异常")
                         mRequestDeviceSuccess?.onRequestDeviceFailed(errorMessage)
@@ -55,9 +64,9 @@ object AnTongSDK {
     }
 
     fun initSdk(context: Context, channelName: String, accessKeyId: String) {
-        Constants.IS_DEBUG = BuildConfig.DEBUG
-        Constants.IS_ERROR = BuildConfig.DEBUG
-        Constants.IS_INFO = BuildConfig.DEBUG
+        Constants.IS_DEBUG = true
+        Constants.IS_ERROR = false
+        Constants.IS_INFO = false
         Constants.IS_TV = true
         ACCESS_KEY_ID = accessKeyId
         AnTongManager.getInstance().init(context, channelName, accessKeyId)
@@ -103,7 +112,7 @@ object AnTongSDK {
         bundle.putBoolean(AnTongVideoView.IS_PORTRAIT, false)
         bundle.putString(AnTongVideoView.BUSINESS_GAME_ID, gameId)
         bundle.putString(AnTongVideoView.SIGN, sign)
-        bundle.putInt(AnTongVideoView.NO_INPUT_TIMEOUT, 5 * 60)
+        bundle.putInt(AnTongVideoView.NO_INPUT_TIMEOUT, 50 * 60)
         bundle.putString(AnTongVideoView.PKG_NAME, anTongPackageName)
         anTongVideoView?.play(bundle)
     }
@@ -119,7 +128,11 @@ object AnTongSDK {
     }
 
     fun stopGame() {
-        anTongVideoView?.stopGame()
+        anTongVideoView?.stopGame(1001)
+    }
+
+    fun stopGame(code: Int) {
+        anTongVideoView?.stopGame(code)
     }
 
     fun onDestroy() {

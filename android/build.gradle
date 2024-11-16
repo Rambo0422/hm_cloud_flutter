@@ -60,8 +60,8 @@ android {
 }
 
 dependencies {
-//    compileOnly fileTree(include: ['*.jar', '*.aar'], dir: 'libs')
-    compileOnly files('libs/at_202411061713.aar')
+    compileOnly fileTree(include: ['*.jar', '*.aar'], dir: 'libs')
+        // compileOnly files('libs/at_202411161141.aar')
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 

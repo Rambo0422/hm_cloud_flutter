@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.res.Configuration
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ScreenUtils
+import com.sayx.hm_cloud.callback.AvailableTimeEvent
 import com.sayx.hm_cloud.model.GameParam
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
@@ -12,6 +13,7 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import me.jessyan.autosize.AutoSizeConfig
 import me.jessyan.autosize.onAdaptListener
+import org.greenrobot.eventbus.EventBus
 
 class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware {
 
@@ -82,6 +84,14 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
                 if (arguments is Map<*, *>) {
                     val userId = arguments["userId"].toString()
                     GameManager.getOldGameInfo(callback, userId)
+                }
+            }
+
+            "availableTime" -> {
+                if (arguments is Map<*, *>) {
+                    val availableTime = arguments["availableTime"].toString().toLong()
+                    val event = AvailableTimeEvent(availableTime)
+                    EventBus.getDefault().post(event)
                 }
             }
 

@@ -3,6 +3,8 @@ package com.sayx.hm_cloud
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.TextUtils
 import android.view.InputDevice
 import android.view.KeyEvent
@@ -12,23 +14,30 @@ import android.view.WindowManager
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.FragmentManager
 import com.blankj.utilcode.util.LogUtils
 import com.gyf.immersionbar.BarHide
 import com.gyf.immersionbar.ktx.immersionBar
+import com.sayx.hm_cloud.callback.AvailableTimeEvent
 import com.sayx.hm_cloud.callback.NoOperateListener
+import com.sayx.hm_cloud.callback.StopPlayEvent
 import com.sayx.hm_cloud.databinding.ActivityGameBinding
 import com.sayx.hm_cloud.dialog.AppCommonDialog
 import com.sayx.hm_cloud.dialog.GameErrorDialog
 import com.sayx.hm_cloud.dialog.NoOperateOfflineDialog
+import com.sayx.hm_cloud.fragment.InsufficientFragment
 import com.sayx.hm_cloud.model.GameErrorEvent
 import com.sayx.hm_cloud.model.GameOverEvent
+import com.sayx.hm_cloud.mvp.GameContract
+import com.sayx.hm_cloud.mvp.GamePresenter
+import com.sayx.hm_cloud.utils.TVUtils
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.util.Timer
 import java.util.TimerTask
 
-class GameActivity : AppCompatActivity() {
+class GameActivity : AppCompatActivity(), GameContract.IGameView {
 
     // 未操作的时间
     private val NO_OPERATE_TIME = 240 * 1000L
@@ -39,9 +48,11 @@ class GameActivity : AppCompatActivity() {
 
     private var countTime = NO_OPERATE_TIME
     private var lastDelay = 0
+    private lateinit var presenter: GameContract.IGamePresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        EventBus.getDefault().register(this)
         LogUtils.d("GameActivity onCreate")
         // 全屏
         immersionBar {
@@ -51,7 +62,6 @@ class GameActivity : AppCompatActivity() {
         // 设置屏幕常亮
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         // 事件监听
-        EventBus.getDefault().register(this)
         dataBinding = DataBindingUtil.setContentView(this, R.layout.activity_game)
         dataBinding.lifecycleOwner = this
 
@@ -60,9 +70,12 @@ class GameActivity : AppCompatActivity() {
 
             }
         })
+
+        presenter = GamePresenter(this)
+        presenter.onCreate(this)
+
         initView()
     }
-
 
     private fun initView() {
         AnTongSDK.anTongVideoView?.let { gameView ->
@@ -142,7 +155,7 @@ class GameActivity : AppCompatActivity() {
         val latencyInfo = AnTongSDK.anTongVideoView?.clockDiffVideoLatencyInfo
 //        val latencyInfo = GameManager.gameView?.clockDiffVideoLatencyInfo
 //        LogUtils.d("updateNetDelay:${latencyInfo}")
-        val delay = latencyInfo?.netDelay ?: 999
+        val delay = latencyInfo?.netDelay?.toInt() ?: 999
         val netDelay = if (delay > 450) 450 else delay
 //        val netDelay = (40..400).random()
         // 延迟在0~60，展示满信号
@@ -164,12 +177,14 @@ class GameActivity : AppCompatActivity() {
         lastDelay = netDelay
         dataBinding.tvLossPacket.text =
             "netDelay:${latencyInfo?.netDelay}\n" +
-                    "decodeDelay:${latencyInfo?.decodeDelay}\n" +
-                    "renderDelay:${latencyInfo?.renderDelay}\n" +
-                    "videoFps:${latencyInfo?.videoFps}\n" +
-                    "bitRate:${latencyInfo?.bitrate}\n" +
-                    "decodeDelayAvg:${latencyInfo?.decodeDelayAvg}\n" +
-                    "packetsLostRate:${latencyInfo?.packetsLostRate}\n"
+                    "decodeDelay: ${latencyInfo?.decodeDelay}\n" +
+                    "renderDelay: ${latencyInfo?.renderDelay}\n" +
+                    "videoFps: ${latencyInfo?.videoFps}\n" +
+                    "bitRate: ${latencyInfo?.bitrate}\n" +
+                    "decodeDelayAvg: ${latencyInfo?.decodeDelayAvg}\n" +
+                    "packetsLostRate: ${latencyInfo?.packetsLostRate}\n" +
+                    "freezeCount: ${latencyInfo?.freezeCount}\n" +
+                    "freezeDuration: ${latencyInfo?.freezeDuration}\n"
 
         val userId = GameManager.getGameParam()?.userId
         if (!TextUtils.isEmpty(userId)) {
@@ -359,6 +374,7 @@ class GameActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         AnTongSDK.onDestroy()
+        presenter.onDestroy()
     }
 
     override fun onUserLeaveHint() {
@@ -370,9 +386,29 @@ class GameActivity : AppCompatActivity() {
      * 写这个的目的是，有些手柄点击home键是不会自动跳转的，所以这里单独进行处理跳转
      */
     private fun toTVHome() {
-        val intent = Intent(Intent.ACTION_MAIN)
-        intent.addCategory(Intent.CATEGORY_HOME)
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        startActivity(intent)
+        TVUtils.toTVHome(this)
+    }
+
+    override fun getUserInfo() {
+        GameManager.getUserInfo()
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onAvailableTimeEvent(event: AvailableTimeEvent) {
+        val availableTime = event.availableTime
+        if (availableTime > 8 * 60) {
+            presenter.onUserInfoReceived(availableTime)
+        } else {
+            // 余额不足八分钟
+            // 显示充值弹窗
+            val insufficientFragment = InsufficientFragment()
+            insufficientFragment.show(supportFragmentManager, "InsufficientFragment")
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onStopPlayEvent(event: StopPlayEvent) {
+        AnTongSDK.onDestroy()
+        // toTVHome()
     }
 }

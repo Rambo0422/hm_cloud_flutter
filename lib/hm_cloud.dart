@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:hm_cloud/hm_cloud_constants.dart';
 
 /// 通信执行
@@ -83,5 +84,12 @@ class HmCloudController {
       "userId": userId,
     };
     return methodChannel.invokeMethod("getOldGameInfo", params);
+  }
+
+  void sendAvailableTime(int availableTime) {
+    Map<String, dynamic> params = {
+      "availableTime": "$availableTime",
+    };
+    methodChannel.invokeMethod("availableTime", params);
   }
 }

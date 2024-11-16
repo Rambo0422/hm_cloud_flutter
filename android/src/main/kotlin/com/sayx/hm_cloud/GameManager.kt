@@ -140,6 +140,7 @@ object GameManager {
 
     fun onBackHome() {
         channel.invokeMethod("homeShow", null)
+        AnTongSDK.stopGame()
 
 //        // 3s 内只允许调用一次
 //        val currentTime = System.currentTimeMillis()
@@ -178,8 +179,9 @@ object GameManager {
                 isPlaying = false
                 gameParam = null
 
-                // 每隔10s，检测一次机器是否释放
-                startReleaseCheckTimer(userId)
+                // 这里做一个调整，只要判断成功了，不再检测
+                releaseOldGameCallback?.success(true)
+                releaseOldGameCallback = null
             }
 
             override fun fail(msg: String?) {
@@ -189,55 +191,8 @@ object GameManager {
         })
     }
 
-    private var isTimerRunning = false
-    private var mCheckReleaseRunnable: CheckReleaseRunnable? = null
-
-    private fun startReleaseCheckTimer(userId: String) {
-        if (handler == null) {
-            handler = Handler(Looper.getMainLooper())
-        }
-        if (!isTimerRunning) {
-            isTimerRunning = true
-            if (mCheckReleaseRunnable == null) {
-                mCheckReleaseRunnable = CheckReleaseRunnable(userId)
-            }
-            handler?.postDelayed(mCheckReleaseRunnable!!, 5000)
-        }
-    }
-
     private fun stopReleaseCheckTimer() {
         handler?.removeCallbacksAndMessages(null)
-        isTimerRunning = false
-    }
-
-    class CheckReleaseRunnable(private val userId: String) : Runnable {
-        override fun run() {
-            checkIfReleased(userId)
-        }
-    }
-
-    private fun checkIfReleased(userId: String) {
-        AnTongManager.getInstance().checkPlayingGame(userId, object : OnGameIsAliveListener {
-            override fun success(deviceInfo: ChannelInfo?) {
-                if (deviceInfo == null) {
-                    // 说明机器释放成功了，
-                    stopReleaseCheckTimer()
-                    releaseOldGameCallback?.success(true)
-                    releaseOldGameCallback = null
-                } else {
-                    // 这里代表还没释放成功，继续检测
-                    // 每隔10秒再次执行
-                    handler?.postDelayed(mCheckReleaseRunnable!!, 5000)
-                }
-            }
-
-            override fun fail(msg: String?) {
-                // 失败了
-                stopReleaseCheckTimer()
-                releaseOldGameCallback?.success(true)
-                releaseOldGameCallback = null
-            }
-        })
     }
 
     fun getOldGameInfo(callback: MethodChannel.Result, userId: String) {
@@ -259,5 +214,13 @@ object GameManager {
     fun leaveQueue() {
         AnTongSDK.leaveQueue()
         stopReleaseCheckTimer()
+    }
+
+    fun getUserInfo() {
+        kotlin.runCatching {
+            channel.invokeMethod("get_user_info", null)
+        }.onFailure {
+            LogUtils.e("getUserInfo onFailure ${it}")
+        }
     }
 }
