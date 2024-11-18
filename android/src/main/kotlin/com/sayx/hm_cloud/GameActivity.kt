@@ -3,8 +3,6 @@ package com.sayx.hm_cloud
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.text.TextUtils
 import android.view.InputDevice
 import android.view.KeyEvent
@@ -14,7 +12,6 @@ import android.view.WindowManager
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.FragmentManager
 import com.blankj.utilcode.util.LogUtils
 import com.gyf.immersionbar.BarHide
 import com.gyf.immersionbar.ktx.immersionBar
@@ -25,7 +22,8 @@ import com.sayx.hm_cloud.databinding.ActivityGameBinding
 import com.sayx.hm_cloud.dialog.AppCommonDialog
 import com.sayx.hm_cloud.dialog.GameErrorDialog
 import com.sayx.hm_cloud.dialog.NoOperateOfflineDialog
-import com.sayx.hm_cloud.fragment.InsufficientFragment
+import com.sayx.hm_cloud.fragment.HandleOperationDialog
+import com.sayx.hm_cloud.fragment.InsufficientDialog
 import com.sayx.hm_cloud.model.GameErrorEvent
 import com.sayx.hm_cloud.model.GameOverEvent
 import com.sayx.hm_cloud.mvp.GameContract
@@ -75,6 +73,9 @@ class GameActivity : AppCompatActivity(), GameContract.IGameView {
         presenter.onCreate(this)
 
         initView()
+
+        val operationDialog = HandleOperationDialog.newInstance()
+        operationDialog.show(supportFragmentManager, "HandleOperationDialog")
     }
 
     private fun initView() {
@@ -401,7 +402,7 @@ class GameActivity : AppCompatActivity(), GameContract.IGameView {
         } else {
             // 余额不足八分钟
             // 显示充值弹窗
-            val insufficientFragment = InsufficientFragment()
+            val insufficientFragment = InsufficientDialog.newInstance()
             insufficientFragment.show(supportFragmentManager, "InsufficientFragment")
         }
     }

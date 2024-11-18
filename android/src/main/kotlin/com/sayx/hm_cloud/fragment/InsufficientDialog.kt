@@ -1,7 +1,6 @@
 package com.sayx.hm_cloud.fragment
 
 import android.content.DialogInterface
-import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.Gravity
@@ -15,18 +14,17 @@ import androidx.fragment.app.DialogFragment
 import com.sayx.hm_cloud.R
 import com.sayx.hm_cloud.utils.TVUtils
 
-
 /**
  * 时长不足续费弹窗
  */
-class InsufficientFragment : DialogFragment(), DialogInterface.OnKeyListener {
+class InsufficientDialog : DialogFragment(), DialogInterface.OnKeyListener {
 
     private lateinit var tvTime: TextView
 
     companion object {
-        fun newInstance(): InsufficientFragment {
-            val insufficientFragment = InsufficientFragment()
-            return insufficientFragment
+        fun newInstance(): InsufficientDialog {
+            val insufficientDialog = InsufficientDialog()
+            return insufficientDialog
         }
     }
 
