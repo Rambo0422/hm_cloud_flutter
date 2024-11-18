@@ -140,7 +140,7 @@ object GameManager {
 
     fun onBackHome() {
         channel.invokeMethod("homeShow", null)
-        AnTongSDK.stopGame()
+        AnTongSDK.onDestroy()
 
 //        // 3s 内只允许调用一次
 //        val currentTime = System.currentTimeMillis()
@@ -163,6 +163,7 @@ object GameManager {
         isPlaying = false
         gameParam = null
         userId = ""
+        AnTongSDK.onDestroy()
         // AnTongSDK.stopGame()
     }
 
