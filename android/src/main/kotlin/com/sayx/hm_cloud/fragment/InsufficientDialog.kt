@@ -23,6 +23,9 @@ import com.sayx.hm_cloud.utils.TVUtils
 class InsufficientDialog : DialogFragment(), DialogInterface.OnKeyListener {
 
     private lateinit var tvTime: TextView
+    private var countdownTimer: CountDownTimer? = null
+    private var exit = false
+    private var payDialog: PayDialog? = null
 
     companion object {
         fun newInstance(): InsufficientDialog {
@@ -77,9 +80,6 @@ class InsufficientDialog : DialogFragment(), DialogInterface.OnKeyListener {
         }
     }
 
-    private var exit = false
-    private var showPayDialog = false
-
     override fun onKey(dialog: DialogInterface?, keyCode: Int, event: KeyEvent?): Boolean {
         if (event?.action == KeyEvent.ACTION_UP) {
             if (keyCode == KeyEvent.KEYCODE_BUTTON_A) {
@@ -90,11 +90,21 @@ class InsufficientDialog : DialogFragment(), DialogInterface.OnKeyListener {
                         TVUtils.toTVHome(it)
                     }
                 }
+            } else if (keyCode == KeyEvent.KEYCODE_BUTTON_B) {
+                dismiss()
             } else if (keyCode == KeyEvent.KEYCODE_BUTTON_Y) {
-                if (!showPayDialog) {
-                    showPayDialog = true
-                    val payDialog = PayDialog.newInstance()
-                    payDialog.show(parentFragmentManager, "PayDialog")
+                if (payDialog == null) {
+                    payDialog = PayDialog.newInstance()
+                    payDialog?.show(parentFragmentManager, "PayDialog")
+                    payDialog?.setPayOderListener(object : PayDialog.PayOderListener {
+                        override fun onPaySuccess() {
+                            this@InsufficientDialog.dismiss()
+                        }
+
+                        override fun onDismiss() {
+                            payDialog = null
+                        }
+                    })
                 }
             }
             return true
@@ -105,12 +115,14 @@ class InsufficientDialog : DialogFragment(), DialogInterface.OnKeyListener {
 
     override fun onDestroyView() {
         dialog?.setOnKeyListener(null)
+        countdownTimer?.cancel()
+        countdownTimer = null
         super.onDestroyView()
     }
 
     private fun startCountdown(millisInFuture: Long) {
         // 初始化倒计时器
-        val countdownTimer = object : CountDownTimer(millisInFuture, 1000) {
+        countdownTimer = object : CountDownTimer(millisInFuture, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 // 格式化剩余时间为 mm:ss
                 val minutes = (millisUntilFinished / 1000) / 60
@@ -127,6 +139,6 @@ class InsufficientDialog : DialogFragment(), DialogInterface.OnKeyListener {
         }
 
         // 启动倒计时
-        countdownTimer.start()
+        countdownTimer?.start()
     }
 }

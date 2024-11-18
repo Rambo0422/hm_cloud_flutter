@@ -141,14 +141,6 @@ object GameManager {
     fun onBackHome() {
         channel.invokeMethod("homeShow", null)
         AnTongSDK.onDestroy()
-
-//        // 3s 内只允许调用一次
-//        val currentTime = System.currentTimeMillis()
-//        if ((currentTime - startReleaseTime) >= 3000) {
-//            startReleaseTime = currentTime
-//            // 检测设备，如果有游戏，直接下机
-//            releaseOldGame(null, this.userId)
-//        }
     }
 
     fun releaseGame(finish: String) {
@@ -227,5 +219,9 @@ object GameManager {
 
     fun createOrder(orderId: String) {
         channel.invokeMethod("createOrder", orderId)
+    }
+
+    fun checkOrderStatus(orderNo: String) {
+        channel.invokeMethod("checkOrderStatus", orderNo)
     }
 }

@@ -18,7 +18,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="选择游玩套餐开始游戏(56s)"
+            android:text="选择游玩套餐开始游戏"
             android:textColor="#C6EC4B"
             android:textSize="21sp"
             android:textStyle="bold" />

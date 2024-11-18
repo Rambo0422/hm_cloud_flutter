@@ -69,13 +69,13 @@ class GameActivity : AppCompatActivity(), GameContract.IGameView {
             }
         })
 
+        val operationDialog = HandleOperationDialog.newInstance()
+        operationDialog.show(supportFragmentManager, "HandleOperationDialog")
+
         presenter = GamePresenter(this)
         presenter.onCreate(this)
 
         initView()
-
-//        val operationDialog = HandleOperationDialog.newInstance()
-//        operationDialog.show(supportFragmentManager, "HandleOperationDialog")
     }
 
     private fun initView() {
@@ -353,12 +353,11 @@ class GameActivity : AppCompatActivity(), GameContract.IGameView {
             || ((eventSource and InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK)
         ) {
             // 判断是手柄，且 keyCode 是home
-            if (keyCode == KeyEvent.KEYCODE_BUTTON_MODE && event.scanCode == 316) {
+            if (keyCode == KeyEvent.KEYCODE_BUTTON_MODE && (event.scanCode == 316 || event.scanCode == 172)) {
                 toTVHome()
                 return true
             }
         }
-
 
         return !(keyCode == KeyEvent.KEYCODE_VOLUME_DOWN || keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_MUTE)
     }
@@ -396,18 +395,15 @@ class GameActivity : AppCompatActivity(), GameContract.IGameView {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onAvailableTimeEvent(event: AvailableTimeEvent) {
-//        val availableTime = event.availableTime
-//        if (availableTime > 8 * 60) {
-//            presenter.onUserInfoReceived(availableTime)
-//        } else {
-//            // 余额不足八分钟
-//            // 显示充值弹窗
-//            val insufficientFragment = InsufficientDialog.newInstance()
-//            insufficientFragment.show(supportFragmentManager, "InsufficientFragment")
-//        }
-
-        val insufficientFragment = InsufficientDialog.newInstance()
-        insufficientFragment.show(supportFragmentManager, "InsufficientFragment")
+        val availableTime = event.availableTime
+        if (availableTime > 8 * 60) {
+            presenter.onUserInfoReceived(availableTime)
+        } else {
+            // 余额不足八分钟
+            // 显示充值弹窗
+            val insufficientFragment = InsufficientDialog.newInstance()
+            insufficientFragment.show(supportFragmentManager, "InsufficientFragment")
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

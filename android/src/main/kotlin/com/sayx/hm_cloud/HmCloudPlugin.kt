@@ -9,6 +9,7 @@ import com.sayx.hm_cloud.callback.AvailableTimeEvent
 import com.sayx.hm_cloud.model.GameParam
 import com.sayx.hm_cloud.model.PayInfoModel
 import com.sayx.hm_cloud.model.PayOrderInfo
+import com.sayx.hm_cloud.model.PayOrderStatus
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -104,8 +105,15 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
             }
 
             "payOrderInfo" -> {
-                val payOrderInfo = GsonUtils.fromJson(arguments.toString(), PayOrderInfo::class.java)
+                val payOrderInfo =
+                    GsonUtils.fromJson(arguments.toString(), PayOrderInfo::class.java)
                 EventBus.getDefault().post(payOrderInfo)
+            }
+
+            "orderStatus" -> {
+                val status =
+                    GsonUtils.fromJson(arguments.toString(), PayOrderStatus::class.java)
+                EventBus.getDefault().post(status)
             }
 
             else -> {

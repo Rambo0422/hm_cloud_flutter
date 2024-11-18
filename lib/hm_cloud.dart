@@ -101,4 +101,8 @@ class HmCloudController {
   void sendOrderInfo(Map<String, dynamic> params) {
     methodChannel.invokeMethod("payOrderInfo", json.encode(params));
   }
+
+  void sendOrderStatus(Map<String, dynamic> params) {
+    methodChannel.invokeMethod("orderStatus", json.encode(params));
+  }
 }

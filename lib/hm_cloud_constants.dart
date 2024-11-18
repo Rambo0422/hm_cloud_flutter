@@ -55,4 +55,7 @@ class HMCloudConstants {
 
   // 获取订单数据
   static const createOrder = "createOrder";
+
+  // 获取订单状态
+  static const checkOrderStatus = "checkOrderStatus";
 }

@@ -14,16 +14,24 @@ import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.ThreadUtils
 import com.sayx.hm_cloud.GameManager
 import com.sayx.hm_cloud.R
 import com.sayx.hm_cloud.adapter.PayInfoAdapter
 import com.sayx.hm_cloud.model.PayInfoModel
 import com.sayx.hm_cloud.model.PayOrderInfo
+import com.sayx.hm_cloud.model.PayOrderStatus
+import com.sayx.hm_cloud.mvp.pay.PayContract
+import com.sayx.hm_cloud.mvp.pay.PayPresenter
 import com.sayx.hm_cloud.utils.CircleTransform
 import com.sayx.hm_cloud.utils.EncodingHandler
 import com.squareup.picasso.Picasso
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import me.jessyan.autosize.utils.AutoSizeUtils
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -34,7 +42,7 @@ import kotlin.math.abs
 /**
  * 二维码支付弹窗
  */
-class PayDialog : DialogFragment(), DialogInterface.OnKeyListener {
+class PayDialog : DialogFragment(), DialogInterface.OnKeyListener, PayContract.IPayView {
 
     private lateinit var tvName: TextView
     private lateinit var tvTime: TextView
@@ -45,6 +53,9 @@ class PayDialog : DialogFragment(), DialogInterface.OnKeyListener {
     private lateinit var payInfoAdapter: PayInfoAdapter
     private val isProcessing = AtomicBoolean(false)
     private var lastProcessedTime = 0L
+    private var payOderListener: PayOderListener? = null
+
+    private lateinit var presenter: PayContract.IPayPresenter
 
     companion object {
         fun newInstance(): PayDialog {
@@ -73,9 +84,10 @@ class PayDialog : DialogFragment(), DialogInterface.OnKeyListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        EventBus.getDefault().register(this)
+        presenter = PayPresenter(this)
         // 向web端获取数据
         GameManager.requestPayData()
-        EventBus.getDefault().register(this)
         tvName = view.findViewById(R.id.tv_name)
         tvTime = view.findViewById(R.id.tv_time)
         ivAvatar = view.findViewById(R.id.iv_avatar)
@@ -146,8 +158,6 @@ class PayDialog : DialogFragment(), DialogInterface.OnKeyListener {
 
                 tvOldPrice.text = "¥${payInfo.oldPrice}"
                 tvPrice.text = "¥${payInfo.price}"
-
-
             }
         })
     }
@@ -163,9 +173,18 @@ class PayDialog : DialogFragment(), DialogInterface.OnKeyListener {
     override fun onDestroyView() {
         super.onDestroyView()
         EventBus.getDefault().unregister(this)
+        this.presenter.stopChecking()
+        this.payOderListener = null
     }
 
     override fun onKey(dialog: DialogInterface?, keyCode: Int, event: KeyEvent?): Boolean {
+        // 如果是B的话，则返回上一页
+        if (event?.action == KeyEvent.ACTION_UP) {
+            if (keyCode == KeyEvent.KEYCODE_BUTTON_B) {
+                dismiss()
+            }
+            return true
+        }
         return true
     }
 
@@ -188,15 +207,31 @@ class PayDialog : DialogFragment(), DialogInterface.OnKeyListener {
         }
     }
 
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        this.payOderListener?.onDismiss()
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onPayOrderStatusEvent(event: PayOrderStatus) {
+        if (event.status == 2) {
+            // 代表充值成功
+            dismiss()
+            this.payOderListener?.onPaySuccess()
+        }
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onPayInfoModelEvent(event: PayInfoModel) {
         val userInfo = event.userInfo
         tvName.text = userInfo.nickName
         tvTime.text = "剩余时长: ${formatTime(userInfo.availableTime)}"
-        Picasso.get()
-            .load(userInfo.avatar)
-            .transform(CircleTransform())
-            .into(ivAvatar)
+        if (userInfo.avatar.isNotEmpty()) {
+            Picasso.get()
+                .load(userInfo.avatar)
+                .transform(CircleTransform())
+                .into(ivAvatar)
+        }
         payInfoAdapter.updateList(event.payInfo)
 
         // 创建订单
@@ -224,6 +259,8 @@ class PayDialog : DialogFragment(), DialogInterface.OnKeyListener {
         }
 
         setQrCode(event)
+
+        presenter.startCheckOrderStatus(event.orderNo)
     }
 
     private fun setQrCode(payOrderInfo: PayOrderInfo) {
@@ -245,5 +282,22 @@ class PayDialog : DialogFragment(), DialogInterface.OnKeyListener {
         val minutes = (seconds % 3600) / 60
         val remainingSeconds = seconds % 60
         return "%02d:%02d:%02d".format(hours, minutes, remainingSeconds)
+    }
+
+    override fun checkOrderIsPay(orderNo: String) {
+        lifecycleScope.launch(Dispatchers.Main) {
+            LogUtils.e("main: ${ThreadUtils.isMainThread()} orderNo: $orderNo")
+            GameManager.checkOrderStatus(orderNo)
+        }
+    }
+
+    fun setPayOderListener(payOderListener: PayOderListener) {
+        this.payOderListener = payOderListener;
+    }
+
+    interface PayOderListener {
+        fun onPaySuccess()
+
+        fun onDismiss()
     }
 }
