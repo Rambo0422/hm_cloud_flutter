@@ -1,6 +1,8 @@
 package com.sayx.hm_cloud.fragment
 
 import android.content.DialogInterface
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.Gravity
@@ -12,6 +14,7 @@ import android.view.WindowManager
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import com.sayx.hm_cloud.R
+import com.sayx.hm_cloud.dialog.PayDialog
 import com.sayx.hm_cloud.utils.TVUtils
 
 /**
@@ -50,7 +53,7 @@ class InsufficientDialog : DialogFragment(), DialogInterface.OnKeyListener {
         super.onViewCreated(view, savedInstanceState)
         // 倒计时 5 分钟（300000 毫秒）
         tvTime = view.findViewById(R.id.time)
-        startCountdown(5 * 1 * 1000)
+        startCountdown(5 * 60 * 1000)
     }
 
     override fun onStart() {
@@ -69,10 +72,13 @@ class InsufficientDialog : DialogFragment(), DialogInterface.OnKeyListener {
 
             window.decorView.systemUiVisibility =
                 View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+
+            dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.parseColor("#BF000000")))
         }
     }
 
     private var exit = false
+    private var showPayDialog = false
 
     override fun onKey(dialog: DialogInterface?, keyCode: Int, event: KeyEvent?): Boolean {
         if (event?.action == KeyEvent.ACTION_UP) {
@@ -85,7 +91,11 @@ class InsufficientDialog : DialogFragment(), DialogInterface.OnKeyListener {
                     }
                 }
             } else if (keyCode == KeyEvent.KEYCODE_BUTTON_Y) {
-
+                if (!showPayDialog) {
+                    showPayDialog = true
+                    val payDialog = PayDialog.newInstance()
+                    payDialog.show(parentFragmentManager, "PayDialog")
+                }
             }
             return true
         }

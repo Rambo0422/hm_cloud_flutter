@@ -74,8 +74,8 @@ class GameActivity : AppCompatActivity(), GameContract.IGameView {
 
         initView()
 
-        val operationDialog = HandleOperationDialog.newInstance()
-        operationDialog.show(supportFragmentManager, "HandleOperationDialog")
+//        val operationDialog = HandleOperationDialog.newInstance()
+//        operationDialog.show(supportFragmentManager, "HandleOperationDialog")
     }
 
     private fun initView() {
@@ -396,20 +396,22 @@ class GameActivity : AppCompatActivity(), GameContract.IGameView {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onAvailableTimeEvent(event: AvailableTimeEvent) {
-        val availableTime = event.availableTime
-        if (availableTime > 8 * 60) {
-            presenter.onUserInfoReceived(availableTime)
-        } else {
-            // 余额不足八分钟
-            // 显示充值弹窗
-            val insufficientFragment = InsufficientDialog.newInstance()
-            insufficientFragment.show(supportFragmentManager, "InsufficientFragment")
-        }
+//        val availableTime = event.availableTime
+//        if (availableTime > 8 * 60) {
+//            presenter.onUserInfoReceived(availableTime)
+//        } else {
+//            // 余额不足八分钟
+//            // 显示充值弹窗
+//            val insufficientFragment = InsufficientDialog.newInstance()
+//            insufficientFragment.show(supportFragmentManager, "InsufficientFragment")
+//        }
+
+        val insufficientFragment = InsufficientDialog.newInstance()
+        insufficientFragment.show(supportFragmentManager, "InsufficientFragment")
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onStopPlayEvent(event: StopPlayEvent) {
         AnTongSDK.onDestroy()
-        // toTVHome()
     }
 }

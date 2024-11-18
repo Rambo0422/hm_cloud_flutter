@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    android:paddingHorizontal="45dp"
+    android:paddingVertical="25dp">
+
+    <LinearLayout
+        android:id="@+id/layout_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="选择游玩套餐开始游戏(56s)"
+            android:textColor="#C6EC4B"
+            android:textSize="21sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="Tips: 套餐未使用完，登录购买账号可继续使用"
+            android:textColor="#A6FFFFFF"
+            android:textSize="10sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layout_title">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+        <LinearLayout
+            android:layout_width="185dp"
+            android:layout_height="266dp"
+            android:orientation="vertical">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="#ECECEC">
+
+                <ImageView
+                    android:id="@+id/iv_avatar"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="10dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:textColor="#000000"
+                    android:textSize="12sp"
+                    app:layout_constraintStart_toEndOf="@id/iv_avatar"
+                    app:layout_constraintTop_toTopOf="@id/iv_avatar" />
+
+                <TextView
+                    android:id="@+id/tv_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:text="剩余时长:"
+                    android:textColor="#000000"
+                    android:textSize="10sp"
+                    app:layout_constraintBottom_toBottomOf="@id/iv_avatar"
+                    app:layout_constraintStart_toEndOf="@id/iv_avatar" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#FFFFFF">
+
+                <ImageView
+                    android:scaleType="fitXY"
+                    android:id="@+id/iv_qrcode"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toTopOf="@id/iv_qrcode"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:textColor="#000000"
+                        android:text="扫码支付"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tv_price"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:text="¥6"
+                        android:textColor="#FB1D02"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:text="，已节省"
+                        android:textColor="#000000"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tv_old_price"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:text="¥6"
+                        android:textColor="#FB1D02"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="120dp"
+                    android:layout_height="25dp"
+                    android:layout_marginTop="4dp"
+                    android:background="#4AC775"
+                    android:gravity="center"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/iv_qrcode">
+
+                    <ImageView
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:src="@drawable/offline_topup_wx" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:text="微信支付"
+                        android:textColor="#FFFFFFFF"
+                        android:textSize="10sp" />
+
+                </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

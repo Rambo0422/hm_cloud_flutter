@@ -128,11 +128,11 @@ object AnTongSDK {
     }
 
     fun stopGame() {
-        anTongVideoView?.stopGame(1001)
+        anTongVideoView?.stopGame()
     }
 
     fun stopGame(code: Int) {
-        anTongVideoView?.stopGame(code)
+//        anTongVideoView?.stopGame(code)
     }
 
     fun onDestroy() {

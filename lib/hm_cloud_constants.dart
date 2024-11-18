@@ -1,5 +1,4 @@
 class HMCloudConstants {
-
   HMCloudConstants._();
 
   /// 通道名称
@@ -50,4 +49,10 @@ class HMCloudConstants {
 
   // 游戏退出
   static const getUserInfo = "get_user_info";
+
+  // 获取支付数据
+  static const requestPayData = "requestPayData";
+
+  // 获取订单数据
+  static const createOrder = "createOrder";
 }

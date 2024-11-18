@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
@@ -91,5 +92,13 @@ class HmCloudController {
       "availableTime": "$availableTime",
     };
     methodChannel.invokeMethod("availableTime", params);
+  }
+
+  void sendPayInfo(Map<String, dynamic> params) {
+    methodChannel.invokeMethod("payInfo", json.encode(params));
+  }
+
+  void sendOrderInfo(Map<String, dynamic> params) {
+    methodChannel.invokeMethod("payOrderInfo", json.encode(params));
   }
 }

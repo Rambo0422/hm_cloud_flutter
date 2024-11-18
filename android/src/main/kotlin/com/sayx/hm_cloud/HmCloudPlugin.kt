@@ -2,10 +2,13 @@ package com.sayx.hm_cloud
 
 import android.app.Activity
 import android.content.res.Configuration
+import com.blankj.utilcode.util.GsonUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ScreenUtils
 import com.sayx.hm_cloud.callback.AvailableTimeEvent
 import com.sayx.hm_cloud.model.GameParam
+import com.sayx.hm_cloud.model.PayInfoModel
+import com.sayx.hm_cloud.model.PayOrderInfo
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -93,6 +96,16 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
                     val event = AvailableTimeEvent(availableTime)
                     EventBus.getDefault().post(event)
                 }
+            }
+
+            "payInfo" -> {
+                val payInfo = GsonUtils.fromJson(arguments.toString(), PayInfoModel::class.java)
+                EventBus.getDefault().post(payInfo)
+            }
+
+            "payOrderInfo" -> {
+                val payOrderInfo = GsonUtils.fromJson(arguments.toString(), PayOrderInfo::class.java)
+                EventBus.getDefault().post(payOrderInfo)
             }
 
             else -> {

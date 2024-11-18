@@ -218,10 +218,14 @@ object GameManager {
     }
 
     fun getUserInfo() {
-        kotlin.runCatching {
-            channel.invokeMethod("get_user_info", null)
-        }.onFailure {
-            LogUtils.e("getUserInfo onFailure ${it}")
-        }
+        channel.invokeMethod("get_user_info", null)
+    }
+
+    fun requestPayData() {
+        channel.invokeMethod("requestPayData", null)
+    }
+
+    fun createOrder(orderId: String) {
+        channel.invokeMethod("createOrder", orderId)
     }
 }
