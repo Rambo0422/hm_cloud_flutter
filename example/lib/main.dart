@@ -62,7 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 loadJson();
               },
-              child: Text("获取json"),
+              child: const Text("获取json"),
             )
           ],
         ),
