@@ -54,7 +54,7 @@ import com.sayx.hm_cloud.constants.controllerStatus
 import com.sayx.hm_cloud.databinding.ActivityGameBinding
 import com.sayx.hm_cloud.dialog.AppCommonDialog
 import com.sayx.hm_cloud.dialog.ControllerTypeDialog
-import com.sayx.hm_cloud.http.AppRepository
+import com.sayx.hm_cloud.http.repository.AppRepository
 import com.sayx.hm_cloud.http.bean.HttpResponse
 import com.sayx.hm_cloud.model.ControllerChangeEvent
 import com.sayx.hm_cloud.model.ControllerConfigEvent
@@ -64,6 +64,7 @@ import com.sayx.hm_cloud.model.GameNotice
 import com.sayx.hm_cloud.model.GameParam
 import com.sayx.hm_cloud.model.KeyInfo
 import com.sayx.hm_cloud.model.TimeUpdateEvent
+import com.sayx.hm_cloud.model.UserRechargeStatusEvent
 import com.sayx.hm_cloud.utils.AppSizeUtils
 import com.sayx.hm_cloud.utils.GameUtils
 import com.sayx.hm_cloud.utils.TimeUtils
@@ -74,6 +75,7 @@ import com.sayx.hm_cloud.widget.EditCombineKey
 import com.sayx.hm_cloud.widget.EditRouletteKey
 import com.sayx.hm_cloud.widget.GameNoticeView
 import com.sayx.hm_cloud.widget.GameSettings
+import com.sayx.hm_cloud.widget.LoadingView
 import io.reactivex.rxjava3.core.Observer
 import io.reactivex.rxjava3.disposables.Disposable
 import org.greenrobot.eventbus.EventBus
@@ -107,10 +109,6 @@ class AtGameActivity : AppCompatActivity() {
     // 剪切板
     private val clipboardManager: ClipboardManager by lazy {
         getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-    }
-
-    private val appRepository: AppRepository by lazy {
-        AppRepository()
     }
 
     private var inputTimer: Timer? = null
@@ -149,14 +147,21 @@ class AtGameActivity : AppCompatActivity() {
 
     private fun initView() {
         val anTongVideoView = AnTongSDK.anTongVideoView
-        if (anTongVideoView?.parent != null && anTongVideoView.parent is ViewGroup) {
-            (anTongVideoView.parent as ViewGroup).removeView(anTongVideoView)
+        anTongVideoView?.let {
+            val parent = it.parent
+            if (parent != null && parent is ViewGroup) {
+                parent.removeView(it)
+            }
+            dataBinding.gameController.addView(
+                it,
+                0,
+                ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                )
+            )
         }
-        val layoutParams = ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-        )
-        dataBinding.gameController.addView(anTongVideoView, 0, layoutParams)
+        anTongVideoView?.setAttachContext(this)
         anTongVideoView?.setHmcpPlayerListener(object : AnTongPlayerListener {
             override fun antongPlayerStatusCallback(callback: String?) {
                 LogUtils.d("antongPlayerStatusCallback:$callback")
@@ -260,7 +265,7 @@ class AtGameActivity : AppCompatActivity() {
 //        showSaveTips()
         GameManager.gameStat(
             "游戏界面", "show", mapOf(
-                "sdk_platform" to "安通",
+                "sdk_platform" to GameManager.getGameParam()?.channel,
                 "gamepage_type" to "游戏界面",
             )
         )
@@ -380,7 +385,7 @@ class AtGameActivity : AppCompatActivity() {
                 return
             }
         }
-        appRepository.requestGameConfig(object : Observer<HttpResponse<GameConfig>> {
+        AppRepository.requestGameConfig(object : Observer<HttpResponse<GameConfig>> {
             override fun onSubscribe(d: Disposable) {
             }
 
@@ -428,10 +433,14 @@ class AtGameActivity : AppCompatActivity() {
         }
     }
 
+    private fun showLoading() {
+        dataBinding.layoutLoading.visibility = View.VISIBLE
+    }
+
     private fun showGameSetting() {
         GameManager.gameStat(
             "游戏界面", "show", mapOf(
-                "sdk_platform" to "安通",
+                "sdk_platform" to GameManager.getGameParam()?.channel,
                 "gamepage_type" to "设置页面",
             )
         )
@@ -552,7 +561,7 @@ class AtGameActivity : AppCompatActivity() {
 
             override fun getNetDelay(): Int {
                 val netDelay = AnTongSDK.anTongVideoView?.clockDiffVideoLatencyInfo?.netDelay
-                return netDelay ?: 999
+                return netDelay?.toInt() ?: 999
             }
 
             override fun getPacketsLostRate(): String {
@@ -574,12 +583,17 @@ class AtGameActivity : AppCompatActivity() {
             }
             .setRightButton(getString(R.string.confirm)) {
                 LogUtils.d("exitGameByUser")
+                AppCommonDialog.hideDialog(
+                    this,
+                    "hideExitGameDialog"
+                )
+                showLoading()
                 AnTongSDK.stopGame()
                 GameManager.releaseGame(finish = "1")
                 gameSettings?.release()
                 GameManager.gameStat(
                     "结束游戏", "click", mapOf(
-                        "sdk_platform" to "安通",
+                        "sdk_platform" to GameManager.getGameParam()?.channel,
                     )
                 )
             }
@@ -1081,6 +1095,11 @@ class AtGameActivity : AppCompatActivity() {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onUpdateUserRechargeStatusEvent(event: UserRechargeStatusEvent) {
+        gameSettings?.updateUserRechargeStatus(event)
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
     fun onTimeUpdateEvent(event: TimeUpdateEvent) {
         val params: GameParam = event.param
         gameSettings?.updatePlayTime(params.playTime)
@@ -1163,15 +1182,15 @@ class AtGameActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-//        try {
-//            inputTimer?.cancel()
-//            inputTimer?.purge()
-//            inputTimer = null
-//        } catch (e: Exception) {
-//            LogUtils.e("exitCustom:${e.message}")
-//        }
+        try {
+            inputTimer?.cancel()
+            inputTimer?.purge()
+            inputTimer = null
+        } catch (e: Exception) {
+            LogUtils.e("exitCustom:${e.message}")
+        }
 
-        AnTongSDK.onDestroy()
+        // AnTongSDK.onDestroy()
         EventBus.getDefault().unregister(this)
 //        GameManager.gameView?.onDestroy()
 //        if (GameManager.isPlaying) {

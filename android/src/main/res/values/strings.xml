@@ -146,6 +146,7 @@
     <string name="interaction">云游互动</string>
     <string name="hang">挂机</string>
     <string name="exit_game">退出游戏</string>
+    <string name="exit">退出</string>
     <string name="debug_code">调试码</string>
     <string name="control_method">操作方式</string>
     <string name="custom">自定义</string>
@@ -168,6 +169,9 @@
     <string name="join_vip">我要开通</string>
     <string name="game_time_lack">剩余游玩时间不足5分钟</string>
     <string name="recharge">充值</string>
+    <string name="limit_discount">限时折扣</string>
+    <string name="first_charge">首充</string>
+    <string name="limit_activity">限时活动</string>
     <string name="game_notice_title">温馨提示</string>
     <string name="hint_hide_notice">点击任意地方隐藏展示</string>
 </resources>

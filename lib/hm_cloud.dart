@@ -22,10 +22,9 @@ class HmCloudController {
   }
 
   ///MARK: 初始化sdk
-  void initSdk(Map<String, dynamic> params) {
+  Future<dynamic> initSdk(Map<String, dynamic> params) async {
     // print('init sdk $params');
-
-    methodChannel.invokeMethod("initSDK", params);
+    return methodChannel.invokeMethod("initSDK", params);
   }
 
   ///MARK: 开始云游戏
@@ -129,5 +128,17 @@ class HmCloudController {
 
   Future<dynamic> getArchiveProgress() async {
     return await methodChannel.invokeMethod("getArchiveProgress");
+  }
+
+  void errorDialogConfig(String config) {
+    methodChannel.invokeMethod("error_dialog_config", config);
+  }
+
+  Future<String> getCToken(Map map) async {
+    return await methodChannel.invokeMethod("getCToken", map);
+  }
+
+  void updateUserRechargeStatus(Map status) {
+    methodChannel.invokeMethod("updateUserRechargeStatus", status);
   }
 }

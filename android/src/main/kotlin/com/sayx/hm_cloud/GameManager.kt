@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.hardware.input.InputManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -36,18 +37,20 @@ import com.haima.hmcp.widgets.beans.VirtualOperateType
 import com.sayx.hm_cloud.callback.RequestDeviceSuccess
 import com.sayx.hm_cloud.constants.AppVirtualOperateType
 import com.sayx.hm_cloud.dialog.AppCommonDialog
-import com.sayx.hm_cloud.http.AppRepository
+import com.sayx.hm_cloud.http.repository.AppRepository
 import com.sayx.hm_cloud.http.bean.AppHttpException
 import com.sayx.hm_cloud.http.bean.HttpResponse
 import com.sayx.hm_cloud.imp.HmcpPlayerListenerImp
 import com.sayx.hm_cloud.model.AccountInfo
 import com.sayx.hm_cloud.model.ArchiveData
+import com.sayx.hm_cloud.model.ErrorDialogConfig
 import com.sayx.hm_cloud.model.GameError
 import com.sayx.hm_cloud.model.GameErrorEvent
 import com.sayx.hm_cloud.model.GameParam
 import com.sayx.hm_cloud.model.PCMouseEvent
 import com.sayx.hm_cloud.model.SpecificArchive
 import com.sayx.hm_cloud.model.TimeUpdateEvent
+import com.sayx.hm_cloud.model.UserRechargeStatusEvent
 import com.sayx.hm_cloud.utils.GameUtils
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -113,6 +116,9 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
 
     var disposable: Disposable? = null
 
+    // 后台配置的错误弹窗信息
+    private var dialogConfig: ErrorDialogConfig? = null
+
     fun init(channel: MethodChannel, context: Activity) {
         this.channel = channel
         this.activity = context
@@ -122,7 +128,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         }
     }
 
-    fun initSDK(gameParam: GameParam) {
+    fun initSDK(gameParam: GameParam, callback: MethodChannel.Result) {
         this.gameParam = gameParam
         channel.invokeMethod(
             "gameStatusStat", mapOf(
@@ -137,6 +143,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         if (isAnTong()) {
             AnTongSDK.initSdk(activity, gameParam)
             initState = true
+            callback.success(true)
             return
         }
 
@@ -148,20 +155,18 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         Constants.IS_ERROR = false
         Constants.IS_INFO = false
 
-        this.isPartyPlay = gameParam.isPartyGame
-        this.isPartyPlayOwner = isPartyPlay
-        this.roomIndex = 0
-
         HmcpManager.getInstance().releaseRequestManager()
 
         HmcpManager.getInstance().init(config, activity, object : OnInitCallBackListener {
             override fun success() {
                 LogUtils.d("haiMaSDK success:${HmcpManager.getInstance().sdkVersion}")
                 initState = true
+                callback.success(true)
             }
 
             override fun fail(msg: String?) {
                 LogUtils.e("haiMaSDK fail:$msg")
+                callback.success(false)
                 var errorCode = GameError.gameInitErrorCode
                 var errorMsg = GameError.gameInitErrorMsg
                 if (msg is String && !TextUtils.isEmpty(msg)) {
@@ -293,7 +298,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         this.gameParam = gameParam
 
         this.isPartyPlay = gameParam.isPartyGame
-        this.isPartyPlayOwner = isPartyPlay
+        this.isPartyPlayOwner = true
         this.roomIndex = 0
         this.userId = gameParam.userId
 
@@ -314,7 +319,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             "channel" to getChannel(),
             "version" to getAppVersion()
         )
-        AppRepository().requestArchiveData(
+        AppRepository.requestArchiveData(
             params,
             object : Observer<HttpResponse<ArchiveData>> {
                 override fun onSubscribe(d: Disposable) {
@@ -432,6 +437,18 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                 gameParam!!,
                 archiveData,
                 object : RequestDeviceSuccess {
+                    override fun onQueueTime(time: Int) {
+                        inQueue = true
+                        activity.runOnUiThread {
+                            channel.invokeMethod(
+                                "queueInfo",
+                                mapOf(
+                                    Pair("queueTime", time)
+                                )
+                            )
+                        }
+                    }
+
                     override fun onRequestDeviceSuccess() {
                         LogUtils.d("onRequestDeviceSuccess")
                         // 跳转activity
@@ -439,6 +456,8 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                             channel.invokeMethod(GameViewConstants.firstFrameArrival, null)
                             openGame = true
                         }
+                        isPlaying = true
+                        inQueue = false
                         AtGameActivity.startActivityForResult(activity)
                     }
 
@@ -722,6 +741,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                         LogUtils.e("gameTimeCountDown error:$dataStr")
                     }
                 }
+                // 401，异端登录
                 Constants.STATUS_INVALID_CONN_IN_MULTI_CONN -> {
                     EventBus.getDefault().post(GameErrorEvent("$status", ""))
                 }
@@ -846,6 +866,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             when (sceneId) {
                 "play" -> {
                     isPlaying = true
+                    inQueue = false
                 }
             }
         }
@@ -882,7 +903,49 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             putExtra("route", "/rechargeCenter")
             putExtra("arguments", Bundle().also {
                 it.putString("type", "rechargeTime")
-                it.putString("from", "native")
+                it.putString("from", "游戏页面")
+            })
+            setClass(activity, AppFlutterActivity::class.java)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            activity.startActivity(this)
+        }
+    }
+
+    fun openFirstCharge() {
+        Intent().apply {
+            putExtra("route", "/webview")
+            putExtra("arguments", Bundle().also {
+                it.putString("url", "https://play.3ayx.net/pages/webView/firstCharge?landscape=true")
+                it.putString("gameId", "${gameParam?.gameId}")
+                it.putString("from", "游戏页面")
+            })
+            setClass(activity, AppFlutterActivity::class.java)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            activity.startActivity(this)
+        }
+    }
+
+    fun openLimitActivity() {
+        Intent().apply {
+            putExtra("route", "/webview")
+            putExtra("arguments", Bundle().also {
+                it.putString("url", activityUrl?.replace("activity", "webview"))
+                it.putString("gameId", "${gameParam?.gameId}")
+                it.putString("from", "游戏页面")
+            })
+            setClass(activity, AppFlutterActivity::class.java)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            activity.startActivity(this)
+        }
+    }
+
+    fun openLimitDiscount() {
+        Intent().apply {
+            putExtra("route", "/rechargeCenter")
+            putExtra("arguments", Bundle().also {
+                it.putString("type", "rechargeTime")
+                it.putString("from", "游戏页面")
+                it.putBoolean("discount", true)
             })
             setClass(activity, AppFlutterActivity::class.java)
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -895,7 +958,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             putExtra("route", "/rechargeCenter")
             putExtra("arguments", Bundle().also {
                 it.putString("type", "rechargeVip")
-                it.putString("from", "native")
+                it.putString("from", "游戏页面")
             })
             setClass(activity, AppFlutterActivity::class.java)
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -910,7 +973,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
     fun gameStat(
         page: String,
         action: String,
-        arg: Map<String, Any>? = null,
+        arg: Map<String, Any?>? = null,
         type: String = "event"
     ) {
         channel.invokeMethod(
@@ -1335,7 +1398,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         channel.invokeMethod("kickOutUser", arguments)
     }
 
-    private fun isAnTong(): Boolean {
+    fun isAnTong(): Boolean {
         val channel = gameParam?.channel
         if (channel?.isEmpty() != false) {
             // 未配置channel，根据游戏类型判断
@@ -1343,6 +1406,28 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         } else {
             // 配置了channel，根据channel判断
             return channel == AnTongSDK.CHANNEL_TYPE
+        }
+    }
+
+    fun setErrorDialogConfig(dialogConfig: ErrorDialogConfig?) {
+        this.dialogConfig = dialogConfig
+    }
+
+    fun getErrorDialogConfig(): ErrorDialogConfig? {
+        return this.dialogConfig
+    }
+
+    fun getUserRechargeStatus() {
+        channel.invokeMethod("getUserRechargeStatus", null)
+    }
+
+    private var activityUrl : String? = ""
+
+    fun updateUserRechargeStatus(arguments: Map<*, *>) {
+        val type = arguments["type"]
+        activityUrl = arguments["jumpUrl"] as String?
+        if (type is String) {
+            EventBus.getDefault().post(UserRechargeStatusEvent(type))
         }
     }
 }
