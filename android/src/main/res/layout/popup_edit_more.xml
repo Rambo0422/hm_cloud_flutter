@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    tools:ignore="SmallSp">
+
+    <View
+        android:background="@drawable/icon_triangle"
+        android:layout_width="12dp"
+        android:layout_gravity="top|center"
+        android:layout_height="5.5dp"/>
+
+    <LinearLayout
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5.4dp"
+        android:orientation="vertical"
+        android:background="@drawable/shape_popup_bg">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/btn_edit_name"
+            android:gravity="center"
+            android:textSize="10sp"
+            android:textColor="@android:color/white"
+            android:text="@string/config_name"
+            android:layout_width="match_parent"
+            android:layout_height="30dp" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/btn_restore"
+            android:gravity="center"
+            android:textSize="10sp"
+            android:textColor="@android:color/white"
+            android:text="@string/restore_default"
+            android:layout_width="match_parent"
+            android:layout_height="30dp" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/btn_delete_key"
+            android:gravity="center"
+            android:textSize="10sp"
+            android:textColor="@android:color/white"
+            android:text="@string/delete_key"
+            android:layout_width="match_parent"
+            android:layout_height="30dp" />
+    </LinearLayout>
+</FrameLayout>

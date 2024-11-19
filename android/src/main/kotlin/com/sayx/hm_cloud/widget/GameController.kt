@@ -165,6 +165,7 @@ class GameController @JvmOverloads constructor(
     private fun initGamepad(keyInfoList: List<KeyInfo>) {
         LogUtils.d("initGamepad:${keyInfoList}")
         editGamepadKeys.clear()
+        removeAllViews(keyboardViews)
         removeAllViews(gamepadViews)
         for (item in keyInfoList) {
             val keyInfo = item.copy()
@@ -202,6 +203,7 @@ class GameController @JvmOverloads constructor(
         LogUtils.d("initKeyboard:${keyInfoList}")
         editKeyboardKeys.clear()
         removeAllViews(keyboardViews)
+        removeAllViews(gamepadViews)
         for (item in keyInfoList) {
             val keyInfo = item.copy()
             editKeyboardKeys.add(keyInfo)
@@ -726,7 +728,7 @@ class GameController @JvmOverloads constructor(
      * 创建并添加摇杆控件到面板
      */
     private fun addRouletteKey(keyInfo: KeyInfo): RouletteKeyView {
-        LogUtils.d("addRouletteKey:$keyInfo")
+//        LogUtils.d("addRouletteKey:$keyInfo")
         val keyView = RouletteKeyView(context)
         keyView.setKeyInfo(keyInfo)
         keyView.onKeyEventListener = keyEventListener
@@ -888,7 +890,7 @@ class GameController @JvmOverloads constructor(
      * 编辑模式下，添加轮盘控件
      */
     fun addRouletteKey(keyInfo: KeyInfo, type: AppVirtualOperateType) {
-        LogUtils.d("addRouletteKey:$type")
+//        LogUtils.d("addRouletteKey:$type")
         if (type == AppVirtualOperateType.APP_STICK_XBOX) {
             editGamepadKeys.add(keyInfo)
             keyInfo.rouArr?.forEach { rouKey ->
@@ -1157,10 +1159,8 @@ class GameController @JvmOverloads constructor(
      */
     fun restoreDefault() {
         if (controllerType == AppVirtualOperateType.APP_STICK_XBOX) {
-//            controllerCallback?.getDefaultGamepadData()
             initGamepad(gamepadKeys)
         } else if (controllerType == AppVirtualOperateType.APP_KEYBOARD) {
-//            controllerCallback?.getDefaultKeyboardData()
             initKeyboard(keyboardKeys)
         }
     }

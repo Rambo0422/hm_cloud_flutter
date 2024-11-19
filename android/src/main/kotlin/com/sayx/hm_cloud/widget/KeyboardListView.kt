@@ -8,12 +8,18 @@ import android.widget.FrameLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
+import com.blankj.utilcode.util.LogUtils
 import com.sayx.hm_cloud.GameManager
 import com.sayx.hm_cloud.R
 import com.sayx.hm_cloud.adapter.KeyboardAdapter
 import com.sayx.hm_cloud.callback.KeyboardClickListener
+import com.sayx.hm_cloud.callback.KeyboardListCallback
+import com.sayx.hm_cloud.constants.GameConstants
 import com.sayx.hm_cloud.databinding.ViewKeyboardListBinding
+import com.sayx.hm_cloud.model.ControllerConfigEvent
 import com.sayx.hm_cloud.model.ControllerInfo
+import com.sayx.hm_cloud.model.MessageEvent
+import org.greenrobot.eventbus.EventBus
 
 class KeyboardListView @JvmOverloads constructor(
     context: Context,
@@ -28,15 +34,25 @@ class KeyboardListView @JvmOverloads constructor(
         KeyboardAdapter().apply {
             keyboardClickListener = object : KeyboardClickListener {
                 override fun onAddClick(position: Int) {
+                    hide()
+                    EventBus.getDefault().post(MessageEvent("addKeyboard", arg = GameConstants.gamepadConfig))
                 }
 
                 override fun onEditClick(info: ControllerInfo, position: Int) {
+                    hide()
+                    EventBus.getDefault().post(MessageEvent("updateKeyboard", arg = info))
                 }
 
                 override fun onDeleteClick(info: ControllerInfo, position: Int) {
+                    EventBus.getDefault().post(MessageEvent("deleteKeyboard", arg = info.id))
                 }
 
                 override fun onUseClick(info: ControllerInfo, position: Int) {
+                    if (GameManager.getGameParam()?.isVip() == true || info.isOfficial == true) {
+                        EventBus.getDefault().post(ControllerConfigEvent(info, showNotice = true))
+                    } else {
+                        EventBus.getDefault().post(MessageEvent("showVIP"))
+                    }
                 }
             }
         }
@@ -46,16 +62,38 @@ class KeyboardListView @JvmOverloads constructor(
         KeyboardAdapter().apply {
             keyboardClickListener = object : KeyboardClickListener {
                 override fun onAddClick(position: Int) {
+                    hide()
+                    EventBus.getDefault().post(MessageEvent("addKeyboard", arg = GameConstants.keyboardConfig))
                 }
 
                 override fun onEditClick(info: ControllerInfo, position: Int) {
+                    hide()
+                    EventBus.getDefault().post(MessageEvent("updateKeyboard", arg = info))
                 }
 
                 override fun onDeleteClick(info: ControllerInfo, position: Int) {
+                    EventBus.getDefault().post(MessageEvent("deleteKeyboard", arg = info.id))
                 }
 
                 override fun onUseClick(info: ControllerInfo, position: Int) {
+                    if (GameManager.getGameParam()?.isVip() == true || info.isOfficial == true) {
+                        EventBus.getDefault().post(ControllerConfigEvent(info, showNotice = true))
+                    } else {
+                        EventBus.getDefault().post(MessageEvent("showVIP"))
+                    }
                 }
+            }
+        }
+    }
+
+    private val gamepadCallback : KeyboardListCallback by lazy {
+        object : KeyboardListCallback {
+            override fun onGamepadList(list: List<ControllerInfo>) {
+                gamepadAdapter.itemList = list
+            }
+
+            override fun onKeyboardList(list: List<ControllerInfo>) {
+                keyboardAdapter.itemList = list
             }
         }
     }
@@ -74,13 +112,20 @@ class KeyboardListView @JvmOverloads constructor(
         dataBinding.rvKeyboard.adapter = keyboardAdapter
         when(GameManager.getGameParam()?.supportOperation) {
             1 -> {
-
+                // 只支持键盘
+                dataBinding.tvGamepadOpen.visibility = VISIBLE
+                dataBinding.rvGamepad.visibility = GONE
+                GameManager.getAllKeyboard(gamepadCallback)
             }
             2 -> {
-
+                // 只支持手柄
+                dataBinding.tvKeyboardOpen.visibility = VISIBLE
+                dataBinding.rvKeyboard.visibility = INVISIBLE
+                GameManager.getAllGamepad(gamepadCallback)
             }
-            3 -> {
-
+            else -> {
+                GameManager.getAllKeyboard(gamepadCallback)
+                GameManager.getAllGamepad(gamepadCallback)
             }
         }
     }
@@ -104,6 +149,10 @@ class KeyboardListView @JvmOverloads constructor(
 
         fun hide() {
             keyboardListView?.visibility = INVISIBLE
+        }
+
+        fun destroy() {
+            keyboardListView = null
         }
     }
 }

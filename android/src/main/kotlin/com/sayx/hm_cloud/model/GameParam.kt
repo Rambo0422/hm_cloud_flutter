@@ -23,6 +23,9 @@ data class GameParam(
     var priority: Int,
     // 用户id
     var userId: String,
+    var userName: String,
+    var userMobile: String,
+    var userAvatar: String,
     // 游戏channel
     var channelName: String,
     var vipExpiredTime: Long,
@@ -54,6 +57,9 @@ data class GameParam(
                 "realTime=$realTime, " +
                 "priority=$priority, " +
                 "userId='$userId', " +
+                "userName='$userName', " +
+                "userMobile='$userMobile', " +
+                "userAvatar='$userAvatar', " +
                 "channelName='$channelName', " +
                 "vipExpiredTime=$vipExpiredTime, " +
                 "gameId='$gameId', " +
@@ -81,6 +87,9 @@ data class GameParam(
                 getTimeValue(arguments["realTime"]),
                 (arguments["priority"] as Number?)?.toInt() ?: 0,
                 arguments["userId"] as String? ?: "",
+                arguments["userName"] as String? ?: "",
+                arguments["userMobile"] as String? ?: "",
+                arguments["userAvatar"] as String? ?: "",
                 arguments["channelName"] as String? ?: "",
                 getTimeValue(arguments["vipExpiredTime"]),
                 arguments["gameId"] as String? ?: "",

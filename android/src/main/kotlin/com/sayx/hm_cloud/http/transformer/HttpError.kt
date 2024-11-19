@@ -23,7 +23,7 @@ object HttpError {
         return ObservableTransformer {
             // http status onError
             it.onErrorReturn { throwable ->
-                LogUtils.e(throwable)
+                throwable.printStackTrace()
                 val httpResponse: HttpResponse<T> = HttpResponse(data = null)
                 when (throwable) {
                     is UnknownServiceException -> {

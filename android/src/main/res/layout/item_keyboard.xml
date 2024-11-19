@@ -38,6 +38,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="8dp"
+                android:layout_marginTop="2dp"
                 android:ellipsize="end"
                 android:lines="1"
                 android:textColor="@android:color/white"
@@ -51,6 +52,7 @@
                 android:id="@+id/iv_avatar"
                 android:layout_width="15dp"
                 android:layout_height="15dp"
+                android:layout_marginBottom="2dp"
                 app:layout_constraintBottom_toBottomOf="@id/iv_icon"
                 app:layout_constraintStart_toStartOf="@id/tv_name"
                 tools:src="@drawable/icon_official" />
@@ -77,6 +79,8 @@
                 android:layout_height="15dp"
                 android:layout_marginTop="-7.5dp"
                 android:layout_marginEnd="-7.5dp"
+                android:visibility="invisible"
+                tools:visibility="visible"
                 android:src="@drawable/icon_delete_keyboard"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />

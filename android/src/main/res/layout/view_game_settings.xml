@@ -634,42 +634,82 @@
                 android:layout_marginTop="5dp"
                 android:layout_marginEnd="15dp"
                 android:background="@drawable/shape_settings_function_bg"
-                android:clipToPadding="false"
+                android:clipChildren="false"
                 android:paddingHorizontal="10dp"
                 app:layout_constraintBottom_toTopOf="@id/mouse_config"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@id/control_method"
                 app:layout_constraintTop_toBottomOf="@id/control_method">
 
-                <com.sayx.hm_cloud.widget.DrawableTextView
-                    android:id="@+id/btn_gamepad"
+                <FrameLayout
                     android:layout_width="0dp"
                     android:layout_height="64dp"
-                    android:layout_marginVertical="10dp"
-                    android:layout_weight="1"
-                    android:drawablePadding="5dp"
-                    android:gravity="center"
-                    android:text="@string/gamepad_control"
-                    android:textColor="#ADB5CD"
-                    android:textSize="10sp"
-                    app:drawableSize="40dp"
-                    app:drawableTop="@drawable/selector_gamepad"
-                    tools:visibility="visible" />
+                    android:layout_marginTop="10dp"
+                    android:clipChildren="false"
+                    android:layout_weight="1">
 
-                <com.sayx.hm_cloud.widget.DrawableTextView
-                    android:id="@+id/btn_keyboard"
+                    <com.sayx.hm_cloud.widget.DrawableTextView
+                        android:id="@+id/btn_gamepad"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:drawablePadding="5dp"
+                        android:gravity="center"
+                        android:text="@string/gamepad_control"
+                        android:textColor="#ADB5CD"
+                        android:textSize="10sp"
+                        app:drawableSize="40dp"
+                        app:drawableTop="@drawable/selector_gamepad"
+                        tools:visibility="visible" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_gamepad_sign"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="-5dp"
+                        android:layout_marginEnd="-5dp"
+                        android:background="@drawable/shape_not_open_bg"
+                        android:text="@string/not_open"
+                        tools:visibility="visible"
+                        android:visibility="invisible"
+                        android:layout_gravity="end"
+                        android:textColor="#FF959AA9"
+                        android:textSize="8sp" />
+                </FrameLayout>
+
+                <FrameLayout
                     android:layout_width="0dp"
                     android:layout_height="64dp"
-                    android:layout_marginVertical="10dp"
-                    android:layout_weight="1"
-                    android:drawablePadding="5dp"
-                    android:gravity="center"
-                    android:text="@string/keyboard_control"
-                    android:textColor="#ADB5CD"
-                    android:textSize="10sp"
-                    app:drawableSize="40dp"
-                    app:drawableTop="@drawable/selector_keyboard"
-                    tools:visibility="visible" />
+                    android:layout_marginTop="10dp"
+                    android:clipChildren="false"
+                    android:layout_weight="1">
+
+                    <com.sayx.hm_cloud.widget.DrawableTextView
+                        android:id="@+id/btn_keyboard"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:drawablePadding="5dp"
+                        android:gravity="center"
+                        android:text="@string/keyboard_control"
+                        android:textColor="#ADB5CD"
+                        android:textSize="10sp"
+                        app:drawableSize="40dp"
+                        app:drawableTop="@drawable/selector_keyboard"
+                        tools:visibility="visible" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_keyboard_sign"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="-5dp"
+                        android:layout_marginEnd="-5dp"
+                        android:background="@drawable/shape_not_open_bg"
+                        android:text="@string/not_open"
+                        tools:visibility="visible"
+                        android:visibility="invisible"
+                        android:layout_gravity="end"
+                        android:textColor="#FF959AA9"
+                        android:textSize="8sp" />
+                </FrameLayout>
 
                 <com.sayx.hm_cloud.widget.DrawableTextView
                     android:id="@+id/btn_more_keyboard"

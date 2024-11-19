@@ -394,12 +394,15 @@ class GameSettings @JvmOverloads constructor(
                 dataBinding.btnGamepad.isEnabled = false
                 dataBinding.btnGamepad.setDrawableTop(R.drawable.icon_gamepad_close)
                 dataBinding.btnGamepad.setTextColor(Color.parseColor("#FF444855"))
+                dataBinding.tvGamepadSign.visibility = VISIBLE
             }
 
             2 -> {
+                // 只支持手柄
                 dataBinding.btnKeyboard.isEnabled = false
                 dataBinding.btnKeyboard.setDrawableTop(R.drawable.icon_keyboard_close)
                 dataBinding.btnKeyboard.setTextColor(Color.parseColor("#FF444855"))
+                dataBinding.tvKeyboardSign.visibility = VISIBLE
             }
         }
     }

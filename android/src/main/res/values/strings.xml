@@ -111,7 +111,7 @@
     <string name="combine_key">组合按键</string>
     <string name="roulette_key">轮盘按键</string>
     <string name="key_size">按键大小</string>
-    <string name="delete">删除</string>
+    <string name="delete_key">删除按键</string>
     <string name="key_opacity">透明度</string>
     <string name="default_percent" translatable="false">0%</string>
     <string name="edit">编辑</string>
@@ -165,7 +165,7 @@
     <string name="confirm_save">确认保存</string>
     <string name="confirm_restore">确认还原</string>
     <string name="title_join_vip">VIP专属功能</string>
-    <string name="subtitle_join_vip">VIP每日可领1h高峰时长，双倍经验</string>
+    <string name="subtitle_join_vip">VIP每日可领1h高峰时长等7大特权</string>
     <string name="join_vip">我要开通</string>
     <string name="game_time_lack">剩余游玩时间不足5分钟</string>
     <string name="recharge">充值</string>
@@ -179,4 +179,6 @@
     <string name="use">使用</string>
     <string name="using">使用中</string>
     <string name="request_keyboard_config_fail">获取按键配置失败</string>
+    <string name="official_share">官方分享</string>
+    <string name="config_name">配置命名</string>
 </resources>

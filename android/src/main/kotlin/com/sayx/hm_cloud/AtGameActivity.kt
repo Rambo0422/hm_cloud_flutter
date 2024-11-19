@@ -61,10 +61,12 @@ import com.sayx.hm_cloud.http.bean.HttpResponse
 import com.sayx.hm_cloud.model.ControllerChangeEvent
 import com.sayx.hm_cloud.model.ControllerConfigEvent
 import com.sayx.hm_cloud.model.ControllerEditEvent
+import com.sayx.hm_cloud.model.ControllerInfo
 import com.sayx.hm_cloud.model.GameConfig
 import com.sayx.hm_cloud.model.GameNotice
 import com.sayx.hm_cloud.model.GameParam
 import com.sayx.hm_cloud.model.KeyInfo
+import com.sayx.hm_cloud.model.MessageEvent
 import com.sayx.hm_cloud.model.TimeUpdateEvent
 import com.sayx.hm_cloud.model.UserRechargeStatusEvent
 import com.sayx.hm_cloud.utils.AppSizeUtils
@@ -242,7 +244,7 @@ class AtGameActivity : AppCompatActivity() {
 
             override fun updateKeyboardData(data: JsonObject) {
                 // 需要更新配置
-                GameManager.updateKeyboardData(data)
+//                GameManager.updateKeyboardData(data)
             }
         }
         // 游戏控制器按键操作处理
@@ -560,6 +562,7 @@ class AtGameActivity : AppCompatActivity() {
                     this,
                     "hideExitGameDialog"
                 )
+                finish()
                 showLoading()
                 AnTongSDK.stopGame()
                 GameManager.releaseGame(finish = "1")
@@ -858,6 +861,7 @@ class AtGameActivity : AppCompatActivity() {
     private fun showRestoreCustomDialog() {
         AppCommonDialog.Builder(this)
             .setTitle(getString(R.string.title_restore_custom))
+            .setSubTitle("按键将会恢复到上次保存记录", subTitleColor = Color.GRAY)
             .setLeftButton(getString(R.string.cancel)) {
                 AppCommonDialog.hideDialog(this)
             }
@@ -1027,8 +1031,69 @@ class AtGameActivity : AppCompatActivity() {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onMessageEvent(event: MessageEvent) {
+        when(event.msg) {
+            "showVIP" -> {
+                showJoinVipDialog()
+            }
+            "addKeyboard" -> {
+                event.arg?.let {
+                    when (it) {
+                        GameConstants.gamepadConfig -> {
+                            dataBinding.gameController.setControllerData(GameManager.gamepadList[0])
+                            showControllerEdit(AppVirtualOperateType.APP_STICK_XBOX)
+                        }
+                        GameConstants.keyboardConfig -> {
+                            dataBinding.gameController.setControllerData(GameManager.keyboardList[1])
+                            showControllerEdit(AppVirtualOperateType.APP_KEYBOARD)
+                        }
+                    }
+                }
+            }
+            "updateKeyboard" -> {
+                event.arg?.let {
+                    if (it is ControllerInfo) {
+                        LogUtils.d("updateKeyboard:${it.type}")
+                        dataBinding.gameController.setControllerData(it)
+                        when (it.type) {
+                            GameConstants.gamepadConfig -> {
+                                showControllerEdit(AppVirtualOperateType.APP_STICK_XBOX)
+                            }
+                            GameConstants.keyboardConfig -> {
+                                showControllerEdit(AppVirtualOperateType.APP_KEYBOARD)
+                            }
+                        }
+                    }
+                }
+            }
+            "deleteKeyboard" -> {
+                AppCommonDialog.Builder(this)
+                    .setTitle("确认删除吗?")
+                    .setSubTitle("删除后按键将无法恢复!", Color.parseColor("#FFA3ACBD"))
+                    .setLeftButton("取消") {
+                        AppCommonDialog.hideDialog(this, tag = "deleteKeyboard")
+                    }
+                    .setRightButton("确认删除", Color.parseColor("#FFFFFFFF")) {
+                        AppCommonDialog.hideDialog(this, tag = "deleteKeyboard")
+                        event.arg?.let {
+                            GameManager.deleteKeyboardConfig(it as String)
+                        }
+                    }
+                    .setRightButtonBg(R.drawable.shape_delete_keyboard_bg)
+                    .build()
+                    .show(tag = "deleteKeyboard")
+            }
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
     fun onControllerConfigEvent(event: ControllerConfigEvent) {
         dataBinding.gameController.setControllerData(event.data)
+        gameSettings?.controllerType = dataBinding.gameController.controllerType
+        if (event.data.use != 1) {
+            event.data.use = 1
+            GameManager.updateKeyboardData(event.data)
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -1152,7 +1217,7 @@ class AtGameActivity : AppCompatActivity() {
         } catch (e: Exception) {
             LogUtils.e("exitCustom:${e.message}")
         }
-
+        KeyboardListView.destroy()
         // AnTongSDK.onDestroy()
         EventBus.getDefault().unregister(this)
         super.onDestroy()
