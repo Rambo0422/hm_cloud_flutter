@@ -116,7 +116,7 @@ typedef void (^BoolBlock)(BOOL isSucc);
 
 + (instancetype)share;
 - (void)configWithParams:(NSDictionary *)params;
-- (void)registWithDelegate:(id<HmCloudToolDelegate>)delegate;
+- (void)registWithDelegate:(id<HmCloudToolDelegate>)delegate result:(nullable BoolBlock)block;
 
 - (void)startGame;
 

@@ -17,7 +17,7 @@
 @property (nonatomic, strong)  CloudPreViewController *vc;
 
 
-@property (nonatomic, assign) BOOL isInit;
+@property (nonatomic, strong) BoolBlock initBlock;
 
 @end
 
@@ -78,7 +78,7 @@
     [self mj_setKeyValues:params];
 }
 
-- (void)registWithDelegate:(id<HmCloudToolDelegate>)delegate {
+- (void)registWithDelegate:(id<HmCloudToolDelegate>)delegate result:(nullable BoolBlock)block {
     self.delegate = delegate;
     NSLog(@" =============== SDK_VERSION : %@", CLOUDGAME_SDK_VERSION);
 
@@ -100,6 +100,8 @@
 //    [self pushPreView];
 //    return;
 
+    self.initBlock = block;
+
     [[HMCloudPlayer sharedCloudPlayer] setDelegate:self];
     [[HMCloudPlayer sharedCloudPlayer] registCloudPlayer:self.accessKeyId channelId:self.channelName options:nil];
 }
@@ -119,7 +121,6 @@
 
     self.vc = nil;
     self.gameVC = nil;
-    self.isInit = NO;
 
     [[HMCloudPlayer sharedCloudPlayer] stop:10 withReason:HMCloudAppStopReasonNormal];
 }
@@ -379,7 +380,9 @@
     NSString *state = [info objectForKey:@"state"];
 
     if ([state isEqualToString:@"success"]) {
-        self.isInit = YES;
+        if (self.initBlock) {
+            self.initBlock(YES);
+        }
     } else if ([state isEqualToString:@"failed"]) {
         NSString *errorCode = [info objectForKey:@"errorCode"];
 

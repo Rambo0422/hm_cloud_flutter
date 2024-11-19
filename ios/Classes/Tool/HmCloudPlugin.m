@@ -33,7 +33,10 @@
     if ([call.method isEqualToString:MethodInit]) {
         [[HmCloudTool share] configWithParams:call.arguments];
 
-        [[HmCloudTool share] registWithDelegate:self];
+        [[HmCloudTool share] registWithDelegate:self
+                                         result:^(BOOL isSucc) {
+            result(@(isSucc));
+        }];
     }
 
     if ([call.method isEqualToString:MethodStart]) {
