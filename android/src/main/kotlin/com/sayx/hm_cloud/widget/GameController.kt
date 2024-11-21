@@ -134,7 +134,7 @@ class GameController @JvmOverloads constructor(
             if (gamepadKeys.isEmpty()) {
                 controllerCallback?.getGamepadData()
             } else {
-                LogUtils.d("showGamepad:${gamepadViews.size}")
+//                LogUtils.d("showGamepad:${gamepadViews.size}")
                 // 加载Views
                 if (gamepadViews.size == 0) {
                     initGamepad(gamepadKeys)
@@ -146,14 +146,14 @@ class GameController @JvmOverloads constructor(
     }
 
     private fun showKeyboard() {
-        LogUtils.d("showKeyboard:${keyboardKeys.size}")
+//        LogUtils.d("showKeyboard:${keyboardKeys.size}")
         try {
             changViewVisibility(gamepadViews, INVISIBLE)
             changViewVisibility(keyboardViews, VISIBLE)
             if (keyboardKeys.isEmpty()) {
                 controllerCallback?.getKeyboardData()
             } else {
-                LogUtils.d("showKeyboard:${keyboardViews.size}")
+//                LogUtils.d("showKeyboard:${keyboardViews.size}")
                 // 加载Views
                 if (keyboardViews.size == 0) {
                     initKeyboard(keyboardKeys)
@@ -165,7 +165,7 @@ class GameController @JvmOverloads constructor(
     }
 
     private fun initGamepad(keyInfoList: List<KeyInfo>) {
-        LogUtils.d("initGamepad:${keyInfoList}")
+//        LogUtils.d("initGamepad:${keyInfoList}")
         editGamepadKeys.clear()
         removeAllViews(keyboardViews)
         removeAllViews(gamepadViews)
@@ -199,6 +199,11 @@ class GameController @JvmOverloads constructor(
                 }
             }
         }
+        currentKey?.let { info ->
+            val view = findKeyView(this, info)
+            view?.isActivated = true
+            view?.invalidate()
+        }
     }
 
     private fun initKeyboard(keyInfoList: List<KeyInfo>) {
@@ -231,6 +236,11 @@ class GameController @JvmOverloads constructor(
                     LogUtils.e("initGamepad:$keyInfo")
                 }
             }
+        }
+        currentKey?.let { info ->
+            val view = findKeyView(this, info)
+            view?.isActivated = true
+            view?.invalidate()
         }
     }
 
@@ -661,8 +671,6 @@ class GameController @JvmOverloads constructor(
 //        LogUtils.d("addCombineKey:$keyInfo")
         val keyView = CombineKeyView(context)
         keyView.setKeyInfo(keyInfo)
-        keyView.isClickable = true
-        keyView.isFocusable = true
         keyView.setOnClickListener {
 //            LogUtils.d("onKeyClick:$keyInfo, editMode:$controllerStatus")
             if (controllerStatus == ControllerStatus.Edit) {
@@ -677,8 +685,6 @@ class GameController @JvmOverloads constructor(
                 currentKey?.let { info ->
                     listener?.onEditKeyClick(info)
                 }
-            } else if (controllerStatus == ControllerStatus.Roulette) {
-//                ToastUtils.showShort("无法在轮盘中添加")
             }
         }
         keyView.onKeyTouchListener = object : OnKeyTouchListener {
@@ -707,6 +713,7 @@ class GameController @JvmOverloads constructor(
                 }
             }
         }
+
         keyView.tag = keyInfo.id
         if (controllerType == AppVirtualOperateType.APP_STICK_XBOX) {
             gamepadViews.add(keyView)
@@ -840,13 +847,20 @@ class GameController @JvmOverloads constructor(
      * 编辑模式下，添加按键控件
      */
     fun addKeyButton(keyInfo: KeyInfo, type: AppVirtualOperateType) {
-        LogUtils.d("addKeyButton:$type")
+//        LogUtils.d("addKeyButton:$type")
         if (type == AppVirtualOperateType.APP_STICK_XBOX) {
             editGamepadKeys.add(keyInfo)
         } else if (type == AppVirtualOperateType.APP_KEYBOARD) {
             editKeyboardKeys.add(keyInfo)
         }
-        addKeyButton(keyInfo)
+        val keyView = addKeyButton(keyInfo)
+        currentKey?.let { info ->
+            val view = findKeyView(this@GameController, info)
+            view?.isActivated = false
+            view?.invalidate()
+        }
+        keyView.isActivated = true
+        keyView.invalidate()
         currentKey = keyInfo
     }
 
@@ -854,13 +868,20 @@ class GameController @JvmOverloads constructor(
      * 编辑模式下，添加摇杆控件
      */
     fun addRocker(keyInfo: KeyInfo, type: AppVirtualOperateType) {
-        LogUtils.d("addRocker:$type")
+//        LogUtils.d("addRocker:$type")
         if (type == AppVirtualOperateType.APP_STICK_XBOX) {
             editGamepadKeys.add(keyInfo)
         } else if (type == AppVirtualOperateType.APP_KEYBOARD) {
             editKeyboardKeys.add(keyInfo)
         }
-        addRocker(keyInfo)
+        val rockerView = addRocker(keyInfo)
+        currentKey?.let { info ->
+            val view = findKeyView(this@GameController, info)
+            view?.isActivated = false
+            view?.invalidate()
+        }
+        rockerView.isActivated = true
+        rockerView.invalidate()
         currentKey = keyInfo
     }
 
@@ -868,9 +889,16 @@ class GameController @JvmOverloads constructor(
      * 编辑模式下，添加十字摇杆控件
      */
     fun addCrossRocker(keyInfo: KeyInfo, type: AppVirtualOperateType) {
-        LogUtils.d("addCrossRocker:$type")
+//        LogUtils.d("addCrossRocker:$type")
         editGamepadKeys.add(keyInfo)
-        addCrossRocker(keyInfo)
+        val rockerView = addCrossRocker(keyInfo)
+        currentKey?.let { info ->
+            val view = findKeyView(this@GameController, info)
+            view?.isActivated = false
+            view?.invalidate()
+        }
+        rockerView.isActivated = true
+        rockerView.invalidate()
         currentKey = keyInfo
     }
 
@@ -878,13 +906,21 @@ class GameController @JvmOverloads constructor(
      * 编辑模式下，添加组合按键控件
      */
     fun addCombineKey(keyInfo: KeyInfo, type: AppVirtualOperateType) {
-        LogUtils.d("addCombineKey:$type")
+//        LogUtils.d("addCombineKey:$type")
         if (type == AppVirtualOperateType.APP_STICK_XBOX) {
             editGamepadKeys.add(keyInfo)
         } else if (type == AppVirtualOperateType.APP_KEYBOARD) {
             editKeyboardKeys.add(keyInfo)
         }
-        addCombineKey(keyInfo)
+        val keyView = addCombineKey(keyInfo)
+        currentKey?.let { info ->
+            val view = findKeyView(this@GameController, info)
+            LogUtils.d("unActivated:${view?.javaClass?.simpleName}")
+            view?.isActivated = false
+            view?.invalidate()
+        }
+        keyView.isActivated = true
+        keyView.invalidate()
         currentKey = keyInfo
     }
 
@@ -906,7 +942,15 @@ class GameController @JvmOverloads constructor(
                 removeView(findKeyView(this, rouKey))
             }
         }
-        addRouletteKey(keyInfo)
+        val keyView = addRouletteKey(keyInfo)
+        currentKey?.let { info ->
+            val view = findKeyView(this@GameController, info)
+            LogUtils.d("unActivated:${view?.javaClass?.simpleName}")
+            view?.isActivated = false
+            view?.invalidate()
+        }
+        keyView.isActivated = true
+        keyView.invalidate()
         currentKey = keyInfo
     }
 
@@ -920,7 +964,7 @@ class GameController @JvmOverloads constructor(
     fun setControllerData(data: ControllerInfo) {
         controllerInfo = data
         controllerName = data.name?: ""
-        LogUtils.d("setKeyData:$data")
+//        LogUtils.d("setKeyData:$data")
         if (data.type == GameConstants.keyboardConfig) {
             // 键鼠
 //            LogUtils.d("setKeyData-> keyboard")
@@ -1034,6 +1078,12 @@ class GameController @JvmOverloads constructor(
         dataBinding.layoutMask.clearLine()
     }
 
+    fun updateKey() {
+        currentKey?.let {
+            updateKey(it)
+        }
+    }
+
     fun updateKey(keyInfo: KeyInfo) {
         LogUtils.v("updateKey->\ncurrent:$currentKey\nnew:$keyInfo")
         if (controllerType == AppVirtualOperateType.APP_STICK_XBOX) {
@@ -1136,12 +1186,13 @@ class GameController @JvmOverloads constructor(
      * 点击还原默认
      */
     fun restoreDefault() {
+        currentKey = null
         if (controllerType == AppVirtualOperateType.APP_STICK_XBOX) {
             initGamepad(gamepadKeys)
         } else if (controllerType == AppVirtualOperateType.APP_KEYBOARD) {
             initKeyboard(keyboardKeys)
         }
-        EventBus.getDefault().post(MessageEvent("restoreSuccess"))
+        EventBus.getDefault().post(MessageEvent("restoreSuccess", arg = currentKey))
     }
 
     /**

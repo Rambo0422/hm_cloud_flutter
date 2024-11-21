@@ -12,6 +12,7 @@ import android.hardware.input.InputManager
 import android.media.AudioManager
 import android.os.Bundle
 import android.os.Handler
+import android.os.IBinder
 import android.os.Looper
 import android.provider.Settings
 import android.view.Gravity
@@ -23,6 +24,7 @@ import android.view.WindowManager
 import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
 import android.view.animation.ScaleAnimation
+import android.view.inputmethod.InputMethodManager
 import android.widget.FrameLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
@@ -31,7 +33,6 @@ import com.antong.keyboard.sa.constants.HMInputOpData
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.SPUtils
 import com.blankj.utilcode.util.ToastUtils
-import com.google.gson.JsonObject
 import com.gyf.immersionbar.BarHide
 import com.gyf.immersionbar.ktx.immersionBar
 import com.gyf.immersionbar.ktx.navigationBarHeight
@@ -80,7 +81,6 @@ import com.sayx.hm_cloud.widget.AddGamepadKey
 import com.sayx.hm_cloud.widget.AddKeyboardKey
 import com.sayx.hm_cloud.widget.ControllerEditLayout
 import com.sayx.hm_cloud.widget.EditCombineKey
-import com.sayx.hm_cloud.widget.EditKeyView
 import com.sayx.hm_cloud.widget.EditRouletteKey
 import com.sayx.hm_cloud.widget.GameNoticeView
 import com.sayx.hm_cloud.widget.GameSettings
@@ -123,7 +123,12 @@ class AtGameActivity : AppCompatActivity() {
 
     // 设备连接监听
     private val inputManager : InputManager by lazy {
-        this.getSystemService(Context.INPUT_SERVICE) as InputManager
+        getSystemService(Context.INPUT_SERVICE) as InputManager
+    }
+
+    // 隐藏软键盘
+    private val inputMethodManager : InputMethodManager by lazy {
+        getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     }
 
     private var inputTimer: Timer? = null
@@ -683,20 +688,6 @@ class AtGameActivity : AppCompatActivity() {
                 dataBinding.gameController.deleteKey()
             }
 
-            override fun onEditCombine(keyInfo: KeyInfo) {
-                controllerEditLayout?.hideLayout(object : AnimatorListenerImp() {
-                    override fun onAnimationEnd(animation: Animator) {
-                        if (keyInfo.type == KeyType.KEY_COMBINE || keyInfo.type == KeyType.GAMEPAD_COMBINE) {
-//                            LogUtils.d("onEditCombine:$keyInfo")
-                            showEditCombineKeyLayout(keyInfo)
-                        } else if (keyInfo.type == KeyType.KEY_ROULETTE || keyInfo.type == KeyType.GAMEPAD_ROULETTE) {
-//                            LogUtils.d("onEditRoulette:$keyInfo")
-                            showEditRouletteKeyLayout(keyInfo)
-                        }
-                    }
-                })
-            }
-
             override fun onEditName() {
                 showEditConfigName()
             }
@@ -742,7 +733,7 @@ class AtGameActivity : AppCompatActivity() {
     }
 
     private fun showKeyBoard(showRocker: Boolean) {
-        LogUtils.d("showKeyBoard:$showRocker, ${dataBinding.gameController.controllerType}")
+//        LogUtils.d("showKeyBoard:$showRocker, ${dataBinding.gameController.controllerType}")
         if (dataBinding.gameController.controllerType == AppVirtualOperateType.APP_KEYBOARD) {
             showAddKeyboardView(showRocker)
         } else if (dataBinding.gameController.controllerType == AppVirtualOperateType.APP_STICK_XBOX) {
@@ -755,12 +746,12 @@ class AtGameActivity : AppCompatActivity() {
             editCombineKey = EditCombineKey(this)
             editCombineKey?.setCombineKeyInfo(keyInfo)
             editCombineKey?.onHideListener = object : HideListener {
-                override fun onHide() {
+                override fun onHide(keyInfo: KeyInfo?) {
+                    keyInfo?.let {
+                        showKeyEditView(it)
+                    }
                     controllerEditLayout?.showLayout()
                     hideKeyBoard()
-                    if (keyInfo != null) {
-                        showKeyEditView(keyInfo)
-                    }
                 }
             }
             editCombineKey?.addKeyListener = object : AddKeyListenerImp() {
@@ -796,12 +787,12 @@ class AtGameActivity : AppCompatActivity() {
             editRouletteKey = EditRouletteKey(this)
             editRouletteKey?.setRouletteKeyInfo(keyInfo)
             editRouletteKey?.onHideListener = object : HideListener {
-                override fun onHide() {
-                    controllerEditLayout?.showLayout()
-                    hideKeyBoard()
-                    if (keyInfo != null) {
-                        showKeyEditView(keyInfo)
+                override fun onHide(keyInfo: KeyInfo?) {
+                    keyInfo?.let {
+                        showKeyEditView(it)
                     }
+                    hideKeyBoard()
+                    controllerEditLayout?.showLayout()
                 }
             }
             editRouletteKey?.addKeyListener = object : AddKeyListenerImp() {
@@ -816,9 +807,6 @@ class AtGameActivity : AppCompatActivity() {
                         dataBinding.gameController.controllerType
                     )
                     controllerEditLayout?.setKeyInfo(keyInfo)
-                }
-
-                override fun onUpdateKey() {
                 }
 
                 override fun rouAddData(list: List<KeyInfo>?) {
@@ -1024,7 +1012,7 @@ class AtGameActivity : AppCompatActivity() {
     }
 
     private fun hideKeyBoard() {
-        LogUtils.d("hideKeyBoard")
+//        LogUtils.d("hideKeyBoard")
         if (dataBinding.gameController.controllerType == AppVirtualOperateType.APP_KEYBOARD) {
             addKeyboardKey?.hideBoard(null)
         } else if (dataBinding.gameController.controllerType == AppVirtualOperateType.APP_STICK_XBOX) {
@@ -1055,7 +1043,7 @@ class AtGameActivity : AppCompatActivity() {
             "updateKeyboard" -> {
                 event.arg?.let {
                     if (it is ControllerInfo) {
-                        LogUtils.d("updateKeyboard:${it.type}")
+//                        LogUtils.d("updateKeyboard:${it.type}")
                         dataBinding.gameController.setControllerData(it)
                         when (it.type) {
                             GameConstants.gamepadConfig -> {
@@ -1097,6 +1085,11 @@ class AtGameActivity : AppCompatActivity() {
                     .show()
             }
             "restoreSuccess" -> {
+                if (event.arg is KeyInfo) {
+                    keyEditView?.setKeyInfo(event.arg)
+                } else {
+                    controllerEditLayout?.setKeyInfo(null)
+                }
                 GameToastDialog.Builder(this)
                     .setTitle("还原成功")
                     .setSubTitle("继续编辑最适合你的按键配置吧！")
@@ -1112,7 +1105,7 @@ class AtGameActivity : AppCompatActivity() {
     }
 
     private fun showKeyEditView(keyInfo: KeyInfo) {
-//        LogUtils.d("showKeyEditView:$keyInfo")
+        LogUtils.d("showKeyEditView:$keyInfo")
         if (keyEditView == null) {
             keyEditView = KeyEditView(this)
             val layoutParams = FrameLayout.LayoutParams(
@@ -1125,7 +1118,8 @@ class AtGameActivity : AppCompatActivity() {
                     dataBinding.gameController.deleteKey()
                 }
 
-                override fun onSaveKey(keyInfo: KeyInfo) {
+                override fun onSaveKey(keyInfo: KeyInfo, windowToken: IBinder) {
+                    hideSoftKeyBoard(windowToken)
                     dataBinding.gameController.updateKey(keyInfo)
                 }
 
@@ -1148,6 +1142,10 @@ class AtGameActivity : AppCompatActivity() {
             keyEditView?.setKeyInfo(keyInfo)
             keyEditView?.visibility = View.VISIBLE
         }
+    }
+
+    fun hideSoftKeyBoard(windowToken: IBinder) {
+        inputMethodManager.hideSoftInputFromWindow(windowToken, 0)
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

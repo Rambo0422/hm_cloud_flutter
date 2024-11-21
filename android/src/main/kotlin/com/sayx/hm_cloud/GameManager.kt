@@ -1100,6 +1100,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
 
     fun useKeyboardData(keyboardInfo: ControllerInfo) {
         LogUtils.d("useKeyboardData:$keyboardInfo")
+        keyboardInfo.use = 1
         updateKeyboardData(keyboardInfo, object : BaseObserver<HttpResponse<Any>>() {
             override fun onNext(response: HttpResponse<Any>) {
                 if (keyboardInfo.type == GameConstants.gamepadConfig) {

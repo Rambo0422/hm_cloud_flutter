@@ -11,6 +11,7 @@ import android.hardware.input.InputManager
 import android.media.AudioManager
 import android.os.Bundle
 import android.os.Handler
+import android.os.IBinder
 import android.os.Looper
 import android.provider.Settings
 import android.text.TextUtils
@@ -23,6 +24,7 @@ import android.view.WindowManager
 import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
 import android.view.animation.ScaleAnimation
+import android.view.inputmethod.InputMethodManager
 import android.widget.FrameLayout
 import android.widget.LinearLayout.LayoutParams
 import androidx.activity.OnBackPressedCallback
@@ -34,7 +36,6 @@ import androidx.lifecycle.lifecycleScope
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.SPUtils
 import com.blankj.utilcode.util.ToastUtils
-import com.google.gson.JsonObject
 import com.gyf.immersionbar.BarHide
 import com.gyf.immersionbar.ktx.immersionBar
 import com.gyf.immersionbar.ktx.navigationBarHeight
@@ -146,7 +147,12 @@ class GameActivity : AppCompatActivity() {
 
     // 设备连接监听
     private val inputManager : InputManager by lazy {
-        this.getSystemService(Context.INPUT_SERVICE) as InputManager
+        getSystemService(Context.INPUT_SERVICE) as InputManager
+    }
+
+    // 隐藏软键盘
+    private val inputMethodManager : InputMethodManager by lazy {
+        getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -654,20 +660,6 @@ class GameActivity : AppCompatActivity() {
                 dataBinding.gameController.deleteKey()
             }
 
-            override fun onEditCombine(keyInfo: KeyInfo) {
-                controllerEditLayout?.hideLayout(object : AnimatorListenerImp() {
-                    override fun onAnimationEnd(animation: Animator) {
-                        if (keyInfo.type == KeyType.KEY_COMBINE || keyInfo.type == KeyType.GAMEPAD_COMBINE) {
-//                            LogUtils.d("onEditCombine:$keyInfo")
-                            showEditCombineKeyLayout(keyInfo)
-                        } else if (keyInfo.type == KeyType.KEY_ROULETTE || keyInfo.type == KeyType.GAMEPAD_ROULETTE) {
-//                            LogUtils.d("onEditRoulette:$keyInfo")
-                            showEditRouletteKeyLayout(keyInfo)
-                        }
-                    }
-                })
-            }
-
             override fun onEditName() {
                 showEditConfigName()
             }
@@ -679,12 +671,12 @@ class GameActivity : AppCompatActivity() {
             editCombineKey = EditCombineKey(this)
             editCombineKey?.setCombineKeyInfo(keyInfo)
             editCombineKey?.onHideListener = object : HideListener {
-                override fun onHide() {
+                override fun onHide(keyInfo: KeyInfo?) {
+                    keyInfo?.let {
+                        showKeyEditView(it)
+                    }
                     controllerEditLayout?.showLayout()
                     hideKeyBoard()
-                    if (keyInfo != null) {
-                        showKeyEditView(keyInfo)
-                    }
                 }
             }
             editCombineKey?.addKeyListener = object : AddKeyListenerImp() {
@@ -720,12 +712,12 @@ class GameActivity : AppCompatActivity() {
             editRouletteKey = EditRouletteKey(this)
             editRouletteKey?.setRouletteKeyInfo(keyInfo)
             editRouletteKey?.onHideListener = object : HideListener {
-                override fun onHide() {
-                    controllerEditLayout?.showLayout()
-                    hideKeyBoard()
-                    if (keyInfo != null) {
+                override fun onHide(keyInfo: KeyInfo?) {
+                    keyInfo?.let {
                         showKeyEditView(keyInfo)
                     }
+                    controllerEditLayout?.showLayout()
+                    hideKeyBoard()
                 }
             }
             editRouletteKey?.addKeyListener = object : AddKeyListenerImp() {
@@ -740,10 +732,6 @@ class GameActivity : AppCompatActivity() {
                         dataBinding.gameController.controllerType
                     )
                     controllerEditLayout?.setKeyInfo(keyInfo)
-                }
-
-                override fun onUpdateKey() {
-
                 }
 
                 override fun rouAddData(list: List<KeyInfo>?) {
@@ -1085,6 +1073,11 @@ class GameActivity : AppCompatActivity() {
                     .show()
             }
             "restoreSuccess" -> {
+                if (event.arg is KeyInfo) {
+                    keyEditView?.setKeyInfo(event.arg)
+                } else {
+                    controllerEditLayout?.setKeyInfo(null)
+                }
                 GameToastDialog.Builder(this)
                     .setTitle("还原成功")
                     .setSubTitle("继续编辑最适合你的按键配置吧！")
@@ -1114,7 +1107,8 @@ class GameActivity : AppCompatActivity() {
                     dataBinding.gameController.deleteKey()
                 }
 
-                override fun onSaveKey(keyInfo: KeyInfo) {
+                override fun onSaveKey(keyInfo: KeyInfo, windowToken: IBinder) {
+                    hideSoftKeyBoard(windowToken)
                     dataBinding.gameController.updateKey(keyInfo)
                 }
 
@@ -1137,6 +1131,10 @@ class GameActivity : AppCompatActivity() {
             keyEditView?.setKeyInfo(keyInfo)
             keyEditView?.visibility = View.VISIBLE
         }
+    }
+
+    fun hideSoftKeyBoard(windowToken: IBinder) {
+        inputMethodManager.hideSoftInputFromWindow(windowToken, 0)
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
