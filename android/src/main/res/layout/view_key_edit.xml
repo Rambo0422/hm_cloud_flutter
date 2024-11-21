@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="SmallSp">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#FF1C222D"
+        android:paddingHorizontal="50dp"
+        android:paddingVertical="23.5dp">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/btn_exit_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/shape_add_key_bg"
+            android:gravity="center"
+            android:paddingHorizontal="36dp"
+            android:paddingVertical="6dp"
+            android:text="@string/exit_edit"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/btn_delete_key"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/shape_add_key_bg"
+            android:gravity="center"
+            android:paddingHorizontal="36dp"
+            android:paddingVertical="6dp"
+            android:text="@string/delete_key"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toStartOf="@id/btn_save_edit"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/btn_save_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/shape_save_edit_bg"
+            android:gravity="center"
+            android:paddingHorizontal="36dp"
+            android:paddingVertical="6dp"
+            android:text="@string/save_edit"
+            android:textColor="@android:color/black"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:id="@+id/preview_bg"
+            android:layout_width="250dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/shape_key_preview_bg"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btn_exit_edit" />
+
+        <FrameLayout
+            android:id="@+id/layout_preview"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_margin="15dp"
+            android:background="@drawable/img_key_preview_bg"
+            app:layout_constraintBottom_toTopOf="@id/preview"
+            app:layout_constraintEnd_toEndOf="@id/preview_bg"
+            app:layout_constraintStart_toStartOf="@id/preview_bg"
+            app:layout_constraintTop_toTopOf="@id/preview_bg">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxWidth="120dp"
+                android:gravity="center"
+                android:layout_gravity="bottom|center"
+                android:layout_marginBottom="40dp"
+                android:textColor="#FF9CA3B4"
+                android:textSize="12sp"
+                android:visibility="invisible"
+                tools:text="A + B + C + D + E + F + G"
+                tools:visibility="visible" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/btn_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|center"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/shape_add_key_bg"
+                android:gravity="center"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="4.5dp"
+                android:text="@string/edit"
+                android:textColor="@android:color/white"
+                android:textSize="10sp"
+                android:visibility="invisible"
+                tools:visibility="visible" />
+        </FrameLayout>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/preview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:text="@string/key_preview"
+            android:textColor="#FF757B8C"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@id/preview_bg"
+            app:layout_constraintEnd_toEndOf="@id/preview_bg"
+            app:layout_constraintStart_toStartOf="@id/preview_bg" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="15dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/preview_bg"
+            app:layout_constraintTop_toBottomOf="@id/btn_save_edit">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tab_setting"
+                android:layout_width="0dp"
+                android:layout_height="33dp"
+                android:layout_marginEnd="2.5dp"
+                android:background="@drawable/selector_key_edit_tab"
+                android:gravity="center"
+                android:text="@string/key_setting"
+                android:textColor="@color/selector_key_edit_tab_color"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toStartOf="@id/tab_map"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tab_map"
+                android:layout_width="0dp"
+                android:layout_height="33dp"
+                android:layout_marginStart="2.5dp"
+                android:background="@drawable/selector_key_edit_tab"
+                android:gravity="center"
+                android:text="@string/key_map"
+                android:textColor="@color/selector_key_edit_tab_color"
+                android:textSize="12sp"
+                android:visibility="invisible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/tab_setting"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="visible" />
+
+            <LinearLayout
+                android:id="@+id/layout_key_param"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:background="#FF242B37"
+                android:orientation="vertical"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="15dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tab_setting">
+
+                <LinearLayout
+                    android:id="@+id/layout_key_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <com.sayx.hm_cloud.widget.DrawableTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawablePadding="6dp"
+                        android:text="@string/key_name"
+                        android:textColor="#FFBEC2CE"
+                        android:textSize="12sp"
+                        app:drawableLeft="@drawable/shape_point"
+                        app:drawableSize="4dp" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                    <FrameLayout
+                        android:layout_width="200dp"
+                        android:layout_height="24dp"
+                        android:background="@drawable/shape_key_param_bg"
+                        android:paddingHorizontal="8dp">
+
+                        <EditText
+                            android:id="@+id/et_key_name"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@android:color/transparent"
+                            android:hint="@string/key_name"
+                            android:inputType="text"
+                            android:lines="1"
+                            android:textColor="@android:color/white"
+                            android:textColorHint="#FF9CA3B4"
+                            android:textSize="11sp"
+                            tools:text="轮盘" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tv_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="end"
+                            android:gravity="center"
+                            android:textColor="#FF9CA3B4"
+                            tools:text="2/2" />
+                    </FrameLayout>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:background="#FF323741" />
+
+                <LinearLayout
+                    android:id="@+id/layout_key_interact"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <com.sayx.hm_cloud.widget.DrawableTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawablePadding="6dp"
+                        android:text="@string/key_interact"
+                        android:textColor="#FFBEC2CE"
+                        android:textSize="12sp"
+                        app:drawableLeft="@drawable/shape_point"
+                        app:drawableSize="4dp" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/btn_click"
+                        android:layout_width="97dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="3dp"
+                        android:background="@drawable/selector_key_interact"
+                        android:gravity="center"
+                        android:text="@string/click"
+                        android:textColor="@color/selector_key_edit_tab_color"
+                        android:textSize="11sp" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/btn_press"
+                        android:layout_width="97dp"
+                        android:layout_height="24dp"
+                        android:layout_marginStart="3dp"
+                        android:background="@drawable/selector_key_interact"
+                        android:gravity="center"
+                        android:text="@string/press"
+                        android:textColor="@color/selector_key_edit_tab_color"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:background="#FF323741" />
+
+                <LinearLayout
+                    android:id="@+id/layout_key_size"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <com.sayx.hm_cloud.widget.DrawableTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawablePadding="6dp"
+                        android:text="@string/key_size"
+                        android:textColor="#FFBEC2CE"
+                        android:textSize="12sp"
+                        app:drawableLeft="@drawable/shape_point"
+                        app:drawableSize="4dp" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/btn_reduce_key_size"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginEnd="5dp"
+                        android:src="@drawable/img_reduce_edit" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_key_size"
+                        android:layout_width="150dp"
+                        android:layout_height="20dp"
+                        android:layout_marginStart="2dp"
+                        android:background="@drawable/shape_key_param_bg"
+                        android:gravity="center"
+                        android:text="@string/default_percent"
+                        android:textColor="#C4D7EB"
+                        android:textSize="10sp"
+                        tools:text="100%" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/btn_add_key_size"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginStart="5dp"
+                        android:src="@drawable/img_add_edit" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:background="#FF323741" />
+
+                <LinearLayout
+                    android:id="@+id/layout_key_opacity"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <com.sayx.hm_cloud.widget.DrawableTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawablePadding="6dp"
+                        android:text="@string/key_opacity"
+                        android:textColor="#FFBEC2CE"
+                        android:textSize="12sp"
+                        app:drawableLeft="@drawable/shape_point"
+                        app:drawableSize="4dp" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/btn_reduce_key_opacity"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginEnd="5dp"
+                        android:src="@drawable/img_reduce_edit" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_key_opacity"
+                        android:layout_width="150dp"
+                        android:layout_height="20dp"
+                        android:layout_marginStart="2dp"
+                        android:background="@drawable/shape_key_param_bg"
+                        android:gravity="center"
+                        android:text="@string/default_percent"
+                        android:textColor="#C4D7EB"
+                        android:textSize="10sp"
+                        tools:text="100%" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/btn_add_key_opacity"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginStart="5dp"
+                        android:src="@drawable/img_add_edit" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_maps"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:background="#FF242B37"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="10dp"
+                android:visibility="invisible"
+                android:overScrollMode="never"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tab_setting"
+                tools:visibility="invisible" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

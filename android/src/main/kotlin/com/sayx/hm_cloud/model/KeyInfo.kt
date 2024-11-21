@@ -1,5 +1,6 @@
 package com.sayx.hm_cloud.model
 
+import android.text.TextUtils
 import com.blankj.utilcode.util.LogUtils
 import com.google.gson.GsonBuilder
 import com.google.gson.annotations.Expose
@@ -24,11 +25,11 @@ class KeyInfo(
     @Expose(serialize = true) var map: String? = "",
     @Expose(serialize = true) var composeArr: List<KeyInfo>? = null,
     @Expose(serialize = true) var rouArr: List<KeyInfo>? = null,
-    @Expose(serialize = false) var zoomChange: Boolean = false,
-    @Expose(serialize = false) var opacityChange: Boolean = false,
-    @Expose(serialize = false) var textChange: Boolean = false,
-    @Expose(serialize = false) var listChange: Boolean = false
 ) : Serializable {
+
+    init {
+        id = if (id == null) UUID.randomUUID() else id
+    }
 
     fun getKeyWidth(): Int {
         return ceil(width * (zoom / 100f * 2f)).toInt()
@@ -38,41 +39,9 @@ class KeyInfo(
         return ceil(height * (zoom / 100f * 2f)).toInt()
     }
 
-    fun changeZoom(zoom: Int) {
-        this.zoom = zoom
-        zoomChange = true
-    }
-
-    fun changeOpacity(opacity: Int) {
-        this.opacity = opacity
-        opacityChange = true
-    }
-
     fun changePosition(left: Int, top: Int) {
         this.left = left
         this.top = top
-    }
-
-    fun changeText(text: String?) {
-        this.text = text
-        textChange = true
-    }
-
-    fun changeList(composeArr: List<KeyInfo>) {
-        this.composeArr = composeArr
-        listChange = true
-    }
-
-    fun updateRouList(rouArr: List<KeyInfo>) {
-        this.rouArr = rouArr
-        listChange = true
-    }
-
-    fun updateChange(boolean: Boolean) {
-        textChange = boolean
-        zoomChange = boolean
-        opacityChange = boolean
-        listChange = boolean
     }
 
     fun copy(): KeyInfo {
@@ -125,5 +94,15 @@ class KeyInfo(
             map["rouArr"] = it.map { keyInfo -> keyInfo.toMap() }.toList()
         }
         return map
+    }
+
+    fun copyFrom(keyInfo: KeyInfo) {
+        this.text = keyInfo.text
+        this.zoom = keyInfo.zoom
+        this.opacity = keyInfo.opacity
+        this.composeArr = keyInfo.composeArr
+        this.rouArr = keyInfo.rouArr
+        this.click = keyInfo.click
+        this.map = keyInfo.map
     }
 }

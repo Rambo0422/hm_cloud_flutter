@@ -17,8 +17,4 @@ interface ControllerEventCallback {
      * 获取手柄数据
      */
     fun getGamepadData()
-    /**
-     * 更新键盘数据
-     */
-    fun updateKeyboardData(data: JsonObject)
 }

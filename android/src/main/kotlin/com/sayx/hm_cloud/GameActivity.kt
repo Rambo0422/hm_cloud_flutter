@@ -46,10 +46,12 @@ import com.haima.hmcp.rtc.widgets.beans.RtcVideoDelayInfo
 import com.haima.hmcp.widgets.beans.VirtualOperateType
 import com.sayx.hm_cloud.callback.AddKeyListenerImp
 import com.sayx.hm_cloud.callback.AnimatorListenerImp
+import com.sayx.hm_cloud.callback.ConfigNameCallback
 import com.sayx.hm_cloud.callback.ControllerEventCallback
 import com.sayx.hm_cloud.callback.EditCallback
 import com.sayx.hm_cloud.callback.GameSettingChangeListener
 import com.sayx.hm_cloud.callback.HideListener
+import com.sayx.hm_cloud.callback.KeyEditCallback
 import com.sayx.hm_cloud.callback.OnEditClickListener
 import com.sayx.hm_cloud.constants.AppVirtualOperateType
 import com.sayx.hm_cloud.constants.ControllerStatus
@@ -60,7 +62,9 @@ import com.sayx.hm_cloud.constants.OnRockerOperationListenerImp
 import com.sayx.hm_cloud.constants.controllerStatus
 import com.sayx.hm_cloud.databinding.ActivityGameBinding
 import com.sayx.hm_cloud.dialog.AppCommonDialog
+import com.sayx.hm_cloud.dialog.EditControllerNameDialog
 import com.sayx.hm_cloud.dialog.GameErrorDialog
+import com.sayx.hm_cloud.dialog.GameToastDialog
 import com.sayx.hm_cloud.http.bean.BaseObserver
 import com.sayx.hm_cloud.http.bean.HttpResponse
 import com.sayx.hm_cloud.http.repository.AppRepository
@@ -90,8 +94,8 @@ import com.sayx.hm_cloud.widget.ControllerEditLayout
 import com.sayx.hm_cloud.widget.EditCombineKey
 import com.sayx.hm_cloud.widget.EditRouletteKey
 import com.sayx.hm_cloud.widget.GameNoticeView
-import com.sayx.hm_cloud.widget.GameToastView
 import com.sayx.hm_cloud.widget.GameSettings
+import com.sayx.hm_cloud.widget.KeyEditView
 import com.sayx.hm_cloud.widget.KeyboardListView
 import com.sayx.hm_cloud.widget.PlayPartyGameView
 import com.sayx.hm_cloud.widget.PlayPartyPermissionView
@@ -121,6 +125,8 @@ class GameActivity : AppCompatActivity() {
     private var editCombineKey: EditCombineKey? = null
 
     private var editRouletteKey: EditRouletteKey? = null
+
+    private var keyEditView: KeyEditView? = null
 
     // 编辑状态无响应处理
     private var inputTimer: Timer? = null
@@ -231,11 +237,6 @@ class GameActivity : AppCompatActivity() {
             override fun getGamepadData() {
                 // 需要手柄配置
                 GameManager.initGamepadData()
-            }
-
-            override fun updateKeyboardData(data: JsonObject) {
-                // 需要更新配置
-//                GameManager.updateKeyboardData(data)
             }
         }
         // 游戏控制器按键操作处理
@@ -575,6 +576,7 @@ class GameActivity : AppCompatActivity() {
             dataBinding.layoutGame.removeView(controllerEditLayout)
         }
         controllerEditLayout = ControllerEditLayout(this)
+        controllerEditLayout?.controllerType = type
         configControllerEditCallback()
         val layoutParams = FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -648,26 +650,6 @@ class GameActivity : AppCompatActivity() {
                 showRestoreCustomDialog()
             }
 
-            override fun onAddKeySize() {
-                dataBinding.gameController.updateKey()
-            }
-
-            override fun onReduceKeySize() {
-                dataBinding.gameController.updateKey()
-            }
-
-            override fun onAddKeyOpacity() {
-                dataBinding.gameController.updateKey()
-            }
-
-            override fun onReduceKeyOpacity() {
-                dataBinding.gameController.updateKey()
-            }
-
-            override fun onTextChange() {
-                dataBinding.gameController.updateKey()
-            }
-
             override fun onDeleteKey() {
                 dataBinding.gameController.deleteKey()
             }
@@ -685,6 +667,10 @@ class GameActivity : AppCompatActivity() {
                     }
                 })
             }
+
+            override fun onEditName() {
+                showEditConfigName()
+            }
         })
     }
 
@@ -696,6 +682,9 @@ class GameActivity : AppCompatActivity() {
                 override fun onHide() {
                     controllerEditLayout?.showLayout()
                     hideKeyBoard()
+                    if (keyInfo != null) {
+                        showKeyEditView(keyInfo)
+                    }
                 }
             }
             editCombineKey?.addKeyListener = object : AddKeyListenerImp() {
@@ -734,6 +723,9 @@ class GameActivity : AppCompatActivity() {
                 override fun onHide() {
                     controllerEditLayout?.showLayout()
                     hideKeyBoard()
+                    if (keyInfo != null) {
+                        showKeyEditView(keyInfo)
+                    }
                 }
             }
             editRouletteKey?.addKeyListener = object : AddKeyListenerImp() {
@@ -751,7 +743,7 @@ class GameActivity : AppCompatActivity() {
                 }
 
                 override fun onUpdateKey() {
-                    dataBinding.gameController.updateKey()
+
                 }
 
                 override fun rouAddData(list: List<KeyInfo>?) {
@@ -1006,6 +998,10 @@ class GameActivity : AppCompatActivity() {
             dataBinding.layoutGame.removeView(it)
             editCombineKey = null
         }
+        keyEditView?.let {
+            dataBinding.layoutGame.removeView(it)
+            keyEditView = null
+        }
         dataBinding.btnGameSettings.visibility = View.VISIBLE
         dataBinding.btnVirtualKeyboard.visibility = View.VISIBLE
 
@@ -1034,9 +1030,11 @@ class GameActivity : AppCompatActivity() {
                 event.arg?.let {
                     when (it) {
                         GameConstants.gamepadConfig -> {
+                            dataBinding.gameController.setControllerData(GameManager.gamepadList[0])
                             showControllerEdit(AppVirtualOperateType.APP_STICK_XBOX)
                         }
                         GameConstants.keyboardConfig -> {
+                            dataBinding.gameController.setControllerData(GameManager.keyboardList[0])
                             showControllerEdit(AppVirtualOperateType.APP_KEYBOARD)
                         }
                     }
@@ -1046,6 +1044,7 @@ class GameActivity : AppCompatActivity() {
                 event.arg?.let {
                     if (it is ControllerInfo) {
                         LogUtils.d("updateKeyboard:${it.type}")
+                        dataBinding.gameController.setControllerData(it)
                         when (it.type) {
                             GameConstants.gamepadConfig -> {
                                 showControllerEdit(AppVirtualOperateType.APP_STICK_XBOX)
@@ -1067,13 +1066,76 @@ class GameActivity : AppCompatActivity() {
                     .setRightButton("确认删除") {
                         AppCommonDialog.hideDialog(this, tag = "deleteKeyboard")
                         event.arg?.let {
-                            GameManager.deleteKeyboardConfig(it as String)
+                            GameManager.deleteKeyboardConfig(it as ControllerInfo)
                         }
                     }
                     .setRightButtonBg(R.drawable.shape_delete_keyboard_bg)
                     .build()
                     .show(tag = "deleteKeyboard")
             }
+            "editKey" -> {
+                showKeyEditView(event.arg as KeyInfo)
+            }
+            "useSuccess" -> {
+                GameToastDialog.Builder(this)
+                    .setTitle("使用成功")
+                    .setSubTitle("请在操作方法中选择“手柄”使用")
+                    .setDrawable(R.drawable.icon_toast_success)
+                    .build()
+                    .show()
+            }
+            "restoreSuccess" -> {
+                GameToastDialog.Builder(this)
+                    .setTitle("还原成功")
+                    .setSubTitle("继续编辑最适合你的按键配置吧！")
+                    .setDrawable(R.drawable.icon_toast_success)
+                    .build()
+                    .show()
+            }
+            "addSuccess", "updateSuccess" -> {
+                exitCustom()
+                KeyboardListView.show(dataBinding.layoutGame)
+            }
+        }
+    }
+
+    private fun showKeyEditView(keyInfo: KeyInfo) {
+        LogUtils.d("showKeyEditView:$keyInfo")
+        if (keyEditView == null) {
+            keyEditView = KeyEditView(this)
+            val layoutParams = FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+            keyEditView?.setKeyInfo(keyInfo)
+
+            keyEditView?.callback = object : KeyEditCallback {
+                override fun onKeyDelete() {
+                    dataBinding.gameController.deleteKey()
+                }
+
+                override fun onSaveKey(keyInfo: KeyInfo) {
+                    dataBinding.gameController.updateKey(keyInfo)
+                }
+
+                override fun onCombineKeyEdit(keyInfo: KeyInfo) {
+                    controllerEditLayout?.hideLayout(object : AnimatorListenerImp() {
+                        override fun onAnimationEnd(animation: Animator) {
+                            if (keyInfo.type == KeyType.KEY_COMBINE || keyInfo.type == KeyType.GAMEPAD_COMBINE) {
+                                showEditCombineKeyLayout(keyInfo)
+                            } else if (keyInfo.type == KeyType.KEY_ROULETTE || keyInfo.type == KeyType.GAMEPAD_ROULETTE) {
+                                showEditRouletteKeyLayout(keyInfo)
+                            }
+                        }
+                    })
+                }
+            }
+            dataBinding.layoutGame.post {
+                dataBinding.layoutGame.addView(keyEditView, layoutParams)
+            }
+        } else {
+            keyEditView?.setKeyInfo(keyInfo)
+            keyEditView?.visibility = View.VISIBLE
         }
     }
 
@@ -1102,8 +1164,7 @@ class GameActivity : AppCompatActivity() {
         dataBinding.gameController.setControllerData(event.data)
         gameSettings?.controllerType = dataBinding.gameController.controllerType
         if (event.data.use != 1) {
-            event.data.use = 1
-            GameManager.updateKeyboardData(event.data)
+            GameManager.useKeyboardData(event.data)
         }
     }
 
@@ -1121,6 +1182,14 @@ class GameActivity : AppCompatActivity() {
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onGameError(event: GameErrorEvent) {
         exitGame(errorCode = event.errorCode, errorMsg = event.errorMsg)
+    }
+
+    private fun showEditConfigName() {
+        EditControllerNameDialog.show(this, dataBinding.gameController.controllerName, object : ConfigNameCallback {
+            override fun onName(name: String) {
+                dataBinding.gameController.controllerName = name
+            }
+        })
     }
 
     private fun exitGame(errorCode: String = "0", errorMsg: String? = null) {

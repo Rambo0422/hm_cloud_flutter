@@ -5,19 +5,23 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.text.TextUtils
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.SizeUtils
 import com.sayx.hm_cloud.R
 import com.sayx.hm_cloud.model.KeyInfo
 import com.sayx.hm_cloud.callback.OnKeyTouchListener
 import com.sayx.hm_cloud.callback.OnPositionChangeListener
 import com.sayx.hm_cloud.constants.ControllerStatus
 import com.sayx.hm_cloud.constants.controllerStatus
+import com.sayx.hm_cloud.constants.maps
 import com.sayx.hm_cloud.databinding.ViewCombineKeyBinding
 import com.sayx.hm_cloud.utils.AppSizeUtils
 import com.sayx.hm_cloud.utils.AppVibrateUtils
@@ -46,17 +50,35 @@ class CombineKeyView @JvmOverloads constructor(
 
     private var firstTouchId = 0
 
+    var needDrawShadow = true
+
     init {
         setWillNotDraw(false)
     }
 
     fun setKeyInfo(keyInfo: KeyInfo) {
-        updateText(keyInfo.text)
-    }
-
-    fun updateText(text: String?) {
-        dataBinding.tvName.text = text
-        LogUtils.d("updateText:$text")
+        val layoutParams = LayoutParams(
+            AppSizeUtils.convertViewSize(keyInfo.getKeyWidth()),
+            AppSizeUtils.convertViewSize(keyInfo.getKeyHeight())
+        )
+        this.layoutParams = layoutParams
+        this.alpha = keyInfo.opacity / 100f
+        dataBinding.tvName.layoutParams = layoutParams
+        val map = maps.find { item -> item.first == keyInfo.map}?.second
+        if (TextUtils.isEmpty(keyInfo.map) || keyInfo.map == "map1" || map == null) {
+            dataBinding.tvName.text = keyInfo.text
+        } else {
+            dataBinding.tvName.text = ""
+            dataBinding.ivIcon.layoutParams = layoutParams
+            dataBinding.ivIcon.visibility = VISIBLE
+            dataBinding.ivIcon.setPadding(SizeUtils.dp2px(5f), SizeUtils.dp2px(5f), SizeUtils.dp2px(5f) , SizeUtils.dp2px(5f))
+            dataBinding.ivIcon.setImageDrawable(
+                ContextCompat.getDrawable(
+                    context,
+                    map
+                )
+            )
+        }
     }
 
     private val bgPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -66,7 +88,8 @@ class CombineKeyView @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        if (controllerStatus == ControllerStatus.Edit || controllerStatus == ControllerStatus.Combine) {
+        if (needDrawShadow && (controllerStatus == ControllerStatus.Edit || controllerStatus == ControllerStatus.Combine)) {
+            bgPaint.color = if (isActivated) Color.parseColor("#8CC6EC4B") else Color.parseColor("#3CFFFFFF")
             canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), bgPaint)
         }
     }
@@ -79,7 +102,7 @@ class CombineKeyView @JvmOverloads constructor(
             when (it.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
                     isPressed = true
-                    if (controllerStatus == ControllerStatus.Edit) {
+                    if (controllerStatus == ControllerStatus.Edit && needDrawShadow) {
                         isDrag = false
                         if (parent is ViewGroup) {
                             parentWidth = (parent as ViewGroup).width
@@ -98,7 +121,7 @@ class CombineKeyView @JvmOverloads constructor(
                 }
 
                 MotionEvent.ACTION_MOVE -> {
-                    if (controllerStatus == ControllerStatus.Edit) {
+                    if (controllerStatus == ControllerStatus.Edit && needDrawShadow) {
                         isDrag = parentWidth > 0 && parentHeight > 0
                         val offsetX = it.x - lastX
                         val offsetY = it.y - lastY
@@ -125,7 +148,7 @@ class CombineKeyView @JvmOverloads constructor(
 
                 MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> {
                     isPressed = false
-                    if (controllerStatus == ControllerStatus.Edit) {
+                    if (controllerStatus == ControllerStatus.Edit && needDrawShadow) {
                         val position = IntArray(4)
                         val location = AppSizeUtils.getLocationOnScreen(this, position)
                         positionListener?.onPositionChange(location[0], location[1], location[2],  location[3])

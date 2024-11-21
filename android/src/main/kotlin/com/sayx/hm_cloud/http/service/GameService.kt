@@ -28,7 +28,7 @@ interface GameService {
     @POST("/api/cloudgame/v2/keyboard/create")
     fun requestAddKeyboard(
         @Body body: HashMap<String, Any>
-    ) : Observable<HttpResponse<Any>>
+    ) : Observable<HttpResponse<String>>
 
     @POST("/api/cloudgame/v2/keyboard/del")
     fun requestDeleteKeyboard(

@@ -7,14 +7,29 @@
 
     </data>
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tv_name"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:background="@drawable/selector_key_round_bg"
-        android:gravity="center"
-        android:textSize="10sp"
-        tools:text="组合键"
-        tools:visibility="visible" />
+        tools:layout_height="40dp"
+        tools:layout_width="40dp">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_name"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:background="@drawable/selector_key_round_bg"
+            android:gravity="center"
+            android:textSize="10sp"
+            tools:text="组合键"
+            tools:visibility="visible" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_icon"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:visibility="invisible"
+            tools:src="@drawable/img_mouse_left"/>
+    </FrameLayout>
 </layout>

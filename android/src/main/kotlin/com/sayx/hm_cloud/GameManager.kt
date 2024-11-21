@@ -38,6 +38,7 @@ import com.haima.hmcp.widgets.beans.VirtualOperateType
 import com.sayx.hm_cloud.callback.KeyboardListCallback
 import com.sayx.hm_cloud.callback.RequestDeviceSuccess
 import com.sayx.hm_cloud.constants.AppVirtualOperateType
+import com.sayx.hm_cloud.constants.GameConstants
 import com.sayx.hm_cloud.dialog.AppCommonDialog
 import com.sayx.hm_cloud.http.HttpManager
 import com.sayx.hm_cloud.http.repository.AppRepository
@@ -55,12 +56,15 @@ import com.sayx.hm_cloud.model.GameError
 import com.sayx.hm_cloud.model.GameErrorEvent
 import com.sayx.hm_cloud.model.GameParam
 import com.sayx.hm_cloud.model.KeyboardList
+import com.sayx.hm_cloud.model.MessageEvent
 import com.sayx.hm_cloud.model.SpecificArchive
 import com.sayx.hm_cloud.model.TimeUpdateEvent
 import com.sayx.hm_cloud.model.UserRechargeStatusEvent
 import com.sayx.hm_cloud.utils.GameUtils
+import com.sayx.hm_cloud.widget.KeyboardListView
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
+import io.reactivex.rxjava3.core.Observer
 import io.reactivex.rxjava3.disposables.Disposable
 import org.greenrobot.eventbus.EventBus
 import org.json.JSONArray
@@ -434,8 +438,8 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
      */
     private fun prepareGame(archiveData: ArchiveData?) {
         LogUtils.d("priority:${gameParam?.priority}")
-        AtGameActivity.startActivityForResult(activity)
-        return
+//        AtGameActivity.startActivityForResult(activity)
+//        return
         val code = archiveData?.code
         val custodian = archiveData?.custodian
         val listEmpty = archiveData?.list?.isEmpty() ?: true
@@ -876,6 +880,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                         it.isOfficial = true
                         gamepadList.add(0, it)
                         if (callback != null) {
+                            it.use = 1
                             callback.onGamepadList(gamepadList)
                             getUserGamepadData(callback)
                         } else if (defaultUse || it.use == 1) {
@@ -892,8 +897,11 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                 val controllerInfo = GameRepository.readDefaultGamepadFromAsset(activity.assets)
                 if (controllerInfo != null)  {
                     if (gamepadList.isEmpty()) {
+                        controllerInfo.gameId = gameParam?.gameId ?: ""
+                        controllerInfo.userId = gameParam?.userId ?: ""
                         gamepadList.add(0, controllerInfo)
                         if (callback != null) {
+                            controllerInfo.use = 1
                             callback.onGamepadList(gamepadList)
                             getUserGamepadData(callback)
                         } else if (defaultUse || controllerInfo.use == 1) {
@@ -921,6 +929,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                         it.isOfficial = true
                         keyboardList.add(0, it)
                         if (callback != null) {
+                            it.use = 1
                             callback.onKeyboardList(keyboardList)
                             getUserKeyboardData(callback)
                         } else if (defaultUse || it.use == 1) {
@@ -930,10 +939,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                         }
                     }
                 }
-            }
-
-            override fun onError(e: Throwable) {
-                super.onError(e)
             }
         })
     }
@@ -945,6 +950,10 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                 response.data?.let {
                     gamepadList.addAll(it.datas)
                     if (callback != null) {
+                        val info = it.datas.find { data -> data.use == 1 }
+                        if (info != null) {
+                            gamepadList[0].use = 0
+                        }
                         callback.onGamepadList(gamepadList)
                     } else {
                         val info = it.datas.find { data -> data.use == 1 } ?: gamepadList[0]
@@ -973,6 +982,10 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                 response.data?.let {
                     keyboardList.addAll(it.datas)
                     if (callback != null) {
+                        val info = it.datas.find { data -> data.use == 1 }
+                        if (info != null) {
+                            keyboardList[0].use = 0
+                        }
                         callback.onKeyboardList(keyboardList)
                     } else {
                         val info = it.datas.find { data -> data.use == 1 }?: keyboardList[0]
@@ -999,9 +1012,12 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         if (gamepadList.isEmpty()) {
             getDefaultGamepadData(false, callback)
         } else {
-            callback.onGamepadList(gamepadList)
             if (gamepadList[0].isOfficial == true && gamepadList.size == 1) {
+                gamepadList[0].use = 1
+                callback.onGamepadList(gamepadList)
                 getUserGamepadData(callback)
+            } else {
+                callback.onGamepadList(gamepadList)
             }
         }
     }
@@ -1011,37 +1027,116 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         if (keyboardList.isEmpty()) {
             getDefaultKeyboardData(false, callback)
         } else {
-            callback.onKeyboardList(keyboardList)
             if (keyboardList[0].isOfficial == true && keyboardList.size == 1) {
+                // 只获取到了默认数据
+                keyboardList[0].use = 1
+                callback.onKeyboardList(keyboardList)
                 getUserKeyboardData(callback)
+            } else {
+                callback.onKeyboardList(keyboardList)
             }
         }
     }
 
-    fun deleteKeyboardConfig(keyboardId: String) {
-        GameRepository.requestDeleteKeyboard(keyboardId, object : BaseObserver<HttpResponse<Any>>() {
-            override fun onNext(response: HttpResponse<Any>) {
-
+    fun addKeyboardConfig(keyboardInfo: ControllerInfo) {
+        LogUtils.d("addKeyboardConfig:$keyboardInfo")
+        GameRepository.requestAddKeyboard(keyboardInfo, object : BaseObserver<HttpResponse<String>>() {
+            override fun onNext(response: HttpResponse<String>) {
+                response.data?.let {
+                    keyboardInfo.id = it
+                    // 添加成功
+                    if (keyboardInfo.type == GameConstants.gamepadConfig) {
+                        gamepadList.add(keyboardInfo)
+                        KeyboardListView.updateGamePad(gamepadList, "addSuccess")
+                    } else if (keyboardInfo.type == GameConstants.keyboardConfig) {
+                        keyboardList.add(keyboardInfo)
+                        KeyboardListView.updateKeyboard(keyboardList, "addSuccess")
+                    }
+                }
             }
+        })
+    }
 
-            override fun onError(e: Throwable) {
-                super.onError(e)
+    fun deleteKeyboardConfig(keyboardInfo: ControllerInfo) {
+        LogUtils.d("deleteKeyboardConfig")
+        GameRepository.requestDeleteKeyboard(keyboardInfo.id, object : BaseObserver<HttpResponse<Any>>() {
+            override fun onNext(response: HttpResponse<Any>) {
+                if (keyboardInfo.type == GameConstants.gamepadConfig) {
+                    val info = gamepadList.find { info -> info.id == keyboardInfo.id }
+                    info?.let {
+                        gamepadList.remove(info)
+                        if (info.use == 1) {
+                            gamepadList[0].use = 1
+                            EventBus.getDefault().post(ControllerConfigEvent(gamepadList[0]))
+                        }
+                    }
+                    KeyboardListView.updateGamePad(gamepadList, "deleteSuccess")
+                } else if (keyboardInfo.type == GameConstants.keyboardConfig) {
+                    val info = keyboardList.find { info -> info.id == keyboardInfo.id }
+                    info?.let {
+                        keyboardList.remove(info)
+                        if (info.use == 1) {
+                            keyboardList[0].use = 1
+                            EventBus.getDefault().post(ControllerConfigEvent(keyboardList[0]))
+                        }
+                    }
+                    KeyboardListView.updateKeyboard(keyboardList, "deleteSuccess")
+                }
+            }
+        })
+    }
+
+    fun useKeyboardData(keyboardInfo: ControllerInfo) {
+        LogUtils.d("useKeyboardData:$keyboardInfo")
+        updateKeyboardData(keyboardInfo, object : BaseObserver<HttpResponse<Any>>() {
+            override fun onNext(response: HttpResponse<Any>) {
+                if (keyboardInfo.type == GameConstants.gamepadConfig) {
+                    val index = gamepadList.indexOfFirst { info -> info.id == keyboardInfo.id }
+                    if (index != -1) {
+                        gamepadList[index] = keyboardInfo
+                    }
+                    val info = gamepadList.find { info -> info.id != keyboardInfo.id && info.use == 1 }
+                    info?.use = 0
+                    KeyboardListView.updateGamePad(gamepadList, "useSuccess")
+                } else if (keyboardInfo.type == GameConstants.keyboardConfig) {
+                    val index = keyboardList.indexOfFirst { info -> info.id == keyboardInfo.id }
+                    if (index != -1) {
+                        keyboardList[index] = keyboardInfo
+                    }
+                    val info = keyboardList.find { info -> info.id != keyboardInfo.id && info.use == 1 }
+                    info?.use = 0
+                    KeyboardListView.updateKeyboard(keyboardList, "useSuccess")
+                }
+                keyboardInfo.use = 1
+                EventBus.getDefault().post(ControllerConfigEvent(keyboardInfo))
+            }
+        })
+    }
+
+    fun updateKeyboardConfig(keyboardInfo: ControllerInfo) {
+        LogUtils.d("updateKeyboardConfig")
+        updateKeyboardData(keyboardInfo, object : BaseObserver<HttpResponse<Any>>() {
+            override fun onNext(response: HttpResponse<Any>) {
+                if (keyboardInfo.type == GameConstants.gamepadConfig) {
+                    val index = gamepadList.indexOfFirst { info -> info.id == keyboardInfo.id }
+                    if (index != -1) {
+                        gamepadList[index] = keyboardInfo
+                    }
+                    KeyboardListView.updateGamePad(gamepadList, "updateSuccess")
+                } else if (keyboardInfo.type == GameConstants.keyboardConfig) {
+                    val index = keyboardList.indexOfFirst { info -> info.id == keyboardInfo.id }
+                    if (index != -1) {
+                        keyboardList[index] = keyboardInfo
+                    }
+                    KeyboardListView.updateKeyboard(keyboardList, "updateSuccess")
+                }
             }
         })
     }
 
     // 更新虚拟操作数据
-    fun updateKeyboardData(keyboardInfo: ControllerInfo) {
-        GameRepository.requestUpdateKeyboard(keyboardInfo, object : BaseObserver<HttpResponse<Any>>() {
-            override fun onNext(response: HttpResponse<Any>) {
-                ToastUtils.showShort("更新成功")
-            }
-
-            override fun onError(e: Throwable) {
-                super.onError(e)
-                ToastUtils.showShort("更新失败")
-            }
-        })
+    private fun updateKeyboardData(keyboardInfo: ControllerInfo, observer: Observer<HttpResponse<Any>>) {
+        GameRepository.requestUpdateKeyboard(keyboardInfo, observer)
     }
 
     override fun onSceneChanged(sceneMessage: String?) {

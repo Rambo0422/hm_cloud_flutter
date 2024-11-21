@@ -64,12 +64,12 @@ object GameRepository {
         }
     }
 
-    fun requestAddKeyboard(keyboardInfo: ControllerInfo, observer: Observer<HttpResponse<Any>>) {
-        val params = hashMapOf<String, Any>(
-            "id" to keyboardInfo.id,
-            "use" to (keyboardInfo.use ?: 0),
+    fun requestAddKeyboard(keyboardInfo: ControllerInfo, observer: Observer<HttpResponse<String>>) {
+        val params = hashMapOf(
             "name" to (keyboardInfo.name ?: ""),
-            "keyboard" to ""
+            "game_id" to keyboardInfo.gameId,
+            "type" to keyboardInfo.type,
+            "keyboard" to keyboardInfo.keyboard.map { keyInfo -> keyInfo.toMap() }.toList()
         )
         gameService.requestAddKeyboard(params)
             .compose(HttpError.onError())

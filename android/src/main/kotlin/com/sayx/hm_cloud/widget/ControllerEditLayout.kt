@@ -12,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import androidx.databinding.DataBindingUtil
@@ -21,11 +22,14 @@ import com.sayx.hm_cloud.R
 import com.sayx.hm_cloud.callback.AnimatorListenerImp
 import com.sayx.hm_cloud.callback.EditCallback
 import com.sayx.hm_cloud.callback.TextWatcherImp
+import com.sayx.hm_cloud.constants.AppVirtualOperateType
 import com.sayx.hm_cloud.constants.ControllerStatus
 import com.sayx.hm_cloud.constants.KeyType
 import com.sayx.hm_cloud.constants.controllerStatus
 import com.sayx.hm_cloud.databinding.ViewControllerEditBinding
 import com.sayx.hm_cloud.model.KeyInfo
+import com.sayx.hm_cloud.model.MessageEvent
+import org.greenrobot.eventbus.EventBus
 
 class ControllerEditLayout @JvmOverloads constructor(
     context: Context,
@@ -43,6 +47,12 @@ class ControllerEditLayout @JvmOverloads constructor(
     private var callback: EditCallback? = null
 
     private var keyInfo: KeyInfo? = null
+
+    var controllerType: AppVirtualOperateType? = null
+        set(value) {
+            field = value
+            dataBinding.btnAddRouletteKey.visibility = if (value == AppVirtualOperateType.APP_STICK_XBOX) GONE else VISIBLE
+        }
 
     init {
 
@@ -72,9 +82,10 @@ class ControllerEditLayout @JvmOverloads constructor(
         dataBinding.btnEditMore.setOnClickListener {
             showMore(it)
         }
-        // 展示更多
+        // 编辑单个入口
         dataBinding.btnEdit.setOnClickListener {
             keyInfo?.let {
+                EventBus.getDefault().post(MessageEvent("editKey", arg = it))
             } ?: ToastUtils.showLong(R.string.unselect_key)
         }
         // 保存
@@ -98,22 +109,28 @@ class ControllerEditLayout @JvmOverloads constructor(
     private fun showMore(anchor: View) {
         val inflater = LayoutInflater.from(context)
         val view = inflater.inflate(R.layout.popup_edit_more, null)
+        val width = SizeUtils.dp2px(120f)
+        val popupWindow = PopupWindow(view, width, ViewGroup.LayoutParams.WRAP_CONTENT)
+        popupWindow.apply {
+            isOutsideTouchable = true
+            isFocusable = true
+            isTouchable = true
+            showAsDropDown(anchor, -width / 2 + anchor.width / 2,SizeUtils.dp2px(5f), Gravity.CENTER)
+        }
         view.findViewById<View>(R.id.btn_edit_name).setOnClickListener {
-
+            callback?.onEditName()
+            popupWindow.dismiss()
         }
         view.findViewById<View>(R.id.btn_restore).setOnClickListener {
+            popupWindow.dismiss()
             callback?.onRestoreDefault()
         }
         view.findViewById<View>(R.id.btn_delete_key).setOnClickListener {
             keyInfo?.let {
+                popupWindow.dismiss()
                 setKeyInfo(null)
                 callback?.onDeleteKey()
             } ?: ToastUtils.showLong(R.string.unselect_key)
-        }
-        PopupWindow(view, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
-            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            isOutsideTouchable = true
-            showAsDropDown(anchor, -SizeUtils.dp2px(45f), SizeUtils.dp2px(5f))
         }
     }
 

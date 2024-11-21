@@ -64,10 +64,9 @@ class KeyboardAdapter : RecyclerView.Adapter<ItemViewHolder>() {
             holder.btnUse.text = holder.btnUse.context.getString(if (info.use == 1) R.string.using else R.string.use)
             holder.btnUse.isSelected = info.use == 1
             holder.layoutKeyboardInfo.isSelected = info.use == 1
+            holder.btnEdit.isSelected = false
             holder.btnDelete.setOnClickListener {
-                if (!it.isSelected) {
-                    keyboardClickListener?.onDeleteClick(info, position)
-                }
+                keyboardClickListener?.onDeleteClick(info, position)
             }
             holder.btnEdit.setOnClickListener {
                 keyboardClickListener?.onEditClick(info, position)

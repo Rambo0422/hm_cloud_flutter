@@ -44,12 +44,13 @@ class KeyboardListView @JvmOverloads constructor(
                 }
 
                 override fun onDeleteClick(info: ControllerInfo, position: Int) {
-                    EventBus.getDefault().post(MessageEvent("deleteKeyboard", arg = info.id))
+                    EventBus.getDefault().post(MessageEvent("deleteKeyboard", arg = info))
                 }
 
                 override fun onUseClick(info: ControllerInfo, position: Int) {
+                    LogUtils.d("onUseClick:$info")
                     if (GameManager.getGameParam()?.isVip() == true || info.isOfficial == true) {
-                        EventBus.getDefault().post(ControllerConfigEvent(info, showNotice = true))
+                        EventBus.getDefault().post(ControllerConfigEvent(info))
                     } else {
                         EventBus.getDefault().post(MessageEvent("showVIP"))
                     }
@@ -72,12 +73,12 @@ class KeyboardListView @JvmOverloads constructor(
                 }
 
                 override fun onDeleteClick(info: ControllerInfo, position: Int) {
-                    EventBus.getDefault().post(MessageEvent("deleteKeyboard", arg = info.id))
+                    EventBus.getDefault().post(MessageEvent("deleteKeyboard", arg = info))
                 }
 
                 override fun onUseClick(info: ControllerInfo, position: Int) {
                     if (GameManager.getGameParam()?.isVip() == true || info.isOfficial == true) {
-                        EventBus.getDefault().post(ControllerConfigEvent(info, showNotice = true))
+                        EventBus.getDefault().post(ControllerConfigEvent(info))
                     } else {
                         EventBus.getDefault().post(MessageEvent("showVIP"))
                     }
@@ -153,6 +154,22 @@ class KeyboardListView @JvmOverloads constructor(
 
         fun destroy() {
             keyboardListView = null
+        }
+
+        fun updateGamePad(gamepadList: MutableList<ControllerInfo>, msg:String) {
+            keyboardListView?.let {
+                it.gamepadAdapter.itemList = gamepadList
+                // 使用成功
+                EventBus.getDefault().post(MessageEvent(msg))
+            }
+        }
+
+        fun updateKeyboard(keyboardList: MutableList<ControllerInfo>, msg:String) {
+            keyboardListView?.let {
+                it.keyboardAdapter.itemList = keyboardList
+                // 使用成功
+                EventBus.getDefault().post(MessageEvent(msg))
+            }
         }
     }
 }

@@ -81,7 +81,7 @@ class EditRouletteKey @JvmOverloads constructor(
                 addKeyListener?.rouRemoveData(addList)
                 // rou添加的数据会从列表移除
                 addKeyListener?.rouAddData(removeList)
-                keyInfo!!.updateRouList(oldData ?: listOf())
+                keyInfo?.rouArr = oldData ?: listOf()
                 addKeyListener?.onUpdateKey()
             } else {
                 newData.forEach { info ->
@@ -105,8 +105,7 @@ class EditRouletteKey @JvmOverloads constructor(
                     full = false
                     addKeyListener?.onKeyRemove(data)
                     if (keyInfo != null) {
-                        keyInfo?.updateRouList(keyList.filter { item -> item.value != null }.map { item -> item.value!! }.toList())
-                        keyInfo?.listChange = true
+                        keyInfo?.rouArr = keyList.filter { item -> item.value != null }.map { item -> item.value!! }.toList()
                         addKeyListener?.onUpdateKey()
                     }
                 }
@@ -230,10 +229,7 @@ class EditRouletteKey @JvmOverloads constructor(
                 }
 
                 if (this@EditRouletteKey.keyInfo != null) {
-                    this@EditRouletteKey.keyInfo?.updateRouList(keyList.filter
-                        { item -> item.value != null }.map { item -> item.value!! }.toList()
-                    )
-                    this@EditRouletteKey.keyInfo?.listChange = true
+                    this@EditRouletteKey.keyInfo?.rouArr = keyList.filter { item -> item.value != null }.map { item -> item.value!! }.toList()
                     addKeyListener?.onUpdateKey()
                 }
                 return
@@ -274,7 +270,7 @@ class EditRouletteKey @JvmOverloads constructor(
             }
             addKeyListener?.rouRemoveData(addList)
             addKeyListener?.rouAddData(removeList)
-            keyInfo!!.updateRouList(newData)
+            keyInfo?.rouArr = newData
             addKeyListener?.onUpdateKey()
         } else {
             addKeyListener?.onAddKey(

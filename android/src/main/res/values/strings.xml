@@ -157,9 +157,10 @@
     <string name="try_reconnect">尝试重连</string>
     <string name="confirm">确定</string>
     <string name="choose_controller_type">选择按键类型</string>
-    <string name="title_exit_custom">你还没有保存，确定离开吗？</string>
+    <string name="title_exit_custom">确认退出吗？</string>
+    <string name="subtitle_exit_custom">编辑的按键还未保存，退出会丢失记录</string>
     <string name="title_save_custom">确认保存吗？</string>
-    <string name="leave">离开</string>
+    <string name="leave">退出</string>
     <string name="cancel">取消</string>
     <string name="title_restore_custom">确认还原默认吗？</string>
     <string name="confirm_save">确认保存</string>
@@ -181,4 +182,10 @@
     <string name="request_keyboard_config_fail">获取按键配置失败</string>
     <string name="official_share">官方分享</string>
     <string name="config_name">配置命名</string>
+    <string name="exit_edit">退出编辑</string>
+    <string name="save_edit">保存按键</string>
+    <string name="key_preview">按键预览</string>
+    <string name="key_setting">按键设置</string>
+    <string name="key_map">按键贴图</string>
+    <string name="input_config_name">输入配置名称</string>
 </resources>

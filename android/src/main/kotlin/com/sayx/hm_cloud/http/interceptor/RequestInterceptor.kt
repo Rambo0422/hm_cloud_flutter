@@ -94,7 +94,7 @@ class RequestInterceptor : Interceptor {
                                 requestParams.addProperty(it, commonParam[it].toString())
                             }
                         }
-                        newBody = requestParams.toString().toRequestBody(body.contentType())
+                        newBody = requestParams.toString().toRequestBody()
                     } catch (e: Exception) {
                         newBody = body
                         e.printStackTrace()
@@ -108,6 +108,7 @@ class RequestInterceptor : Interceptor {
             }
             return request.newBuilder()
                 .url(urlBuilder.build())
+                .header("Content-Type", "application/json")
                 .post(newBody)
                 .build()
         }
