@@ -12,6 +12,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.annotation.DrawableRes
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
@@ -30,6 +32,9 @@ class AppCommonDialog : DialogFragment() {
     var leftBtnText: CharSequence? = null
     var leftBtnClickListener: View.OnClickListener? = null
     var rightBtnText: CharSequence? = null
+    @DrawableRes
+    var rightBtnBg: Int? = null
+    var rightBtnColor: Int? = null
     var rightBtnClickListener: View.OnClickListener? = null
 
     var enableCancel = false
@@ -139,6 +144,12 @@ class AppCommonDialog : DialogFragment() {
 
     private fun showRightBtn() {
         dataBinding.btnRight.text = rightBtnText
+        rightBtnBg?.let {
+            dataBinding.btnRight.background = AppCompatResources.getDrawable(dataBinding.btnRight.context, it)
+        }
+        rightBtnColor?.let {
+            dataBinding.btnRight.setTextColor(it)
+        }
         dataBinding.btnRight.isSelected = true
 //        dataBinding.btnRight.requestFocusFromTouch()
     }
@@ -152,6 +163,9 @@ class AppCommonDialog : DialogFragment() {
         private var leftBtnText: CharSequence? = null
         private var leftBtnClickListener: View.OnClickListener? = null
         private var rightBtnText: CharSequence? = null
+        private var rightBtnColor: Int? = null
+        @DrawableRes
+        private var rightBtnBg: Int? = null
         private var rightBtnClickListener: View.OnClickListener? = null
         private var enableCancel: Boolean = false
         private var appCommonDialog: AppCommonDialog? = null
@@ -174,9 +188,15 @@ class AppCommonDialog : DialogFragment() {
             return this
         }
 
-        fun setRightButton(rightBtnText: CharSequence?, clickListener: View.OnClickListener? = null): Builder {
+        fun setRightButton(rightBtnText: CharSequence?, rightBtnColor: Int? = null, clickListener: View.OnClickListener? = null): Builder {
             this.rightBtnText = rightBtnText
+            this.rightBtnColor = rightBtnColor
             this.rightBtnClickListener = clickListener
+            return this
+        }
+
+        fun setRightButtonBg(@DrawableRes resourceId: Int): Builder {
+            this.rightBtnBg = resourceId
             return this
         }
 
@@ -193,6 +213,8 @@ class AppCommonDialog : DialogFragment() {
             appCommonDialog?.subTitleColor = subTitleColor
             appCommonDialog?.leftBtnText = leftBtnText
             appCommonDialog?.rightBtnText = rightBtnText
+            appCommonDialog?.rightBtnBg = rightBtnBg
+            appCommonDialog?.rightBtnColor = rightBtnColor
             appCommonDialog?.leftBtnClickListener = leftBtnClickListener
             appCommonDialog?.rightBtnClickListener = rightBtnClickListener
             appCommonDialog?.enableCancel = enableCancel

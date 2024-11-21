@@ -1,5 +1,6 @@
 package com.sayx.hm_cloud.http.interceptor
 
+import com.blankj.utilcode.util.LogUtils
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -93,7 +94,7 @@ class RequestInterceptor : Interceptor {
                                 requestParams.addProperty(it, commonParam[it].toString())
                             }
                         }
-                        newBody = requestParams.toString().toRequestBody(body.contentType())
+                        newBody = requestParams.toString().toRequestBody()
                     } catch (e: Exception) {
                         newBody = body
                         e.printStackTrace()
@@ -107,6 +108,7 @@ class RequestInterceptor : Interceptor {
             }
             return request.newBuilder()
                 .url(urlBuilder.build())
+                .header("Content-Type", "application/json")
                 .post(newBody)
                 .build()
         }

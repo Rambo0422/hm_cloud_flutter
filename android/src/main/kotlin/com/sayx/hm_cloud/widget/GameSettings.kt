@@ -142,18 +142,14 @@ class GameSettings @JvmOverloads constructor(
             controllerType = AppVirtualOperateType.APP_KEYBOARD
             gameSettingChangeListener?.onControlMethodChange(AppVirtualOperateType.APP_KEYBOARD)
         }
-        dataBinding.btnCustom.setOnClickListener {
+        dataBinding.btnMoreKeyboard.setOnClickListener {
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
                 "sdk_platform" to GameManager.getGameParam()?.channel,
                 "gamepage_type" to "设置页面",
-                "clickup_content" to "自定义",
+                "clickup_content" to "更多按键",
             ))
             hideLayout()
-            if (GameManager.getGameParam()?.isVip() == true) {
-                gameSettingChangeListener?.onCustomSettings()
-            } else {
-                gameSettingChangeListener?.onShowVipDialog()
-            }
+            gameSettingChangeListener?.onMoreKeyboard()
         }
         // 震动开关
         dataBinding.btnVibrate.setOnClickListener {
@@ -321,21 +317,18 @@ class GameSettings @JvmOverloads constructor(
         volume: Int,
         maxVolume: Int,
         light: Float,
-        virtualOperateType: AppVirtualOperateType,
         userPeakTime: Long,
-        playStartTime: Long,
         gamePlayTime: Long,
         peakChannel: Boolean,
         mobileGame: Boolean
     ) {
 //        LogUtils.d("initSettings")
         this.gameView = gameView
-        // 控制方法
-        this.controllerType = virtualOperateType
         // 是否高峰通道
         this.peakChannel = peakChannel
         // 手游不展示控制方法
         updateControllerMethod(if (mobileGame) View.GONE else VISIBLE)
+        checkControllerSupport()
         // 配置声音/亮度
         updateVoice(maxVolume, volume)
         updateLight((light * 100).toInt())
@@ -349,10 +342,10 @@ class GameSettings @JvmOverloads constructor(
         if (gameView is HmcpVideoView) {
             // 默认开启云游互动
             dataBinding.btnInteraction.isSelected = true
+            gameSettingChangeListener?.onLiveInteractionChange(true)
         } else {
             dataBinding.btnInteraction.setDrawableTop(R.drawable.icon_interaction_normal)
             dataBinding.btnInteraction.setTextColor(Color.parseColor("#FF444855"))
-            dataBinding.ivInteractionSign.visibility = View.INVISIBLE
             dataBinding.tvInteractionSign.visibility = View.VISIBLE
         }
         gameSettingChangeListener?.onLiveInteractionChange(true)
@@ -386,7 +379,6 @@ class GameSettings @JvmOverloads constructor(
         this.currentPlayTime = gamePlayTime / 1000L
         LogUtils.d("playTime=$userPeakTime, currentPlayTime=$currentPlayTime")
         // 如果是派对吧，且如果是游客，则不显示游戏倒计时
-
         if (GameManager.isPartyPlay) {
             if (GameManager.isPartyPlayOwner) {
                 startCountTime()
@@ -397,8 +389,30 @@ class GameSettings @JvmOverloads constructor(
             // 当前不是派对吧的情况下，隐藏派对吧条目
             dataBinding.btnPlayParty.visibility = View.GONE
         }
+        // 设置部分设置状态监听
         initStatusListener()
+        // 获取用户充值状态，当时长不足提示展示时，展示对应状态按钮文案
         GameManager.getUserRechargeStatus()
+    }
+
+    private fun checkControllerSupport() {
+        when(GameManager.getGameParam()?.supportOperation) {
+            1 -> {
+                // 只支持键鼠
+                dataBinding.btnGamepad.isEnabled = false
+                dataBinding.btnGamepad.setDrawableTop(R.drawable.icon_gamepad_close)
+                dataBinding.btnGamepad.setTextColor(Color.parseColor("#FF444855"))
+                dataBinding.tvGamepadSign.visibility = VISIBLE
+            }
+
+            2 -> {
+                // 只支持手柄
+                dataBinding.btnKeyboard.isEnabled = false
+                dataBinding.btnKeyboard.setDrawableTop(R.drawable.icon_keyboard_close)
+                dataBinding.btnKeyboard.setTextColor(Color.parseColor("#FF444855"))
+                dataBinding.tvKeyboardSign.visibility = VISIBLE
+            }
+        }
     }
 
     private fun initStatusListener() {
@@ -710,10 +724,6 @@ class GameSettings @JvmOverloads constructor(
         if (dataBinding.layoutGameOffNotice.visibility == VISIBLE) {
             return
         }
-        GameManager.gameStat("游戏界面", "show", mapOf(
-            "sdk_platform" to GameManager.getGameParam()?.channel,
-            "gamepage_type" to "时长不足",
-        ))
         val animatorSet = AnimatorSet()
         val translation = ObjectAnimator.ofFloat(
             dataBinding.layoutGameOffNotice,

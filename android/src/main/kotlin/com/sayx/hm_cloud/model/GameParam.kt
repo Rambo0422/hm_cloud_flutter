@@ -23,6 +23,9 @@ data class GameParam(
     var priority: Int,
     // 用户id
     var userId: String,
+    var userName: String,
+    var userMobile: String,
+    var userAvatar: String,
     // 游戏channel
     var channelName: String,
     var vipExpiredTime: Long,
@@ -32,9 +35,13 @@ data class GameParam(
     var isPeakChannel: Boolean,
     var isPartyGame: Boolean,
     var gameType: String,
+    // 默认按键类型 1:键盘，2:手柄
+    var defaultOperation: Int,
+    // 支持按键类型 1:键盘，2:手柄，3:两者
+    var supportOperation: Int,
 ) {
     fun isVip(): Boolean {
-        return vipExpiredTime > System.currentTimeMillis()
+        return vipExpiredTime > TimeUtils.currentTime()
     }
 
     override fun toString(): String {
@@ -50,6 +57,9 @@ data class GameParam(
                 "realTime=$realTime, " +
                 "priority=$priority, " +
                 "userId='$userId', " +
+                "userName='$userName', " +
+                "userMobile='$userMobile', " +
+                "userAvatar='$userAvatar', " +
                 "channelName='$channelName', " +
                 "vipExpiredTime=$vipExpiredTime, " +
                 "gameId='$gameId', " +
@@ -57,7 +67,10 @@ data class GameParam(
                 "accountInfo=$accountInfo, " +
                 "isPeakChannel=$isPeakChannel, " +
                 "isPartyGame=$isPartyGame," +
-                "gameType=$gameType)"
+                "gameType=$gameType," +
+                "defaultOperation=$defaultOperation," +
+                "supportOperation=$supportOperation," +
+                ")"
     }
 
     companion object {
@@ -74,6 +87,9 @@ data class GameParam(
                 getTimeValue(arguments["realTime"]),
                 (arguments["priority"] as Number?)?.toInt() ?: 0,
                 arguments["userId"] as String? ?: "",
+                arguments["userName"] as String? ?: "",
+                arguments["userMobile"] as String? ?: "",
+                arguments["userAvatar"] as String? ?: "",
                 arguments["channelName"] as String? ?: "",
                 getTimeValue(arguments["vipExpiredTime"]),
                 arguments["gameId"] as String? ?: "",
@@ -82,6 +98,8 @@ data class GameParam(
                 arguments["isPeakChannel"] as Boolean? ?: false,
                 arguments["isPartyGame"] as Boolean? ?: false,
                 arguments["gameType"] as String? ?: "",
+                (arguments["defaultOperation"] as Number?)?.toInt() ?: 2,
+                (arguments["supportOperation"] as Number?)?.toInt() ?: 3,
             )
         }
 

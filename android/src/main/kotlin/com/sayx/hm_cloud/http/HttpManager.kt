@@ -2,6 +2,7 @@ package com.sayx.hm_cloud.http
 
 import com.sayx.hm_cloud.BuildConfig
 import com.sayx.hm_cloud.http.interceptor.RequestInterceptor
+import com.sayx.hm_cloud.http.interceptor.ResponseInterceptor
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -20,6 +21,7 @@ object HttpManager {
     private val retrofitBuilder = Retrofit.Builder()
 
     private val requestInterceptor = RequestInterceptor()
+    private val responseInterceptor = ResponseInterceptor()
 
     init {
         val clientBuilder = OkHttpClient.Builder()
@@ -27,6 +29,7 @@ object HttpManager {
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
             .addInterceptor(requestInterceptor)
+            .addInterceptor(responseInterceptor)
 
         if (BuildConfig.DEBUG) {
             val httpLoggingInterceptor = HttpLoggingInterceptor()

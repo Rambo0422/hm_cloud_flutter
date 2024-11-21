@@ -10,7 +10,7 @@ data class HttpResponse<T>(
     @SerializedName("code")
     var responseCode: Int? = -1,
 
-    @SerializedName("data")
+    @SerializedName("data", alternate = ["id"])
     val data: T?,
 ) {
     override fun toString(): String {

@@ -22,7 +22,7 @@ interface GameSettingChangeListener {
 
     fun onExitGame()
 
-    fun onCustomSettings()
+    fun onMoreKeyboard()
 
     fun onShowVipDialog()
 

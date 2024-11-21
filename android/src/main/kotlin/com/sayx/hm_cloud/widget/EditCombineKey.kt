@@ -242,7 +242,7 @@ class EditCombineKey @JvmOverloads constructor(
                 )
             )
         } else {
-            keyInfo?.changeList(composeArr = keyInfoList)
+            keyInfo?.composeArr = keyInfoList
             addKeyListener?.onUpdateKey()
         }
         hideLayout()

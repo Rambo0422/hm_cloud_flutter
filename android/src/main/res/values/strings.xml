@@ -111,7 +111,7 @@
     <string name="combine_key">组合按键</string>
     <string name="roulette_key">轮盘按键</string>
     <string name="key_size">按键大小</string>
-    <string name="delete">删除</string>
+    <string name="delete_key">删除按键</string>
     <string name="key_opacity">透明度</string>
     <string name="default_percent" translatable="false">0%</string>
     <string name="edit">编辑</string>
@@ -149,7 +149,7 @@
     <string name="exit">退出</string>
     <string name="debug_code">调试码</string>
     <string name="control_method">操作方式</string>
-    <string name="custom">自定义</string>
+    <string name="more_keyboard">更多按键</string>
     <string name="gamepad_control">官方手柄</string>
     <string name="keyboard_control">官方键鼠</string>
     <string name="mouse_editable_notice">连接外设情况下，鼠标设置无法修改</string>
@@ -157,15 +157,16 @@
     <string name="try_reconnect">尝试重连</string>
     <string name="confirm">确定</string>
     <string name="choose_controller_type">选择按键类型</string>
-    <string name="title_exit_custom">你还没有保存，确定离开吗？</string>
+    <string name="title_exit_custom">确认退出吗？</string>
+    <string name="subtitle_exit_custom">编辑的按键还未保存，退出会丢失记录</string>
     <string name="title_save_custom">确认保存吗？</string>
-    <string name="leave">离开</string>
+    <string name="leave">退出</string>
     <string name="cancel">取消</string>
     <string name="title_restore_custom">确认还原默认吗？</string>
     <string name="confirm_save">确认保存</string>
     <string name="confirm_restore">确认还原</string>
     <string name="title_join_vip">VIP专属功能</string>
-    <string name="subtitle_join_vip">VIP每日可领1h高峰时长，双倍经验</string>
+    <string name="subtitle_join_vip">VIP每日可领1h高峰时长等7大特权</string>
     <string name="join_vip">我要开通</string>
     <string name="game_time_lack">剩余游玩时间不足5分钟</string>
     <string name="recharge">充值</string>
@@ -174,4 +175,17 @@
     <string name="limit_activity">限时活动</string>
     <string name="game_notice_title">温馨提示</string>
     <string name="hint_hide_notice">点击任意地方隐藏展示</string>
+    <string name="gamepad_config">手柄配置</string>
+    <string name="keyboard_config">键鼠配置</string>
+    <string name="use">使用</string>
+    <string name="using">使用中</string>
+    <string name="request_keyboard_config_fail">获取按键配置失败</string>
+    <string name="official_share">官方分享</string>
+    <string name="config_name">配置命名</string>
+    <string name="exit_edit">退出编辑</string>
+    <string name="save_edit">保存按键</string>
+    <string name="key_preview">按键预览</string>
+    <string name="key_setting">按键设置</string>
+    <string name="key_map">按键贴图</string>
+    <string name="input_config_name">输入配置名称</string>
 </resources>

@@ -171,13 +171,11 @@ object AnTongSDK {
         })
     }
 
-
     private val mAnTongPlayerListener = object : AnTongPlayerListener {
         override fun antongPlayerStatusCallback(callback: String?) {
             callback?.let {
                 val jsonObject = JSONObject(it)
                 val status = jsonObject.getInt(StatusCallbackUtil.STATUS)
-
                 when (status) {
                     Constants.STATUS_FIRST_FRAME_ARRIVAL -> {
                         anTongVideoView?.setHmcpPlayerListener(null)
