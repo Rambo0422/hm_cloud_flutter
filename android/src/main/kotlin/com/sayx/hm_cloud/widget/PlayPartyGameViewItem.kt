@@ -114,7 +114,7 @@ class PlayPartyGameViewItem @JvmOverloads constructor(
 
     fun onPlayPartyRoomInfoEvent(index: Int, roomStatu: PlayPartyRoomInfo.RoomStatu, controlInfos: List<ControlInfo>) {
         this.roomStatu = roomStatu
-        currentUid = GameManager.userId
+        currentUid = GameManager.getGameParam()?.userId ?: ""
         isPartyPlayOwner = GameManager.isPartyPlayOwner
         view_home_owner_tag.visibility = if (index == 0) {
             View.VISIBLE

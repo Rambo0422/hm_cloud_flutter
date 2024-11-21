@@ -69,7 +69,7 @@ class PlayPartyUserAvatarItem @JvmOverloads constructor(
             .into(ivAvatar)
 
         val uid = roomStatu.uid
-        if (uid == GameManager.userId) {
+        if (uid == GameManager.getGameParam()?.userId) {
             layoutCenter.background = DrawableCreator.Builder()
                 .setSolidColor(Color.parseColor("#40000000"))
                 .setStrokeColor(Color.parseColor("#FFC6EC4B"))

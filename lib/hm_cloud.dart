@@ -32,26 +32,6 @@ class HmCloudController {
     methodChannel.invokeMethod(HMCloudConstants.startCloudGame, params);
   }
 
-  void showController({int? operation}) {
-    methodChannel.invokeMethod("showController", operation);
-  }
-
-  void setPCMouseMode(bool value) {
-    methodChannel.invokeMethod("setPCMouseMode", value);
-  }
-
-  void setControllerData(dynamic data) {
-    methodChannel.invokeMethod("setControllerData", data);
-  }
-
-  void onEditSuccess(params) {
-    methodChannel.invokeMethod("controllerEditSuccess", params);
-  }
-
-  void onEditFail(params) {
-    methodChannel.invokeMethod("controllerEditFail");
-  }
-
   void showToast(String msg) {
     methodChannel.invokeMethod("showToast", msg);
   }

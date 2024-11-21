@@ -104,9 +104,9 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
             }
 
             GameViewConstants.controlPlay -> {
-                Log.d("flutter", "arguments: $arguments")
                 if (arguments is Map<*, *>) {
-                    GameManager.initHmcpSdk(arguments)
+                    val gameParam = GameParam.formGson(arguments)
+                    GameManager.initHmcpSdk(gameParam)
                 }
             }
 

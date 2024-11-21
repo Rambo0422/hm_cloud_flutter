@@ -279,7 +279,7 @@ class GameActivity : AppCompatActivity() {
     private fun initPlayPartyView() {
         playPartyGameView = PlayPartyGameView(this)
         playPartyGameView?.visibility = View.GONE
-        // 将设置面板控件加入主面板
+
         val layoutParams = FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.MATCH_PARENT
@@ -1426,11 +1426,16 @@ class GameActivity : AppCompatActivity() {
 
         // 判断我自己是否有权限，如果没权限，就显示，有权限就隐藏
         val position = controlInfos.find {
-            it.uid == GameManager.userId
+            it.uid == GameManager.getGameParam()?.userId
         }?.position ?: 0
         if (position == 0) {
+            GameManager.hasPremission = false
+            dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
+            gameSettings?.controllerType = AppVirtualOperateType.NONE
             initWantPlayView()
         } else {
+            GameManager.hasPremission = true
+            checkInputDevices()
             // 如果有权限，则需要removeView
             dataBinding.gameController.findViewById<View>(wantPlayViewId)?.let {
                 dataBinding.gameController.removeView(it)
@@ -1597,7 +1602,7 @@ class GameActivity : AppCompatActivity() {
         }
         GameManager.gameView?.setPCMouseMode(pcMouseMode)
         var controllerType = AppVirtualOperateType.NONE
-        if (!pcMouseMode) {
+        if (!pcMouseMode && GameManager.hasPremission) {
             if (GameManager.lastControllerType == AppVirtualOperateType.NONE) {
                 when(GameManager.getGameParam()?.defaultOperation ?: 2) {
                     1 -> {
