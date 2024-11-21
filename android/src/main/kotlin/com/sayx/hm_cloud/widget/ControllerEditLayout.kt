@@ -2,23 +2,34 @@ package com.sayx.hm_cloud.widget
 
 import android.animation.Animator
 import android.animation.ObjectAnimator
+import android.annotation.SuppressLint
 import android.content.Context
-import android.text.Editable
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.util.AttributeSet
+import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
+import android.widget.FrameLayout
 import android.widget.LinearLayout
+import android.widget.PopupWindow
 import androidx.databinding.DataBindingUtil
+import com.blankj.utilcode.util.SizeUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.sayx.hm_cloud.R
 import com.sayx.hm_cloud.callback.AnimatorListenerImp
 import com.sayx.hm_cloud.callback.EditCallback
 import com.sayx.hm_cloud.callback.TextWatcherImp
+import com.sayx.hm_cloud.constants.AppVirtualOperateType
 import com.sayx.hm_cloud.constants.ControllerStatus
 import com.sayx.hm_cloud.constants.KeyType
 import com.sayx.hm_cloud.constants.controllerStatus
 import com.sayx.hm_cloud.databinding.ViewControllerEditBinding
 import com.sayx.hm_cloud.model.KeyInfo
+import com.sayx.hm_cloud.model.MessageEvent
+import org.greenrobot.eventbus.EventBus
 
 class ControllerEditLayout @JvmOverloads constructor(
     context: Context,
@@ -37,6 +48,12 @@ class ControllerEditLayout @JvmOverloads constructor(
 
     private var keyInfo: KeyInfo? = null
 
+    var controllerType: AppVirtualOperateType? = null
+        set(value) {
+            field = value
+            dataBinding.btnAddRouletteKey.visibility = if (value == AppVirtualOperateType.APP_STICK_XBOX) GONE else VISIBLE
+        }
+
     init {
 
         initView()
@@ -53,84 +70,27 @@ class ControllerEditLayout @JvmOverloads constructor(
         dataBinding.btnAddKey.setOnClickListener {
             callback?.onAddKey()
         }
-        // 添加按键
+        // 添加组合按键
         dataBinding.btnAddCombineKey.setOnClickListener {
             callback?.onAddCombineKey()
         }
-        // 添加按键
+        // 添加轮盘按键
         dataBinding.btnAddRouletteKey.setOnClickListener {
             callback?.onAddRouletteKey()
         }
-        // 还原默认
-        dataBinding.btnRestoreEdit.setOnClickListener {
-            callback?.onRestoreDefault()
+        // 展示更多
+        dataBinding.btnEditMore.setOnClickListener {
+            showMore(it)
+        }
+        // 编辑单个入口
+        dataBinding.btnEdit.setOnClickListener {
+            keyInfo?.let {
+                EventBus.getDefault().post(MessageEvent("editKey", arg = it))
+            } ?: ToastUtils.showLong(R.string.unselect_key)
         }
         // 保存
         dataBinding.btnSaveEdit.setOnClickListener {
             callback?.onSaveEdit()
-        }
-        // 增大按键
-        dataBinding.btnAddKeySize.setOnClickListener {
-            keyInfo?.let {
-                if (it.zoom < 100) {
-                    it.changeZoom(it.zoom + 10)
-                    dataBinding.tvKeySize.text = String.format("%s", "${it.zoom}%")
-                    callback?.onAddKeySize()
-                }
-            } ?: ToastUtils.showLong(R.string.unselect_key)
-        }
-        // 缩小按键
-        dataBinding.btnReduceKeySize.setOnClickListener {
-            keyInfo?.let {
-                if (it.zoom > 40) {
-                    it.changeZoom(it.zoom - 10)
-                    dataBinding.tvKeySize.text = String.format("%s", "${it.zoom}%")
-                    callback?.onReduceKeySize()
-                }
-            } ?: ToastUtils.showLong(R.string.unselect_key)
-        }
-        // 增加按键透明度
-        dataBinding.btnAddKeyOpacity.setOnClickListener {
-            keyInfo?.let {
-                if (it.opacity < 100) {
-                    it.changeOpacity(it.opacity + 10)
-                    dataBinding.tvKeyOpacity.text = String.format("%s", "${it.opacity}%")
-                    callback?.onAddKeyOpacity()
-                }
-            } ?: ToastUtils.showLong(R.string.unselect_key)
-        }
-        // 减少按键透明度
-        dataBinding.btnReduceKeyOpacity.setOnClickListener {
-            keyInfo?.let {
-                if (it.opacity > 10) {
-                    it.changeOpacity(it.opacity - 10)
-                    dataBinding.tvKeyOpacity.text = String.format("%s", "${it.opacity}%")
-                    callback?.onReduceKeyOpacity()
-                }
-            } ?: ToastUtils.showLong(R.string.unselect_key)
-        }
-        // 按键交互:点击
-        dataBinding.btnClick.setOnClickListener {
-            keyInfo?.let {
-                it.click = 0
-                dataBinding.btnClick.isSelected = true
-                dataBinding.btnPress.isSelected = false
-            } ?: ToastUtils.showLong(R.string.unselect_key)
-        }
-        // 按键交互:长按
-        dataBinding.btnPress.setOnClickListener {
-            keyInfo?.let {
-                it.click = 1
-                dataBinding.btnClick.isSelected = false
-                dataBinding.btnPress.isSelected = true
-            } ?: ToastUtils.showLong(R.string.unselect_key)
-        }
-        // 删除按键
-        dataBinding.btnDeleteKey.setOnClickListener {
-            keyInfo?.let {
-                setKeyInfo(null)
-                callback?.onDeleteKey()
-            } ?: ToastUtils.showLong(R.string.unselect_key)
         }
         // 编辑菜单隐藏/显示
         dataBinding.btnEditFold.setOnClickListener {
@@ -142,23 +102,36 @@ class ControllerEditLayout @JvmOverloads constructor(
                 unfoldMenu()
             }
         }
-        // 名称编辑
-        dataBinding.etKeyName.addTextChangedListener(object : TextWatcherImp() {
-            override fun afterTextChanged(s: Editable?) {
-                keyInfo?.changeText(s?.toString())
-                callback?.onTextChange()
-            }
-        })
-        // 组合键，轮盘键编辑
-        dataBinding.btnEditKey.setOnClickListener {
-            keyInfo?.let {
-                callback?.onEditCombine(it)
-            }
-        }
-        // 初始状态
-        dataBinding.btnClick.isSelected = true
-        dataBinding.btnPress.isSelected = false
         dataBinding.btnEditFold.isSelected = false
+    }
+
+    @SuppressLint("InflateParams")
+    private fun showMore(anchor: View) {
+        val inflater = LayoutInflater.from(context)
+        val view = inflater.inflate(R.layout.popup_edit_more, null)
+        val width = SizeUtils.dp2px(120f)
+        val popupWindow = PopupWindow(view, width, ViewGroup.LayoutParams.WRAP_CONTENT)
+        popupWindow.apply {
+            isOutsideTouchable = true
+            isFocusable = true
+            isTouchable = true
+            showAsDropDown(anchor, -width / 2 + anchor.width / 2,SizeUtils.dp2px(5f), Gravity.CENTER)
+        }
+        view.findViewById<View>(R.id.btn_edit_name).setOnClickListener {
+            callback?.onEditName()
+            popupWindow.dismiss()
+        }
+        view.findViewById<View>(R.id.btn_restore).setOnClickListener {
+            popupWindow.dismiss()
+            callback?.onRestoreDefault()
+        }
+        view.findViewById<View>(R.id.btn_delete_key).setOnClickListener {
+            keyInfo?.let {
+                popupWindow.dismiss()
+                setKeyInfo(null)
+                callback?.onDeleteKey()
+            } ?: ToastUtils.showLong(R.string.unselect_key)
+        }
     }
 
     private fun unfoldMenu() {
@@ -229,45 +202,5 @@ class ControllerEditLayout @JvmOverloads constructor(
 
     fun setKeyInfo(keyInfo: KeyInfo?) {
         this.keyInfo = keyInfo
-        if (keyInfo != null) {
-            dataBinding.tvKeySize.text = String.format("%s", "${keyInfo.zoom}%")
-            dataBinding.tvKeyOpacity.text = String.format("%s", "${keyInfo.opacity}%")
-            dataBinding.btnClick.isSelected = keyInfo.click == 0
-            dataBinding.btnPress.isSelected = keyInfo.click != 0
-            keyInfo.text?.let {
-                dataBinding.etKeyName.setText(it)
-                dataBinding.etKeyName.setSelection(it.length)
-            }
-            val nameable =
-                keyInfo.type == KeyType.KEYBOARD_KEY || keyInfo.type == KeyType.GAMEPAD_SQUARE ||
-                        keyInfo.type == KeyType.GAMEPAD_ROUND_MEDIUM || keyInfo.type == KeyType.GAMEPAD_ROUND_SMALL ||
-                        keyInfo.type == KeyType.KEY_COMBINE || keyInfo.type == KeyType.GAMEPAD_COMBINE ||
-                        keyInfo.type == KeyType.KEY_ROULETTE || keyInfo.type == KeyType.GAMEPAD_ROULETTE
-            val clickable =
-                keyInfo.type == KeyType.KEYBOARD_MOUSE_LEFT || keyInfo.type == KeyType.KEYBOARD_MOUSE_RIGHT ||
-                        keyInfo.type == KeyType.KEYBOARD_MOUSE_UP || keyInfo.type == KeyType.KEYBOARD_MOUSE_DOWN ||
-                        keyInfo.type == KeyType.KEYBOARD_MOUSE_MIDDLE || keyInfo.type == KeyType.KEYBOARD_KEY
-            val editable =
-                keyInfo.type == KeyType.KEY_COMBINE || keyInfo.type == KeyType.GAMEPAD_COMBINE ||
-                        keyInfo.type == KeyType.KEY_ROULETTE || keyInfo.type == KeyType.GAMEPAD_ROULETTE
-            dataBinding.btnClick.visibility = if (clickable) VISIBLE else GONE
-            dataBinding.btnPress.visibility = if (clickable) VISIBLE else GONE
-            dataBinding.keyInteract.visibility = if (clickable) VISIBLE else GONE
-            dataBinding.keyName.visibility = if (nameable) VISIBLE else GONE
-            dataBinding.etKeyName.visibility = if (nameable) VISIBLE else GONE
-            dataBinding.btnEditKey.visibility = if (editable) VISIBLE else GONE
-        } else {
-            dataBinding.tvKeySize.text = String.format("%s", "${0}%")
-            dataBinding.tvKeyOpacity.text = String.format("%s", "${0}%")
-            dataBinding.btnClick.isSelected = true
-            dataBinding.btnPress.isSelected = false
-            dataBinding.etKeyName.setText("")
-            dataBinding.btnClick.visibility = GONE
-            dataBinding.btnPress.visibility = GONE
-            dataBinding.keyInteract.visibility = GONE
-            dataBinding.keyName.visibility = GONE
-            dataBinding.etKeyName.visibility = GONE
-            dataBinding.btnEditKey.visibility = GONE
-        }
     }
 }

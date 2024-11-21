@@ -15,17 +15,9 @@ interface EditCallback {
 
     fun onRestoreDefault()
 
-    fun onAddKeySize()
-
-    fun onReduceKeySize()
-
-    fun onAddKeyOpacity()
-
-    fun onReduceKeyOpacity()
-
-    fun onTextChange()
-
     fun onDeleteKey()
 
     fun onEditCombine(keyInfo: KeyInfo)
+
+    fun onEditName()
 }

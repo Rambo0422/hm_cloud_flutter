@@ -7,6 +7,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.DashPathEffect
 import android.graphics.Paint
+import android.text.TextUtils
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -27,6 +28,7 @@ import com.sayx.hm_cloud.constants.ControllerStatus
 import com.sayx.hm_cloud.constants.GameConstants
 import com.sayx.hm_cloud.constants.KeyConstants
 import com.sayx.hm_cloud.constants.controllerStatus
+import com.sayx.hm_cloud.constants.maps
 import com.sayx.hm_cloud.utils.AppSizeUtils
 import com.sayx.hm_cloud.utils.AppVibrateUtils
 
@@ -40,6 +42,8 @@ class KeyView @JvmOverloads constructor(
         DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.view_key, this, true)
 
     private var isDrag = false
+
+    var needDrawShadow: Boolean = true
 
     private var lastX = 0f
     private var lastY = 0f
@@ -64,10 +68,24 @@ class KeyView @JvmOverloads constructor(
     }
 
     fun setKeyInfo(keyInfo: KeyInfo) {
+        val layoutParams = LayoutParams(
+            AppSizeUtils.convertViewSize(keyInfo.getKeyWidth()),
+            AppSizeUtils.convertViewSize(keyInfo.getKeyHeight())
+        )
+        this.layoutParams = layoutParams
+        this.alpha = keyInfo.opacity / 100f
         when (keyInfo.type) {
-            KeyType.KEYBOARD_KEY, KeyType.GAMEPAD_SQUARE, KeyType.GAMEPAD_ROUND_SMALL,
-            KeyType.GAMEPAD_ROUND_MEDIUM, KeyType.KEY_COMBINE, KeyType.GAMEPAD_COMBINE -> {
+            KeyType.GAMEPAD_SQUARE, KeyType.GAMEPAD_ROUND_SMALL,
+            KeyType.GAMEPAD_ROUND_MEDIUM -> {
                 showKeyboardKey(keyInfo)
+            }
+
+            KeyType.KEYBOARD_KEY -> {
+                if (TextUtils.isEmpty(keyInfo.map) || keyInfo.map == "map1") {
+                    showKeyboardKey(keyInfo)
+                } else {
+                    showKeyboardMouse(keyInfo)
+                }
             }
 
             KeyType.KEYBOARD_MOUSE_LEFT, KeyType.KEYBOARD_MOUSE_RIGHT, KeyType.KEYBOARD_MOUSE_MIDDLE,
@@ -83,8 +101,6 @@ class KeyView @JvmOverloads constructor(
 
     private fun showKeyboardKey(keyInfo: KeyInfo) {
         val layoutParams = LayoutParams(
-//            SizeUtils.dp2px(keyInfo.getKeyWidth().toFloat()),
-//            SizeUtils.dp2px(keyInfo.getKeyHeight().toFloat())
             AppSizeUtils.convertViewSize(keyInfo.getKeyWidth()),
             AppSizeUtils.convertViewSize(keyInfo.getKeyHeight())
         )
@@ -104,6 +120,7 @@ class KeyView @JvmOverloads constructor(
             }
         }
         dataBinding.tvName.visibility = VISIBLE
+        dataBinding.ivIcon.visibility = INVISIBLE
     }
 
     private val bgPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -113,20 +130,44 @@ class KeyView @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        if (controllerStatus == ControllerStatus.Edit || controllerStatus == ControllerStatus.Roulette) {
+        if (needDrawShadow && (controllerStatus == ControllerStatus.Edit || controllerStatus == ControllerStatus.Roulette)) {
+            bgPaint.color = if (isActivated) Color.parseColor("#8CC6EC4B") else Color.parseColor("#3CFFFFFF")
             canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), bgPaint)
         }
     }
 
     private fun showKeyboardMouse(keyInfo: KeyInfo) {
         val layoutParams = LayoutParams(
-//            SizeUtils.dp2px(keyInfo.getKeyWidth().toFloat()),
-//            SizeUtils.dp2px(keyInfo.getKeyHeight().toFloat())
             AppSizeUtils.convertViewSize(keyInfo.getKeyWidth()),
             AppSizeUtils.convertViewSize(keyInfo.getKeyHeight())
         )
+        dataBinding.ivIcon.layoutParams = layoutParams
         dataBinding.ivIcon.visibility = VISIBLE
         when (keyInfo.type) {
+            KeyType.KEYBOARD_KEY -> {
+                val map = maps.find { item -> item.first == keyInfo.map}?.second
+                if (map != null) {
+                    // 展示label
+                    val labelText = KeyConstants.keyControl[keyInfo.inputOp]
+                        ?: KeyConstants.keyNumber[keyInfo.inputOp]
+                    dataBinding.tvLabel.text = labelText
+                    dataBinding.tvLabel.visibility = VISIBLE
+                    // 缩小内容，展示边框
+                    dataBinding.ivIcon.setPadding(SizeUtils.dp2px(5f), SizeUtils.dp2px(5f), SizeUtils.dp2px(5f) , SizeUtils.dp2px(5f))
+                    dataBinding.tvName.text = ""
+                    dataBinding.tvName.layoutParams = layoutParams
+                    dataBinding.tvName.visibility = VISIBLE
+
+                    dataBinding.ivIcon.setImageDrawable(
+                        ContextCompat.getDrawable(
+                            context,
+                            map
+                        )
+                    )
+                } else {
+                    showKeyboardKey(keyInfo)
+                }
+            }
             KeyType.KEYBOARD_MOUSE_LEFT -> {
                 dataBinding.ivIcon.setImageDrawable(
                     ContextCompat.getDrawable(
@@ -191,7 +232,6 @@ class KeyView @JvmOverloads constructor(
                 }
             }
         }
-        dataBinding.ivIcon.layoutParams = layoutParams
     }
 
     fun updateText(text: String?) {
@@ -210,7 +250,7 @@ class KeyView @JvmOverloads constructor(
             when (it.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
                     isPressed = true
-                    if (controllerStatus == ControllerStatus.Edit) {
+                    if (controllerStatus == ControllerStatus.Edit && needDrawShadow) {
                         isDrag = false
                         if (parent is ViewGroup) {
                             parentWidth = (parent as ViewGroup).width
@@ -229,7 +269,7 @@ class KeyView @JvmOverloads constructor(
                 }
 
                 MotionEvent.ACTION_MOVE -> {
-                    if (controllerStatus == ControllerStatus.Edit) {
+                    if (controllerStatus == ControllerStatus.Edit && needDrawShadow) {
                         isDrag = parentWidth > 0 && parentHeight > 0
                         val offsetX = it.x - lastX
                         val offsetY = it.y - lastY
@@ -256,7 +296,7 @@ class KeyView @JvmOverloads constructor(
 
                 MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> {
                     isPressed = false
-                    if (controllerStatus == ControllerStatus.Edit) {
+                    if (controllerStatus == ControllerStatus.Edit && needDrawShadow) {
                         val position = IntArray(4)
                         val location = AppSizeUtils.getLocationOnScreen(this, position)
                         positionListener?.onPositionChange(

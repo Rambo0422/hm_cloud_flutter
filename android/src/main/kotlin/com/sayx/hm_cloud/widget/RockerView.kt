@@ -17,6 +17,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.SizeUtils
 import com.sayx.hm_cloud.R
@@ -26,6 +27,7 @@ import com.sayx.hm_cloud.constants.controllerStatus
 import com.sayx.hm_cloud.model.CallBackMode
 import com.sayx.hm_cloud.model.Direction
 import com.sayx.hm_cloud.model.DirectionMode
+import com.sayx.hm_cloud.model.KeyInfo
 import com.sayx.hm_cloud.utils.AppSizeUtils
 import com.sayx.hm_cloud.utils.AppVibrateUtils
 import kotlin.math.acos
@@ -93,6 +95,8 @@ class RockerView @JvmOverloads constructor(
     var positionOffsetListener: OnPositionOffsetListener? = null
 
     private var firstTouchId = 0
+
+    var needDrawShadow = true
 
     init {
         setWillNotDraw(false)
@@ -185,17 +189,29 @@ class RockerView @JvmOverloads constructor(
         style = Paint.Style.FILL
     }
 
+    fun setKeyInfo(keyInfo: KeyInfo) {
+        alpha = keyInfo.opacity / 100f
+        val layoutParams = FrameLayout.LayoutParams(
+            AppSizeUtils.convertViewSize(keyInfo.getKeyWidth()),
+            AppSizeUtils.convertViewSize(keyInfo.getKeyHeight())
+        )
+        this.layoutParams = layoutParams
+        rockerCenterPosition.set(0 , 0)
+        invalidate()
+    }
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        if (controllerStatus == ControllerStatus.Edit) {
+        if (needDrawShadow && (controllerStatus == ControllerStatus.Edit || controllerStatus == ControllerStatus.Roulette)) {
+            bgPaint.color = if (isActivated) Color.parseColor("#8CC6EC4B") else Color.parseColor("#3CFFFFFF")
             canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), bgPaint)
         }
-        val cx = measuredWidth / 2
-        val cy = measuredHeight / 2
+        val cx = width / 2
+        val cy = height / 2
         // 中心点
         centerPoint.set(cx, cy)
 
-        arrowRadius = if (measuredWidth <= measuredHeight) cx else cy
+        arrowRadius = if (width <= height) cx else cy
 
         backgroundRadius = arrowRadius - SizeUtils.dp2px(8f)
 
@@ -270,7 +286,7 @@ class RockerView @JvmOverloads constructor(
             when (it.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
                     isPressed = true
-                    if (controllerStatus == ControllerStatus.Edit) {
+                    if (controllerStatus == ControllerStatus.Edit && needDrawShadow) {
                         isDrag = false
                         if (parent is ViewGroup) {
                             parentWidth = (parent as ViewGroup).width
@@ -291,7 +307,7 @@ class RockerView @JvmOverloads constructor(
                 }
 
                 MotionEvent.ACTION_MOVE -> {
-                    if (controllerStatus == ControllerStatus.Edit) {
+                    if (controllerStatus == ControllerStatus.Edit && needDrawShadow) {
                         isDrag = parentWidth > 0 && parentHeight > 0
                         val offsetX = it.x - lastX
                         val offsetY = it.y - lastY
@@ -324,7 +340,7 @@ class RockerView @JvmOverloads constructor(
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                     isPressed = false
                     // 回调 结束
-                    if (controllerStatus == ControllerStatus.Edit) {
+                    if (controllerStatus == ControllerStatus.Edit && needDrawShadow) {
                         val position = IntArray(4)
                         val location = AppSizeUtils.getLocationOnScreen(this, position)
                         positionChangeListener?.onPositionChange(location[0], location[1], location[2],  location[3])

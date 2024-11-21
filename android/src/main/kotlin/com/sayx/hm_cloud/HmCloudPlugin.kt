@@ -8,13 +8,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ScreenUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.google.gson.reflect.TypeToken
-import com.haima.hmcp.utils.CryptoUtils
-import com.sayx.hm_cloud.constants.AppVirtualOperateType
 import com.sayx.hm_cloud.model.ControlInfo
-import com.sayx.hm_cloud.model.ControllerChangeEvent
-import com.sayx.hm_cloud.model.ControllerConfigEvent
-import com.sayx.hm_cloud.model.ControllerEditEvent
-import com.sayx.hm_cloud.model.ControllerInfo
 import com.sayx.hm_cloud.model.ErrorDialogConfig
 import com.sayx.hm_cloud.model.ExitGameEvent
 import com.sayx.hm_cloud.model.GameParam
@@ -83,58 +77,12 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
                     GameManager.startGame(gameParam)
                 }
             }
-            // 切换操作方式
-            "showController" -> {
-                if (arguments is Int) {
-                    when (arguments) {
-                        0 -> {
-                            GameManager.lastControllerType = AppVirtualOperateType.NONE
-                        }
-
-                        1 -> {
-                            GameManager.lastControllerType = AppVirtualOperateType.APP_KEYBOARD
-                        }
-
-                        2 -> {
-                            GameManager.lastControllerType = AppVirtualOperateType.APP_STICK_XBOX
-                        }
-                    }
-                    EventBus.getDefault().post(ControllerChangeEvent(arguments))
-                }
-            }
-            // 监听到设备接入，设置为电脑模式
-            "setPCMouseMode" -> {
-                GameManager.setPCMouseMode(arguments)
-            }
             // 释放游戏
             "releaseGame" -> {
                 if (arguments is Map<*, *>) {
                     val gameParam = GameParam.formGson(arguments)
                     GameManager.releaseGame(gameParam, callback)
                 }
-            }
-            // 操作方式数据
-            "setControllerData" -> {
-                val data = GameManager.gson.fromJson(
-                    GameManager.gson.toJson(arguments),
-                    Map::class.java
-                )
-                val controllerInfo = ControllerInfo.fromData(data)
-                LogUtils.d("setControllerData:$controllerInfo")
-                EventBus.getDefault().post(ControllerConfigEvent(controllerInfo))
-            }
-            // 操作方式编辑成功
-            "controllerEditSuccess" -> {
-                ToastUtils.showShort("已保存")
-                val data =
-                    GameManager.gson.fromJson(arguments as String, Map::class.java)
-                val controllerInfo = ControllerInfo.fromData(data)
-                EventBus.getDefault()
-                    .post(ControllerEditEvent(controllerInfo.type))
-            }
-            // 操作方式编辑失败
-            "controllerEditFail" -> {
-                ToastUtils.showShort("编辑保存失败")
             }
 
             "updatePlayInfo" -> {

@@ -75,6 +75,8 @@ class RouletteKeyView @JvmOverloads constructor(
 
     private var currentIndex = -1
 
+    var needDrawShadow = true
+
     lateinit var keyInfoData: KeyInfo
 
     init {
@@ -141,7 +143,8 @@ class RouletteKeyView @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        if (controllerStatus == ControllerStatus.Edit || controllerStatus == ControllerStatus.Roulette) {
+        if (needDrawShadow && (controllerStatus == ControllerStatus.Edit || controllerStatus == ControllerStatus.Roulette)) {
+            bgPaint.color = if (isActivated) Color.parseColor("#8CC6EC4B") else Color.parseColor("#3CFFFFFF")
             canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), bgPaint)
         }
         rouletteParts?.let {
@@ -218,6 +221,12 @@ class RouletteKeyView @JvmOverloads constructor(
 
     fun setKeyInfo(keyInfo: KeyInfo) {
 //        LogUtils.d("setKeyInfo:$keyInfo")
+        val layoutParams = LayoutParams(
+            AppSizeUtils.convertViewSize(keyInfo.getKeyWidth()),
+            AppSizeUtils.convertViewSize(keyInfo.getKeyHeight())
+        )
+        this.layoutParams = layoutParams
+        this.alpha = keyInfo.opacity / 100f
         this.keyInfoData = keyInfo
         thumbText = keyInfo.text
         keyInfo.rouArr?.let {
@@ -248,7 +257,7 @@ class RouletteKeyView @JvmOverloads constructor(
         event?.let {
             when (it.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
-                    if (controllerStatus == ControllerStatus.Edit) {
+                    if (controllerStatus == ControllerStatus.Edit && needDrawShadow) {
                         isPressed = true
                         isDrag = false
                         if (parent is ViewGroup) {
@@ -273,7 +282,7 @@ class RouletteKeyView @JvmOverloads constructor(
                 }
 
                 MotionEvent.ACTION_MOVE -> {
-                    if (controllerStatus == ControllerStatus.Edit) {
+                    if (controllerStatus == ControllerStatus.Edit && needDrawShadow) {
                         isDrag = parentWidth > 0 && parentHeight > 0
                         val offsetX = it.x - lastX
                         val offsetY = it.y - lastY
@@ -323,7 +332,7 @@ class RouletteKeyView @JvmOverloads constructor(
                 }
 
                 MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> {
-                    if (controllerStatus == ControllerStatus.Edit) {
+                    if (controllerStatus == ControllerStatus.Edit && needDrawShadow) {
                         isPressed = false
                         val position = IntArray(4)
                         val location = AppSizeUtils.getLocationOnScreen(this, position)

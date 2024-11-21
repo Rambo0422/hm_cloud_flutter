@@ -7,6 +7,8 @@ import java.util.TimeZone
 
 object TimeUtils {
 
+    var timeInterval = 0L
+
     // 可玩时间
     // time 时间值秒
     fun getTimeString(time: Long): String {
@@ -38,5 +40,19 @@ object TimeUtils {
             return dateFormat.format(date1) == dateFormat.format(date2)
         }
         return false
+    }
+
+    // timeInterval = 本地时间 - 服务器时间
+    // 服务器时间 = 本地时间 - timeInterval
+    fun currentTime(): Long {
+        return System.currentTimeMillis() - timeInterval
+    }
+
+    fun string2Millis(date: String, format: SimpleDateFormat): Long {
+        return try {
+            format.parse(date)?.time ?: -1
+        } catch (e: Exception) {
+            -1
+        }
     }
 }

@@ -33,7 +33,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:visibility="gone"
+            android:visibility="invisible"
             tools:src="@drawable/img_mouse_left" />
 
         <androidx.appcompat.widget.AppCompatTextView

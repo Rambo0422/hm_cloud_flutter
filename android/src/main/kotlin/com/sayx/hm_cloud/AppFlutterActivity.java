@@ -35,14 +35,6 @@ public class AppFlutterActivity extends FlutterActivity {
             LogUtils.d("route:" + route + ", arguments:" + arguments);
             GameManager.INSTANCE.openFlutterPage(route, bundleToMap(arguments));
         }
-
-        Map<String, Object> map = new HashMap<>();
-        GameParam gameParam = GameManager.INSTANCE.getGameParam();
-        if (gameParam != null) {
-            map.put("sdk_platform", gameParam.getChannel());
-        }
-        map.put("gamepage_type", "充值中心");
-        GameManager.INSTANCE.gameStat("游戏界面", "show", map, "event");
     }
 
     public Map<String, Object> bundleToMap(@Nullable Bundle bundle) {
