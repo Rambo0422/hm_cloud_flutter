@@ -149,7 +149,7 @@ class EditCombineKey @JvmOverloads constructor(
         animator.addListener(object : AnimatorListenerImp() {
             override fun onAnimationEnd(animation: Animator) {
                 clear()
-                onHideListener?.onHide()
+                onHideListener?.onHide(keyInfo)
             }
         })
         animator.start()
@@ -180,7 +180,7 @@ class EditCombineKey @JvmOverloads constructor(
     }
 
     fun addKey(keyInfo: KeyInfo) {
-        LogUtils.d("addKey:$keyInfo, keyList:$keyList")
+//        LogUtils.d("addKey:$keyInfo, keyList:$keyList")
         if (full) {
             return
         }
@@ -243,7 +243,6 @@ class EditCombineKey @JvmOverloads constructor(
             )
         } else {
             keyInfo?.composeArr = keyInfoList
-            addKeyListener?.onUpdateKey()
         }
         hideLayout()
     }
@@ -255,6 +254,7 @@ class EditCombineKey @JvmOverloads constructor(
             if (!keyInfoList.isNullOrEmpty()) {
                 for (index in keyInfoList.indices) {
                     val info = keyInfoList[index]
+                    info.id = if (info.id == null) UUID.randomUUID() else info.id
                     keyList[index * 2] = info
                     val view = dataBinding.layoutKey[index * 2]
                     if (view is EditKeyView) {

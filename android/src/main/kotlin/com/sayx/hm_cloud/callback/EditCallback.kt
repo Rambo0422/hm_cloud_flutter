@@ -17,7 +17,5 @@ interface EditCallback {
 
     fun onDeleteKey()
 
-    fun onEditCombine(keyInfo: KeyInfo)
-
     fun onEditName()
 }

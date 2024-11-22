@@ -51,10 +51,10 @@ class PlayPartyWantPlayView @JvmOverloads constructor(
         setOnClickListener {
             // 判断我是不是房主，如果我是房主，就直接给权限，如果不是权限，就申请
             if (GameManager.isPartyPlayOwner) {
-                GameManager.letPlay(GameManager.userId)
+                GameManager.letPlay(GameManager.getGameParam()?.userId ?: "")
             } else {
                 if (countDownTimer == null) {
-                    GameManager.wantPlay(GameManager.userId)
+                    GameManager.wantPlay(GameManager.getGameParam()?.userId ?: "")
                     // 开始30s倒计时
                     startCountDownTimer()
                 }
@@ -117,7 +117,7 @@ class PlayPartyWantPlayView @JvmOverloads constructor(
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        LogUtils.e("PlayPartyWantPlayView onDetachedFromWindow")
+//        LogUtils.e("PlayPartyWantPlayView onDetachedFromWindow")
         stopCountDown()
     }
 

@@ -117,7 +117,7 @@ class KeyboardAdapter : RecyclerView.Adapter<ItemViewHolder>() {
 
     private fun getItemName(name: String?, type: Int): CharSequence? {
         if (TextUtils.isEmpty(name)) {
-            return StringBuilder(GameManager.getGameParam()?.gameName ?: "").append(if (type == 1) "手柄" else "键鼠")
+            return StringBuilder(GameManager.getGameParam()?.gameName ?: "").append(if (type == 1) "手柄按键" else "键鼠按键")
         } else {
             return name
         }

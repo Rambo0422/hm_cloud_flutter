@@ -125,6 +125,9 @@ class GameSettings @JvmOverloads constructor(
         }
         // 控制方法
         dataBinding.btnGamepad.setOnClickListener {
+            if (!GameManager.hasPremission) {
+                return@setOnClickListener
+            }
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
                 "sdk_platform" to GameManager.getGameParam()?.channel,
                 "gamepage_type" to "设置页面",
@@ -134,6 +137,9 @@ class GameSettings @JvmOverloads constructor(
             gameSettingChangeListener?.onControlMethodChange(AppVirtualOperateType.APP_STICK_XBOX)
         }
         dataBinding.btnKeyboard.setOnClickListener {
+            if (!GameManager.hasPremission) {
+                return@setOnClickListener
+            }
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
                 "sdk_platform" to GameManager.getGameParam()?.channel,
                 "gamepage_type" to "设置页面",
@@ -143,6 +149,9 @@ class GameSettings @JvmOverloads constructor(
             gameSettingChangeListener?.onControlMethodChange(AppVirtualOperateType.APP_KEYBOARD)
         }
         dataBinding.btnMoreKeyboard.setOnClickListener {
+            if (!GameManager.hasPremission) {
+                return@setOnClickListener
+            }
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
                 "sdk_platform" to GameManager.getGameParam()?.channel,
                 "gamepage_type" to "设置页面",

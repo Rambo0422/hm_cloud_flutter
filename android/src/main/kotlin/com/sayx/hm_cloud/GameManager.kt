@@ -11,12 +11,10 @@ import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
 import androidx.fragment.app.FragmentActivity
-import com.blankj.utilcode.util.FileUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import com.google.gson.JsonObject
 import com.haima.hmcp.Constants
 import com.haima.hmcp.HmcpManager
 import com.haima.hmcp.beans.CheckCloudServiceResult
@@ -56,7 +54,6 @@ import com.sayx.hm_cloud.model.GameError
 import com.sayx.hm_cloud.model.GameErrorEvent
 import com.sayx.hm_cloud.model.GameParam
 import com.sayx.hm_cloud.model.KeyboardList
-import com.sayx.hm_cloud.model.MessageEvent
 import com.sayx.hm_cloud.model.SpecificArchive
 import com.sayx.hm_cloud.model.TimeUpdateEvent
 import com.sayx.hm_cloud.model.UserRechargeStatusEvent
@@ -131,6 +128,8 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
     // 是否是派对吧
     var isPartyPlay = false
     var isPartyPlayOwner = false
+
+    var hasPremission = false
 
     var disposable: Disposable? = null
 
@@ -322,9 +321,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
 
         this.isPartyPlay = gameParam.isPartyGame
         this.isPartyPlayOwner = true
-        this.roomIndex = 0
-        this.userId = gameParam.userId
-
+        hasPremission = true
         channel.invokeMethod(
             "gameStatusStat", mapOf(
                 Pair("type", "game_start"),
@@ -437,7 +434,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
      * 准备进入游戏队列
      */
     private fun prepareGame(archiveData: ArchiveData?) {
-        LogUtils.d("priority:${gameParam?.priority}")
+//        LogUtils.d("priority:${gameParam?.priority}")
 //        AtGameActivity.startActivityForResult(activity)
 //        return
         val code = archiveData?.code
@@ -1100,6 +1097,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
 
     fun useKeyboardData(keyboardInfo: ControllerInfo) {
         LogUtils.d("useKeyboardData:$keyboardInfo")
+        keyboardInfo.use = 1
         updateKeyboardData(keyboardInfo, object : BaseObserver<HttpResponse<Any>>() {
             override fun onNext(response: HttpResponse<Any>) {
                 if (keyboardInfo.type == GameConstants.gamepadConfig) {
@@ -1555,27 +1553,22 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         gameView?.queryControlPermitUsers(this)
     }
 
-    var roomIndex = -1
-    var userId = ""
-
     /**
      * 派对吧情况下才会用的到
      * 主要提供给游客，因为游客初始之前是并没有初始化的
      */
-    fun initHmcpSdk(arguments: Map<*, *>) {
+    fun initHmcpSdk(gameParam: GameParam) {
+        this.gameParam = gameParam
         isPartyPlay = true
         isPartyPlayOwner = false
+        hasPremission = false
 
-        val accessKeyId = arguments["accessKeyId"]?.toString() ?: ""
-        val channelName = arguments["channelName"]?.toString() ?: ""
-        val cid = arguments["cid"]?.toString() ?: ""
-        val pinCode = arguments["pinCode"]?.toString() ?: ""
-        val userId = arguments["userId"]?.toString() ?: ""
-        val userToken = arguments["userToken"]?.toString() ?: ""
-        val roomIndex = (arguments["roomIndex"] as? Int) ?: -1
-
-        this.userId = userId
-        this.roomIndex = roomIndex
+        val accessKeyId = gameParam.accessKeyId
+        val channelName = gameParam.channelName
+        val cid = gameParam.cid
+        val pinCode = gameParam.pinCode
+        val userId = gameParam.userId
+        val userToken = gameParam.userToken
 
         if (initState) {
             controlPlay(cid, pinCode, accessKeyId, userId, userToken)
@@ -1629,15 +1622,13 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
 
         gameView?.hmcpPlayerListener = this
         gameView?.virtualDeviceType = VirtualOperateType.NONE
-        // 默认静音启动，隐藏云端操作
-//        gameView?.setAudioMute(true)
     }
 
     fun sendCurrentCid() {
         val cloudId = HmcpManager.getInstance().cloudId
         val cidArr = JSONObject().apply {
-            put("index", roomIndex)
-            put("uid", userId)
+            put("index", gameParam?.roomIndex ?: -1)
+            put("uid", gameParam?.userId)
             put("cid", cloudId)
         }
         channel.invokeMethod("cidArr", cidArr.toString())

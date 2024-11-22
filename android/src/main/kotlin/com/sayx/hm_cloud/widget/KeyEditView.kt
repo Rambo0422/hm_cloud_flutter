@@ -19,6 +19,7 @@ import com.sayx.hm_cloud.R
 import com.sayx.hm_cloud.adapter.MapAdapter
 import com.sayx.hm_cloud.callback.KeyEditCallback
 import com.sayx.hm_cloud.callback.MapClickListener
+import com.sayx.hm_cloud.callback.TextWatcherImp
 import com.sayx.hm_cloud.constants.KeyConstants
 import com.sayx.hm_cloud.constants.KeyType
 import com.sayx.hm_cloud.constants.maps
@@ -53,14 +54,22 @@ class KeyEditView @JvmOverloads constructor(
             callback?.onKeyDelete()
         }
         dataBinding.btnSaveEdit.setOnClickListener {
-            val text = mKeyInfo.text ?: ""
+            val text = dataBinding.etKeyName.text ?: ""
             if (text.length > 4) {
                 ToastUtils.showLong("按键名称建议为1～4个字符")
                 return@setOnClickListener
             }
+            mKeyInfo.text = text.toString()
             visibility = GONE
-            callback?.onSaveKey(mKeyInfo)
+            callback?.onSaveKey(mKeyInfo, dataBinding.etKeyName.windowToken)
         }
+        dataBinding.etKeyName.addTextChangedListener(object : TextWatcherImp() {
+            override fun afterTextChanged(s: Editable?) {
+                super.afterTextChanged(s)
+                mKeyInfo.text = s?.toString() ?: ""
+                updateView()
+            }
+        })
         dataBinding.btnEdit.setOnClickListener {
             visibility = GONE
             callback?.onCombineKeyEdit(mKeyInfo)
@@ -168,6 +177,7 @@ class KeyEditView @JvmOverloads constructor(
                 selectIndex = maps.indexOfFirst { item -> item.first == mKeyInfo.map }
             }
         }
+        // 移除上个添加的View
         when (val view = dataBinding.layoutPreview[0]) {
             is KeyView, is RockerView, is CombineKeyView, is RouletteKeyView -> {
                 dataBinding.layoutPreview.removeView(view)
@@ -192,13 +202,18 @@ class KeyEditView @JvmOverloads constructor(
                 previewView = addCrossRocker()
             }
 
-            KeyType.GAMEPAD_COMBINE, KeyType.KEY_COMBINE -> {
-                dataBinding.tvInfo.text = mKeyInfo.composeArr?.map { info -> getCombineKeyText(info) }?.toList()?.joinToString(" + ")
+            KeyType.GAMEPAD_COMBINE -> {
+                dataBinding.tvInfo.text = mKeyInfo.composeArr?.map { info -> info.text }?.toList()?.joinToString(" + ")
                 previewView = addCombineKey()
             }
 
-            KeyType.GAMEPAD_ROULETTE, KeyType.KEY_ROULETTE -> {
-                dataBinding.tvInfo.text = mKeyInfo.rouArr?.map { info -> getCombineKeyText(info) }?.toList()?.joinToString(" + ")
+            KeyType.KEY_COMBINE -> {
+                dataBinding.tvInfo.text = mKeyInfo.composeArr?.map { info -> getRouletteKeyText(info) }?.toList()?.joinToString(" + ")
+                previewView = addCombineKey()
+            }
+
+            KeyType.KEY_ROULETTE -> {
+                dataBinding.tvInfo.text = ""
                 previewView = addRouletteKey()
             }
 
@@ -208,7 +223,7 @@ class KeyEditView @JvmOverloads constructor(
         }
     }
 
-    private fun getCombineKeyText(info: KeyInfo): String {
+    private fun getRouletteKeyText(info: KeyInfo): String {
         return when (info.type) {
             KeyType.KEYBOARD_MOUSE_LEFT -> {
                 "左击"
