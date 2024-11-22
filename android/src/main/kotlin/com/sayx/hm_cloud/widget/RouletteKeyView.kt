@@ -18,7 +18,6 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
 import com.blankj.utilcode.util.LogUtils
-import com.blankj.utilcode.util.SizeUtils
 import com.sayx.hm_cloud.R
 import com.sayx.hm_cloud.model.KeyInfo
 import com.sayx.hm_cloud.callback.OnKeyEventListener
@@ -29,6 +28,7 @@ import com.sayx.hm_cloud.constants.controllerStatus
 import com.sayx.hm_cloud.model.RoulettePart
 import com.sayx.hm_cloud.utils.AppSizeUtils
 import com.sayx.hm_cloud.utils.AppVibrateUtils
+import me.jessyan.autosize.utils.AutoSizeUtils
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.hypot
@@ -108,7 +108,7 @@ class RouletteKeyView @JvmOverloads constructor(
 
     init {
         setWillNotDraw(false)
-        val padding = SizeUtils.dp2px(2f)
+        val padding = AutoSizeUtils.dp2px(context, 2f)
         setPadding(padding, padding, padding, padding)
     }
 

@@ -12,7 +12,6 @@ import androidx.core.view.children
 import androidx.core.view.get
 import androidx.databinding.DataBindingUtil
 import com.blankj.utilcode.util.LogUtils
-import com.blankj.utilcode.util.SizeUtils
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.sayx.hm_cloud.GameManager
@@ -36,6 +35,7 @@ import com.sayx.hm_cloud.model.KeyInfo
 import com.sayx.hm_cloud.model.MessageEvent
 import com.sayx.hm_cloud.utils.AppSizeUtils
 import com.sayx.hm_cloud.utils.ViewUtils
+import me.jessyan.autosize.utils.AutoSizeUtils
 import org.greenrobot.eventbus.EventBus
 import kotlin.math.abs
 
@@ -988,8 +988,8 @@ class GameController @JvmOverloads constructor(
         val centerY = height / 2f
 
         dataBinding.layoutMask.isCenterHorizontal =
-            abs(viewCenterX - centerX) <= SizeUtils.dp2px(4f)
-        dataBinding.layoutMask.isCenterVertical = abs(viewCenterY - centerY) <= SizeUtils.dp2px(4f)
+            abs(viewCenterX - centerX) <= AutoSizeUtils.dp2px(context, 4f)
+        dataBinding.layoutMask.isCenterVertical = abs(viewCenterY - centerY) <= AutoSizeUtils.dp2px(context, 4f)
         if (dataBinding.layoutMask.isCenterHorizontal || dataBinding.layoutMask.isCenterVertical) {
             // 居中对齐画居中对齐线
             dataBinding.layoutMask.drawCenterLine(view)
@@ -1004,43 +1004,43 @@ class GameController @JvmOverloads constructor(
                 continue
             }
             val leftAlign =
-                abs(ViewUtils.getViewLeft(view) - ViewUtils.getViewLeft(child)) <= SizeUtils.dp2px(
+                abs(ViewUtils.getViewLeft(view) - ViewUtils.getViewLeft(child)) <= AutoSizeUtils.dp2px(context,
                     4f
                 )
             val leftRightAlign =
-                abs(ViewUtils.getViewLeft(view) - ViewUtils.getViewRight(child)) <= SizeUtils.dp2px(
+                abs(ViewUtils.getViewLeft(view) - ViewUtils.getViewRight(child)) <= AutoSizeUtils.dp2px(context,
                     4f
                 )
             val topAlign =
-                abs(ViewUtils.getViewTop(view) - ViewUtils.getViewTop(child)) <= SizeUtils.dp2px(
+                abs(ViewUtils.getViewTop(view) - ViewUtils.getViewTop(child)) <= AutoSizeUtils.dp2px(context,
                     4f
                 )
             val topBottomAlign =
-                abs(ViewUtils.getViewTop(view) - ViewUtils.getViewBottom(child)) <= SizeUtils.dp2px(
+                abs(ViewUtils.getViewTop(view) - ViewUtils.getViewBottom(child)) <= AutoSizeUtils.dp2px(context,
                     4f
                 )
             val rightAlign =
-                abs(ViewUtils.getViewRight(view) - ViewUtils.getViewRight(child)) <= SizeUtils.dp2px(
+                abs(ViewUtils.getViewRight(view) - ViewUtils.getViewRight(child)) <= AutoSizeUtils.dp2px(context,
                     4f
                 )
             val rightLeftAlign =
-                abs(ViewUtils.getViewRight(view) - ViewUtils.getViewLeft(child)) <= SizeUtils.dp2px(
+                abs(ViewUtils.getViewRight(view) - ViewUtils.getViewLeft(child)) <= AutoSizeUtils.dp2px(context,
                     4f
                 )
             val bottomAlign =
-                abs(ViewUtils.getViewBottom(view) - ViewUtils.getViewBottom(child)) <= SizeUtils.dp2px(
+                abs(ViewUtils.getViewBottom(view) - ViewUtils.getViewBottom(child)) <= AutoSizeUtils.dp2px(context,
                     4f
                 )
             val bottomTopAlign =
-                abs(ViewUtils.getViewBottom(view) - ViewUtils.getViewTop(child)) <= SizeUtils.dp2px(
+                abs(ViewUtils.getViewBottom(view) - ViewUtils.getViewTop(child)) <= AutoSizeUtils.dp2px(context,
                     4f
                 )
             val centerXAlign =
-                abs(ViewUtils.getViewCenterX(view) - ViewUtils.getViewCenterX(child)) <= SizeUtils.dp2px(
+                abs(ViewUtils.getViewCenterX(view) - ViewUtils.getViewCenterX(child)) <= AutoSizeUtils.dp2px(context,
                     4f
                 )
             val centerYAlign =
-                abs(ViewUtils.getViewCenterY(view) - ViewUtils.getViewCenterY(child)) <= SizeUtils.dp2px(
+                abs(ViewUtils.getViewCenterY(view) - ViewUtils.getViewCenterY(child)) <= AutoSizeUtils.dp2px(context,
                     4f
                 )
             if (leftAlign || topAlign || rightAlign || bottomAlign || centerXAlign ||

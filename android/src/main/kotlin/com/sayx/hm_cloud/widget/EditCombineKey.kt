@@ -14,7 +14,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.get
 import androidx.databinding.DataBindingUtil
 import com.blankj.utilcode.util.LogUtils
-import com.blankj.utilcode.util.SizeUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.sayx.hm_cloud.R
 import com.sayx.hm_cloud.model.KeyInfo
@@ -26,6 +25,7 @@ import com.sayx.hm_cloud.constants.KeyType
 import com.sayx.hm_cloud.constants.controllerStatus
 import com.sayx.hm_cloud.databinding.ViewEditCombineKeyBinding
 import com.sayx.hm_cloud.utils.AppSizeUtils
+import me.jessyan.autosize.utils.AutoSizeUtils
 import java.util.UUID
 
 class EditCombineKey @JvmOverloads constructor(
@@ -94,7 +94,7 @@ class EditCombineKey @JvmOverloads constructor(
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 )
             } else {
-                FrameLayout.LayoutParams(SizeUtils.dp2px(25f), SizeUtils.dp2px(25f))
+                FrameLayout.LayoutParams(AutoSizeUtils.dp2px(context,25f), AutoSizeUtils.dp2px(context,25f))
             }
             dataBinding.layoutKey.addView(view, layoutParams)
         }

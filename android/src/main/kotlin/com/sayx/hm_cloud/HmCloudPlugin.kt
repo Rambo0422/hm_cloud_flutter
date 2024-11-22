@@ -34,22 +34,11 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
         channel =
             MethodChannel(flutterPluginBinding.binaryMessenger, GameViewConstants.methodChannelName)
         channel.setMethodCallHandler(this)
-        AutoSizeConfig.getInstance().onAdaptListener = object : onAdaptListener {
-            override fun onAdaptBefore(target: Any?, activity: Activity?) {
-                AutoSizeConfig.getInstance().screenWidth = ScreenUtils.getScreenWidth()
-                AutoSizeConfig.getInstance().screenHeight = ScreenUtils.getScreenHeight()
-                if (activity?.resources?.configuration?.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    AutoSizeConfig.getInstance().designWidthInDp = 812
-                    AutoSizeConfig.getInstance().designHeightInDp = 375
-                } else {
-                    AutoSizeConfig.getInstance().designWidthInDp = 375
-                    AutoSizeConfig.getInstance().designHeightInDp = 812
-                }
-            }
 
-            override fun onAdaptAfter(target: Any?, activity: Activity?) {
-            }
-        }
+        AutoSizeConfig.getInstance().screenWidth = ScreenUtils.getScreenWidth()
+        AutoSizeConfig.getInstance().screenHeight = ScreenUtils.getScreenHeight()
+        AutoSizeConfig.getInstance().designWidthInDp = 812
+        AutoSizeConfig.getInstance().designHeightInDp = 375
         AutoSizeConfig.getInstance().isExcludeFontScale = true
     }
 

@@ -23,7 +23,6 @@ import com.sayx.hm_cloud.constants.KeyType
 import com.sayx.hm_cloud.databinding.ViewKeyBinding
 import kotlin.math.sqrt
 import androidx.databinding.DataBindingUtil
-import com.blankj.utilcode.util.SizeUtils
 import com.sayx.hm_cloud.constants.ControllerStatus
 import com.sayx.hm_cloud.constants.GameConstants
 import com.sayx.hm_cloud.constants.KeyConstants
@@ -31,6 +30,7 @@ import com.sayx.hm_cloud.constants.controllerStatus
 import com.sayx.hm_cloud.constants.maps
 import com.sayx.hm_cloud.utils.AppSizeUtils
 import com.sayx.hm_cloud.utils.AppVibrateUtils
+import me.jessyan.autosize.utils.AutoSizeUtils
 
 class KeyView @JvmOverloads constructor(
     context: Context,
@@ -153,7 +153,8 @@ class KeyView @JvmOverloads constructor(
                     dataBinding.tvLabel.text = labelText
                     dataBinding.tvLabel.visibility = VISIBLE
                     // 缩小内容，展示边框
-                    dataBinding.ivIcon.setPadding(SizeUtils.dp2px(5f), SizeUtils.dp2px(5f), SizeUtils.dp2px(5f) , SizeUtils.dp2px(5f))
+                    val padding = AutoSizeUtils.dp2px(context, 5f)
+                    dataBinding.ivIcon.setPadding(padding, padding, padding , padding)
                     dataBinding.tvName.text = ""
                     dataBinding.tvName.layoutParams = layoutParams
                     dataBinding.tvName.visibility = VISIBLE

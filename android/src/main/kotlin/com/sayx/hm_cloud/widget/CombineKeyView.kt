@@ -14,7 +14,6 @@ import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.blankj.utilcode.util.LogUtils
-import com.blankj.utilcode.util.SizeUtils
 import com.sayx.hm_cloud.R
 import com.sayx.hm_cloud.model.KeyInfo
 import com.sayx.hm_cloud.callback.OnKeyTouchListener
@@ -25,6 +24,7 @@ import com.sayx.hm_cloud.constants.maps
 import com.sayx.hm_cloud.databinding.ViewCombineKeyBinding
 import com.sayx.hm_cloud.utils.AppSizeUtils
 import com.sayx.hm_cloud.utils.AppVibrateUtils
+import me.jessyan.autosize.utils.AutoSizeUtils
 import kotlin.math.sqrt
 
 class CombineKeyView @JvmOverloads constructor(
@@ -71,7 +71,8 @@ class CombineKeyView @JvmOverloads constructor(
             dataBinding.tvName.text = ""
             dataBinding.ivIcon.layoutParams = layoutParams
             dataBinding.ivIcon.visibility = VISIBLE
-            dataBinding.ivIcon.setPadding(SizeUtils.dp2px(5f), SizeUtils.dp2px(5f), SizeUtils.dp2px(5f) , SizeUtils.dp2px(5f))
+            val padding = AutoSizeUtils.dp2px(context, 5f)
+            dataBinding.ivIcon.setPadding(padding, padding, padding , padding)
             dataBinding.ivIcon.setImageDrawable(
                 ContextCompat.getDrawable(
                     context,

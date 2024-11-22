@@ -12,7 +12,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.get
 import androidx.databinding.DataBindingUtil
 import com.blankj.utilcode.util.LogUtils
-import com.blankj.utilcode.util.SizeUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.sayx.hm_cloud.R
 import com.sayx.hm_cloud.model.KeyInfo
@@ -24,6 +23,7 @@ import com.sayx.hm_cloud.constants.KeyType
 import com.sayx.hm_cloud.constants.controllerStatus
 import com.sayx.hm_cloud.databinding.ViewEditRouletteKeyBinding
 import com.sayx.hm_cloud.utils.AppSizeUtils
+import me.jessyan.autosize.utils.AutoSizeUtils
 import java.util.UUID
 
 class EditRouletteKey @JvmOverloads constructor(
@@ -114,16 +114,16 @@ class EditRouletteKey @JvmOverloads constructor(
             )
             when (index) {
                 0 -> {
-                    layoutParams.marginEnd = SizeUtils.dp2px(4.75f)
+                    layoutParams.marginEnd = AutoSizeUtils.dp2px(context,4.75f)
                 }
 
                 7 -> {
-                    layoutParams.marginStart = SizeUtils.dp2px(4.75f)
+                    layoutParams.marginStart = AutoSizeUtils.dp2px(context, 4.75f)
                 }
 
                 else -> {
-                    layoutParams.marginEnd = SizeUtils.dp2px(4.75f)
-                    layoutParams.marginStart = SizeUtils.dp2px(4.75f)
+                    layoutParams.marginEnd = AutoSizeUtils.dp2px(context,4.75f)
+                    layoutParams.marginStart = AutoSizeUtils.dp2px(context,4.75f)
                 }
             }
             dataBinding.layoutKey.addView(editKeyView, layoutParams)

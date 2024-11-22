@@ -19,7 +19,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import com.blankj.utilcode.util.LogUtils
-import com.blankj.utilcode.util.SizeUtils
 import com.sayx.hm_cloud.R
 import com.sayx.hm_cloud.callback.OnPositionChangeListener
 import com.sayx.hm_cloud.constants.ControllerStatus
@@ -30,6 +29,7 @@ import com.sayx.hm_cloud.model.DirectionMode
 import com.sayx.hm_cloud.model.KeyInfo
 import com.sayx.hm_cloud.utils.AppSizeUtils
 import com.sayx.hm_cloud.utils.AppVibrateUtils
+import me.jessyan.autosize.utils.AutoSizeUtils
 import kotlin.math.acos
 import kotlin.math.cos
 import kotlin.math.sin
@@ -213,7 +213,7 @@ class RockerView @JvmOverloads constructor(
 
         arrowRadius = if (width <= height) cx else cy
 
-        backgroundRadius = arrowRadius - SizeUtils.dp2px(8f)
+        backgroundRadius = arrowRadius - AutoSizeUtils.dp2px(context,8f)
 
         // 中心位置
         if (0 == rockerCenterPosition.x || 0 == rockerCenterPosition.y) {

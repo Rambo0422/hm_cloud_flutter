@@ -6,8 +6,8 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
-import com.blankj.utilcode.util.SizeUtils
 import com.sayx.hm_cloud.utils.ViewUtils
+import me.jessyan.autosize.utils.AutoSizeUtils
 import kotlin.math.abs
 
 class AlignOverlayLayout @JvmOverloads constructor(
@@ -26,13 +26,13 @@ class AlignOverlayLayout @JvmOverloads constructor(
 
     private val linePaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.parseColor("#CCC6EC4B")
-        strokeWidth = SizeUtils.dp2px(1f).toFloat()
+        strokeWidth = AutoSizeUtils.dp2px(context, 1f).toFloat()
     }
 
 //    private val textPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
 //        color = Color.RED
 //        textAlign = Paint.Align.CENTER
-//        textSize = SizeUtils.sp2px(12f).toFloat()
+//        textSize = AutoSizeUtils.sp2px(context, 12f).toFloat()
 //    }
 
     override fun onDraw(canvas: Canvas) {
@@ -78,7 +78,7 @@ class AlignOverlayLayout @JvmOverloads constructor(
             }
             matchView?.let { view ->
                 val verticalAlign =
-                    abs((view.x + view.width / 2f) - (it.x + it.width / 2f)) <= SizeUtils.dp2px(4f)
+                    abs((view.x + view.width / 2f) - (it.x + it.width / 2f)) <= AutoSizeUtils.dp2px(context, 4f)
                 if (verticalAlign) {
                     // 中心点竖向对齐
                     drawRelationLine(
@@ -91,7 +91,7 @@ class AlignOverlayLayout @JvmOverloads constructor(
                     )
                 }
                 val horizontalAlign =
-                    abs((view.y + view.height / 2f) - (it.y + it.height / 2f)) <= SizeUtils.dp2px(4f)
+                    abs((view.y + view.height / 2f) - (it.y + it.height / 2f)) <= AutoSizeUtils.dp2px(context, 4f)
                 if (horizontalAlign) {
                     // 中心点横顺向对齐
                     drawRelationLine(
@@ -106,7 +106,8 @@ class AlignOverlayLayout @JvmOverloads constructor(
                 if (verticalAlign || horizontalAlign) {
                     return
                 }
-                if (abs(ViewUtils.getViewLeft(view) - ViewUtils.getViewLeft(it)) <= SizeUtils.dp2px(
+                if (abs(ViewUtils.getViewLeft(view) - ViewUtils.getViewLeft(it)) <= AutoSizeUtils.dp2px(
+                        context,
                         4f
                     )
                 ) {
@@ -120,7 +121,8 @@ class AlignOverlayLayout @JvmOverloads constructor(
                         0f
                     )
                 }
-                if (abs(ViewUtils.getViewLeft(view) - ViewUtils.getViewRight(it)) <= SizeUtils.dp2px(
+                if (abs(ViewUtils.getViewLeft(view) - ViewUtils.getViewRight(it)) <= AutoSizeUtils.dp2px(
+                        context,
                         4f
                     )
                 ) {
@@ -134,7 +136,8 @@ class AlignOverlayLayout @JvmOverloads constructor(
                         0f
                     )
                 }
-                if (abs(ViewUtils.getViewTop(view) - ViewUtils.getViewTop(it)) <= SizeUtils.dp2px(
+                if (abs(ViewUtils.getViewTop(view) - ViewUtils.getViewTop(it)) <= AutoSizeUtils.dp2px(
+                        context,
                         4f
                     )
                 ) {
@@ -148,7 +151,8 @@ class AlignOverlayLayout @JvmOverloads constructor(
                         0f
                     )
                 }
-                if (abs(ViewUtils.getViewTop(view) - ViewUtils.getViewBottom(it)) <= SizeUtils.dp2px(
+                if (abs(ViewUtils.getViewTop(view) - ViewUtils.getViewBottom(it)) <= AutoSizeUtils.dp2px(
+                        context,
                         4f
                     )
                 ) {
@@ -162,7 +166,8 @@ class AlignOverlayLayout @JvmOverloads constructor(
                         0f
                     )
                 }
-                if (abs(ViewUtils.getViewRight(view) - ViewUtils.getViewRight(it)) <= SizeUtils.dp2px(
+                if (abs(ViewUtils.getViewRight(view) - ViewUtils.getViewRight(it)) <= AutoSizeUtils.dp2px(
+                        context,
                         4f
                     )
                 ) {
@@ -176,7 +181,8 @@ class AlignOverlayLayout @JvmOverloads constructor(
                         0f
                     )
                 }
-                if (abs(ViewUtils.getViewRight(view) - ViewUtils.getViewLeft(it)) <= SizeUtils.dp2px(
+                if (abs(ViewUtils.getViewRight(view) - ViewUtils.getViewLeft(it)) <= AutoSizeUtils.dp2px(
+                        context,
                         4f
                     )
                 ) {
@@ -190,7 +196,8 @@ class AlignOverlayLayout @JvmOverloads constructor(
                         0f
                     )
                 }
-                if (abs(ViewUtils.getViewBottom(view) - ViewUtils.getViewBottom(it)) <= SizeUtils.dp2px(
+                if (abs(ViewUtils.getViewBottom(view) - ViewUtils.getViewBottom(it)) <= AutoSizeUtils.dp2px(
+                        context,
                         4f
                     )
                 ) {
@@ -204,7 +211,8 @@ class AlignOverlayLayout @JvmOverloads constructor(
                         0f
                     )
                 }
-                if (abs(ViewUtils.getViewBottom(view) - ViewUtils.getViewTop(it)) <= SizeUtils.dp2px(
+                if (abs(ViewUtils.getViewBottom(view) - ViewUtils.getViewTop(it)) <= AutoSizeUtils.dp2px(
+                        context,
                         4f
                     )
                 ) {
@@ -259,70 +267,80 @@ class AlignOverlayLayout @JvmOverloads constructor(
                     it.y = height / 2f - it.height / 2f
                 }
                 matchView?.let { view ->
-                    if (abs(ViewUtils.getViewLeft(view) - ViewUtils.getViewLeft(it)) <= SizeUtils.dp2px(
+                    if (abs(ViewUtils.getViewLeft(view) - ViewUtils.getViewLeft(it)) <= AutoSizeUtils.dp2px(
+                            context,
                             4f
                         )
                     ) {
                         // 左边对齐
                         it.x = view.x
                     }
-                    if (abs(ViewUtils.getViewLeft(view) - ViewUtils.getViewRight(it)) <= SizeUtils.dp2px(
+                    if (abs(ViewUtils.getViewLeft(view) - ViewUtils.getViewRight(it)) <= AutoSizeUtils.dp2px(
+                            context,
                             4f
                         )
                     ) {
                         // 右测对齐
                         it.x = view.x - it.width
                     }
-                    if (abs(ViewUtils.getViewTop(view) - ViewUtils.getViewTop(it)) <= SizeUtils.dp2px(
+                    if (abs(ViewUtils.getViewTop(view) - ViewUtils.getViewTop(it)) <= AutoSizeUtils.dp2px(
+                            context,
                             4f
                         )
                     ) {
                         // 上边对齐
                         it.y = view.y
                     }
-                    if (abs(ViewUtils.getViewTop(view) - ViewUtils.getViewBottom(it)) <= SizeUtils.dp2px(
+                    if (abs(ViewUtils.getViewTop(view) - ViewUtils.getViewBottom(it)) <= AutoSizeUtils.dp2px(
+                            context,
                             4f
                         )
                     ) {
                         // 底部对齐
                         it.y = view.y - it.height
                     }
-                    if (abs(ViewUtils.getViewRight(view) - ViewUtils.getViewRight(it)) <= SizeUtils.dp2px(
+                    if (abs(ViewUtils.getViewRight(view) - ViewUtils.getViewRight(it)) <= AutoSizeUtils.dp2px(
+                            context,
                             4f
                         )
                     ) {
                         // 右边对齐
                         it.x = view.x + view.width - it.width
                     }
-                    if (abs(ViewUtils.getViewRight(view) - ViewUtils.getViewLeft(it)) <= SizeUtils.dp2px(
+                    if (abs(ViewUtils.getViewRight(view) - ViewUtils.getViewLeft(it)) <= AutoSizeUtils.dp2px(
+                            context,
                             4f
                         )
                     ) {
                         // 左侧对齐
                         it.x = view.x + view.width
                     }
-                    if (abs(ViewUtils.getViewBottom(view) - ViewUtils.getViewBottom(it)) <= SizeUtils.dp2px(
+                    if (abs(ViewUtils.getViewBottom(view) - ViewUtils.getViewBottom(it)) <= AutoSizeUtils.dp2px(
+                            context,
                             4f
                         )
                     ) {
                         // 底边对齐
                         it.y = view.y + view.height - it.height
                     }
-                    if (abs(ViewUtils.getViewBottom(view) - ViewUtils.getViewTop(it)) <= SizeUtils.dp2px(
+                    if (abs(ViewUtils.getViewBottom(view) - ViewUtils.getViewTop(it)) <= AutoSizeUtils.dp2px(
+                            context,
                             4f
                         )
                     ) {
                         // 顶部对齐
                         it.y = view.y + view.height
                     }
-                    if (abs((view.x + view.width / 2f) - (it.x + it.width / 2f)) <= SizeUtils.dp2px(
+                    if (abs((view.x + view.width / 2f) - (it.x + it.width / 2f)) <= AutoSizeUtils.dp2px(
+                            context,
                             4f
                         )
                     ) {
                         // 中心点竖向对齐
                         it.x = view.x + view.width / 2 - it.width / 2
                     }
-                    if (abs((view.y + view.height / 2f) - (it.y + it.height / 2f)) <= SizeUtils.dp2px(
+                    if (abs((view.y + view.height / 2f) - (it.y + it.height / 2f)) <= AutoSizeUtils.dp2px(
+                            context,
                             4f
                         )
                     ) {

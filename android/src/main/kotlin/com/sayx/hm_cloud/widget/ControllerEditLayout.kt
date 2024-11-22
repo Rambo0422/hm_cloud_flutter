@@ -16,7 +16,6 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import androidx.databinding.DataBindingUtil
-import com.blankj.utilcode.util.SizeUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.sayx.hm_cloud.R
 import com.sayx.hm_cloud.callback.AnimatorListenerImp
@@ -29,6 +28,7 @@ import com.sayx.hm_cloud.constants.controllerStatus
 import com.sayx.hm_cloud.databinding.ViewControllerEditBinding
 import com.sayx.hm_cloud.model.KeyInfo
 import com.sayx.hm_cloud.model.MessageEvent
+import me.jessyan.autosize.utils.AutoSizeUtils
 import org.greenrobot.eventbus.EventBus
 
 class ControllerEditLayout @JvmOverloads constructor(
@@ -109,13 +109,13 @@ class ControllerEditLayout @JvmOverloads constructor(
     private fun showMore(anchor: View) {
         val inflater = LayoutInflater.from(context)
         val view = inflater.inflate(R.layout.popup_edit_more, null)
-        val width = SizeUtils.dp2px(120f)
+        val width = AutoSizeUtils.dp2px(context,120f)
         val popupWindow = PopupWindow(view, width, ViewGroup.LayoutParams.WRAP_CONTENT)
         popupWindow.apply {
             isOutsideTouchable = true
             isFocusable = true
             isTouchable = true
-            showAsDropDown(anchor, -width / 2 + anchor.width / 2,SizeUtils.dp2px(5f), Gravity.CENTER)
+            showAsDropDown(anchor, -width / 2 + anchor.width / 2, AutoSizeUtils.dp2px(context, 5f), Gravity.CENTER)
         }
         view.findViewById<View>(R.id.btn_edit_name).setOnClickListener {
             callback?.onEditName()
