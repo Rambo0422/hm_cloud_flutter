@@ -434,7 +434,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
      * 准备进入游戏队列
      */
     private fun prepareGame(archiveData: ArchiveData?) {
-        LogUtils.d("priority:${gameParam?.priority}")
+//        LogUtils.d("priority:${gameParam?.priority}")
 //        AtGameActivity.startActivityForResult(activity)
 //        return
         val code = archiveData?.code
@@ -1621,6 +1621,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         gameView?.setUserInfo(userInfo)
 
         gameView?.hmcpPlayerListener = this
+        gameView?.virtualDeviceType = VirtualOperateType.NONE
     }
 
     fun sendCurrentCid() {

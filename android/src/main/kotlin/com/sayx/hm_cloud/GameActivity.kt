@@ -1051,7 +1051,7 @@ class GameActivity : AppCompatActivity() {
                     .setLeftButton("取消") {
                         AppCommonDialog.hideDialog(this, tag = "deleteKeyboard")
                     }
-                    .setRightButton("确认删除") {
+                    .setRightButton("确认删除", Color.parseColor("#FFFFFFFF")) {
                         AppCommonDialog.hideDialog(this, tag = "deleteKeyboard")
                         event.arg?.let {
                             GameManager.deleteKeyboardConfig(it as ControllerInfo)
@@ -1065,9 +1065,16 @@ class GameActivity : AppCompatActivity() {
                 showKeyEditView(event.arg as KeyInfo)
             }
             "useSuccess" -> {
+                val type = if (event.arg == GameConstants.gamepadConfig) {
+                    "手柄"
+                } else if (event.arg == GameConstants.keyboardConfig) {
+                    "键鼠"
+                } else {
+                    ""
+                }
                 GameToastDialog.Builder(this)
                     .setTitle("使用成功")
-                    .setSubTitle("请在操作方法中选择“手柄”使用")
+                    .setSubTitle("请在操作方法中选择“$type”使用")
                     .setDrawable(R.drawable.icon_toast_success)
                     .build()
                     .show()

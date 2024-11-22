@@ -55,7 +55,7 @@ class KeyEditView @JvmOverloads constructor(
         }
         dataBinding.btnSaveEdit.setOnClickListener {
             val text = dataBinding.etKeyName.text ?: ""
-            if (text.length > 4 || TextUtils.isEmpty(text)) {
+            if (text.length > 4) {
                 ToastUtils.showLong("按键名称建议为1～4个字符")
                 return@setOnClickListener
             }
@@ -202,13 +202,18 @@ class KeyEditView @JvmOverloads constructor(
                 previewView = addCrossRocker()
             }
 
-            KeyType.GAMEPAD_COMBINE, KeyType.KEY_COMBINE -> {
+            KeyType.GAMEPAD_COMBINE -> {
                 dataBinding.tvInfo.text = mKeyInfo.composeArr?.map { info -> info.text }?.toList()?.joinToString(" + ")
                 previewView = addCombineKey()
             }
 
-            KeyType.GAMEPAD_ROULETTE, KeyType.KEY_ROULETTE -> {
-                dataBinding.tvInfo.text = mKeyInfo.rouArr?.map { info -> getRouletteKeyText(info) }?.toList()?.joinToString(" + ")
+            KeyType.KEY_COMBINE -> {
+                dataBinding.tvInfo.text = mKeyInfo.composeArr?.map { info -> getRouletteKeyText(info) }?.toList()?.joinToString(" + ")
+                previewView = addCombineKey()
+            }
+
+            KeyType.KEY_ROULETTE -> {
+                dataBinding.tvInfo.text = ""
                 previewView = addRouletteKey()
             }
 

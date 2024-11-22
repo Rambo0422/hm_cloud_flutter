@@ -85,9 +85,6 @@ class GameSettings @JvmOverloads constructor(
     init {
         // 可用时长点击，添加可用时长
         dataBinding.tvAvailableTime.setOnClickListener {
-            if (!GameManager.hasPremission) {
-                return@setOnClickListener
-            }
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
                 "sdk_platform" to GameManager.getGameParam()?.channel,
                 "gamepage_type" to "设置页面",
@@ -194,9 +191,6 @@ class GameSettings @JvmOverloads constructor(
         }
         // 画质选择
         dataBinding.tvQuality.setOnClickListener {
-            if (!GameManager.hasPremission) {
-                return@setOnClickListener
-            }
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
                 "sdk_platform" to GameManager.getGameParam()?.channel,
                 "gamepage_type" to "设置页面",
@@ -244,9 +238,6 @@ class GameSettings @JvmOverloads constructor(
         }
         // 云游互动开关
         dataBinding.btnInteraction.setOnClickListener {
-            if (!GameManager.hasPremission) {
-                return@setOnClickListener
-            }
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
                 "sdk_platform" to GameManager.getGameParam()?.channel,
                 "gamepage_type" to "设置页面",
@@ -270,9 +261,6 @@ class GameSettings @JvmOverloads constructor(
         }
         // 鼠标点击
         dataBinding.btnMouseClick.setOnClickListener {
-            if (!GameManager.hasPremission) {
-                return@setOnClickListener
-            }
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
                 "sdk_platform" to GameManager.getGameParam()?.channel,
                 "gamepage_type" to "设置页面",
@@ -288,9 +276,6 @@ class GameSettings @JvmOverloads constructor(
         }
         // 触控点击
         dataBinding.btnTouchClick.setOnClickListener {
-            if (!GameManager.hasPremission) {
-                return@setOnClickListener
-            }
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
                 "sdk_platform" to GameManager.getGameParam()?.channel,
                 "gamepage_type" to "设置页面",
@@ -306,9 +291,6 @@ class GameSettings @JvmOverloads constructor(
         }
         // 触屏攻击
         dataBinding.btnTouchAttack.setOnClickListener {
-            if (!GameManager.hasPremission) {
-                return@setOnClickListener
-            }
             GameManager.gameStat("游戏界面-点击", "click", mapOf(
                 "sdk_platform" to GameManager.getGameParam()?.channel,
                 "gamepage_type" to "设置页面",
@@ -445,9 +427,6 @@ class GameSettings @JvmOverloads constructor(
     private fun initStatusListener() {
         // 鼠标设置
         dataBinding.switchMouseConfig.setOnCheckedChangeListener { _, isChecked ->
-            if (!GameManager.hasPremission) {
-                return@setOnCheckedChangeListener
-            }
 //            LogUtils.d("MouseMode change:$isChecked, touchMode:${gameView?.touchMode}, currentTouchMode:$currentTouchMode, mouseModeEditable:$mouseModeEditable")
             if (mouseModeEditable) {
                 if (isChecked) {
@@ -503,9 +482,6 @@ class GameSettings @JvmOverloads constructor(
         // 鼠标灵敏度状态变更
         dataBinding.sbSensitivity.setOnSeekBarChangeListener(object : SeekBarChangListenerImp() {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                if (!GameManager.hasPremission) {
-                    return
-                }
                 LogUtils.d("onProgressChanged->sensitivity=$progress, fromUser=$fromUser")
                 if (fromUser) {
                     if (gameView is HmcpVideoView) {

@@ -150,8 +150,8 @@
     <string name="debug_code">调试码</string>
     <string name="control_method">操作方式</string>
     <string name="more_keyboard">更多按键</string>
-    <string name="gamepad_control">官方手柄</string>
-    <string name="keyboard_control">官方键鼠</string>
+    <string name="gamepad_control">手柄</string>
+    <string name="keyboard_control">键鼠</string>
     <string name="mouse_editable_notice">连接外设情况下，鼠标设置无法修改</string>
     <string name="clip_success">已复制到剪切板</string>
     <string name="try_reconnect">尝试重连</string>

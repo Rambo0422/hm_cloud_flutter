@@ -722,6 +722,7 @@ class AtGameActivity : AppCompatActivity() {
     private fun showSaveCustomDialog() {
         AppCommonDialog.Builder(this)
             .setTitle(getString(R.string.title_save_custom))
+            .setSubTitle("已有记录只保存最后配置信息", Color.GRAY)
             .setLeftButton(getString(R.string.cancel)) {
                 AppCommonDialog.hideDialog(this)
             }
@@ -1077,9 +1078,16 @@ class AtGameActivity : AppCompatActivity() {
                 showKeyEditView(event.arg as KeyInfo)
             }
             "useSuccess" -> {
+                val type = if (event.arg == GameConstants.gamepadConfig) {
+                    "手柄"
+                } else if (event.arg == GameConstants.keyboardConfig) {
+                    "键鼠"
+                } else {
+                    ""
+                }
                 GameToastDialog.Builder(this)
                     .setTitle("使用成功")
-                    .setSubTitle("请在操作方法中选择“手柄”使用")
+                    .setSubTitle("请在操作方法中选择“$type”使用")
                     .setDrawable(R.drawable.icon_toast_success)
                     .build()
                     .show()

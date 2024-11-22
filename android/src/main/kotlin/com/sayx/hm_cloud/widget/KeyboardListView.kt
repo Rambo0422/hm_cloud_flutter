@@ -159,16 +159,14 @@ class KeyboardListView @JvmOverloads constructor(
         fun updateGamePad(gamepadList: MutableList<ControllerInfo>, msg:String) {
             keyboardListView?.let {
                 it.gamepadAdapter.itemList = gamepadList
-                // 使用成功
-                EventBus.getDefault().post(MessageEvent(msg))
+                EventBus.getDefault().post(MessageEvent(msg, arg = GameConstants.gamepadConfig))
             }
         }
 
         fun updateKeyboard(keyboardList: MutableList<ControllerInfo>, msg:String) {
             keyboardListView?.let {
                 it.keyboardAdapter.itemList = keyboardList
-                // 使用成功
-                EventBus.getDefault().post(MessageEvent(msg))
+                EventBus.getDefault().post(MessageEvent(msg, arg = GameConstants.keyboardConfig))
             }
         }
     }

@@ -190,9 +190,9 @@ class GameController @JvmOverloads constructor(
                     addCombineKey(keyInfo)
                 }
 
-                KeyType.GAMEPAD_ROULETTE -> {
-                    addRouletteKey(keyInfo)
-                }
+//                KeyType.GAMEPAD_ROULETTE -> {
+//                    addRouletteKey(keyInfo)
+//                }
 
                 else -> {
                     LogUtils.e("initGamepad:$keyInfo")
@@ -808,9 +808,9 @@ class GameController @JvmOverloads constructor(
                     addCombineKey(keyInfo)
                 }
 
-                KeyType.GAMEPAD_ROULETTE -> {
-                    addRouletteKey(keyInfo)
-                }
+//                KeyType.GAMEPAD_ROULETTE -> {
+//                    addRouletteKey(keyInfo)
+//                }
 
                 else -> {
                     LogUtils.e("initGamepad:$keyInfo")
