@@ -4,15 +4,12 @@ import android.animation.Animator
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
-import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import androidx.databinding.DataBindingUtil
@@ -20,10 +17,8 @@ import com.blankj.utilcode.util.ToastUtils
 import com.sayx.hm_cloud.R
 import com.sayx.hm_cloud.callback.AnimatorListenerImp
 import com.sayx.hm_cloud.callback.EditCallback
-import com.sayx.hm_cloud.callback.TextWatcherImp
 import com.sayx.hm_cloud.constants.AppVirtualOperateType
 import com.sayx.hm_cloud.constants.ControllerStatus
-import com.sayx.hm_cloud.constants.KeyType
 import com.sayx.hm_cloud.constants.controllerStatus
 import com.sayx.hm_cloud.databinding.ViewControllerEditBinding
 import com.sayx.hm_cloud.model.KeyInfo

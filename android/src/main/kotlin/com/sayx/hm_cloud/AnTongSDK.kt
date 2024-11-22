@@ -213,22 +213,6 @@ object AnTongSDK {
                 }
             } ?: return
         }
-
-        override fun onPlayerError(errorCode: String?, errorInfo: String?) {
-            GameManager.gameEsStat(
-                "game_error", "安通报错码", "show",
-                mapOf(
-                    "errorcode_at" to "$errorCode",
-                    "errormsg_at" to "$errorInfo",
-                ).toString(),
-            )
-            GameManager.gameStat(
-                "安通报错码", "show", mapOf(
-                    "errorcode_at" to "$errorCode",
-                    "errormsg_at" to "$errorInfo",
-                )
-            )
-        }
     }
 }
 

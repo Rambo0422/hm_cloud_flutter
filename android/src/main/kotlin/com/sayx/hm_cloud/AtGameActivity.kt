@@ -195,17 +195,33 @@ class AtGameActivity : AppCompatActivity() {
                                 finish()
                             }
                         }
-                        Constants.STATUS_NO_INPUT -> {
+                        Constants.STATUS_INSUFFICIENT_CLOSE, Constants.STATUS_NO_INPUT -> {
                             runOnUiThread {
-                                showWarningDialog()
+                                showWarningDialog("$status")
                             }
                         }
+                        Constants.STATUS_APP_ID_ERROR,
+                        Constants.STATUS_NOT_FOND_GAME,
+                        Constants.STATUS_SIGN_FAILED,
+                        Constants.STATUS_CONN_FAILED -> {
+                             runOnUiThread {
+                                 gameSettings?.release()
+                                 GameManager.isPlaying = false
+
+                                 GameManager.releaseGame(finish = "errorCode")
+                                 AppCommonDialog.Builder(this@AtGameActivity)
+                                     .setTitle("游戏已结束")
+                                     .setRightButton("退出游戏") {
+                                         AppCommonDialog.hideDialog(this@AtGameActivity, "gameErrorDialog")
+                                         showLoading()
+                                         AnTongSDK.anTongVideoView?.stopGame()
+                                     }
+                                     .build()
+                                     .show("gameErrorDialog")
+                             }
+                         }
                     }
                 }
-            }
-
-            override fun onPlayerError(errorCode: String?, errorInfo: String?) {
-                LogUtils.d("onPlayerError errorCode: $errorCode errorInfo: $errorInfo")
             }
         })
 
@@ -273,20 +289,6 @@ class AtGameActivity : AppCompatActivity() {
                 "gamepage_type" to GameManager.getGameParam()?.gameType,
             )
         )
-    }
-
-    private fun showWarningDialog() {
-        gameSettings?.release()
-        GameManager.isPlaying = false
-        GameManager.releaseGame(finish = "11")
-        AppCommonDialog.Builder(this)
-            .setTitle("游戏结束\n[11]")
-            .setSubTitle("游戏长时间无操作", Color.parseColor("#FF555A69"))
-            .setRightButton("退出游戏") {
-                LogUtils.d("exitGameForTime")
-                finish()
-            }
-            .build().show()
     }
 
     private fun checkGuideShow() {
@@ -553,6 +555,34 @@ class AtGameActivity : AppCompatActivity() {
                 return packetsLostRate ?: ""
             }
         }
+    }
+
+    private fun showWarningDialog(errorCode: String) {
+        gameSettings?.release()
+        GameManager.isPlaying = false
+
+        GameManager.releaseGame(finish = "errorCode")
+        val title = "游戏结束\n[$errorCode]"
+        val subtitle = when (errorCode) {
+            "${Constants.STATUS_NO_INPUT}" -> {
+                "游戏长时间无操作"
+            }
+            "${Constants.STATUS_INSUFFICIENT_CLOSE}" -> {
+                "游戏结束"
+            }
+            else -> {
+                "游戏结束"
+            }
+        }
+        AppCommonDialog.Builder(this)
+            .setTitle(title)
+            .setSubTitle(subtitle, Color.parseColor("#FF555A69"))
+            .setRightButton("退出游戏") {
+                AppCommonDialog.hideDialog(this, "warningDialog")
+                showLoading()
+                AnTongSDK.stopGame()
+            }
+            .build().show("warningDialog")
     }
 
     private fun showExitGameDialog() {
