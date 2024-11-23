@@ -1741,7 +1741,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
 
     // 向 flutter 端发送埋点需求
     fun processEvent(processStr: String) {
-        LogUtils.d("processEvent processStr: $processStr")
         val paramsMap = hashMapOf("processStr" to processStr)
         if (ThreadUtils.isMainThread()) {
             channel.invokeMethod("processEvent", paramsMap)
