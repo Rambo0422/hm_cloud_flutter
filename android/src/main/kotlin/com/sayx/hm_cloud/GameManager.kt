@@ -326,6 +326,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         this.isPartyPlay = gameParam.isPartyGame
         this.isPartyPlayOwner = true
         hasPremission = true
+        isFirstGetControllerInfo = false
         channel.invokeMethod(
             "gameStatusStat", mapOf(
                 Pair("type", "game_start"),
