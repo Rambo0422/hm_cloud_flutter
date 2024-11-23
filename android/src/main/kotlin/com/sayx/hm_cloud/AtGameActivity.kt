@@ -213,8 +213,7 @@ class AtGameActivity : AppCompatActivity() {
                                      .setTitle("游戏已结束")
                                      .setRightButton("退出游戏") {
                                          AppCommonDialog.hideDialog(this@AtGameActivity, "gameErrorDialog")
-                                         showLoading()
-                                         AnTongSDK.anTongVideoView?.stopGame()
+                                         finish()
                                      }
                                      .build()
                                      .show("gameErrorDialog")
@@ -579,8 +578,7 @@ class AtGameActivity : AppCompatActivity() {
             .setSubTitle(subtitle, Color.parseColor("#FF555A69"))
             .setRightButton("退出游戏") {
                 AppCommonDialog.hideDialog(this, "warningDialog")
-                showLoading()
-                AnTongSDK.stopGame()
+                finish()
             }
             .build().show("warningDialog")
     }
@@ -600,7 +598,6 @@ class AtGameActivity : AppCompatActivity() {
                     this,
                     "hideExitGameDialog"
                 )
-                finish()
                 showLoading()
                 AnTongSDK.stopGame()
                 GameManager.releaseGame(finish = "1")
