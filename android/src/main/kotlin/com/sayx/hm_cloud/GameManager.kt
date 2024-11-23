@@ -12,6 +12,7 @@ import android.os.Looper
 import android.text.TextUtils
 import androidx.fragment.app.FragmentActivity
 import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.ThreadUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -130,6 +131,9 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
     var isPartyPlayOwner = false
 
     var hasPremission = false
+
+    // 是否是第一次获取手柄或者键盘数据
+    private var isFirstGetControllerInfo = true
 
     var disposable: Disposable? = null
 
@@ -692,6 +696,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                 Constants.STATUS_WAIT_CHOOSE -> {
                     if (resume) {
                         gameView?.entryQueue()
+                        processEvent("开始排队")
                     } else {
 
                     }
@@ -899,6 +904,11 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                         }
                     }
                 }
+
+                if (isFirstGetControllerInfo) {
+                    isFirstGetControllerInfo = false
+                    processEvent("加载按键成功")
+                }
             }
 
             override fun onError(e: Throwable) {
@@ -921,6 +931,11 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                     }
                 } else {
                     LogUtils.e("读取assets手柄配置失败")
+                }
+
+                if (isFirstGetControllerInfo) {
+                    isFirstGetControllerInfo = false
+                    processEvent("加载按键成功")
                 }
             }
         })
@@ -947,6 +962,11 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                             getUserKeyboardData(null)
                         }
                     }
+                }
+
+                if (isFirstGetControllerInfo) {
+                    isFirstGetControllerInfo = false
+                    processEvent("加载按键成功")
                 }
             }
         })
@@ -1715,6 +1735,18 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         activityUrl = arguments["jumpUrl"] as String?
         if (type is String) {
             EventBus.getDefault().post(UserRechargeStatusEvent(type))
+        }
+    }
+
+    // 向 flutter 端发送埋点需求
+    fun processEvent(processStr: String) {
+        val paramsMap = hashMapOf("processStr" to processStr)
+        if (ThreadUtils.isMainThread()) {
+            channel.invokeMethod("processEvent", paramsMap)
+        } else {
+            activity.runOnUiThread {
+                channel.invokeMethod("processEvent", paramsMap)
+            }
         }
     }
 }

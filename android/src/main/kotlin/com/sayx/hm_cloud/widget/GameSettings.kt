@@ -665,6 +665,11 @@ class GameSettings @JvmOverloads constructor(
                     gameSettingChangeListener?.onPlayTimeLack(false)
                 }
                 updateNetDelay()
+
+                // 因埋点需求，需要上报用户游玩三分钟
+                if (gamePlayTime == (3 * 60).toLong()) {
+                    GameManager.processEvent("游玩3分钟")
+                }
             }
         }
     }
