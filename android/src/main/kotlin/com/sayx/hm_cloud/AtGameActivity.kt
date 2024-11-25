@@ -196,6 +196,7 @@ class AtGameActivity : AppCompatActivity() {
                             }
                         }
                         Constants.STATUS_INSUFFICIENT_CLOSE, Constants.STATUS_NO_INPUT -> {
+                            AnTongSDK.uploadErrorCode(status)
                             runOnUiThread {
                                 showWarningDialog("$status")
                             }
