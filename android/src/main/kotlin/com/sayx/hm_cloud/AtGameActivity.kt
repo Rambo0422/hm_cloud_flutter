@@ -204,21 +204,26 @@ class AtGameActivity : AppCompatActivity() {
                         Constants.STATUS_NOT_FOND_GAME,
                         Constants.STATUS_SIGN_FAILED,
                         Constants.STATUS_CONN_FAILED -> {
-                             runOnUiThread {
-                                 gameSettings?.release()
-                                 GameManager.isPlaying = false
+                            AnTongSDK.uploadErrorCode(status)
+                            runOnUiThread {
+                                gameSettings?.release()
+                                GameManager.isPlaying = false
 
-                                 GameManager.releaseGame(finish = "errorCode")
-                                 AppCommonDialog.Builder(this@AtGameActivity)
-                                     .setTitle("游戏已结束")
-                                     .setRightButton("退出游戏") {
-                                         AppCommonDialog.hideDialog(this@AtGameActivity, "gameErrorDialog")
-                                         finish()
-                                     }
-                                     .build()
-                                     .show("gameErrorDialog")
-                             }
-                         }
+                                GameManager.releaseGame(finish = "errorCode")
+                                AppCommonDialog.Builder(this@AtGameActivity)
+                                    .setTitle("游戏已结束")
+                                    .setRightButton("退出游戏") {
+                                        AppCommonDialog.hideDialog(this@AtGameActivity, "gameErrorDialog")
+                                        finish()
+                                    }
+                                    .build()
+                                    .show("gameErrorDialog")
+                            }
+                        }
+
+                        else -> {
+                            AnTongSDK.uploadErrorCode(status)
+                        }
                     }
                 }
             }

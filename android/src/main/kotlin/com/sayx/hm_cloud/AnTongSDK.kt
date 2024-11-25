@@ -195,24 +195,30 @@ object AnTongSDK {
                     Constants.STATUS_NOT_FOND_GAME,
                     Constants.STATUS_SIGN_FAILED,
                     Constants.STATUS_CONN_FAILED -> {
-                        GameManager.gameEsStat(
-                            "game_error",
-                            "安通报错码",
-                            "show",
-                            mapOf("errorCode" to "$status").toString(),
-                        )
-                        GameManager.gameStat("安通报错码", "show", mapOf(
-                            "errorcode_at" to "$status"
-                        ))
+                        uploadErrorCode(status)
                         val errorMessage =
                             jsonObject.optString(StatusCallbackUtil.DATA, "服务器异常")
                         mRequestDeviceSuccess?.onRequestDeviceFailed(errorMessage)
                     }
 
-                    else -> {}
+                    else -> {
+                        uploadErrorCode(status)
+                    }
                 }
             } ?: return
         }
+    }
+
+    fun uploadErrorCode(errorCode: Int) {
+        GameManager.gameEsStat(
+            "game_error",
+            "安通报错码",
+            "show",
+            mapOf("errorCode" to "$errorCode").toString(),
+        )
+        GameManager.gameStat("安通报错码", "show", mapOf(
+            "errorcode_at" to "$errorCode"
+        ))
     }
 }
 
