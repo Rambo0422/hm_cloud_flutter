@@ -6,5 +6,5 @@ interface RequestDeviceSuccess {
 
     fun onRequestDeviceSuccess()
 
-    fun onRequestDeviceFailed(errorMessage: String)
+    fun onRequestDeviceFailed(status:Int, errorMessage: String)
 }

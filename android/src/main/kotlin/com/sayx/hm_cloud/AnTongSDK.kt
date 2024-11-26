@@ -194,11 +194,12 @@ object AnTongSDK {
                     Constants.STATUS_APP_ID_ERROR,
                     Constants.STATUS_NOT_FOND_GAME,
                     Constants.STATUS_SIGN_FAILED,
+                    Constants.STATUS_STOP_PLAY,
                     Constants.STATUS_CONN_FAILED -> {
                         uploadErrorCode(status)
                         val errorMessage =
                             jsonObject.optString(StatusCallbackUtil.DATA, "服务器异常")
-                        mRequestDeviceSuccess?.onRequestDeviceFailed(errorMessage)
+                        mRequestDeviceSuccess?.onRequestDeviceFailed(status, errorMessage)
                     }
 
                     else -> {

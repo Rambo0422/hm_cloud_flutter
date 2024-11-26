@@ -486,8 +486,14 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                         AtGameActivity.startActivityForResult(activity)
                     }
 
-                    override fun onRequestDeviceFailed(errorMessage: String) {
+                    override fun onRequestDeviceFailed(status: Int, errorMessage: String) {
                         LogUtils.d("onRequestDeviceFailed errorMessage: $errorMessage")
+                        activity.runOnUiThread {
+                            channel.invokeMethod(
+                                "errorInfo",
+                                mapOf(Pair("errorCode", "$status"), Pair("errorMsg", errorMessage))
+                            )
+                        }
                     }
                 })
             return
