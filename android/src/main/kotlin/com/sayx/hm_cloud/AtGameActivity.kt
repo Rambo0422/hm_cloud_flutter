@@ -204,7 +204,9 @@ class AtGameActivity : AppCompatActivity() {
                         Constants.STATUS_APP_ID_ERROR,
                         Constants.STATUS_NOT_FOND_GAME,
                         Constants.STATUS_SIGN_FAILED,
-                        Constants.STATUS_CONN_FAILED -> {
+                        Constants.STATUS_CONN_FAILED,
+                        Constants.STATUS_FINISH_WAIT,
+                        600000,300010,101001,201011 -> {
                             AnTongSDK.uploadErrorCode(status)
                             runOnUiThread {
                                 gameSettings?.release()
@@ -212,7 +214,7 @@ class AtGameActivity : AppCompatActivity() {
 
                                 GameManager.releaseGame(finish = "errorCode")
                                 AppCommonDialog.Builder(this@AtGameActivity)
-                                    .setTitle("游戏已结束")
+                                    .setTitle("游戏已结束\n[$status]")
                                     .setRightButton("退出游戏") {
                                         AppCommonDialog.hideDialog(this@AtGameActivity, "gameErrorDialog")
                                         finish()
@@ -1384,11 +1386,11 @@ class AtGameActivity : AppCompatActivity() {
         var controllerType = AppVirtualOperateType.NONE
         if (!pcMouseMode) {
             if (GameManager.lastControllerType == AppVirtualOperateType.NONE) {
-                when(GameManager.getGameParam()?.defaultOperation ?: 2) {
-                    1 -> {
+                when(GameManager.getGameParam()?.defaultOperation ?: GameConstants.gamepadConfig) {
+                    GameConstants.keyboardConfig -> {
                         controllerType = AppVirtualOperateType.APP_KEYBOARD
                     }
-                    2 -> {
+                    GameConstants.gamepadConfig -> {
                         controllerType = AppVirtualOperateType.APP_STICK_XBOX
                     }
                 }

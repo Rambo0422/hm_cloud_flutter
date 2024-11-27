@@ -195,7 +195,9 @@ object AnTongSDK {
                     Constants.STATUS_NOT_FOND_GAME,
                     Constants.STATUS_SIGN_FAILED,
                     Constants.STATUS_STOP_PLAY,
-                    Constants.STATUS_CONN_FAILED -> {
+                    Constants.STATUS_CONN_FAILED,
+                    Constants.STATUS_FINISH_WAIT,
+                    600000,300010,101001,201011 -> {
                         uploadErrorCode(status)
                         val errorMessage =
                             jsonObject.optString(StatusCallbackUtil.DATA, "服务器异常")

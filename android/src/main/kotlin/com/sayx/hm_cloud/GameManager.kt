@@ -320,6 +320,8 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             })
     }
 
+    var requestCount = 0
+
     fun startGame(gameParam: GameParam) {
         activityPauseTime = 0
         this.gameParam = gameParam
@@ -336,6 +338,10 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                 Pair("arguments", gameParam.toString())
             )
         )
+        getArchiveData(gameParam)
+    }
+
+    private fun getArchiveData(gameParam: GameParam) {
         val params: HashMap<String, Any> = hashMapOf(
             "userId" to gameParam.userId,
             "gameId" to gameParam.gameId,
@@ -362,7 +368,13 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                 }
 
                 override fun onError(e: Throwable) {
-                    LogUtils.e("requestArchiveData:${e.message}")
+//                    LogUtils.e("requestArchiveData:${e.message}")
+                    if (requestCount == 0) {
+                        requestCount += 1
+                        getArchiveData(gameParam)
+                        return
+                    }
+                    requestCount = 0
                     if (e is AppHttpException) {
                         channel.invokeMethod(
                             "errorInfo", mapOf(
@@ -384,10 +396,10 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                             )
                         )
                     }
-                    prepareGame(null)
                 }
 
                 override fun onNext(response: HttpResponse<ArchiveData>) {
+                    requestCount = 0
                     channel.invokeMethod(
                         "gameStatusStat", mapOf(
                             Pair("type", "game_request"),
@@ -953,6 +965,10 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
     private fun getDefaultKeyboardData(defaultUse: Boolean, callback: KeyboardListCallback? = null) {
         LogUtils.d("getDefaultKeyboardData:$defaultUse")
         GameRepository.requestDefaultKeyboard(gameParam?.gameId, object : BaseObserver<HttpResponse<ControllerInfo>>() {
+            override fun onSubscribe(d: Disposable) {
+                super.onSubscribe(d)
+                processEvent("getKeyboard")
+            }
 
             override fun onNext(response: HttpResponse<ControllerInfo>) {
                 super.onNext(response)
@@ -976,6 +992,11 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                     isFirstGetControllerInfo = false
                     processEvent("加载按键成功")
                 }
+            }
+
+            override fun onError(e: Throwable) {
+                super.onError(e)
+                processEvent("keyboardFail")
             }
         })
     }

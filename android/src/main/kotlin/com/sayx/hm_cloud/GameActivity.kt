@@ -1611,11 +1611,11 @@ class GameActivity : AppCompatActivity() {
         var controllerType = AppVirtualOperateType.NONE
         if (!pcMouseMode && GameManager.hasPremission) {
             if (GameManager.lastControllerType == AppVirtualOperateType.NONE) {
-                when(GameManager.getGameParam()?.defaultOperation ?: 2) {
-                    1 -> {
+                when(GameManager.getGameParam()?.defaultOperation ?: GameConstants.gamepadConfig) {
+                    GameConstants.keyboardConfig -> {
                         controllerType = AppVirtualOperateType.APP_KEYBOARD
                     }
-                    2 -> {
+                    GameConstants.gamepadConfig -> {
                         controllerType = AppVirtualOperateType.APP_STICK_XBOX
                     }
                 }
