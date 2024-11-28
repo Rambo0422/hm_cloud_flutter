@@ -219,7 +219,7 @@ object AnTongSDK {
             "show",
             mapOf("errorCode" to "$errorCode").toString(),
         )
-        GameManager.gameStat("安通报错码", "show", mapOf(
+        GameManager.gameStat("page-errorPage", "show", mapOf(
             "errorcode_at" to "$errorCode"
         ))
     }

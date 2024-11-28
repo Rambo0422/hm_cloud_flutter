@@ -76,7 +76,7 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
 
             "updatePlayInfo" -> {
                 if (arguments is Map<*, *>) {
-                GameManager.updatePlayInfo(arguments)
+                    GameManager.updatePlayInfo(arguments)
                 }
             }
 

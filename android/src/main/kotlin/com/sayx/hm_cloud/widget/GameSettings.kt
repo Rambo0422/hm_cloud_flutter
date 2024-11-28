@@ -656,6 +656,7 @@ class GameSettings @JvmOverloads constructor(
                 }
                 if (gamePlayTime % 60 == 0L) {
                     GameManager.statGamePlay()
+                    GameManager.updateGameTime()
                 }
                 gamePlayTime += 1L
                 if (currentPlayTime <= 300L) {

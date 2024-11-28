@@ -33,6 +33,7 @@ data class GameParam(
     var cid: String,
     var accountInfo: Any?,
     var isPeakChannel: Boolean,
+    var buyout: Long,
     var isPartyGame: Boolean,
     var gameType: String,
     // 默认按键类型 1:键盘，2:手柄
@@ -68,6 +69,7 @@ data class GameParam(
                 "cid='$cid', " +
                 "accountInfo=$accountInfo, " +
                 "isPeakChannel=$isPeakChannel, " +
+                "buyout=$buyout, " +
                 "isPartyGame=$isPartyGame," +
                 "gameType=$gameType," +
                 "defaultOperation=$defaultOperation," +
@@ -98,6 +100,7 @@ data class GameParam(
                 arguments["cid"] as String? ?: "",
                 arguments["accountInfo"],
                 arguments["isPeakChannel"] as Boolean? ?: false,
+                getTimeValue(arguments["buyout"]),
                 arguments["isPartyGame"] as Boolean? ?: false,
                 arguments["gameType"] as String? ?: "",
                 (arguments["defaultOperation"] as Number?)?.toInt() ?: 2,

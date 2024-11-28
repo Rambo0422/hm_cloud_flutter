@@ -1,6 +1,7 @@
 package com.sayx.hm_cloud.utils
 
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
@@ -54,5 +55,12 @@ object TimeUtils {
         } catch (e: Exception) {
             -1
         }
+    }
+
+    fun isPeakTime(): Boolean {
+        val calendar = Calendar.getInstance()
+        calendar.time = Date(currentTime())
+        val hour = calendar.get(Calendar.HOUR_OF_DAY)
+        return hour > 18
     }
 }
