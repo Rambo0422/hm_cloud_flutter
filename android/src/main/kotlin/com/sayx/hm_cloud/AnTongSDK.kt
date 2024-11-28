@@ -191,13 +191,14 @@ object AnTongSDK {
                             LogUtils.e("queue info error:$dataStr")
                         }
                     }
-                    Constants.STATUS_APP_ID_ERROR,
+//                    Constants.STATUS_APP_ID_ERROR,
                     Constants.STATUS_NOT_FOND_GAME,
                     Constants.STATUS_SIGN_FAILED,
                     Constants.STATUS_STOP_PLAY,
                     Constants.STATUS_CONN_FAILED,
                     Constants.STATUS_FINISH_WAIT,
-                    600000,300010,101001,201011 -> {
+                    Constants.STATUS_START_QUEUE_FAILED,
+                    300010,101001,201011 -> {
                         uploadErrorCode(status)
                         val errorMessage =
                             jsonObject.optString(StatusCallbackUtil.DATA, "服务器异常")
@@ -220,7 +221,8 @@ object AnTongSDK {
             mapOf("errorCode" to "$errorCode").toString(),
         )
         GameManager.gameStat("page-errorPage", "show", mapOf(
-            "errorcode_at" to "$errorCode"
+            "errorcode_at" to "$errorCode",
+            "cont" to "at"
         ))
     }
 }

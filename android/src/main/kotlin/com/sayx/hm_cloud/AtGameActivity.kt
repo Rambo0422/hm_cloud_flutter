@@ -196,19 +196,19 @@ class AtGameActivity : AppCompatActivity() {
                             }
                         }
                         Constants.STATUS_INSUFFICIENT_CLOSE, Constants.STATUS_NO_INPUT -> {
-                            AnTongSDK.uploadErrorCode(status)
                             runOnUiThread {
+                                AnTongSDK.uploadErrorCode(status)
                                 showWarningDialog("$status")
                             }
                         }
-                        Constants.STATUS_APP_ID_ERROR,
+//                        Constants.STATUS_APP_ID_ERROR,
                         Constants.STATUS_NOT_FOND_GAME,
                         Constants.STATUS_SIGN_FAILED,
                         Constants.STATUS_CONN_FAILED,
                         Constants.STATUS_FINISH_WAIT,
-                        600000,300010,101001,201011 -> {
-                            AnTongSDK.uploadErrorCode(status)
+                        300010,101001,201011 -> {
                             runOnUiThread {
+                                AnTongSDK.uploadErrorCode(status)
                                 gameSettings?.release()
                                 GameManager.isPlaying = false
 
