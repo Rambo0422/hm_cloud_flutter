@@ -47,6 +47,7 @@ class ControllerEditLayout @JvmOverloads constructor(
         set(value) {
             field = value
             dataBinding.btnAddRouletteKey.visibility = if (value == AppVirtualOperateType.APP_STICK_XBOX) GONE else VISIBLE
+            dataBinding.btnAddContainerKey.visibility = if (value == AppVirtualOperateType.APP_STICK_XBOX) GONE else VISIBLE
         }
 
     init {
@@ -72,6 +73,10 @@ class ControllerEditLayout @JvmOverloads constructor(
         // 添加轮盘按键
         dataBinding.btnAddRouletteKey.setOnClickListener {
             callback?.onAddRouletteKey()
+        }
+        // 添加收纳按键
+        dataBinding.btnAddContainerKey.setOnClickListener {
+            callback?.onAddContainerKey()
         }
         // 展示更多
         dataBinding.btnEditMore.setOnClickListener {

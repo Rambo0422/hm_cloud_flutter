@@ -81,6 +81,23 @@
                 app:layout_constraintBottom_toBottomOf="@id/btn_exit_edit"
                 app:layout_constraintTop_toTopOf="@id/btn_exit_edit" />
 
+            <com.sayx.hm_cloud.widget.DrawableTextView
+                android:id="@+id/btn_add_container_key"
+                android:layout_width="80dp"
+                android:layout_height="25dp"
+                android:layout_marginStart="7dp"
+                android:background="@drawable/shape_add_key_bg"
+                android:gravity="center"
+                android:text="@string/container_key"
+                android:textColor="@android:color/white"
+                android:textSize="10sp"
+                android:visibility="visible"
+                app:drawableLeft="@drawable/img_add_key"
+                app:drawableSize="14dp"
+                app:layout_constraintStart_toEndOf="@id/btn_add_roulette_key"
+                app:layout_constraintBottom_toBottomOf="@id/btn_exit_edit"
+                app:layout_constraintTop_toTopOf="@id/btn_exit_edit" />
+
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/btn_edit_more"
                 android:layout_width="25dp"
@@ -89,7 +106,7 @@
                 android:padding="5dp"
                 android:background="@drawable/shape_add_key_bg"
                 android:src="@drawable/icon_edit_more"
-                app:layout_constraintStart_toEndOf="@id/btn_add_roulette_key"
+                app:layout_constraintStart_toEndOf="@id/btn_add_container_key"
                 app:layout_constraintBottom_toBottomOf="@id/btn_exit_edit"
                 app:layout_constraintTop_toTopOf="@id/btn_exit_edit"/>
 

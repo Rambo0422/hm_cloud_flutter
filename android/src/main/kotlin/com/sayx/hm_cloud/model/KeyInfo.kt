@@ -25,6 +25,7 @@ class KeyInfo(
     @Expose(serialize = true) var map: String? = "",
     @Expose(serialize = true) var composeArr: List<KeyInfo>? = null,
     @Expose(serialize = true) var rouArr: List<KeyInfo>? = null,
+    @Expose(serialize = true) var containerArr: List<KeyInfo>? = null,
 ) : Serializable {
 
     init {
@@ -61,6 +62,7 @@ class KeyInfo(
             this.map,
             this.composeArr,
             this.rouArr,
+            this.containerArr,
         )
     }
 
@@ -93,6 +95,9 @@ class KeyInfo(
         rouArr?.let {
             map["rouArr"] = it.map { keyInfo -> keyInfo.toMap() }.toList()
         }
+        containerArr?.let {
+            map["containerArr"] = it.map { keyInfo -> keyInfo.toMap() }.toList()
+        }
         return map
     }
 
@@ -102,6 +107,7 @@ class KeyInfo(
         this.opacity = keyInfo.opacity
         this.composeArr = keyInfo.composeArr
         this.rouArr = keyInfo.rouArr
+        this.containerArr = keyInfo.containerArr
         this.click = keyInfo.click
         this.map = keyInfo.map
     }

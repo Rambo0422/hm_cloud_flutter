@@ -93,6 +93,7 @@ import com.sayx.hm_cloud.widget.AddGamepadKey
 import com.sayx.hm_cloud.widget.AddKeyboardKey
 import com.sayx.hm_cloud.widget.ControllerEditLayout
 import com.sayx.hm_cloud.widget.EditCombineKey
+import com.sayx.hm_cloud.widget.EditContainerKey
 import com.sayx.hm_cloud.widget.EditRouletteKey
 import com.sayx.hm_cloud.widget.GameNoticeView
 import com.sayx.hm_cloud.widget.GameSettings
@@ -126,6 +127,8 @@ class GameActivity : AppCompatActivity() {
     private var editCombineKey: EditCombineKey? = null
 
     private var editRouletteKey: EditRouletteKey? = null
+
+    private var editContainerKey: EditContainerKey? = null
 
     private var keyEditView: KeyEditView? = null
 
@@ -652,6 +655,14 @@ class GameActivity : AppCompatActivity() {
                 })
             }
 
+            override fun onAddContainerKey() {
+                controllerEditLayout?.hideLayout(object : AnimatorListenerImp() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        showEditContainerKeyLayout()
+                    }
+                })
+            }
+
             override fun onRestoreDefault() {
                 showRestoreCustomDialog()
             }
@@ -765,8 +776,64 @@ class GameActivity : AppCompatActivity() {
             editRouletteKey?.setRouletteKeyInfo(keyInfo)
             editRouletteKey?.showBoard()
         }
-        // 展示键盘选择
-//        showKeyBoard(false)
+    }
+
+    private fun showEditContainerKeyLayout(keyInfo: KeyInfo? = null) {
+        if (editContainerKey == null) {
+            editContainerKey = EditContainerKey(this)
+            editContainerKey?.setContainerKeyInfo(keyInfo)
+            editContainerKey?.onHideListener = object : HideListener {
+                override fun onHide(keyInfo: KeyInfo?) {
+                    keyInfo?.let {
+                        showKeyEditView(keyInfo)
+                    }
+                    controllerEditLayout?.showLayout()
+                    hideKeyBoard()
+                }
+            }
+            editContainerKey?.addKeyListener = object : AddKeyListenerImp() {
+                override fun onAddKey(keyInfo: KeyInfo) {
+                    if (dataBinding.gameController.controllerType == AppVirtualOperateType.APP_KEYBOARD) {
+                        keyInfo.type = KeyType.KEY_CONTAINER
+                    }
+                    dataBinding.gameController.addContainerKey(
+                        keyInfo,
+                        dataBinding.gameController.controllerType
+                    )
+                    controllerEditLayout?.setKeyInfo(keyInfo)
+                }
+
+                override fun rouAddData(list: List<KeyInfo>?) {
+                    if (!list.isNullOrEmpty()) {
+                        dataBinding.gameController.removeKeys(list)
+                    }
+                }
+
+                override fun rouRemoveData(list: List<KeyInfo>?) {
+                    if (!list.isNullOrEmpty()) {
+                        dataBinding.gameController.addKeys(list)
+                    }
+                }
+
+                override fun onKeyAdd(keyInfo: KeyInfo) {
+                    dataBinding.gameController.removeKeys(listOf(keyInfo))
+                }
+
+                override fun onKeyRemove(keyInfo: KeyInfo) {
+                    dataBinding.gameController.addKey(keyInfo)
+                }
+            }
+            val layoutParams = FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            dataBinding.layoutGame.post {
+                dataBinding.layoutGame.addView(editContainerKey, layoutParams)
+            }
+        } else if (editContainerKey?.isShow != true) {
+            editContainerKey?.setContainerKeyInfo(keyInfo)
+            editContainerKey?.showBoard()
+        }
     }
 
     private fun showExitCustomDialog() {
@@ -920,6 +987,8 @@ class GameActivity : AppCompatActivity() {
             editCombineKey?.addKey(keyInfo)
         } else if (editRouletteKey?.isShow == true) {
             editRouletteKey?.addKey(keyInfo)
+        } else if (editContainerKey?.isShow == true) {
+            editContainerKey?.addKey(keyInfo)
         }
     }
 
@@ -1126,6 +1195,8 @@ class GameActivity : AppCompatActivity() {
                                 showEditCombineKeyLayout(keyInfo)
                             } else if (keyInfo.type == KeyType.KEY_ROULETTE || keyInfo.type == KeyType.GAMEPAD_ROULETTE) {
                                 showEditRouletteKeyLayout(keyInfo)
+                            } else if (keyInfo.type == KeyType.KEY_CONTAINER) {
+                                showEditContainerKeyLayout(keyInfo)
                             }
                         }
                     })

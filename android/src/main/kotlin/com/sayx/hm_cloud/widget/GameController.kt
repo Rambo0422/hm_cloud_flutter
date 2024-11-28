@@ -787,6 +787,23 @@ class GameController @JvmOverloads constructor(
         return keyView
     }
 
+    private fun addContainerKey(keyInfo: KeyInfo) : View {
+        val keyView = View(context)
+        keyView.tag = keyInfo.id
+        if (controllerType == AppVirtualOperateType.APP_STICK_XBOX) {
+            gamepadViews.add(keyView)
+        }
+        if (controllerType == AppVirtualOperateType.APP_KEYBOARD) {
+            keyboardViews.add(keyView)
+        }
+        addView(keyView)
+        keyView.post {
+            keyView.x = AppSizeUtils.convertWidthSize(keyInfo.left).toFloat()
+            keyView.y = AppSizeUtils.convertHeightSize(keyInfo.top).toFloat()
+        }
+        return keyView
+    }
+
     fun addKey(keyInfo: KeyInfo) {
         if (controllerType == AppVirtualOperateType.APP_STICK_XBOX) {
             editGamepadKeys.add(keyInfo)
@@ -943,6 +960,26 @@ class GameController @JvmOverloads constructor(
             }
         }
         val keyView = addRouletteKey(keyInfo)
+        currentKey?.let { info ->
+            val view = findKeyView(this@GameController, info)
+            LogUtils.d("unActivated:${view?.javaClass?.simpleName}")
+            view?.isActivated = false
+            view?.invalidate()
+        }
+        keyView.isActivated = true
+        keyView.invalidate()
+        currentKey = keyInfo
+    }
+
+    fun addContainerKey(keyInfo: KeyInfo, type: AppVirtualOperateType) {
+        if (type == AppVirtualOperateType.APP_KEYBOARD) {
+            editKeyboardKeys.add(keyInfo)
+            keyInfo.containerArr?.forEach { keyData ->
+                editKeyboardKeys.remove(keyData)
+                removeView(findKeyView(this, keyData))
+            }
+        }
+        val keyView = addContainerKey(keyInfo)
         currentKey?.let { info ->
             val view = findKeyView(this@GameController, info)
             LogUtils.d("unActivated:${view?.javaClass?.simpleName}")

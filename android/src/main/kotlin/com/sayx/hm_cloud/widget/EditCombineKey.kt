@@ -227,8 +227,8 @@ class EditCombineKey @JvmOverloads constructor(
             addKeyListener?.onAddKey(
                 KeyInfo(
                     UUID.randomUUID(),
-                    AppSizeUtils.DESIGN_WIDTH / 2 - 15,
-                    AppSizeUtils.DESIGN_HEIGHT / 2 - 15,
+                    AppSizeUtils.DESIGN_WIDTH / 2 - 32,
+                    AppSizeUtils.DESIGN_HEIGHT / 2 - 32,
                     64,
                     50,
                     context.getString(R.string.combine_key),

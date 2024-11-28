@@ -77,6 +77,9 @@ object KeyType {
 
     // 键盘轮盘键
     const val KEY_ROULETTE = "kb-roulette"
+
+    // 收纳功能键
+    const val KEY_CONTAINER = "kb-container"
 }
 
 val maps : List<Pair<String, Int>> by lazy {
