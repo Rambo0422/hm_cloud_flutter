@@ -16,7 +16,6 @@ import com.blankj.utilcode.util.ThreadUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import com.haima.hmcp.BuildConfig
 import com.haima.hmcp.Constants
 import com.haima.hmcp.HmcpManager
 import com.haima.hmcp.beans.CheckCloudServiceResult
@@ -35,6 +34,7 @@ import com.haima.hmcp.listeners.OnUpdataGameUIDListener
 import com.haima.hmcp.utils.StatusCallbackUtil
 import com.haima.hmcp.widgets.HmcpVideoView
 import com.haima.hmcp.widgets.beans.VirtualOperateType
+import com.sayx.hm_cloud.BuildConfig.*
 import com.sayx.hm_cloud.callback.KeyboardListCallback
 import com.sayx.hm_cloud.callback.RequestDeviceSuccess
 import com.sayx.hm_cloud.constants.AppVirtualOperateType
@@ -145,7 +145,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         this.channel = channel
         this.activity = context
         LogUtils.getConfig().also {
-            it.isLogSwitch = BuildConfig.DEBUG
+            it.isLogSwitch = DEBUG
             it.globalTag = "GameManager"
         }
     }

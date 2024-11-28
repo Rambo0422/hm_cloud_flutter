@@ -176,7 +176,7 @@ class CombineKeyView @JvmOverloads constructor(
                 }
 
                 MotionEvent.ACTION_POINTER_DOWN -> {
-                    LogUtils.d("onTouchEventPOINTERDOWN:${it.getPointerId(it.actionIndex)}, $firstTouchId")
+//                    LogUtils.d("onTouchEventPOINTERDOWN:${it.getPointerId(it.actionIndex)}, $firstTouchId")
                 }
             }
             return it.getPointerId(it.actionIndex) == firstTouchId

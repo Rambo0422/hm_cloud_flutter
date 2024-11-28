@@ -235,13 +235,6 @@ class KeyView @JvmOverloads constructor(
         }
     }
 
-    fun updateText(text: String?) {
-        if (dataBinding.tvName.visibility == VISIBLE) {
-            dataBinding.tvName.text = text
-            LogUtils.d("updateText:$text")
-        }
-    }
-
     private var clickTime = 0L
 
     @SuppressLint("ClickableViewAccessibility")

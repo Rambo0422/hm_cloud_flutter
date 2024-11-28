@@ -788,7 +788,45 @@ class GameController @JvmOverloads constructor(
     }
 
     private fun addContainerKey(keyInfo: KeyInfo) : View {
-        val keyView = View(context)
+        val keyView = ContainerKeyView(context)
+        keyView.setContainerKeyInfo(keyInfo)
+        keyView.setOnClickListener {
+            if (controllerStatus == ControllerStatus.Edit) {
+                currentKey?.let { info ->
+                    val view = findKeyView(this, info)
+                    view?.isActivated = false
+                    view?.invalidate()
+                }
+                it.isActivated = true
+                keyView.invalidate()
+                currentKey = keyInfo
+                currentKey?.let { info ->
+                    listener?.onEditKeyClick(info)
+                }
+            }
+        }
+
+        keyView.positionListener = object : OnPositionChangeListener {
+            override fun onPositionChange(left: Int, top: Int, right: Int, bottom: Int) {
+                if (controllerStatus == ControllerStatus.Edit) {
+                    currentKey?.let { info ->
+                        val view = findKeyView(this@GameController, info)
+                        view?.isActivated = false
+                        view?.invalidate()
+                    }
+                    keyView.isActivated = true
+                    keyView.invalidate()
+                    currentKey = keyInfo
+                    currentKey?.let { info ->
+                        info.changePosition(
+                            AppSizeUtils.reconvertWidthSize(left),
+                            AppSizeUtils.reconvertHeightSize(top),
+                        )
+                        listener?.onEditKeyClick(info)
+                    }
+                }
+            }
+        }
         keyView.tag = keyInfo.id
         if (controllerType == AppVirtualOperateType.APP_STICK_XBOX) {
             gamepadViews.add(keyView)

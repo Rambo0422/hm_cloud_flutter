@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -13,7 +14,11 @@
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/iv_arrow"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="4.5dp"
+            android:paddingVertical="10dp"
+            tools:src="@drawable/icon_container_arrow_left"
+            android:background="@drawable/shape_container_arrow"/>
 
         <LinearLayout
             android:id="@+id/layout_items"
