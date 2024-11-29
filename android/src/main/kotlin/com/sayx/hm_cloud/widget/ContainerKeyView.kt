@@ -9,9 +9,8 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.ViewGroup
-import android.widget.FrameLayout
+import android.widget.LinearLayout
 import androidx.databinding.DataBindingUtil
-import com.blankj.utilcode.util.LogUtils
 import com.sayx.hm_cloud.R
 import com.sayx.hm_cloud.callback.OnPositionChangeListener
 import com.sayx.hm_cloud.constants.ControllerStatus
@@ -20,13 +19,14 @@ import com.sayx.hm_cloud.databinding.ViewContainerKeyBinding
 import com.sayx.hm_cloud.model.KeyInfo
 import com.sayx.hm_cloud.utils.AppSizeUtils
 import com.sayx.hm_cloud.utils.AppVibrateUtils
+import kotlin.math.ceil
 import kotlin.math.sqrt
 
 class ContainerKeyView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : FrameLayout(context, attrs, defStyleAttr) {
+) : LinearLayout(context, attrs, defStyleAttr) {
 
     private var dataBinding: ViewContainerKeyBinding =
         DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.view_container_key, this, true)
@@ -45,24 +45,13 @@ class ContainerKeyView @JvmOverloads constructor(
 
     var needDrawShadow = true
 
-    fun setContainerKeyInfo(keyInfo: KeyInfo) {
-        val layoutParams = LayoutParams(
-            AppSizeUtils.convertViewSize(keyInfo.getKeyWidth()),
-            AppSizeUtils.convertViewSize(keyInfo.getKeyHeight())
-        )
-        dataBinding.ivArrow.layoutParams = layoutParams
-        dataBinding.ivArrow.alpha = keyInfo.opacity / 100f
-        if (keyInfo.left >= (667 - keyInfo.getKeyWidth()) / 2f) {
-            dataBinding.ivArrow.setImageResource(R.drawable.icon_container_arrow_right)
-        } else {
-            dataBinding.ivArrow.setImageResource(R.drawable.icon_container_arrow_left)
-        }
-        invalidate()
-    }
-
     private val bgPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.parseColor("#3CFFFFFF")
         style = Paint.Style.FILL
+    }
+
+    init {
+        setWillNotDraw(false)
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -129,7 +118,18 @@ class ContainerKeyView @JvmOverloads constructor(
                     if (controllerStatus == ControllerStatus.Edit && needDrawShadow) {
                         val position = IntArray(4)
                         val location = AppSizeUtils.getLocationOnScreen(this, position)
-                        positionListener?.onPositionChange(location[0], location[1], location[2],  location[3])
+                        val left = location[0]
+                        val center = left + width / 2
+                        if (center >= parentWidth / 2) {
+                            dataBinding.ivArrow.setImageResource(R.drawable.icon_container_arrow_right)
+                            dataBinding.layoutItemsLeft.visibility = VISIBLE
+                            dataBinding.layoutItemsRight.visibility = GONE
+                        } else {
+                            dataBinding.ivArrow.setImageResource(R.drawable.icon_container_arrow_left)
+                            dataBinding.layoutItemsLeft.visibility = GONE
+                            dataBinding.layoutItemsRight.visibility = VISIBLE
+                        }
+                        positionListener?.onPositionChange(left, location[1], location[2], location[3])
                         if (parent is GameController) {
                             (parent as GameController).clearLine()
                         }
@@ -149,5 +149,42 @@ class ContainerKeyView @JvmOverloads constructor(
             return it.getPointerId(it.actionIndex) == firstTouchId
         }
         return false
+    }
+
+    fun setKeyInfo(keyInfo: KeyInfo) {
+        var layoutWidth = AppSizeUtils.convertViewSize(keyInfo.getKeyWidth())
+        val layoutHeight = AppSizeUtils.convertViewSize(keyInfo.getKeyHeight())
+        val arrowLayoutParams = LayoutParams(
+            layoutWidth,
+            layoutHeight
+        )
+        dataBinding.ivArrow.layoutParams = arrowLayoutParams
+        dataBinding.ivArrow.alpha = keyInfo.opacity / 100f
+
+        val size = keyInfo.containerArr?.size ?: 0
+        if (size > 0) {
+            layoutWidth += layoutHeight * size + AppSizeUtils.convertViewSize(ceil(6 * keyInfo.zoom / 100f * 2f).toInt()) * (size - 1)
+        }
+        this.layoutParams = LayoutParams(
+            layoutWidth,
+            layoutHeight
+        )
+
+        dataBinding.ivArrow.setPadding(
+            AppSizeUtils.convertViewSize(ceil(5 * keyInfo.zoom / 100f * 2f).toInt()),
+            AppSizeUtils.convertViewSize(ceil(15 * keyInfo.zoom / 100f * 2f).toInt()),
+            AppSizeUtils.convertViewSize(ceil(5 * keyInfo.zoom / 100f * 2f).toInt()),
+            AppSizeUtils.convertViewSize(ceil(15 * keyInfo.zoom / 100f * 2f).toInt()),
+        )
+        if (keyInfo.left >= (667 - keyInfo.getKeyWidth()) / 2f) {
+            dataBinding.ivArrow.setImageResource(R.drawable.icon_container_arrow_left)
+        } else {
+            dataBinding.ivArrow.setImageResource(R.drawable.icon_container_arrow_right)
+        }
+        invalidate()
+    }
+
+    fun showItems(keep: Boolean? = false) {
+
     }
 }
