@@ -237,8 +237,6 @@ class GameActivity : AppCompatActivity(), GameContract.IGameView {
     }
 
     private fun showErrorDialog(errorCode: String, errorMsg: String? = null) {
-//        GameManager.gameView?.onDestroy()
-//        GameManager.gameView = null
         AnTongSDK.onDestroy()
         GameManager.isPlaying = false
         try {
@@ -284,7 +282,6 @@ class GameActivity : AppCompatActivity(), GameContract.IGameView {
     }
 
     override fun onStart() {
-        // GameManager.gameView?.onStart()
         AnTongSDK.anTongVideoView?.onStart()
         super.onStart()
     }
@@ -296,15 +293,12 @@ class GameActivity : AppCompatActivity(), GameContract.IGameView {
 
     override fun onRestart() {
         AnTongSDK.anTongVideoView?.onRestart(0)
-        LogUtils.d("onRestart")
         super.onRestart()
     }
 
     override fun onPause() {
         super.onPause()
         AnTongSDK.anTongVideoView?.onPause()
-        LogUtils.d("onPause")
-//        AnTongSDK.anTongVideoView?.stopGame()
         finish()
     }
 
@@ -329,13 +323,13 @@ class GameActivity : AppCompatActivity(), GameContract.IGameView {
     }
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
-//        LogUtils.v("dispatchKeyEvent:$event")
+        // LogUtils.v("dispatchKeyEvent:$event")
         countTime = NO_OPERATE_TIME
         return super.dispatchKeyEvent(event)
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
-        LogUtils.v("onKeyDown:$event")
+        // LogUtils.v("onKeyDown:$event")
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             return true
         }
@@ -343,7 +337,7 @@ class GameActivity : AppCompatActivity(), GameContract.IGameView {
     }
 
     override fun onKeyUp(keyCode: Int, event: KeyEvent): Boolean {
-        LogUtils.v("onKeyUp:$event")
+        // LogUtils.v("onKeyUp:$event")
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             return true
         }
@@ -373,13 +367,7 @@ class GameActivity : AppCompatActivity(), GameContract.IGameView {
 
     override fun onDestroy() {
         super.onDestroy()
-        AnTongSDK.onDestroy()
         presenter.onDestroy()
-    }
-
-    override fun onUserLeaveHint() {
-        super.onUserLeaveHint()
-        LogUtils.d("onUserLeaveHint")
     }
 
     /**
@@ -389,14 +377,14 @@ class GameActivity : AppCompatActivity(), GameContract.IGameView {
         TVUtils.toTVHome(this)
     }
 
-    override fun getUserInfo() {
-        GameManager.getUserInfo()
+    override fun getUserInfo(cache: Int) {
+        GameManager.getUserInfo(0)
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onAvailableTimeEvent(event: AvailableTimeEvent) {
         val availableTime = event.availableTime
-        if (availableTime > 8 * 60) {
+        if (availableTime > 1 * 60) {
             presenter.onUserInfoReceived(availableTime)
         } else {
             // 余额不足八分钟
@@ -408,6 +396,6 @@ class GameActivity : AppCompatActivity(), GameContract.IGameView {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onStopPlayEvent(event: StopPlayEvent) {
-        AnTongSDK.onDestroy()
+        finish()
     }
 }
