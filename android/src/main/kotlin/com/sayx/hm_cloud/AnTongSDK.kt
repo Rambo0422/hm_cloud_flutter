@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.util.Base64
 import android.view.ViewGroup
+import com.blankj.utilcode.util.ToastUtils
 import com.media.atkit.AnTongManager
 import com.media.atkit.Constants
 import com.media.atkit.beans.UserInfo
@@ -32,6 +33,7 @@ object AnTongSDK {
                         //anTongVideoView?.setHmcpPlayerListener(null)
                         // 跳转远程页面
                         mRequestDeviceSuccess?.onRequestDeviceSuccess()
+                        mRequestDeviceSuccess = null
 
                         // 首帧出现，修改码率
                         anTongVideoView?.onSwitchResolution(20000)
@@ -39,6 +41,8 @@ object AnTongSDK {
                         anTongVideoView?.setVideoFps(60)
                     }
 
+                    Constants.STATUS_PEER_REJECT,
+                    Constants.STATUS_TOKEN_INVALID,
                     Constants.STATUS_STOP_PLAY -> {
                         val stopPlayEvent = StopPlayEvent()
                         EventBus.getDefault().post(stopPlayEvent)
@@ -47,19 +51,33 @@ object AnTongSDK {
                     Constants.STATUS_APP_ID_ERROR,
                     Constants.STATUS_NOT_FOND_GAME,
                     Constants.STATUS_SIGN_FAILED,
+                    201011,
                     Constants.STATUS_CONN_FAILED -> {
                         val errorMessage =
-                            jsonObject.optString(StatusCallbackUtil.DATA, "服务器异常")
+                            jsonObject.optString(StatusCallbackUtil.DATA, "连接失败")
                         mRequestDeviceSuccess?.onRequestDeviceFailed(errorMessage)
+                    }
+
+                    Constants.STATUS_NO_INPUT -> {
+                        val errorMessage =
+                            jsonObject.optString(StatusCallbackUtil.DATA, "连接失败")
+                        ToastUtils.showShort(errorMessage)
+                        val stopPlayEvent = StopPlayEvent()
+                        EventBus.getDefault().post(stopPlayEvent)
+                    }
+
+                    Constants.STATUS_INSUFFICIENT_CLOSE -> {
+                        // 余额不足
+                        val errorMessage =
+                            jsonObject.optString(StatusCallbackUtil.DATA, "连接失败")
+                        ToastUtils.showShort(errorMessage)
+                        val stopPlayEvent = StopPlayEvent()
+                        EventBus.getDefault().post(stopPlayEvent)
                     }
 
                     else -> {}
                 }
             } ?: return
-        }
-
-        override fun onPlayerError(errorCode: String, errorInfo: String) {
-            mRequestDeviceSuccess?.onRequestDeviceFailed(errorInfo)
         }
     }
 
@@ -67,6 +85,7 @@ object AnTongSDK {
         Constants.IS_DEBUG = true
         Constants.IS_ERROR = false
         Constants.IS_INFO = false
+        Constants.AK_DEBUG = false
         Constants.IS_TV = true
         ACCESS_KEY_ID = accessKeyId
         AnTongManager.getInstance().init(context, channelName, accessKeyId)
@@ -136,6 +155,7 @@ object AnTongSDK {
     }
 
     fun onDestroy() {
+        anTongVideoView?.setHmcpPlayerListener(null)
         anTongVideoView?.onDestroy()
         val parentViewGroup = anTongVideoView?.parent as? ViewGroup
         if (parentViewGroup != null && anTongVideoView != null) {
@@ -145,6 +165,7 @@ object AnTongSDK {
     }
 
     fun leaveQueue() {
+        anTongVideoView?.setHmcpPlayerListener(null)
         val leaveQueue = anTongVideoView?.leaveQueue() ?: true
         if (leaveQueue) {
             onDestroy()
