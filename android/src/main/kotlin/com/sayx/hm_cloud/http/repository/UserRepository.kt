@@ -5,6 +5,7 @@ import com.sayx.hm_cloud.http.bean.HttpResponse
 import com.sayx.hm_cloud.http.service.UserService
 import com.sayx.hm_cloud.http.transformer.HttpError
 import com.sayx.hm_cloud.http.transformer.RxSchedulers
+import com.sayx.hm_cloud.model.AccountTimeInfo
 import com.sayx.hm_cloud.model.ArchiveData
 import io.reactivex.rxjava3.core.Observer
 
@@ -14,6 +15,13 @@ object UserRepository {
 
     fun checkUserRecharge(observer: Observer<HttpResponse<Int>>) {
         userService.checkUserRecharge()
+            .compose(HttpError.onError())
+            .compose(RxSchedulers.schedulers())
+            .subscribe(observer)
+    }
+
+    fun getUserTimeInfo(observer: Observer<HttpResponse<AccountTimeInfo>>) {
+        userService.getUserTimeInfo()
             .compose(HttpError.onError())
             .compose(RxSchedulers.schedulers())
             .subscribe(observer)

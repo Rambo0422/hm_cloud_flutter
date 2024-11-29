@@ -46,8 +46,10 @@ import com.sayx.hm_cloud.http.bean.AppHttpException
 import com.sayx.hm_cloud.http.bean.BaseObserver
 import com.sayx.hm_cloud.http.bean.HttpResponse
 import com.sayx.hm_cloud.http.repository.GameRepository
+import com.sayx.hm_cloud.http.repository.UserRepository
 import com.sayx.hm_cloud.imp.HmcpPlayerListenerImp
 import com.sayx.hm_cloud.model.AccountInfo
+import com.sayx.hm_cloud.model.AccountTimeInfo
 import com.sayx.hm_cloud.model.ArchiveData
 import com.sayx.hm_cloud.model.ControllerConfigEvent
 import com.sayx.hm_cloud.model.ControllerInfo
@@ -60,6 +62,7 @@ import com.sayx.hm_cloud.model.SpecificArchive
 import com.sayx.hm_cloud.model.TimeUpdateEvent
 import com.sayx.hm_cloud.model.UserRechargeStatusEvent
 import com.sayx.hm_cloud.utils.GameUtils
+import com.sayx.hm_cloud.utils.TimeUtils
 import com.sayx.hm_cloud.widget.KeyboardListView
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -1777,5 +1780,32 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                 channel.invokeMethod("processEvent", paramsMap)
             }
         }
+    }
+
+    fun updateGameTime() {
+        val buyout = gameParam?.buyout ?: 0L
+        if (buyout > TimeUtils.currentTime()) {
+            // 游戏买断，且买断未到期
+            return
+        }
+        val peakChannel = gameParam?.isPeakChannel ?: false
+        val isPeakTime = TimeUtils.isPeakTime()
+        if (!isPeakTime  && !peakChannel) {
+            // 非高峰通道，且非高峰时段
+            return
+        }
+        // 未买断，用了高峰通道或当前处于高峰时段，检查可用时长，为0提示下线
+        UserRepository.getUserTimeInfo(object : BaseObserver<HttpResponse<AccountTimeInfo>>() {
+            override fun onNext(response: HttpResponse<AccountTimeInfo>) {
+                super.onNext(response)
+                response.data?.let {
+                    val totalTime = it.totalTime
+                    // 无时长
+                    if (totalTime <= 0) {
+                        EventBus.getDefault().post(GameErrorEvent("15", ""))
+                    }
+                }
+            }
+        })
     }
 }
