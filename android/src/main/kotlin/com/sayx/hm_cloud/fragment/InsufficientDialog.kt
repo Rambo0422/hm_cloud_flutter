@@ -13,19 +13,21 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
+import com.blankj.utilcode.util.ToastUtils
 import com.sayx.hm_cloud.R
 import com.sayx.hm_cloud.dialog.PayDialog
-import com.sayx.hm_cloud.utils.TVUtils
+
 
 /**
  * 时长不足续费弹窗
  */
 class InsufficientDialog : DialogFragment(), DialogInterface.OnKeyListener {
 
-    private lateinit var tvTime: TextView
-    private var countdownTimer: CountDownTimer? = null
     private var exit = false
     private var payDialog: PayDialog? = null
+    private var countDownTimer: CountDownTimer? = null
+    private var tvCountDown: TextView? = null
+    private var isCountDown = true
 
     companion object {
         fun newInstance(): InsufficientDialog {
@@ -54,9 +56,8 @@ class InsufficientDialog : DialogFragment(), DialogInterface.OnKeyListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // 倒计时 5 分钟（300000 毫秒）
-        tvTime = view.findViewById(R.id.time)
-        startCountdown(5 * 60 * 1000)
+        tvCountDown = view.findViewById(R.id.tv_count_down)
+        startCountDown()
     }
 
     override fun onStart() {
@@ -81,64 +82,61 @@ class InsufficientDialog : DialogFragment(), DialogInterface.OnKeyListener {
     }
 
     override fun onKey(dialog: DialogInterface?, keyCode: Int, event: KeyEvent?): Boolean {
-        if (event?.action == KeyEvent.ACTION_UP) {
-            if (keyCode == KeyEvent.KEYCODE_BUTTON_A) {
-                // 下机退出 (其实只要跳转首页就行了)
-                if (!exit) {
-                    exit = true
-                    context?.let {
-                        TVUtils.toTVHome(it)
+        if (!isCountDown) {
+            if (event?.action == KeyEvent.ACTION_UP) {
+                if (keyCode == KeyEvent.KEYCODE_BUTTON_A || keyCode == KeyEvent.KEYCODE_BUTTON_B) {
+                    // 下机退出 (其实只要跳转首页就行了)
+                    if (!exit) {
+                        exit = true
+                        dismiss()
+                    }
+                } else if (keyCode == KeyEvent.KEYCODE_BUTTON_Y) {
+                    if (payDialog == null) {
+                        payDialog = PayDialog.newInstance()
+                        payDialog?.show(parentFragmentManager, "PayDialog")
+                        payDialog?.setPayOderListener(object : PayDialog.PayOderListener {
+                            override fun onPaySuccess() {
+                                ToastUtils.showLong("充值成功")
+                                this@InsufficientDialog.dismiss()
+                            }
+
+                            override fun onDismiss() {
+                                payDialog = null
+                            }
+                        })
                     }
                 }
-            } else if (keyCode == KeyEvent.KEYCODE_BUTTON_B) {
-                dismiss()
-            } else if (keyCode == KeyEvent.KEYCODE_BUTTON_Y) {
-                if (payDialog == null) {
-                    payDialog = PayDialog.newInstance()
-                    payDialog?.show(parentFragmentManager, "PayDialog")
-                    payDialog?.setPayOderListener(object : PayDialog.PayOderListener {
-                        override fun onPaySuccess() {
-                            this@InsufficientDialog.dismiss()
-                        }
-
-                        override fun onDismiss() {
-                            payDialog = null
-                        }
-                    })
-                }
+                return true
             }
-            return true
         }
-
         return true
     }
 
     override fun onDestroyView() {
         dialog?.setOnKeyListener(null)
-        countdownTimer?.cancel()
-        countdownTimer = null
+        cancelCountDown()
         super.onDestroyView()
     }
 
-    private fun startCountdown(millisInFuture: Long) {
-        // 初始化倒计时器
-        countdownTimer = object : CountDownTimer(millisInFuture, 1000) {
+    private fun startCountDown(durationSeconds: Int = 3) {
+        cancelCountDown()
+        countDownTimer = object : CountDownTimer(durationSeconds * 1000L, 1000) {
             override fun onTick(millisUntilFinished: Long) {
-                // 格式化剩余时间为 mm:ss
-                val minutes = (millisUntilFinished / 1000) / 60
-                val seconds = (millisUntilFinished / 1000) % 60
-                val timeLeft = String.format("%02d:%02d", minutes, seconds)
-                tvTime.text = timeLeft
+                val secondsRemaining = (millisUntilFinished / 1000).toInt()
+                tvCountDown?.text = "${secondsRemaining}秒"
+                tvCountDown?.visibility = View.VISIBLE
             }
 
             override fun onFinish() {
-                context?.let {
-                    TVUtils.toTVHome(it)
-                }
+                tvCountDown?.text = ""
+                isCountDown = false
+                tvCountDown?.visibility = View.GONE
             }
-        }
+        }.start()
+    }
 
-        // 启动倒计时
-        countdownTimer?.start()
+    private fun cancelCountDown() {
+        countDownTimer?.cancel()
+        countDownTimer = null
     }
 }
