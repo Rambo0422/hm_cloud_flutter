@@ -9,17 +9,18 @@ class GamePresenter(
     private val view: GameContract.IGameView,
 ) : GameContract.IGamePresenter {
 
+    private var availableTime: Long = 0  // 存储 availableTime
+
     private var handler: Handler = object : Handler(Looper.getMainLooper()) {
         override fun handleMessage(msg: Message) {
             if (msg.what == 333) {
-                getUserInfo()
+                getUserInfo(1)
             }
         }
     }
-    private var availableTime: Long = 0  // 存储 availableTime
 
     override fun onCreate(context: Context) {
-        getUserInfo()
+        getUserInfo(0)
     }
 
     override fun onDestroy() {
@@ -27,8 +28,8 @@ class GamePresenter(
         handler.removeCallbacksAndMessages(null)
     }
 
-    private fun getUserInfo() {
-        view.getUserInfo()
+    private fun getUserInfo(cache: Int) {
+        view.getUserInfo(cache)
     }
 
     // 处理从视图获取到的用户信息并更新 availableTime
@@ -36,8 +37,8 @@ class GamePresenter(
         this.availableTime = availableTime
 
         // 根据 availableTime 动态调整请求间隔
-        val interval = if (availableTime > 600000) { // availableTime > 10分钟（600000 毫秒）
-            7 * 60 * 1000  // 5分钟
+        val interval = if (availableTime > 60 * 12) { // availableTime > 12分钟
+            1 * 60 * 1000  // 1分钟
         } else {
             1 * 60 * 1000  // 1分钟
         }

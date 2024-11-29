@@ -156,7 +156,6 @@ object GameManager {
         gameParam = null
         userId = ""
         AnTongSDK.onDestroy()
-        // AnTongSDK.stopGame()
     }
 
     fun exitGame(data: Map<*, *>) {
@@ -179,7 +178,8 @@ object GameManager {
 
             override fun fail(msg: String?) {
                 this@GameManager.userId = ""
-                callback?.success(false)
+                releaseOldGameCallback?.success(false)
+                releaseOldGameCallback = null
             }
         })
     }
@@ -207,10 +207,14 @@ object GameManager {
     fun leaveQueue() {
         AnTongSDK.leaveQueue()
         stopReleaseCheckTimer()
+
+        // 假设这个时候碰到了 releaseOldGame 的情况下，所以，需要释放 releaseOldGame 的channel
+        releaseOldGameCallback = null
     }
 
-    fun getUserInfo() {
-        channel.invokeMethod("get_user_info", null)
+    fun getUserInfo(cache: Int) {
+        val arguments = mapOf("cache" to cache)
+        channel.invokeMethod("get_user_info", arguments)
     }
 
     fun requestPayData() {

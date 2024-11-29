@@ -13,6 +13,6 @@ class GameContract {
     }
 
     interface IGameView {
-        fun getUserInfo()
+        fun getUserInfo(cache: Int)
     }
 }

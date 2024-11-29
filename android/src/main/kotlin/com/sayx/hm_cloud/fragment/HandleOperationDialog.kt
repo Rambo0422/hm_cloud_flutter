@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
-import com.blankj.utilcode.util.LogUtils
 import com.sayx.hm_cloud.R
 
 /**
@@ -68,10 +67,5 @@ class HandleOperationDialog : DialogFragment(), DialogInterface.OnKeyListener {
             }
         }
         return true
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        LogUtils.d("HandleOperationDialog onDestroyView")
     }
 }

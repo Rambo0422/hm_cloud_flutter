@@ -24,42 +24,34 @@
             android:layout_width="match_parent"
             android:layout_height="15dp" />
 
-        <TextView
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="时长已用完, 续费开启"
-            android:textColor="#FFFFFF"
-            android:textSize="27sp"
-            android:textStyle="bold" />
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="时长剩余不足一分钟，是否继续续费游玩"
+                android:textColor="#FFFFFF"
+                android:textSize="27sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_count_down"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#C6EC4B"
+                android:textSize="27sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
 
         <Space
             android:layout_width="match_parent"
             android:layout_height="15dp" />
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="机器为你保留"
-                android:textColor="#FFFFFF"
-                android:textSize="17sp" />
-
-            <Space
-                android:layout_width="5dp"
-                android:layout_height="match_parent" />
-
-            <TextView
-                android:id="@+id/time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#C6EC4B"
-                android:textSize="17sp" />
-        </LinearLayout>
 
         <Space
             android:layout_width="match_parent"
@@ -92,7 +84,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
-                    android:text="下机退出"
+                    android:text="继续游玩"
                     android:textColor="#FFFFFF"
                     android:textSize="17sp" />
 
