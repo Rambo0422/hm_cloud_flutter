@@ -759,6 +759,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                                 Pair("cid", HmcpManager.getInstance().cloudId)
                             )
                         )
+                        processEvent("gamePageShow")
                         openGame = true
                         // 打开新的页面展示游戏画面
 
