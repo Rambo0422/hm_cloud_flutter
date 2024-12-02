@@ -477,13 +477,14 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                 gameParam!!,
                 archiveData,
                 object : RequestDeviceSuccess {
-                    override fun onQueueTime(time: Int) {
+                    override fun onQueueStatus(time: Int, rank: Int) {
                         inQueue = true
                         activity.runOnUiThread {
                             channel.invokeMethod(
                                 "queueInfo",
                                 mapOf(
-                                    Pair("queueTime", time)
+                                    Pair("queueTime", time),
+                                    Pair("rank", rank),
                                 )
                             )
                         }
