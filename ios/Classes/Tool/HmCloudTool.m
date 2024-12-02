@@ -202,6 +202,8 @@
 
 - (void)pushPreView {
     if (!self.vc) {
+        [self.delegate sendToFlutter:ActionProcessEvent params:@{ @"processStr": @"gamePageShow" }];
+
         self.vc = [[CloudPreViewController alloc] initWithNibName:@"CloudPreViewController" bundle:k_SanABundle];
         self.vc.gameVC = self.gameVC;
 

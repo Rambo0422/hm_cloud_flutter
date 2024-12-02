@@ -26,6 +26,7 @@ static NSString *ActionQueueInfo = @"queueInfo";
 static NSString *ActionOpenPage = @"openPage";
 static NSString *ActionUpdateTime = @"updateTime";
 static NSString *ActionFirstFrameArrival = @"firstFrameArrival";
+static NSString *ActionProcessEvent = @"processEvent";
 
 
 typedef void (^DataBlock)(NSDictionary *dict);

@@ -204,12 +204,16 @@ class AtGameActivity : AppCompatActivity() {
                                 showWarningDialog("$status")
                             }
                         }
+                        Constants.STATUS_GAME_PROCESS_MISSING,
 //                        Constants.STATUS_APP_ID_ERROR,
                         Constants.STATUS_NOT_FOND_GAME,
+                        Constants.STATUS_TOKEN_INVALID,
                         Constants.STATUS_SIGN_FAILED,
                         Constants.STATUS_CONN_FAILED,
                         Constants.STATUS_FINISH_WAIT,
-                        300010,101001,201011 -> {
+                        300010,
+                        101001,
+                        201011 -> {
                             runOnUiThread {
                                 AnTongSDK.uploadErrorCode(status)
                                 gameSettings?.release()

@@ -477,13 +477,14 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                 gameParam!!,
                 archiveData,
                 object : RequestDeviceSuccess {
-                    override fun onQueueTime(time: Int) {
+                    override fun onQueueStatus(time: Int, rank: Int) {
                         inQueue = true
                         activity.runOnUiThread {
                             channel.invokeMethod(
                                 "queueInfo",
                                 mapOf(
-                                    Pair("queueTime", time)
+                                    Pair("queueTime", time),
+                                    Pair("rank", rank),
                                 )
                             )
                         }
@@ -759,6 +760,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                                 Pair("cid", HmcpManager.getInstance().cloudId)
                             )
                         )
+                        processEvent("gamePageShow")
                         openGame = true
                         // 打开新的页面展示游戏画面
 
