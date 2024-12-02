@@ -63,7 +63,6 @@ import com.sayx.hm_cloud.dialog.GameToastDialog
 import com.sayx.hm_cloud.http.bean.BaseObserver
 import com.sayx.hm_cloud.http.repository.AppRepository
 import com.sayx.hm_cloud.http.bean.HttpResponse
-import com.sayx.hm_cloud.model.ControllerChangeEvent
 import com.sayx.hm_cloud.model.ControllerConfigEvent
 import com.sayx.hm_cloud.model.ControllerEditEvent
 import com.sayx.hm_cloud.model.ControllerInfo
@@ -910,9 +909,6 @@ class AtGameActivity : AppCompatActivity() {
             }
             editContainerKey?.addKeyListener = object : AddKeyListenerImp() {
                 override fun onAddKey(keyInfo: KeyInfo) {
-                    if (dataBinding.gameController.controllerType == AppVirtualOperateType.APP_KEYBOARD) {
-                        keyInfo.type = KeyType.KEY_CONTAINER
-                    }
                     dataBinding.gameController.addContainerKey(
                         keyInfo,
                         dataBinding.gameController.controllerType
@@ -1216,6 +1212,9 @@ class AtGameActivity : AppCompatActivity() {
             "addSuccess", "updateSuccess" -> {
                 exitCustom()
                 KeyboardListView.show(dataBinding.layoutGame)
+                if (GameManager.getGameParam()?.isVip() != true) {
+                    dataBinding.gameController.restoreOriginal()
+                }
             }
         }
     }
@@ -1279,26 +1278,6 @@ class AtGameActivity : AppCompatActivity() {
     fun onControllerEditEvent(event: ControllerEditEvent) {
         dataBinding.gameController.controllerChange(event.type)
         exitCustom()
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onControllerChangeEvent(event: ControllerChangeEvent) {
-        when (event.type) {
-            0 -> {
-                dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
-                gameSettings?.controllerType = AppVirtualOperateType.NONE
-            }
-
-            1 -> {
-                dataBinding.gameController.controllerType = AppVirtualOperateType.APP_KEYBOARD
-                gameSettings?.controllerType = AppVirtualOperateType.APP_KEYBOARD
-            }
-
-            2 -> {
-                dataBinding.gameController.controllerType = AppVirtualOperateType.APP_STICK_XBOX
-                gameSettings?.controllerType = AppVirtualOperateType.APP_STICK_XBOX
-            }
-        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -1461,11 +1440,11 @@ class AtGameActivity : AppCompatActivity() {
         var controllerType = AppVirtualOperateType.NONE
         if (!pcMouseMode) {
             if (GameManager.lastControllerType == AppVirtualOperateType.NONE) {
-                when(GameManager.getGameParam()?.defaultOperation ?: GameConstants.gamepadConfig) {
-                    GameConstants.keyboardConfig -> {
+                when(GameManager.getGameParam()?.defaultOperation ?: GameConstants.keyboardControl) {
+                    GameConstants.keyboardControl -> {
                         controllerType = AppVirtualOperateType.APP_KEYBOARD
                     }
-                    GameConstants.gamepadConfig -> {
+                    GameConstants.gamepadControl -> {
                         controllerType = AppVirtualOperateType.APP_STICK_XBOX
                     }
                 }

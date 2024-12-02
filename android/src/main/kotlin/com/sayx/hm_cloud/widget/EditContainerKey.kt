@@ -241,7 +241,7 @@ class EditContainerKey @JvmOverloads constructor(
     }
 
     private fun saveKey() {
-        LogUtils.d("saveKey:$keyList")
+//        LogUtils.d("saveKey:$keyList")
         val newData: MutableList<KeyInfo> = mutableListOf()
         keyList.keys.forEach {
             val keyInfo = keyList[it]
@@ -249,7 +249,7 @@ class EditContainerKey @JvmOverloads constructor(
                 newData.add(keyInfo)
             }
         }
-        LogUtils.d("keyInfoList:$newData")
+//        LogUtils.d("keyInfoList:$newData")
         if (newData.size < 2) {
             ToastUtils.showLong(R.string.save_at_least_two)
             return

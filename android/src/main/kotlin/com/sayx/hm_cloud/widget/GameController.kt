@@ -807,11 +807,9 @@ class GameController @JvmOverloads constructor(
                 currentKey?.let { info ->
                     listener?.onEditKeyClick(info)
                 }
-            } else if (controllerStatus == ControllerStatus.Normal) {
-                keyView.showItems()
             }
         }
-
+        keyView.keyEventListener = keyEventListener
         keyView.positionListener = object : OnPositionChangeListener {
             override fun onPositionChange(left: Int, top: Int, right: Int, bottom: Int) {
                 if (controllerStatus == ControllerStatus.Edit) {
@@ -1026,7 +1024,7 @@ class GameController @JvmOverloads constructor(
         val keyView = addContainerKey(keyInfo)
         currentKey?.let { info ->
             val view = findKeyView(this@GameController, info)
-            LogUtils.d("unActivated:${view?.javaClass?.simpleName}")
+//            LogUtils.d("unActivated:${view?.javaClass?.simpleName}")
             view?.isActivated = false
             view?.invalidate()
         }

@@ -69,7 +69,6 @@ import com.sayx.hm_cloud.dialog.GameToastDialog
 import com.sayx.hm_cloud.http.bean.BaseObserver
 import com.sayx.hm_cloud.http.bean.HttpResponse
 import com.sayx.hm_cloud.http.repository.AppRepository
-import com.sayx.hm_cloud.model.ControllerChangeEvent
 import com.sayx.hm_cloud.model.ControllerConfigEvent
 import com.sayx.hm_cloud.model.ControllerEditEvent
 import com.sayx.hm_cloud.model.ControllerInfo
@@ -1164,6 +1163,10 @@ class GameActivity : AppCompatActivity() {
             "addSuccess", "updateSuccess" -> {
                 exitCustom()
                 KeyboardListView.show(dataBinding.layoutGame)
+                if (GameManager.getGameParam()?.isVip() != true) {
+                    // 非会员，还原到编辑之前
+                    dataBinding.gameController.restoreOriginal()
+                }
             }
         }
     }
@@ -1213,26 +1216,6 @@ class GameActivity : AppCompatActivity() {
 
     fun hideSoftKeyBoard(windowToken: IBinder) {
         inputMethodManager.hideSoftInputFromWindow(windowToken, 0)
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onControllerChangeEvent(event: ControllerChangeEvent) {
-        when (event.type) {
-            0 -> {
-                dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
-                gameSettings?.controllerType = AppVirtualOperateType.NONE
-            }
-
-            1 -> {
-                dataBinding.gameController.controllerType = AppVirtualOperateType.APP_KEYBOARD
-                gameSettings?.controllerType = AppVirtualOperateType.APP_KEYBOARD
-            }
-
-            2 -> {
-                dataBinding.gameController.controllerType = AppVirtualOperateType.APP_STICK_XBOX
-                gameSettings?.controllerType = AppVirtualOperateType.APP_STICK_XBOX
-            }
-        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -1682,11 +1665,11 @@ class GameActivity : AppCompatActivity() {
         var controllerType = AppVirtualOperateType.NONE
         if (!pcMouseMode && GameManager.hasPremission) {
             if (GameManager.lastControllerType == AppVirtualOperateType.NONE) {
-                when(GameManager.getGameParam()?.defaultOperation ?: GameConstants.gamepadConfig) {
-                    GameConstants.keyboardConfig -> {
+                when(GameManager.getGameParam()?.defaultOperation ?: GameConstants.keyboardControl) {
+                    GameConstants.keyboardControl -> {
                         controllerType = AppVirtualOperateType.APP_KEYBOARD
                     }
-                    GameConstants.gamepadConfig -> {
+                    GameConstants.gamepadControl -> {
                         controllerType = AppVirtualOperateType.APP_STICK_XBOX
                     }
                 }

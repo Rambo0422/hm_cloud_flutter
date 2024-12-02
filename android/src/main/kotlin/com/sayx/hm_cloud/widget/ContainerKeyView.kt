@@ -11,7 +11,11 @@ import android.view.MotionEvent
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.databinding.DataBindingUtil
+import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.ScreenUtils
 import com.sayx.hm_cloud.R
+import com.sayx.hm_cloud.callback.OnKeyEventListener
+import com.sayx.hm_cloud.callback.OnKeyTouchListener
 import com.sayx.hm_cloud.callback.OnPositionChangeListener
 import com.sayx.hm_cloud.constants.ControllerStatus
 import com.sayx.hm_cloud.constants.controllerStatus
@@ -41,6 +45,8 @@ class ContainerKeyView @JvmOverloads constructor(
 
     var positionListener: OnPositionChangeListener? = null
 
+    var keyEventListener: OnKeyEventListener? = null
+
     private var firstTouchId = 0
 
     var needDrawShadow = true
@@ -50,13 +56,20 @@ class ContainerKeyView @JvmOverloads constructor(
         style = Paint.Style.FILL
     }
 
+    private var containerState : ContainerState = ContainerState.HIDE_LEFT
+
     init {
         setWillNotDraw(false)
+        dataBinding.ivArrow.setOnClickListener {
+            if (controllerStatus == ControllerStatus.Normal) {
+                showItems()
+            }
+        }
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        if (needDrawShadow && (controllerStatus == ControllerStatus.Edit || controllerStatus == ControllerStatus.Combine)) {
+        if (needDrawShadow && (controllerStatus == ControllerStatus.Edit || controllerStatus == ControllerStatus.Roulette)) {
             bgPaint.color = if (isActivated) Color.parseColor("#8CC6EC4B") else Color.parseColor("#3CFFFFFF")
             canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), bgPaint)
         }
@@ -69,7 +82,6 @@ class ContainerKeyView @JvmOverloads constructor(
         event?.let {
             when (it.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
-                    isPressed = true
                     if (controllerStatus == ControllerStatus.Edit && needDrawShadow) {
                         isDrag = false
                         if (parent is ViewGroup) {
@@ -114,20 +126,15 @@ class ContainerKeyView @JvmOverloads constructor(
                 }
 
                 MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> {
-                    isPressed = false
                     if (controllerStatus == ControllerStatus.Edit && needDrawShadow) {
                         val position = IntArray(4)
                         val location = AppSizeUtils.getLocationOnScreen(this, position)
                         val left = location[0]
                         val center = left + width / 2
                         if (center >= parentWidth / 2) {
-                            dataBinding.ivArrow.setImageResource(R.drawable.icon_container_arrow_right)
-                            dataBinding.layoutItemsLeft.visibility = VISIBLE
-                            dataBinding.layoutItemsRight.visibility = GONE
+                            showLeft()
                         } else {
-                            dataBinding.ivArrow.setImageResource(R.drawable.icon_container_arrow_left)
-                            dataBinding.layoutItemsLeft.visibility = GONE
-                            dataBinding.layoutItemsRight.visibility = VISIBLE
+                            showRight()
                         }
                         positionListener?.onPositionChange(left, location[1], location[2], location[3])
                         if (parent is GameController) {
@@ -148,7 +155,7 @@ class ContainerKeyView @JvmOverloads constructor(
             }
             return it.getPointerId(it.actionIndex) == firstTouchId
         }
-        return false
+        return super.onTouchEvent(event)
     }
 
     fun setKeyInfo(keyInfo: KeyInfo) {
@@ -163,8 +170,66 @@ class ContainerKeyView @JvmOverloads constructor(
 
         val size = keyInfo.containerArr?.size ?: 0
         if (size > 0) {
-            layoutWidth += layoutHeight * size + AppSizeUtils.convertViewSize(ceil(6 * keyInfo.zoom / 100f * 2f).toInt()) * (size - 1)
+            layoutWidth += layoutHeight * size + AppSizeUtils.convertViewSize(ceil(6 * keyInfo.zoom / 100f * 2f).toInt()) * (size + 1)
         }
+
+        keyInfo.containerArr?.forEachIndexed { _, itemInfo ->
+            val itemLayoutParams = LayoutParams(
+                layoutHeight,
+                layoutHeight
+            )
+            val paddingHorizontal = AppSizeUtils.convertViewSize(ceil(3 * keyInfo.zoom / 100f * 2f).toInt())
+            itemLayoutParams.marginStart = paddingHorizontal
+            itemLayoutParams.marginEnd = paddingHorizontal
+
+            val itemKeyViewLeft = ContainerItemKeyView(context).also {
+                it.setKeyInfo(itemInfo, layoutHeight)
+                it.onKeyTouchListener = object : OnKeyTouchListener {
+                    override fun onKeyTouch(touch: Boolean) {
+                        if (itemInfo.click == 0) {
+                            it.longClick = touch
+                            keyEventListener?.onButtonPress(itemInfo, touch)
+                        } else {
+                            if (touch) {
+                                it.longClick = !it.longClick
+                                keyEventListener?.onButtonPress(itemInfo, true)
+                            } else {
+                                if (!it.longClick) {
+                                    keyEventListener?.onButtonPress(itemInfo, false)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            val itemKeyViewRight = ContainerItemKeyView(context).also {
+                it.setKeyInfo(itemInfo, layoutHeight)
+                it.onKeyTouchListener = object : OnKeyTouchListener {
+                    override fun onKeyTouch(touch: Boolean) {
+                        if (itemInfo.click == 0) {
+                            it.longClick = touch
+                            keyEventListener?.onButtonPress(itemInfo, touch)
+                        } else {
+                            if (touch) {
+                                it.longClick = !it.longClick
+                                keyEventListener?.onButtonPress(itemInfo, true)
+                            } else {
+                                if (!it.longClick) {
+                                    keyEventListener?.onButtonPress(itemInfo, false)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            dataBinding.layoutItemsLeft.setPadding(paddingHorizontal, 0, paddingHorizontal, 0)
+            dataBinding.layoutItemsLeft.addView(itemKeyViewLeft, itemLayoutParams)
+            dataBinding.layoutItemsRight.setPadding(paddingHorizontal, 0, paddingHorizontal, 0)
+            dataBinding.layoutItemsRight.addView(itemKeyViewRight, itemLayoutParams)
+        }
+
         this.layoutParams = LayoutParams(
             layoutWidth,
             layoutHeight
@@ -176,15 +241,81 @@ class ContainerKeyView @JvmOverloads constructor(
             AppSizeUtils.convertViewSize(ceil(5 * keyInfo.zoom / 100f * 2f).toInt()),
             AppSizeUtils.convertViewSize(ceil(15 * keyInfo.zoom / 100f * 2f).toInt()),
         )
-        if (keyInfo.left >= (667 - keyInfo.getKeyWidth()) / 2f) {
-            dataBinding.ivArrow.setImageResource(R.drawable.icon_container_arrow_left)
+        val left = AppSizeUtils.convertViewSize(keyInfo.left)
+        val center = left + layoutWidth / 2
+        val screenWidth = ScreenUtils.getScreenWidth()
+        if (center >= screenWidth / 2) {
+            showLeft()
         } else {
-            dataBinding.ivArrow.setImageResource(R.drawable.icon_container_arrow_right)
+            showRight()
         }
         invalidate()
     }
 
-    fun showItems(keep: Boolean? = false) {
-
+    private fun showLeft() {
+        containerState = ContainerState.SHOW_LEFT
+        dataBinding.ivArrow.setImageResource(R.drawable.icon_container_arrow_right)
+        dataBinding.layoutItemsLeft.visibility = VISIBLE
+        dataBinding.layoutItemsRight.visibility = GONE
     }
+
+    private fun hideLeft() {
+        containerState = ContainerState.HIDE_LEFT
+        dataBinding.ivArrow.setImageResource(R.drawable.icon_container_arrow_left)
+        dataBinding.layoutItemsLeft.visibility = INVISIBLE
+        dataBinding.layoutItemsRight.visibility = GONE
+    }
+
+    private fun showRight() {
+        containerState = ContainerState.SHOW_RIGHT
+        dataBinding.ivArrow.setImageResource(R.drawable.icon_container_arrow_left)
+        dataBinding.layoutItemsLeft.visibility = GONE
+        dataBinding.layoutItemsRight.visibility = VISIBLE
+    }
+
+    private fun hideRight() {
+        containerState = ContainerState.HIDE_RIGHT
+        dataBinding.ivArrow.setImageResource(R.drawable.icon_container_arrow_right)
+        dataBinding.layoutItemsLeft.visibility = GONE
+        dataBinding.layoutItemsRight.visibility = GONE
+    }
+
+    fun showItems(keep: Boolean = false) {
+        when (containerState) {
+            ContainerState.HIDE_LEFT -> {
+                showLeft()
+            }
+
+            ContainerState.SHOW_LEFT -> {
+                if (keep) {
+                    showLeft()
+                } else {
+                    hideLeft()
+                }
+            }
+
+            ContainerState.HIDE_RIGHT -> {
+                showRight()
+            }
+
+            ContainerState.SHOW_RIGHT -> {
+                if (keep) {
+                    showRight()
+                } else {
+                    hideRight()
+                }
+            }
+        }
+    }
+}
+
+enum class ContainerState {
+    // 左侧隐藏
+    HIDE_LEFT,
+    // 右侧隐藏
+    HIDE_RIGHT,
+    // 左侧展示
+    SHOW_LEFT,
+    // 右侧展示
+    SHOW_RIGHT
 }
