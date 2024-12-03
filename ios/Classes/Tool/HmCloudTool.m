@@ -110,7 +110,7 @@
     [self onlyStop];
 
     if (self.delegate) {
-        [self.delegate sendToFlutter:ActionExitGame params:@{ @"action": @1 }];
+        [self.delegate sendToFlutter:ActionExitGame params:@{ @"action": @"1" }];
     }
 }
 
