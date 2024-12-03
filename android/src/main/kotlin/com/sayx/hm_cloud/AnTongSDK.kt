@@ -30,13 +30,14 @@ import com.sayx.hm_cloud.model.Direction
 import com.sayx.hm_cloud.model.GameParam
 import com.sayx.hm_cloud.model.KeyInfo
 import com.sayx.hm_cloud.utils.GameUtils
+import com.sayx.hm_cloud.widget.ATGameView
 import org.json.JSONObject
 
 object AnTongSDK {
 
     const val TYPE = "at_pc"
     const val CHANNEL_TYPE = "at"
-    var anTongVideoView: AnTongVideoView? = null
+    var anTongVideoView: ATGameView? = null
     private var mRequestDeviceSuccess: RequestDeviceSuccess? = null
     private var ACCESS_KEY_ID = ""
     private var isInit = false
@@ -64,7 +65,7 @@ object AnTongSDK {
         this.mRequestDeviceSuccess = requestDeviceSuccess
 
         if (anTongVideoView == null) {
-            anTongVideoView = AnTongVideoView(context)
+            anTongVideoView = ATGameView(context)
         }
         anTongVideoView?.setHmcpPlayerListener(mAnTongPlayerListener)
 
@@ -980,7 +981,7 @@ open class OnKeyEventListenerImp : OnKeyEventListener {
 //                LogUtils.d("key:${keyInfo.text}, inputOp:${oneInputOpData.inputOp}, value:${oneInputOpData.value}, result:$result")
             }
             // 键盘按键，鼠标左中右键
-            KeyType.KEYBOARD_KEY, KeyType.KEYBOARD_MOUSE_LEFT, KeyType.KEYBOARD_MOUSE_RIGHT, KeyType.KEYBOARD_MOUSE_MIDDLE -> {
+            KeyType.KEYBOARD_KEY, KeyType.KEYBOARD_MOUSE_LEFT, KeyType.KEYBOARD_MOUSE_RIGHT, KeyType.KEYBOARD_MOUSE_MIDDLE, KeyType.KEY_SHOT -> {
                 val inputOp = HMInputOpData()
                 val oneInputOpData = HMInputOpData.HMOneInputOPData()
                 oneInputOpData.inputState = if (press) HMInputOpData.HMOneInputOPData_InputState.HMOneInputOPData_InputState_OpStateDown else

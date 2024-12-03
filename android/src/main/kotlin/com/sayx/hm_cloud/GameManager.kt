@@ -63,6 +63,7 @@ import com.sayx.hm_cloud.model.TimeUpdateEvent
 import com.sayx.hm_cloud.model.UserRechargeStatusEvent
 import com.sayx.hm_cloud.utils.GameUtils
 import com.sayx.hm_cloud.utils.TimeUtils
+import com.sayx.hm_cloud.widget.HMGameView
 import com.sayx.hm_cloud.widget.KeyboardListView
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -89,7 +90,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         return gameParam
     }
 
-    var gameView: HmcpVideoView? = null
+    var gameView: HMGameView? = null
 
     // 此处绑定的是HMCloudPlugin挂载的activity
     private lateinit var activity: Activity
@@ -506,7 +507,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                         LogUtils.d("onRequestDeviceFailed errorMessage: $errorMessage")
                         activity.runOnUiThread {
                             channel.invokeMethod(
-                                "errorInfo",
+                                "errorInfo_at",
                                 mapOf(Pair("errorCode", "$status"), Pair("errorMsg", errorMessage))
                             )
                         }
@@ -630,7 +631,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                 releaseGame(finish = "0", bundle)
             }
         } else {
-            gameView = HmcpVideoView(activity)
+            gameView = HMGameView(activity)
             gameView?.setUserInfo(UserInfo().also {
                 it.userId = gameParam?.userId
                 it.userToken = gameParam?.userToken
@@ -1670,7 +1671,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
     }
 
     private fun initHmcpView(userInfo: UserInfo) {
-        gameView = HmcpVideoView(activity)
+        gameView = HMGameView(activity)
         gameView?.setUserInfo(userInfo)
 
         gameView?.hmcpPlayerListener = this

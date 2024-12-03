@@ -985,6 +985,12 @@ class AtGameActivity : AppCompatActivity() {
                                     AppVirtualOperateType.APP_KEYBOARD
                                 )
                             }
+                            KeyType.KEY_SHOT -> {
+                                dataBinding.gameController.addShotKey(
+                                    keyInfo,
+                                    AppVirtualOperateType.APP_KEYBOARD
+                                )
+                            }
                         }
                         controllerEditLayout?.setKeyInfo(keyInfo)
                     } else if (controllerStatus == ControllerStatus.Combine) {
@@ -1241,12 +1247,16 @@ class AtGameActivity : AppCompatActivity() {
                 override fun onCombineKeyEdit(keyInfo: KeyInfo) {
                     controllerEditLayout?.hideLayout(object : AnimatorListenerImp() {
                         override fun onAnimationEnd(animation: Animator) {
-                            if (keyInfo.type == KeyType.KEY_COMBINE || keyInfo.type == KeyType.GAMEPAD_COMBINE) {
-                                showEditCombineKeyLayout(keyInfo)
-                            } else if (keyInfo.type == KeyType.KEY_ROULETTE || keyInfo.type == KeyType.GAMEPAD_ROULETTE) {
-                                showEditRouletteKeyLayout(keyInfo)
-                            } else if (keyInfo.type == KeyType.KEY_CONTAINER) {
-                                showEditContainerKeyLayout(keyInfo)
+                            when (keyInfo.type) {
+                                KeyType.KEY_COMBINE, KeyType.GAMEPAD_COMBINE -> {
+                                    showEditCombineKeyLayout(keyInfo)
+                                }
+                                KeyType.KEY_ROULETTE, KeyType.GAMEPAD_ROULETTE -> {
+                                    showEditRouletteKeyLayout(keyInfo)
+                                }
+                                KeyType.KEY_CONTAINER -> {
+                                    showEditContainerKeyLayout(keyInfo)
+                                }
                             }
                         }
                     })

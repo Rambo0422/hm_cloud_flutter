@@ -186,6 +186,8 @@ class ContainerKeyView @JvmOverloads constructor(
                 it.setKeyInfo(itemInfo, layoutHeight)
                 it.onKeyTouchListener = object : OnKeyTouchListener {
                     override fun onKeyTouch(touch: Boolean) {
+                        handler.removeCallbacks(runnable)
+                        handler.postDelayed(runnable, 10 * 1000L)
                         if (itemInfo.click == 0) {
                             it.longClick = touch
                             keyEventListener?.onButtonPress(itemInfo, touch)
@@ -207,6 +209,8 @@ class ContainerKeyView @JvmOverloads constructor(
                 it.setKeyInfo(itemInfo, layoutHeight)
                 it.onKeyTouchListener = object : OnKeyTouchListener {
                     override fun onKeyTouch(touch: Boolean) {
+                        handler.removeCallbacks(runnable)
+                        handler.postDelayed(runnable, 10 * 1000L)
                         if (itemInfo.click == 0) {
                             it.longClick = touch
                             keyEventListener?.onButtonPress(itemInfo, touch)
@@ -245,9 +249,9 @@ class ContainerKeyView @JvmOverloads constructor(
         val center = left + layoutWidth / 2
         val screenWidth = ScreenUtils.getScreenWidth()
         if (center >= screenWidth / 2) {
-            showLeft()
+            hideLeft()
         } else {
-            showRight()
+            hideRight()
         }
         invalidate()
     }
@@ -280,15 +284,33 @@ class ContainerKeyView @JvmOverloads constructor(
         dataBinding.layoutItemsRight.visibility = GONE
     }
 
+    private val runnable = Runnable {
+        if (controllerStatus == ControllerStatus.Edit) {
+            return@Runnable
+        }
+        when(containerState) {
+            ContainerState.SHOW_LEFT -> {
+                hideLeft()
+            }
+            ContainerState.SHOW_RIGHT -> {
+                hideRight()
+            }
+            else -> {}
+        }
+    }
+
     fun showItems(keep: Boolean = false) {
         when (containerState) {
             ContainerState.HIDE_LEFT -> {
                 showLeft()
+                handler.removeCallbacks(runnable)
+                handler.postDelayed(runnable, 10 * 1000L)
             }
 
             ContainerState.SHOW_LEFT -> {
                 if (keep) {
                     showLeft()
+                    handler.removeCallbacks(runnable)
                 } else {
                     hideLeft()
                 }
@@ -296,11 +318,14 @@ class ContainerKeyView @JvmOverloads constructor(
 
             ContainerState.HIDE_RIGHT -> {
                 showRight()
+                handler.removeCallbacks(runnable)
+                handler.postDelayed(runnable, 10 * 1000L)
             }
 
             ContainerState.SHOW_RIGHT -> {
                 if (keep) {
                     showRight()
+                    handler.removeCallbacks(runnable)
                 } else {
                     hideRight()
                 }

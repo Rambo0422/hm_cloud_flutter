@@ -402,7 +402,7 @@ class RockerView @JvmOverloads constructor(
 //                    LogUtils.d("onTouchEventPOINTERDOWN:${it.getPointerId(it.actionIndex)}, $firstTouchId")
                 }
             }
-            return it.getPointerId(it.actionIndex) == firstTouchId
+            return super.onTouchEvent(event)
         }
         return super.onTouchEvent(event)
     }

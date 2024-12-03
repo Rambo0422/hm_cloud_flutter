@@ -1119,7 +1119,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/btn_hide"
-            tools:visibility="gone">
+            tools:visibility="visible">
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/btn_edit_mouse_left"
@@ -1211,7 +1211,7 @@
                 android:layout_height="65dp"
                 android:layout_marginTop="28.5dp"
                 android:background="@drawable/img_pulley_down"
-                app:layout_constraintEnd_toStartOf="@id/btn_edit_arrow_pad"
+                app:layout_constraintEnd_toStartOf="@id/btn_edit_shot_key"
                 app:layout_constraintStart_toEndOf="@id/btn_edit_pulley_up"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -1227,6 +1227,31 @@
                 app:layout_constraintTop_toBottomOf="@id/btn_edit_pulley_down" />
 
             <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/btn_edit_shot_key"
+                android:layout_width="65dp"
+                android:layout_height="65dp"
+                android:layout_marginTop="28.5dp"
+                android:background="@drawable/img_shot_key"
+                android:padding="15dp"
+                app:layout_constraintEnd_toStartOf="@id/btn_edit_arrow_pad"
+                app:layout_constraintStart_toEndOf="@id/btn_edit_pulley_down"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="visible" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_edit_shot_key"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@string/shot_key"
+                android:textColor="@android:color/white"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="@id/btn_edit_shot_key"
+                app:layout_constraintStart_toStartOf="@id/btn_edit_shot_key"
+                app:layout_constraintTop_toBottomOf="@id/btn_edit_shot_key"
+                tools:visibility="visible" />
+
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/btn_edit_arrow_pad"
                 android:layout_width="65dp"
                 android:layout_height="65dp"
@@ -1235,9 +1260,9 @@
                 android:padding="15dp"
                 android:src="@drawable/img_rocker_default"
                 app:layout_constraintEnd_toStartOf="@id/btn_edit_letter_pad"
-                app:layout_constraintStart_toEndOf="@id/btn_edit_pulley_down"
+                app:layout_constraintStart_toEndOf="@id/btn_edit_shot_key"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:visibility="gone" />
+                tools:visibility="visible" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tv_edit_arrow_pad"
@@ -1250,7 +1275,7 @@
                 app:layout_constraintEnd_toEndOf="@id/btn_edit_arrow_pad"
                 app:layout_constraintStart_toStartOf="@id/btn_edit_arrow_pad"
                 app:layout_constraintTop_toBottomOf="@id/btn_edit_arrow_pad"
-                tools:visibility="gone" />
+                tools:visibility="visible" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/btn_edit_letter_pad"
@@ -1263,7 +1288,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/btn_edit_arrow_pad"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:visibility="gone" />
+                tools:visibility="visible" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tv_edit_letter_pad"
@@ -1276,7 +1301,7 @@
                 app:layout_constraintEnd_toEndOf="@id/btn_edit_letter_pad"
                 app:layout_constraintStart_toStartOf="@id/btn_edit_letter_pad"
                 app:layout_constraintTop_toBottomOf="@id/btn_edit_letter_pad"
-                tools:visibility="gone" />
+                tools:visibility="visible" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

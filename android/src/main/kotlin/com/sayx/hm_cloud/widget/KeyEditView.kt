@@ -179,7 +179,7 @@ class KeyEditView @JvmOverloads constructor(
         }
         // 移除上个添加的View
         when (val view = dataBinding.layoutPreview[0]) {
-            is KeyView, is RockerView, is CombineKeyView, is RouletteKeyView, is ContainerKeyView -> {
+            is KeyView, is RockerView, is CombineKeyView, is RouletteKeyView, is ContainerKeyView, is ShotKeyView -> {
                 dataBinding.layoutPreview.removeView(view)
             }
         }
@@ -220,6 +220,10 @@ class KeyEditView @JvmOverloads constructor(
             KeyType.KEY_CONTAINER -> {
                 dataBinding.tvInfo.text = mKeyInfo.containerArr?.map { info -> getRouletteKeyText(info) }?.toList()?.joinToString(" + ")
                 previewView = addContainerKey()
+            }
+
+            KeyType.KEY_SHOT -> {
+                previewView = addShotKey()
             }
 
             else -> {
@@ -277,6 +281,10 @@ class KeyEditView @JvmOverloads constructor(
                 }
 
                 is ContainerKeyView -> {
+                    it.setKeyInfo(mKeyInfo)
+                }
+
+                is ShotKeyView -> {
                     it.setKeyInfo(mKeyInfo)
                 }
             }
@@ -447,6 +455,19 @@ class KeyEditView @JvmOverloads constructor(
 
     private fun addContainerKey(): View {
         val keyView = ContainerKeyView(context)
+        keyView.needDrawShadow = false
+        keyView.setKeyInfo(mKeyInfo)
+        val layoutParams = FrameLayout.LayoutParams(
+            AppSizeUtils.convertViewSize(mKeyInfo.getKeyWidth()),
+            AppSizeUtils.convertViewSize(mKeyInfo.getKeyHeight())
+        )
+        layoutParams.gravity = Gravity.CENTER
+        dataBinding.layoutPreview.addView(keyView, 0, layoutParams)
+        return keyView
+    }
+
+    private fun addShotKey(): View {
+        val keyView = ShotKeyView(context)
         keyView.needDrawShadow = false
         keyView.setKeyInfo(mKeyInfo)
         val layoutParams = FrameLayout.LayoutParams(

@@ -3,6 +3,7 @@ package com.sayx.hm_cloud.widget
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -190,10 +191,6 @@ class GameController @JvmOverloads constructor(
                     addCombineKey(keyInfo)
                 }
 
-//                KeyType.GAMEPAD_ROULETTE -> {
-//                    addRouletteKey(keyInfo)
-//                }
-
                 else -> {
                     LogUtils.e("initGamepad:$keyInfo")
                 }
@@ -234,6 +231,10 @@ class GameController @JvmOverloads constructor(
 
                 KeyType.KEY_CONTAINER -> {
                     addContainerKey(keyInfo)
+                }
+
+                KeyType.KEY_SHOT -> {
+                    addShotKey(keyInfo)
                 }
 
                 else -> {
@@ -791,7 +792,7 @@ class GameController @JvmOverloads constructor(
         return keyView
     }
 
-    private fun addContainerKey(keyInfo: KeyInfo) : View {
+    private fun addContainerKey(keyInfo: KeyInfo) : ContainerKeyView {
         val keyView = ContainerKeyView(context)
         keyView.setKeyInfo(keyInfo)
         keyView.setOnClickListener {
@@ -838,6 +839,60 @@ class GameController @JvmOverloads constructor(
         if (controllerType == AppVirtualOperateType.APP_KEYBOARD) {
             keyboardViews.add(keyView)
         }
+        addView(keyView)
+        keyView.post {
+            keyView.x = AppSizeUtils.convertWidthSize(keyInfo.left).toFloat()
+            keyView.y = AppSizeUtils.convertHeightSize(keyInfo.top).toFloat()
+        }
+        return keyView
+    }
+
+    private fun addShotKey(keyInfo: KeyInfo) : ShotKeyView {
+        val keyView = ShotKeyView(context)
+        keyView.setKeyInfo(keyInfo)
+        keyView.tag = keyInfo.id
+        keyView.setOnClickListener {
+            if (controllerStatus == ControllerStatus.Edit) {
+                currentKey?.let { info ->
+                    val view = findKeyView(this, info)
+                    view?.isActivated = false
+                    view?.invalidate()
+                }
+                it.isActivated = true
+                keyView.invalidate()
+                currentKey = keyInfo
+                currentKey?.let { info ->
+                    listener?.onEditKeyClick(info)
+                }
+            }
+        }
+        keyView.onKeyTouchListener = object : OnKeyTouchListener {
+            override fun onKeyTouch(touch: Boolean) {
+                keyEventListener?.onButtonPress(keyInfo, touch)
+            }
+        }
+        keyView.positionListener = object : OnPositionChangeListener {
+            override fun onPositionChange(left: Int, top: Int, right: Int, bottom: Int) {
+                if (controllerStatus == ControllerStatus.Edit) {
+                    currentKey?.let { info ->
+                        val view = findKeyView(this@GameController, info)
+                        view?.isActivated = false
+                        view?.invalidate()
+                    }
+                    keyView.isActivated = true
+                    keyView.invalidate()
+                    currentKey = keyInfo
+                    currentKey?.let { info ->
+                        info.changePosition(
+                            AppSizeUtils.reconvertWidthSize(left),
+                            AppSizeUtils.reconvertHeightSize(top),
+                        )
+                        listener?.onEditKeyClick(info)
+                    }
+                }
+            }
+        }
+        keyboardViews.add(keyView)
         addView(keyView)
         keyView.post {
             keyView.x = AppSizeUtils.convertWidthSize(keyInfo.left).toFloat()
@@ -893,6 +948,10 @@ class GameController @JvmOverloads constructor(
 
                 KeyType.KEY_CONTAINER -> {
                     addContainerKey(keyInfo)
+                }
+
+                KeyType.KEY_SHOT -> {
+                    addShotKey(keyInfo)
                 }
 
                 else -> {
@@ -1033,6 +1092,20 @@ class GameController @JvmOverloads constructor(
         currentKey = keyInfo
     }
 
+    fun addShotKey(keyInfo: KeyInfo, type: AppVirtualOperateType) {
+        editKeyboardKeys.add(keyInfo)
+        val keyView = addShotKey(keyInfo)
+        currentKey?.let { info ->
+            val view = findKeyView(this@GameController, info)
+//            LogUtils.d("unActivated:${view?.javaClass?.simpleName}")
+            view?.isActivated = false
+            view?.invalidate()
+        }
+        keyView.isActivated = true
+        keyView.invalidate()
+        currentKey = keyInfo
+    }
+
     var controllerInfo : ControllerInfo? = null
 
     var controllerName : String = ""
@@ -1158,7 +1231,7 @@ class GameController @JvmOverloads constructor(
     }
 
     fun updateKey(keyInfo: KeyInfo) {
-        LogUtils.v("updateKey->\ncurrent:$currentKey\nnew:$keyInfo")
+//        LogUtils.v("updateKey->\ncurrent:$currentKey\nnew:$keyInfo")
         if (controllerType == AppVirtualOperateType.APP_STICK_XBOX) {
             currentKey = editGamepadKeys.find { info -> info.id == keyInfo.id }
             currentKey?.copyFrom(keyInfo)
@@ -1183,6 +1256,9 @@ class GameController @JvmOverloads constructor(
                     view.setKeyInfo(it)
                 }
                 if (view is ContainerKeyView) {
+                    view.setKeyInfo(it)
+                }
+                if (view is ShotKeyView) {
                     view.setKeyInfo(it)
                 }
             }
@@ -1244,7 +1320,7 @@ class GameController @JvmOverloads constructor(
 //        LogUtils.d("findKeyView:$viewGroup, childCount:${viewGroup.childCount}")
         for (index in 0..<childCount) {
             when (val childView = viewGroup.getChildAt(index)) {
-                is KeyView, is RockerView, is CombineKeyView, is RouletteKeyView, is ContainerKeyView -> {
+                is KeyView, is RockerView, is CombineKeyView, is RouletteKeyView, is ContainerKeyView, is ShotKeyView -> {
 //                    LogUtils.d("childView:{tag:${childView.tag}}, keyInfo:{id:${keyInfo.id}}")
                     if (childView.tag == keyInfo.id) {
 //                        LogUtils.d("findKeyView:${childView.tag}, $keyInfo")
@@ -1341,7 +1417,7 @@ class GameController @JvmOverloads constructor(
 
     private fun hideAllKey() {
         children.iterator().forEach {
-            if (it is KeyView|| it is RockerView || it is CombineKeyView || it is RouletteKeyView || it is ContainerKeyView) {
+            if (it is KeyView|| it is RockerView || it is CombineKeyView || it is RouletteKeyView || it is ContainerKeyView || it is ShotKeyView) {
                 it.visibility = View.INVISIBLE
             }
         }
