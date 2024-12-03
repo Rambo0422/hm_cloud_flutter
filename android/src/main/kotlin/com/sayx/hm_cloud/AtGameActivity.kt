@@ -295,13 +295,6 @@ class AtGameActivity : AppCompatActivity() {
 
         // 初始化设置面板
         initGameSettings()
-
-        GameManager.gameStat(
-            "游戏界面", "show", mapOf(
-                "sdk_platform" to GameManager.getGameParam()?.channel,
-                "gamepage_type" to GameManager.getGameParam()?.gameType,
-            )
-        )
     }
 
     private fun checkGuideShow() {
@@ -618,11 +611,6 @@ class AtGameActivity : AppCompatActivity() {
                 AnTongSDK.stopGame()
                 GameManager.releaseGame(finish = "1")
                 gameSettings?.release()
-                GameManager.gameStat(
-                    "结束游戏", "click", mapOf(
-                        "sdk_platform" to GameManager.getGameParam()?.channel,
-                    )
-                )
             }
             .build().show("hideExitGameDialog")
     }

@@ -224,10 +224,13 @@ object AnTongSDK {
             "show",
             mapOf("errorCode" to "$errorCode").toString(),
         )
-        GameManager.gameStat("page-errorPage", "show", mapOf(
-            "errorcode_at" to "$errorCode",
-            "cont" to "at"
-        ))
+        GameManager.invokeMethod("errorInfo_at", mapOf(
+                Pair("page", "page-errorPage"),
+                Pair("action", "show"),
+                Pair("arguments", mapOf(
+                    "errorcode_at" to "$errorCode",
+                )),
+            ))
     }
 }
 

@@ -1314,22 +1314,12 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         channel.invokeMethod("statGameTime", mapOf(Pair("time", time)))
     }
 
-    fun gameStat(
-        page: String,
-        action: String,
-        arg: Map<String, Any?>? = null,
-        type: String = "event"
+    fun invokeMethod(
+        method: String,
+        arg: Map<String, Any?>? = null
     ) {
         activity.runOnUiThread {
-            channel.invokeMethod(
-                "gameStat",
-                mapOf(
-                    Pair("page", page),
-                    Pair("action", action),
-                    Pair("arguments", arg),
-                    Pair("type", type)
-                )
-            )
+            channel.invokeMethod(method, arg)
         }
     }
 

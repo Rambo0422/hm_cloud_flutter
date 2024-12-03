@@ -267,12 +267,6 @@ class GameActivity : AppCompatActivity() {
             GameManager.sendCurrentCid()
             initPlayPartyView()
         }
-        GameManager.gameStat(
-            "游戏界面", "show", mapOf(
-                "sdk_platform" to GameManager.getGameParam()?.channel,
-                "gamepage_type" to GameManager.getGameParam()?.gameType,
-            )
-        )
     }
 
     private var playPartyGameView: PlayPartyGameView? = null
@@ -1383,9 +1377,6 @@ class GameActivity : AppCompatActivity() {
                 GameManager.releaseGame(finish = "1", bundle = null)
                 gameSettings?.release()
                 finish()
-                GameManager.gameStat("结束游戏", "click", mapOf(
-                    "sdk_platform" to GameManager.getGameParam()?.channel,
-                ))
             }
             .build().show()
     }
