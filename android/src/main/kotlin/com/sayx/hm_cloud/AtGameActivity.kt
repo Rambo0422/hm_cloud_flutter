@@ -63,7 +63,6 @@ import com.sayx.hm_cloud.dialog.GameToastDialog
 import com.sayx.hm_cloud.http.bean.BaseObserver
 import com.sayx.hm_cloud.http.repository.AppRepository
 import com.sayx.hm_cloud.http.bean.HttpResponse
-import com.sayx.hm_cloud.model.ControllerChangeEvent
 import com.sayx.hm_cloud.model.ControllerConfigEvent
 import com.sayx.hm_cloud.model.ControllerEditEvent
 import com.sayx.hm_cloud.model.ControllerInfo
@@ -81,6 +80,7 @@ import com.sayx.hm_cloud.widget.AddGamepadKey
 import com.sayx.hm_cloud.widget.AddKeyboardKey
 import com.sayx.hm_cloud.widget.ControllerEditLayout
 import com.sayx.hm_cloud.widget.EditCombineKey
+import com.sayx.hm_cloud.widget.EditContainerKey
 import com.sayx.hm_cloud.widget.EditRouletteKey
 import com.sayx.hm_cloud.widget.GameNoticeView
 import com.sayx.hm_cloud.widget.GameSettings
@@ -108,6 +108,8 @@ class AtGameActivity : AppCompatActivity() {
     private var editCombineKey: EditCombineKey? = null
 
     private var editRouletteKey: EditRouletteKey? = null
+
+    private var editContainerKey: EditContainerKey? = null
 
     private var keyEditView: KeyEditView? = null
 
@@ -201,12 +203,16 @@ class AtGameActivity : AppCompatActivity() {
                                 showWarningDialog("$status")
                             }
                         }
+                        Constants.STATUS_GAME_PROCESS_MISSING,
 //                        Constants.STATUS_APP_ID_ERROR,
                         Constants.STATUS_NOT_FOND_GAME,
+                        Constants.STATUS_TOKEN_INVALID,
                         Constants.STATUS_SIGN_FAILED,
                         Constants.STATUS_CONN_FAILED,
                         Constants.STATUS_FINISH_WAIT,
-                        300010,101001,201011 -> {
+                        300010,
+                        101001,
+                        201011 -> {
                             runOnUiThread {
                                 AnTongSDK.uploadErrorCode(status)
                                 gameSettings?.release()
@@ -447,6 +453,8 @@ class AtGameActivity : AppCompatActivity() {
             editCombineKey?.addKey(keyInfo)
         } else if (editRouletteKey?.isShow == true) {
             editRouletteKey?.addKey(keyInfo)
+        } else if (editContainerKey?.isShow == true) {
+            editContainerKey?.addKey(keyInfo)
         }
     }
 
@@ -715,6 +723,14 @@ class AtGameActivity : AppCompatActivity() {
                 })
             }
 
+            override fun onAddContainerKey() {
+                controllerEditLayout?.hideLayout(object : AnimatorListenerImp() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        showEditContainerKeyLayout()
+                    }
+                })
+            }
+
             override fun onRestoreDefault() {
                 showRestoreCustomDialog()
             }
@@ -876,8 +892,61 @@ class AtGameActivity : AppCompatActivity() {
             editRouletteKey?.setRouletteKeyInfo(keyInfo)
             editRouletteKey?.showBoard()
         }
-        // 展示键盘选择
-//        showKeyBoard(false)
+    }
+
+    private fun showEditContainerKeyLayout(keyInfo: KeyInfo? = null) {
+        if (editContainerKey == null) {
+            editContainerKey = EditContainerKey(this)
+            editContainerKey?.setContainerKeyInfo(keyInfo)
+            editContainerKey?.onHideListener = object : HideListener {
+                override fun onHide(keyInfo: KeyInfo?) {
+                    keyInfo?.let {
+                        showKeyEditView(keyInfo)
+                    }
+                    controllerEditLayout?.showLayout()
+                    hideKeyBoard()
+                }
+            }
+            editContainerKey?.addKeyListener = object : AddKeyListenerImp() {
+                override fun onAddKey(keyInfo: KeyInfo) {
+                    dataBinding.gameController.addContainerKey(
+                        keyInfo,
+                        dataBinding.gameController.controllerType
+                    )
+                    controllerEditLayout?.setKeyInfo(keyInfo)
+                }
+
+                override fun rouAddData(list: List<KeyInfo>?) {
+                    if (!list.isNullOrEmpty()) {
+                        dataBinding.gameController.removeKeys(list)
+                    }
+                }
+
+                override fun rouRemoveData(list: List<KeyInfo>?) {
+                    if (!list.isNullOrEmpty()) {
+                        dataBinding.gameController.addKeys(list)
+                    }
+                }
+
+                override fun onKeyAdd(keyInfo: KeyInfo) {
+                    dataBinding.gameController.removeKeys(listOf(keyInfo))
+                }
+
+                override fun onKeyRemove(keyInfo: KeyInfo) {
+                    dataBinding.gameController.addKey(keyInfo)
+                }
+            }
+            val layoutParams = FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            dataBinding.layoutGame.post {
+                dataBinding.layoutGame.addView(editContainerKey, layoutParams)
+            }
+        } else if (editContainerKey?.isShow != true) {
+            editContainerKey?.setContainerKeyInfo(keyInfo)
+            editContainerKey?.showBoard()
+        }
     }
 
     private fun showRestoreCustomDialog() {
@@ -912,6 +981,12 @@ class AtGameActivity : AppCompatActivity() {
 
                             KeyType.ROCKER_LETTER, KeyType.ROCKER_ARROW -> {
                                 dataBinding.gameController.addRocker(
+                                    keyInfo,
+                                    AppVirtualOperateType.APP_KEYBOARD
+                                )
+                            }
+                            KeyType.KEY_SHOT -> {
+                                dataBinding.gameController.addShotKey(
                                     keyInfo,
                                     AppVirtualOperateType.APP_KEYBOARD
                                 )
@@ -1143,6 +1218,9 @@ class AtGameActivity : AppCompatActivity() {
             "addSuccess", "updateSuccess" -> {
                 exitCustom()
                 KeyboardListView.show(dataBinding.layoutGame)
+                if (GameManager.getGameParam()?.isVip() != true) {
+                    dataBinding.gameController.restoreOriginal()
+                }
             }
         }
     }
@@ -1169,10 +1247,16 @@ class AtGameActivity : AppCompatActivity() {
                 override fun onCombineKeyEdit(keyInfo: KeyInfo) {
                     controllerEditLayout?.hideLayout(object : AnimatorListenerImp() {
                         override fun onAnimationEnd(animation: Animator) {
-                            if (keyInfo.type == KeyType.KEY_COMBINE || keyInfo.type == KeyType.GAMEPAD_COMBINE) {
-                                showEditCombineKeyLayout(keyInfo)
-                            } else if (keyInfo.type == KeyType.KEY_ROULETTE || keyInfo.type == KeyType.GAMEPAD_ROULETTE) {
-                                showEditRouletteKeyLayout(keyInfo)
+                            when (keyInfo.type) {
+                                KeyType.KEY_COMBINE, KeyType.GAMEPAD_COMBINE -> {
+                                    showEditCombineKeyLayout(keyInfo)
+                                }
+                                KeyType.KEY_ROULETTE, KeyType.GAMEPAD_ROULETTE -> {
+                                    showEditRouletteKeyLayout(keyInfo)
+                                }
+                                KeyType.KEY_CONTAINER -> {
+                                    showEditContainerKeyLayout(keyInfo)
+                                }
                             }
                         }
                     })
@@ -1204,26 +1288,6 @@ class AtGameActivity : AppCompatActivity() {
     fun onControllerEditEvent(event: ControllerEditEvent) {
         dataBinding.gameController.controllerChange(event.type)
         exitCustom()
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onControllerChangeEvent(event: ControllerChangeEvent) {
-        when (event.type) {
-            0 -> {
-                dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
-                gameSettings?.controllerType = AppVirtualOperateType.NONE
-            }
-
-            1 -> {
-                dataBinding.gameController.controllerType = AppVirtualOperateType.APP_KEYBOARD
-                gameSettings?.controllerType = AppVirtualOperateType.APP_KEYBOARD
-            }
-
-            2 -> {
-                dataBinding.gameController.controllerType = AppVirtualOperateType.APP_STICK_XBOX
-                gameSettings?.controllerType = AppVirtualOperateType.APP_STICK_XBOX
-            }
-        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -1386,11 +1450,11 @@ class AtGameActivity : AppCompatActivity() {
         var controllerType = AppVirtualOperateType.NONE
         if (!pcMouseMode) {
             if (GameManager.lastControllerType == AppVirtualOperateType.NONE) {
-                when(GameManager.getGameParam()?.defaultOperation ?: GameConstants.gamepadConfig) {
-                    GameConstants.keyboardConfig -> {
+                when(GameManager.getGameParam()?.defaultOperation ?: GameConstants.keyboardControl) {
+                    GameConstants.keyboardControl -> {
                         controllerType = AppVirtualOperateType.APP_KEYBOARD
                     }
-                    GameConstants.gamepadConfig -> {
+                    GameConstants.gamepadControl -> {
                         controllerType = AppVirtualOperateType.APP_STICK_XBOX
                     }
                 }

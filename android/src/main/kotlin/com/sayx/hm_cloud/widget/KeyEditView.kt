@@ -2,7 +2,6 @@ package com.sayx.hm_cloud.widget
 
 import android.content.Context
 import android.text.Editable
-import android.text.TextUtils
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -159,7 +158,8 @@ class KeyEditView @JvmOverloads constructor(
                     keyInfo.type == KeyType.KEYBOARD_MOUSE_MIDDLE || keyInfo.type == KeyType.KEYBOARD_KEY
         val editable =
             keyInfo.type == KeyType.KEY_COMBINE || keyInfo.type == KeyType.GAMEPAD_COMBINE ||
-                    keyInfo.type == KeyType.KEY_ROULETTE || keyInfo.type == KeyType.GAMEPAD_ROULETTE
+                    keyInfo.type == KeyType.KEY_ROULETTE || keyInfo.type == KeyType.GAMEPAD_ROULETTE ||
+                    keyInfo.type == KeyType.KEY_CONTAINER
         val mapAble = keyInfo.type == KeyType.KEYBOARD_KEY || keyInfo.type == KeyType.KEY_COMBINE
         dataBinding.layoutKeyName.visibility = if (nameable) VISIBLE else GONE
         dataBinding.layoutKeyInteract.visibility = if (clickable) VISIBLE else GONE
@@ -179,7 +179,7 @@ class KeyEditView @JvmOverloads constructor(
         }
         // 移除上个添加的View
         when (val view = dataBinding.layoutPreview[0]) {
-            is KeyView, is RockerView, is CombineKeyView, is RouletteKeyView -> {
+            is KeyView, is RockerView, is CombineKeyView, is RouletteKeyView, is ContainerKeyView, is ShotKeyView -> {
                 dataBinding.layoutPreview.removeView(view)
             }
         }
@@ -215,6 +215,15 @@ class KeyEditView @JvmOverloads constructor(
             KeyType.KEY_ROULETTE -> {
                 dataBinding.tvInfo.text = ""
                 previewView = addRouletteKey()
+            }
+
+            KeyType.KEY_CONTAINER -> {
+                dataBinding.tvInfo.text = mKeyInfo.containerArr?.map { info -> getRouletteKeyText(info) }?.toList()?.joinToString(" + ")
+                previewView = addContainerKey()
+            }
+
+            KeyType.KEY_SHOT -> {
+                previewView = addShotKey()
             }
 
             else -> {
@@ -268,6 +277,14 @@ class KeyEditView @JvmOverloads constructor(
                 }
 
                 is RouletteKeyView -> {
+                    it.setKeyInfo(mKeyInfo)
+                }
+
+                is ContainerKeyView -> {
+                    it.setKeyInfo(mKeyInfo)
+                }
+
+                is ShotKeyView -> {
                     it.setKeyInfo(mKeyInfo)
                 }
             }
@@ -425,6 +442,32 @@ class KeyEditView @JvmOverloads constructor(
 
     private fun addRouletteKey(): View {
         val keyView = RouletteKeyView(context)
+        keyView.needDrawShadow = false
+        keyView.setKeyInfo(mKeyInfo)
+        val layoutParams = FrameLayout.LayoutParams(
+            AppSizeUtils.convertViewSize(mKeyInfo.getKeyWidth()),
+            AppSizeUtils.convertViewSize(mKeyInfo.getKeyHeight())
+        )
+        layoutParams.gravity = Gravity.CENTER
+        dataBinding.layoutPreview.addView(keyView, 0, layoutParams)
+        return keyView
+    }
+
+    private fun addContainerKey(): View {
+        val keyView = ContainerKeyView(context)
+        keyView.needDrawShadow = false
+        keyView.setKeyInfo(mKeyInfo)
+        val layoutParams = FrameLayout.LayoutParams(
+            AppSizeUtils.convertViewSize(mKeyInfo.getKeyWidth()),
+            AppSizeUtils.convertViewSize(mKeyInfo.getKeyHeight())
+        )
+        layoutParams.gravity = Gravity.CENTER
+        dataBinding.layoutPreview.addView(keyView, 0, layoutParams)
+        return keyView
+    }
+
+    private fun addShotKey(): View {
+        val keyView = ShotKeyView(context)
         keyView.needDrawShadow = false
         keyView.setKeyInfo(mKeyInfo)
         val layoutParams = FrameLayout.LayoutParams(

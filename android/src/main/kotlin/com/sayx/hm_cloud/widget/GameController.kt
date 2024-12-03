@@ -3,17 +3,15 @@ package com.sayx.hm_cloud.widget
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.core.view.get
 import androidx.databinding.DataBindingUtil
 import com.blankj.utilcode.util.LogUtils
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonObject
 import com.sayx.hm_cloud.GameManager
 import com.sayx.hm_cloud.R
 import com.sayx.hm_cloud.callback.ControllerEventCallback
@@ -115,6 +113,9 @@ class GameController @JvmOverloads constructor(
                 if (view is RouletteKeyView) {
                     view.showRoulette = value
                     view.invalidate()
+                } else if (view is ContainerKeyView) {
+                    view.showItems(true)
+                    view.invalidate()
                 } else if (view.visibility == VISIBLE) {
                     view.invalidate()
                 }
@@ -190,10 +191,6 @@ class GameController @JvmOverloads constructor(
                     addCombineKey(keyInfo)
                 }
 
-//                KeyType.GAMEPAD_ROULETTE -> {
-//                    addRouletteKey(keyInfo)
-//                }
-
                 else -> {
                     LogUtils.e("initGamepad:$keyInfo")
                 }
@@ -230,6 +227,14 @@ class GameController @JvmOverloads constructor(
 
                 KeyType.KEY_ROULETTE -> {
                     addRouletteKey(keyInfo)
+                }
+
+                KeyType.KEY_CONTAINER -> {
+                    addContainerKey(keyInfo)
+                }
+
+                KeyType.KEY_SHOT -> {
+                    addShotKey(keyInfo)
                 }
 
                 else -> {
@@ -787,6 +792,115 @@ class GameController @JvmOverloads constructor(
         return keyView
     }
 
+    private fun addContainerKey(keyInfo: KeyInfo) : ContainerKeyView {
+        val keyView = ContainerKeyView(context)
+        keyView.setKeyInfo(keyInfo)
+        keyView.setOnClickListener {
+            if (controllerStatus == ControllerStatus.Edit) {
+                currentKey?.let { info ->
+                    val view = findKeyView(this, info)
+                    view?.isActivated = false
+                    view?.invalidate()
+                }
+                it.isActivated = true
+                keyView.invalidate()
+                currentKey = keyInfo
+                currentKey?.let { info ->
+                    listener?.onEditKeyClick(info)
+                }
+            }
+        }
+        keyView.keyEventListener = keyEventListener
+        keyView.positionListener = object : OnPositionChangeListener {
+            override fun onPositionChange(left: Int, top: Int, right: Int, bottom: Int) {
+                if (controllerStatus == ControllerStatus.Edit) {
+                    currentKey?.let { info ->
+                        val view = findKeyView(this@GameController, info)
+                        view?.isActivated = false
+                        view?.invalidate()
+                    }
+                    keyView.isActivated = true
+                    keyView.invalidate()
+                    currentKey = keyInfo
+                    currentKey?.let { info ->
+                        info.changePosition(
+                            AppSizeUtils.reconvertWidthSize(left),
+                            AppSizeUtils.reconvertHeightSize(top),
+                        )
+                        listener?.onEditKeyClick(info)
+                    }
+                }
+            }
+        }
+        keyView.tag = keyInfo.id
+        if (controllerType == AppVirtualOperateType.APP_STICK_XBOX) {
+            gamepadViews.add(keyView)
+        }
+        if (controllerType == AppVirtualOperateType.APP_KEYBOARD) {
+            keyboardViews.add(keyView)
+        }
+        addView(keyView)
+        keyView.post {
+            keyView.x = AppSizeUtils.convertWidthSize(keyInfo.left).toFloat()
+            keyView.y = AppSizeUtils.convertHeightSize(keyInfo.top).toFloat()
+        }
+        return keyView
+    }
+
+    private fun addShotKey(keyInfo: KeyInfo) : ShotKeyView {
+        val keyView = ShotKeyView(context)
+        keyView.setKeyInfo(keyInfo)
+        keyView.tag = keyInfo.id
+        keyView.setOnClickListener {
+            if (controllerStatus == ControllerStatus.Edit) {
+                currentKey?.let { info ->
+                    val view = findKeyView(this, info)
+                    view?.isActivated = false
+                    view?.invalidate()
+                }
+                it.isActivated = true
+                keyView.invalidate()
+                currentKey = keyInfo
+                currentKey?.let { info ->
+                    listener?.onEditKeyClick(info)
+                }
+            }
+        }
+        keyView.onKeyTouchListener = object : OnKeyTouchListener {
+            override fun onKeyTouch(touch: Boolean) {
+                keyEventListener?.onButtonPress(keyInfo, touch)
+            }
+        }
+        keyView.positionListener = object : OnPositionChangeListener {
+            override fun onPositionChange(left: Int, top: Int, right: Int, bottom: Int) {
+                if (controllerStatus == ControllerStatus.Edit) {
+                    currentKey?.let { info ->
+                        val view = findKeyView(this@GameController, info)
+                        view?.isActivated = false
+                        view?.invalidate()
+                    }
+                    keyView.isActivated = true
+                    keyView.invalidate()
+                    currentKey = keyInfo
+                    currentKey?.let { info ->
+                        info.changePosition(
+                            AppSizeUtils.reconvertWidthSize(left),
+                            AppSizeUtils.reconvertHeightSize(top),
+                        )
+                        listener?.onEditKeyClick(info)
+                    }
+                }
+            }
+        }
+        keyboardViews.add(keyView)
+        addView(keyView)
+        keyView.post {
+            keyView.x = AppSizeUtils.convertWidthSize(keyInfo.left).toFloat()
+            keyView.y = AppSizeUtils.convertHeightSize(keyInfo.top).toFloat()
+        }
+        return keyView
+    }
+
     fun addKey(keyInfo: KeyInfo) {
         if (controllerType == AppVirtualOperateType.APP_STICK_XBOX) {
             editGamepadKeys.add(keyInfo)
@@ -807,10 +921,6 @@ class GameController @JvmOverloads constructor(
                 KeyType.GAMEPAD_COMBINE -> {
                     addCombineKey(keyInfo)
                 }
-
-//                KeyType.GAMEPAD_ROULETTE -> {
-//                    addRouletteKey(keyInfo)
-//                }
 
                 else -> {
                     LogUtils.e("initGamepad:$keyInfo")
@@ -834,6 +944,14 @@ class GameController @JvmOverloads constructor(
 
                 KeyType.KEY_ROULETTE -> {
                     addRouletteKey(keyInfo)
+                }
+
+                KeyType.KEY_CONTAINER -> {
+                    addContainerKey(keyInfo)
+                }
+
+                KeyType.KEY_SHOT -> {
+                    addShotKey(keyInfo)
                 }
 
                 else -> {
@@ -946,6 +1064,40 @@ class GameController @JvmOverloads constructor(
         currentKey?.let { info ->
             val view = findKeyView(this@GameController, info)
             LogUtils.d("unActivated:${view?.javaClass?.simpleName}")
+            view?.isActivated = false
+            view?.invalidate()
+        }
+        keyView.isActivated = true
+        keyView.invalidate()
+        currentKey = keyInfo
+    }
+
+    fun addContainerKey(keyInfo: KeyInfo, type: AppVirtualOperateType) {
+        if (type == AppVirtualOperateType.APP_KEYBOARD) {
+            editKeyboardKeys.add(keyInfo)
+            keyInfo.containerArr?.forEach { keyData ->
+                editKeyboardKeys.remove(keyData)
+                removeView(findKeyView(this, keyData))
+            }
+        }
+        val keyView = addContainerKey(keyInfo)
+        currentKey?.let { info ->
+            val view = findKeyView(this@GameController, info)
+//            LogUtils.d("unActivated:${view?.javaClass?.simpleName}")
+            view?.isActivated = false
+            view?.invalidate()
+        }
+        keyView.isActivated = true
+        keyView.invalidate()
+        currentKey = keyInfo
+    }
+
+    fun addShotKey(keyInfo: KeyInfo, type: AppVirtualOperateType) {
+        editKeyboardKeys.add(keyInfo)
+        val keyView = addShotKey(keyInfo)
+        currentKey?.let { info ->
+            val view = findKeyView(this@GameController, info)
+//            LogUtils.d("unActivated:${view?.javaClass?.simpleName}")
             view?.isActivated = false
             view?.invalidate()
         }
@@ -1078,14 +1230,8 @@ class GameController @JvmOverloads constructor(
         dataBinding.layoutMask.clearLine()
     }
 
-    fun updateKey() {
-        currentKey?.let {
-            updateKey(it)
-        }
-    }
-
     fun updateKey(keyInfo: KeyInfo) {
-        LogUtils.v("updateKey->\ncurrent:$currentKey\nnew:$keyInfo")
+//        LogUtils.v("updateKey->\ncurrent:$currentKey\nnew:$keyInfo")
         if (controllerType == AppVirtualOperateType.APP_STICK_XBOX) {
             currentKey = editGamepadKeys.find { info -> info.id == keyInfo.id }
             currentKey?.copyFrom(keyInfo)
@@ -1107,6 +1253,12 @@ class GameController @JvmOverloads constructor(
                     view.setKeyInfo(it)
                 }
                 if (view is RouletteKeyView) {
+                    view.setKeyInfo(it)
+                }
+                if (view is ContainerKeyView) {
+                    view.setKeyInfo(it)
+                }
+                if (view is ShotKeyView) {
                     view.setKeyInfo(it)
                 }
             }
@@ -1138,6 +1290,18 @@ class GameController @JvmOverloads constructor(
                         } else {
                             LogUtils.e("deleteKey: $controllerType")
                         }
+                    } else if (view is ContainerKeyView) {
+                        it.containerArr?.forEach { info ->
+                            list.add(info)
+                        }
+                        list.remove(currentKey)
+                        if (controllerType == AppVirtualOperateType.APP_STICK_XBOX) {
+                            initGamepad(list.toList())
+                        } else if (controllerType == AppVirtualOperateType.APP_KEYBOARD) {
+                            initKeyboard(list.toList())
+                        } else {
+                            LogUtils.e("deleteKey: $controllerType")
+                        }
                     } else {
                         list.remove(currentKey)
                     }
@@ -1156,7 +1320,7 @@ class GameController @JvmOverloads constructor(
 //        LogUtils.d("findKeyView:$viewGroup, childCount:${viewGroup.childCount}")
         for (index in 0..<childCount) {
             when (val childView = viewGroup.getChildAt(index)) {
-                is KeyView, is RockerView, is CombineKeyView, is RouletteKeyView -> {
+                is KeyView, is RockerView, is CombineKeyView, is RouletteKeyView, is ContainerKeyView, is ShotKeyView -> {
 //                    LogUtils.d("childView:{tag:${childView.tag}}, keyInfo:{id:${keyInfo.id}}")
                     if (childView.tag == keyInfo.id) {
 //                        LogUtils.d("findKeyView:${childView.tag}, $keyInfo")
@@ -1253,7 +1417,7 @@ class GameController @JvmOverloads constructor(
 
     private fun hideAllKey() {
         children.iterator().forEach {
-            if ((it is KeyView) or (it is RockerView) or (it is CombineKeyView) or (it is RouletteKeyView)) {
+            if (it is KeyView|| it is RockerView || it is CombineKeyView || it is RouletteKeyView || it is ContainerKeyView || it is ShotKeyView) {
                 it.visibility = View.INVISIBLE
             }
         }

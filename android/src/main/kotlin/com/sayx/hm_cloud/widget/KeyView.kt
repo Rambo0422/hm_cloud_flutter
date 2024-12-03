@@ -63,6 +63,11 @@ class KeyView @JvmOverloads constructor(
             isSelected = value
         }
 
+    private val bgPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.parseColor("#3CFFFFFF")
+        style = Paint.Style.FILL
+    }
+
     init {
         setWillNotDraw(false)
     }
@@ -121,19 +126,6 @@ class KeyView @JvmOverloads constructor(
         }
         dataBinding.tvName.visibility = VISIBLE
         dataBinding.ivIcon.visibility = INVISIBLE
-    }
-
-    private val bgPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#3CFFFFFF")
-        style = Paint.Style.FILL
-    }
-
-    override fun onDraw(canvas: Canvas) {
-        super.onDraw(canvas)
-        if (needDrawShadow && (controllerStatus == ControllerStatus.Edit || controllerStatus == ControllerStatus.Roulette)) {
-            bgPaint.color = if (isActivated) Color.parseColor("#8CC6EC4B") else Color.parseColor("#3CFFFFFF")
-            canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), bgPaint)
-        }
     }
 
     private fun showKeyboardMouse(keyInfo: KeyInfo) {
@@ -235,10 +227,11 @@ class KeyView @JvmOverloads constructor(
         }
     }
 
-    fun updateText(text: String?) {
-        if (dataBinding.tvName.visibility == VISIBLE) {
-            dataBinding.tvName.text = text
-            LogUtils.d("updateText:$text")
+    override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+        if (needDrawShadow && (controllerStatus == ControllerStatus.Edit || controllerStatus == ControllerStatus.Roulette)) {
+            bgPaint.color = if (isActivated) Color.parseColor("#8CC6EC4B") else Color.parseColor("#3CFFFFFF")
+            canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), bgPaint)
         }
     }
 

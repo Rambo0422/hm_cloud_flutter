@@ -13,6 +13,8 @@ interface EditCallback {
 
     fun onAddRouletteKey()
 
+    fun onAddContainerKey()
+
     fun onRestoreDefault()
 
     fun onDeleteKey()

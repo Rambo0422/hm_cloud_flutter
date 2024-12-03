@@ -30,13 +30,14 @@ import com.sayx.hm_cloud.model.Direction
 import com.sayx.hm_cloud.model.GameParam
 import com.sayx.hm_cloud.model.KeyInfo
 import com.sayx.hm_cloud.utils.GameUtils
+import com.sayx.hm_cloud.widget.ATGameView
 import org.json.JSONObject
 
 object AnTongSDK {
 
     const val TYPE = "at_pc"
     const val CHANNEL_TYPE = "at"
-    var anTongVideoView: AnTongVideoView? = null
+    var anTongVideoView: ATGameView? = null
     private var mRequestDeviceSuccess: RequestDeviceSuccess? = null
     private var ACCESS_KEY_ID = ""
     private var isInit = false
@@ -64,7 +65,7 @@ object AnTongSDK {
         this.mRequestDeviceSuccess = requestDeviceSuccess
 
         if (anTongVideoView == null) {
-            anTongVideoView = AnTongVideoView(context)
+            anTongVideoView = ATGameView(context)
         }
         anTongVideoView?.setHmcpPlayerListener(mAnTongPlayerListener)
 
@@ -186,19 +187,22 @@ object AnTongSDK {
                         val dataStr = jsonObject.getString(StatusCallbackUtil.DATA)
                         if (dataStr is String && !TextUtils.isEmpty(dataStr)) {
                             val resultData = GameManager.gson.fromJson(dataStr, Map::class.java)
-                            mRequestDeviceSuccess?.onQueueTime((resultData["avg_time"] as Number?)?.toInt() ?: 300)
+                            mRequestDeviceSuccess?.onQueueStatus((resultData["avg_time"] as Number?)?.toInt() ?: 300, (resultData["ranking"] as Number?)?.toInt() ?: 1)
                         } else {
                             LogUtils.e("queue info error:$dataStr")
                         }
                     }
 //                    Constants.STATUS_APP_ID_ERROR,
                     Constants.STATUS_NOT_FOND_GAME,
+                    Constants.STATUS_TOKEN_INVALID,
                     Constants.STATUS_SIGN_FAILED,
                     Constants.STATUS_STOP_PLAY,
                     Constants.STATUS_CONN_FAILED,
                     Constants.STATUS_FINISH_WAIT,
                     Constants.STATUS_START_QUEUE_FAILED,
-                    300010,101001,201011 -> {
+                    300010,
+                    101001,
+                    201011 -> {
                         uploadErrorCode(status)
                         val errorMessage =
                             jsonObject.optString(StatusCallbackUtil.DATA, "服务器异常")
@@ -977,7 +981,7 @@ open class OnKeyEventListenerImp : OnKeyEventListener {
 //                LogUtils.d("key:${keyInfo.text}, inputOp:${oneInputOpData.inputOp}, value:${oneInputOpData.value}, result:$result")
             }
             // 键盘按键，鼠标左中右键
-            KeyType.KEYBOARD_KEY, KeyType.KEYBOARD_MOUSE_LEFT, KeyType.KEYBOARD_MOUSE_RIGHT, KeyType.KEYBOARD_MOUSE_MIDDLE -> {
+            KeyType.KEYBOARD_KEY, KeyType.KEYBOARD_MOUSE_LEFT, KeyType.KEYBOARD_MOUSE_RIGHT, KeyType.KEYBOARD_MOUSE_MIDDLE, KeyType.KEY_SHOT -> {
                 val inputOp = HMInputOpData()
                 val oneInputOpData = HMInputOpData.HMOneInputOPData()
                 oneInputOpData.inputState = if (press) HMInputOpData.HMOneInputOPData_InputState.HMOneInputOPData_InputState_OpStateDown else

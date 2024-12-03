@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/layout_items_left"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:visibility="gone"
+            tools:visibility="visible"
+            android:orientation="horizontal" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/shape_container_arrow"
+            tools:paddingHorizontal="4.5dp"
+            tools:layout_width="22dp"
+            tools:layout_height="48dp"
+            tools:paddingVertical="15dp"
+            tools:src="@drawable/icon_container_arrow_right" />
+
+        <LinearLayout
+            android:id="@+id/layout_items_right"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:visibility="gone"
+            tools:visibility="visible"
+            android:orientation="horizontal" />
+    </LinearLayout>
+</layout>

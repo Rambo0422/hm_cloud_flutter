@@ -22,6 +22,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.sayx.hm_cloud.R
 import com.sayx.hm_cloud.callback.OnPositionChangeListener
 import com.sayx.hm_cloud.constants.ControllerStatus
+import com.sayx.hm_cloud.constants.KeyType
 import com.sayx.hm_cloud.constants.controllerStatus
 import com.sayx.hm_cloud.model.CallBackMode
 import com.sayx.hm_cloud.model.Direction
@@ -80,6 +81,7 @@ class RockerView @JvmOverloads constructor(
     private var arrowDstRect = Rect()
 
     private var showArrow = false
+    private var showBackground = false
 
     private var arrowAngle = 270.0f
 
@@ -97,6 +99,8 @@ class RockerView @JvmOverloads constructor(
     private var firstTouchId = 0
 
     var needDrawShadow = true
+
+    private var keyInfo : KeyInfo? = null
 
     init {
         setWillNotDraw(false)
@@ -190,6 +194,7 @@ class RockerView @JvmOverloads constructor(
     }
 
     fun setKeyInfo(keyInfo: KeyInfo) {
+        this.keyInfo = keyInfo
         alpha = keyInfo.opacity / 100f
         val layoutParams = FrameLayout.LayoutParams(
             AppSizeUtils.convertViewSize(keyInfo.getKeyWidth()),
@@ -204,6 +209,7 @@ class RockerView @JvmOverloads constructor(
         super.onDraw(canvas)
         if (needDrawShadow && (controllerStatus == ControllerStatus.Edit || controllerStatus == ControllerStatus.Roulette)) {
             bgPaint.color = if (isActivated) Color.parseColor("#8CC6EC4B") else Color.parseColor("#3CFFFFFF")
+            showBackground = true
             canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), bgPaint)
         }
         val cx = width / 2
@@ -220,25 +226,35 @@ class RockerView @JvmOverloads constructor(
             rockerCenterPosition.set(centerPoint.x, centerPoint.y)
         }
 
-        // 画可移动区域
-        if (BACKGROUND_MODE_PIC == backgroundDrawableMode || BACKGROUND_MODE_XML == backgroundDrawableMode) {
-            // 图片
-            backgroundBitmap?.let {
-                backgroundSrcRect.set(0, 0, it.width, it.height)
-                backgroundDstRect.set(
-                    centerPoint.x - backgroundRadius,
-                    centerPoint.y - backgroundRadius,
-                    centerPoint.x + backgroundRadius,
-                    centerPoint.y + backgroundRadius
-                )
-                canvas.drawBitmap(it, backgroundSrcRect, backgroundDstRect, backgroundPaint)
-            }
-        } else if (BACKGROUND_MODE_COLOR == backgroundDrawableMode) {
-            // 色值
-            backgroundPaint.color = backgroundColor
-            canvas.drawCircle(centerPoint.x.toFloat(), centerPoint.y.toFloat(), backgroundRadius.toFloat(), backgroundPaint)
+        if (showBackground || keyInfo?.type == KeyType.ROCKER_RIGHT || keyInfo?.type == KeyType.ROCKER_CROSS || keyInfo?.type == KeyType.ROCKER_LEFT) {
+            drawBackground(canvas)
         }
 
+        drawRocker(canvas)
+
+        if (showArrow) {
+            drawArrow(canvas)
+        }
+    }
+
+    private fun drawArrow(canvas: Canvas) {
+        // 画箭头
+        if (ARROW_MODE_PIC == arrowDrawableMode || ARROW_MODE_XML == arrowDrawableMode) {
+            arrowBitmap?.let {
+                arrowSrcRect.set(0, 0, it.width, it.height)
+                arrowDstRect.set(
+                    centerPoint.x - arrowRadius,
+                    centerPoint.y - arrowRadius,
+                    centerPoint.x + arrowRadius,
+                    centerPoint.y + arrowRadius
+                )
+                canvas.rotate(arrowAngle + 90f, centerPoint.x.toFloat(), centerPoint.y.toFloat())
+                canvas.drawBitmap(it, arrowSrcRect, arrowDstRect, arrowPaint)
+            }
+        }
+    }
+
+    private fun drawRocker(canvas: Canvas) {
         // 画摇杆
         if (ROCKER_MODE_PIC == rockerDrawableMode || ROCKER_MODE_XML == rockerDrawableMode) {
             rockerRadius = (arrowRadius / 2.5).toInt()
@@ -258,22 +274,26 @@ class RockerView @JvmOverloads constructor(
             rockerPaint.color = rockerColor
             canvas.drawCircle(rockerCenterPosition.x.toFloat(), rockerCenterPosition.y.toFloat(), rockerRadius.toFloat(), rockerPaint)
         }
+    }
 
-        // 画箭头
-        if (ARROW_MODE_PIC == arrowDrawableMode || ARROW_MODE_XML == arrowDrawableMode) {
-            if (showArrow) {
-                arrowBitmap?.let {
-                    arrowSrcRect.set(0, 0, it.width, it.height)
-                    arrowDstRect.set(
-                        centerPoint.x - arrowRadius,
-                        centerPoint.y - arrowRadius,
-                        centerPoint.x + arrowRadius,
-                        centerPoint.y + arrowRadius
-                    )
-                    canvas.rotate(arrowAngle + 90f, centerPoint.x.toFloat(), centerPoint.y.toFloat())
-                    canvas.drawBitmap(it, arrowSrcRect, arrowDstRect, arrowPaint)
-                }
+    private fun drawBackground(canvas: Canvas) {
+        // 画可移动区域
+        if (BACKGROUND_MODE_PIC == backgroundDrawableMode || BACKGROUND_MODE_XML == backgroundDrawableMode) {
+            // 图片
+            backgroundBitmap?.let {
+                backgroundSrcRect.set(0, 0, it.width, it.height)
+                backgroundDstRect.set(
+                    centerPoint.x - backgroundRadius,
+                    centerPoint.y - backgroundRadius,
+                    centerPoint.x + backgroundRadius,
+                    centerPoint.y + backgroundRadius
+                )
+                canvas.drawBitmap(it, backgroundSrcRect, backgroundDstRect, backgroundPaint)
             }
+        } else if (BACKGROUND_MODE_COLOR == backgroundDrawableMode) {
+            // 色值
+            backgroundPaint.color = backgroundColor
+            canvas.drawCircle(centerPoint.x.toFloat(), centerPoint.y.toFloat(), backgroundRadius.toFloat(), backgroundPaint)
         }
     }
 
@@ -360,6 +380,7 @@ class RockerView @JvmOverloads constructor(
                             moveRocker(centerPoint)
                             showArrow = false
                             invalidate()
+                            handler.postDelayed(runnable, 5000L)
                         }
                     }
                 }
@@ -371,16 +392,26 @@ class RockerView @JvmOverloads constructor(
                         moveRocker(centerPoint)
                         showArrow = false
                         invalidate()
+                        if (controllerStatus == ControllerStatus.Normal) {
+                            handler.postDelayed(runnable, 5000L)
+                        }
                     }
                 }
 
                 MotionEvent.ACTION_POINTER_DOWN -> {
-                    LogUtils.d("onTouchEventPOINTERDOWN:${it.getPointerId(it.actionIndex)}, $firstTouchId")
+//                    LogUtils.d("onTouchEventPOINTERDOWN:${it.getPointerId(it.actionIndex)}, $firstTouchId")
                 }
             }
-            return it.getPointerId(it.actionIndex) == firstTouchId
+            return super.onTouchEvent(event)
         }
         return super.onTouchEvent(event)
+    }
+
+    private val runnable = Runnable {
+        if (showBackground) {
+            showBackground = false
+            invalidate()
+        }
     }
 
     private fun getRockerPositionPoint(touchPoint: Point) {
@@ -403,6 +434,7 @@ class RockerView @JvmOverloads constructor(
         }
 
         moveRocker(point)
+        showBackground = true
         showArrow = true
         invalidate()
 

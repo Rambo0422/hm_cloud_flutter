@@ -16,7 +16,6 @@ import com.blankj.utilcode.util.ThreadUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import com.haima.hmcp.BuildConfig
 import com.haima.hmcp.Constants
 import com.haima.hmcp.HmcpManager
 import com.haima.hmcp.beans.CheckCloudServiceResult
@@ -35,6 +34,7 @@ import com.haima.hmcp.listeners.OnUpdataGameUIDListener
 import com.haima.hmcp.utils.StatusCallbackUtil
 import com.haima.hmcp.widgets.HmcpVideoView
 import com.haima.hmcp.widgets.beans.VirtualOperateType
+import com.sayx.hm_cloud.BuildConfig.*
 import com.sayx.hm_cloud.callback.KeyboardListCallback
 import com.sayx.hm_cloud.callback.RequestDeviceSuccess
 import com.sayx.hm_cloud.constants.AppVirtualOperateType
@@ -63,6 +63,7 @@ import com.sayx.hm_cloud.model.TimeUpdateEvent
 import com.sayx.hm_cloud.model.UserRechargeStatusEvent
 import com.sayx.hm_cloud.utils.GameUtils
 import com.sayx.hm_cloud.utils.TimeUtils
+import com.sayx.hm_cloud.widget.HMGameView
 import com.sayx.hm_cloud.widget.KeyboardListView
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -89,7 +90,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         return gameParam
     }
 
-    var gameView: HmcpVideoView? = null
+    var gameView: HMGameView? = null
 
     // 此处绑定的是HMCloudPlugin挂载的activity
     private lateinit var activity: Activity
@@ -148,7 +149,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         this.channel = channel
         this.activity = context
         LogUtils.getConfig().also {
-            it.isLogSwitch = BuildConfig.DEBUG
+            it.isLogSwitch = DEBUG
             it.globalTag = "GameManager"
         }
     }
@@ -477,13 +478,14 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                 gameParam!!,
                 archiveData,
                 object : RequestDeviceSuccess {
-                    override fun onQueueTime(time: Int) {
+                    override fun onQueueStatus(time: Int, rank: Int) {
                         inQueue = true
                         activity.runOnUiThread {
                             channel.invokeMethod(
                                 "queueInfo",
                                 mapOf(
-                                    Pair("queueTime", time)
+                                    Pair("queueTime", time),
+                                    Pair("rank", rank),
                                 )
                             )
                         }
@@ -505,7 +507,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                         LogUtils.d("onRequestDeviceFailed errorMessage: $errorMessage")
                         activity.runOnUiThread {
                             channel.invokeMethod(
-                                "errorInfo",
+                                "errorInfo_at",
                                 mapOf(Pair("errorCode", "$status"), Pair("errorMsg", errorMessage))
                             )
                         }
@@ -629,7 +631,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                 releaseGame(finish = "0", bundle)
             }
         } else {
-            gameView = HmcpVideoView(activity)
+            gameView = HMGameView(activity)
             gameView?.setUserInfo(UserInfo().also {
                 it.userId = gameParam?.userId
                 it.userToken = gameParam?.userToken
@@ -1170,7 +1172,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                     info?.use = 0
                     KeyboardListView.updateKeyboard(keyboardList, "useSuccess")
                 }
-                keyboardInfo.use = 1
                 EventBus.getDefault().post(ControllerConfigEvent(keyboardInfo))
             }
         })
@@ -1670,7 +1671,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
     }
 
     private fun initHmcpView(userInfo: UserInfo) {
-        gameView = HmcpVideoView(activity)
+        gameView = HMGameView(activity)
         gameView?.setUserInfo(userInfo)
 
         gameView?.hmcpPlayerListener = this

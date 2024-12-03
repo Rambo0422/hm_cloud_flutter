@@ -38,7 +38,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:text="@string/edit_combine_key_tips"
+                android:text="@string/edit_roulette_key_tips"
                 android:textColor="@android:color/white"
                 android:textSize="10sp"
                 app:layout_constraintBottom_toBottomOf="parent"

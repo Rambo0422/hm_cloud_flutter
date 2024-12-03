@@ -179,6 +179,7 @@ class AddKeyboardKey @JvmOverloads constructor(
         dataBinding.btnKeyLeft.setOnClickListener(this)
         dataBinding.btnKeyDown.setOnClickListener(this)
         dataBinding.btnKeyRight.setOnClickListener(this)
+        dataBinding.btnEditShotKey.setOnClickListener(this)
         dataBinding.btnEditArrowPad.setOnClickListener(this)
         dataBinding.btnEditLetterPad.setOnClickListener(this)
     }
@@ -230,10 +231,10 @@ class AddKeyboardKey @JvmOverloads constructor(
         val left = AppSizeUtils.DESIGN_WIDTH / 2
         val top = AppSizeUtils.DESIGN_HEIGHT / 2
         var width = 48
-        var zoom = 50
+        val zoom = 50
         val text: String? = if (v is TextView) v.text?.toString() else null
         var type = ""
-        var optical = 70
+        val optical = 70
         var inputOp = 0
         var height = 48
         var remark = 0
@@ -480,19 +481,23 @@ class AddKeyboardKey @JvmOverloads constructor(
                 type = KeyType.KEYBOARD_MOUSE_DOWN
             }
 
+            R.id.btn_edit_shot_key -> {
+                width = 64
+                height = 64
+                type = KeyType.KEY_SHOT
+                inputOp =
+                    HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpMouseButtonLeft.value
+            }
+
             R.id.btn_edit_arrow_pad -> {
                 width = 144
                 height = 144
-                optical = 70
-                zoom = 50
                 type = KeyType.ROCKER_ARROW
             }
 
             R.id.btn_edit_letter_pad -> {
                 width = 144
                 height = 144
-                optical = 70
-                zoom = 50
                 type = KeyType.ROCKER_LETTER
             }
         }

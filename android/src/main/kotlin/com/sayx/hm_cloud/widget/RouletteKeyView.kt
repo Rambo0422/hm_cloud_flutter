@@ -77,8 +77,6 @@ class RouletteKeyView @JvmOverloads constructor(
 
     var needDrawShadow = true
 
-    lateinit var keyInfoData: KeyInfo
-
     init {
         arcPaint.style = Paint.Style.FILL_AND_STROKE
         arcPaint.isDither = true
@@ -227,7 +225,6 @@ class RouletteKeyView @JvmOverloads constructor(
         )
         this.layoutParams = layoutParams
         this.alpha = keyInfo.opacity / 100f
-        this.keyInfoData = keyInfo
         thumbText = keyInfo.text
         keyInfo.rouArr?.let {
             rouletteParts = mutableListOf()
@@ -244,10 +241,6 @@ class RouletteKeyView @JvmOverloads constructor(
         }
         showRoulette = controllerStatus != ControllerStatus.Normal
         invalidate()
-    }
-
-    fun getKeyInfo(): KeyInfo {
-        return keyInfoData
     }
 
     private var clickTime = 0L
@@ -430,10 +423,5 @@ class RouletteKeyView @JvmOverloads constructor(
         drawable.setBounds(0, 0, width, height)
         drawable.draw(canvas)
         return bitmap
-    }
-
-    fun updateText(text: String?) {
-        thumbText = text
-        invalidate()
     }
 }

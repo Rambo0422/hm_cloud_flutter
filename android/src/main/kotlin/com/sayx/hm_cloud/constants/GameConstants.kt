@@ -10,9 +10,6 @@ import com.sayx.hm_cloud.model.KeyInfo
 
 object GameConstants {
 
-    // 默认控制方法的userId
-    const val defaultControllerUserId = "64f6ed6a466d416d308dc52b"
-
     // 是否展示游戏设置按钮引导层
     const val showGuide = "showGuide"
     // 是否开启振动
@@ -21,8 +18,6 @@ object GameConstants {
     const val volumeSwitch = "volumeSwitch"
     // 鼠标灵敏度
     const val mouseSensitivity = "mouseSensitivity"
-    // 鼠标配置
-    const val mouseMode = "mouseMode"
 
     // 操作键位配置类型
     const val gamepadConfig = 1

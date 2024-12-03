@@ -188,4 +188,8 @@
     <string name="key_setting">按键设置</string>
     <string name="key_map">按键贴图</string>
     <string name="input_config_name">输入配置名称</string>
+    <string name="container_key">收纳按键</string>
+    <string name="edit_roulette_key_tips">选择下方按键进行添加，至少4个</string>
+    <string name="save_container_key">保存按键包</string>
+    <string name="shot_key">射击键(左键)</string>
 </resources>
