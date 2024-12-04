@@ -41,8 +41,8 @@ object AnTongSDK {
                         anTongVideoView?.setVideoFps(60)
                     }
 
-                    Constants.STATUS_PEER_REJECT,
-                    Constants.STATUS_TOKEN_INVALID,
+//                    Constants.STATUS_PEER_REJECT,
+//                    Constants.STATUS_TOKEN_INVALID,
                     Constants.STATUS_STOP_PLAY -> {
                         val stopPlayEvent = StopPlayEvent()
                         EventBus.getDefault().post(stopPlayEvent)
@@ -79,13 +79,23 @@ object AnTongSDK {
                 }
             } ?: return
         }
+
+        override fun onPlayerError(errorCode: Int, errorMsg: String) {
+            if (mRequestDeviceSuccess != null) {
+                // 排队阶段
+                mRequestDeviceSuccess?.onRequestDeviceFailed(errorMsg)
+            } else {
+                // 画面已经出现
+                ToastUtils.showShort(errorMsg)
+                val stopPlayEvent = StopPlayEvent()
+                EventBus.getDefault().post(stopPlayEvent)
+            }
+        }
     }
 
     fun initSdk(context: Context, channelName: String, accessKeyId: String) {
         Constants.IS_DEBUG = true
-        Constants.IS_ERROR = false
-        Constants.IS_INFO = false
-        Constants.AK_DEBUG = false
+        Constants.AK_DEBUG = true
         Constants.IS_TV = true
         ACCESS_KEY_ID = accessKeyId
         AnTongManager.getInstance().init(context, channelName, accessKeyId)
