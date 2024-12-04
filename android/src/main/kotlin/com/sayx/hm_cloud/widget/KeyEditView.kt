@@ -222,7 +222,7 @@ class KeyEditView @JvmOverloads constructor(
                 previewView = addContainerKey()
             }
 
-            KeyType.KEY_SHOT -> {
+            KeyType.KEY_SHOOT -> {
                 previewView = addShotKey()
             }
 

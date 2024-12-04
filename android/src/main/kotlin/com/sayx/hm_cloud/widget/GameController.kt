@@ -114,7 +114,11 @@ class GameController @JvmOverloads constructor(
                     view.showRoulette = value
                     view.invalidate()
                 } else if (view is ContainerKeyView) {
-                    view.showItems(true)
+                    if (value) {
+                        view.showItems(true)
+                    } else {
+                        view.hideItems()
+                    }
                     view.invalidate()
                 } else if (view.visibility == VISIBLE) {
                     view.invalidate()
@@ -233,7 +237,7 @@ class GameController @JvmOverloads constructor(
                     addContainerKey(keyInfo)
                 }
 
-                KeyType.KEY_SHOT -> {
+                KeyType.KEY_SHOOT -> {
                     addShotKey(keyInfo)
                 }
 
@@ -950,7 +954,7 @@ class GameController @JvmOverloads constructor(
                     addContainerKey(keyInfo)
                 }
 
-                KeyType.KEY_SHOT -> {
+                KeyType.KEY_SHOOT -> {
                     addShotKey(keyInfo)
                 }
 
@@ -1087,6 +1091,7 @@ class GameController @JvmOverloads constructor(
             view?.isActivated = false
             view?.invalidate()
         }
+        keyView.showItems(true)
         keyView.isActivated = true
         keyView.invalidate()
         currentKey = keyInfo
@@ -1257,6 +1262,7 @@ class GameController @JvmOverloads constructor(
                 }
                 if (view is ContainerKeyView) {
                     view.setKeyInfo(it)
+                    view.showItems(true)
                 }
                 if (view is ShotKeyView) {
                     view.setKeyInfo(it)

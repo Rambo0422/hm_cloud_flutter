@@ -82,7 +82,7 @@ object KeyType {
     const val KEY_CONTAINER = "kb-container"
 
     // 射击功能键
-    const val KEY_SHOT = "kb-shot"
+    const val KEY_SHOOT = "kb-shoot"
 }
 
 val maps : List<Pair<String, Int>> by lazy {

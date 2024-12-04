@@ -484,7 +484,7 @@ class AddKeyboardKey @JvmOverloads constructor(
             R.id.btn_edit_shot_key -> {
                 width = 64
                 height = 64
-                type = KeyType.KEY_SHOT
+                type = KeyType.KEY_SHOOT
                 inputOp =
                     HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpMouseButtonLeft.value
             }

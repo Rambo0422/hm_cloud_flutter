@@ -190,6 +190,7 @@ class AtGameActivity : AppCompatActivity() {
                 callback?.let {
                     val jsonObject = JSONObject(it)
                     val status = jsonObject.getInt(StatusCallbackUtil.STATUS)
+                    val errorMessage = jsonObject.optString(StatusCallbackUtil.DATA, "服务器异常")
                     when (status) {
                         // 结束游戏，finish
                         Constants.STATUS_STOP_PLAY -> {
@@ -199,41 +200,34 @@ class AtGameActivity : AppCompatActivity() {
                         }
                         Constants.STATUS_INSUFFICIENT_CLOSE, Constants.STATUS_NO_INPUT -> {
                             runOnUiThread {
-                                AnTongSDK.uploadErrorCode(status)
+                                AnTongSDK.uploadErrorCode(status, errorMessage)
                                 showWarningDialog("$status")
-                            }
-                        }
-                        Constants.STATUS_GAME_PROCESS_MISSING,
-//                        Constants.STATUS_APP_ID_ERROR,
-                        Constants.STATUS_NOT_FOND_GAME,
-                        Constants.STATUS_TOKEN_INVALID,
-                        Constants.STATUS_SIGN_FAILED,
-                        Constants.STATUS_CONN_FAILED,
-                        Constants.STATUS_FINISH_WAIT,
-                        300010,
-                        101001,
-                        201011 -> {
-                            runOnUiThread {
-                                AnTongSDK.uploadErrorCode(status)
-                                gameSettings?.release()
-                                GameManager.isPlaying = false
-
-                                GameManager.releaseGame(finish = "errorCode")
-                                AppCommonDialog.Builder(this@AtGameActivity)
-                                    .setTitle("游戏已结束\n[$status]")
-                                    .setRightButton("退出游戏") {
-                                        AppCommonDialog.hideDialog(this@AtGameActivity, "gameErrorDialog")
-                                        finish()
-                                    }
-                                    .build()
-                                    .show("gameErrorDialog")
                             }
                         }
 
                         else -> {
-                            AnTongSDK.uploadErrorCode(status)
+                            AnTongSDK.uploadErrorCode(status, errorMessage)
                         }
                     }
+                }
+            }
+
+            override fun onPlayerError(errorCode: Int, errorMsg: String?) {
+                runOnUiThread {
+                    AnTongSDK.uploadErrorCode(errorCode, errorMsg ?: "")
+                    gameSettings?.release()
+                    GameManager.isPlaying = false
+
+                    GameManager.releaseGame(finish = "errorCode")
+                    AppCommonDialog.Builder(this@AtGameActivity)
+                        .setTitle("游戏已结束\n[$errorCode]")
+                        .setSubTitle(errorMsg)
+                        .setRightButton("退出游戏") {
+                            AppCommonDialog.hideDialog(this@AtGameActivity, "gameErrorDialog")
+                            finish()
+                        }
+                        .build()
+                        .show("gameErrorDialog")
                 }
             }
         })
@@ -973,7 +967,7 @@ class AtGameActivity : AppCompatActivity() {
                                     AppVirtualOperateType.APP_KEYBOARD
                                 )
                             }
-                            KeyType.KEY_SHOT -> {
+                            KeyType.KEY_SHOOT -> {
                                 dataBinding.gameController.addShotKey(
                                     keyInfo,
                                     AppVirtualOperateType.APP_KEYBOARD

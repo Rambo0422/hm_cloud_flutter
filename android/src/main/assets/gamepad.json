@@ -52,13 +52,14 @@
             "click": 0,
             "inputOp": 0,
             "width": 90,
-            "height": 90
+            "height": 90,
+            "map": "map1"
         },
         {
-            "top": 260,
-            "left": 188,
+            "top": 241,
+            "left": 179,
             "type": "xbox-cross",
-            "zoom": 50,
+            "zoom": 60,
             "opacity": 70,
             "click": 0,
             "inputOp": 0,
@@ -66,8 +67,8 @@
             "height": 80
         },
         {
-            "top": 16,
-            "left": 217,
+            "top": 18,
+            "left": 241,
             "type": "xbox-elliptic",
             "zoom": 50,
             "opacity": 70,
@@ -88,10 +89,10 @@
             "height": 25
         },
         {
-            "top": 263,
-            "left": 381,
+            "top": 223,
+            "left": 368,
             "type": "xbox-rock-rt",
-            "zoom": 50,
+            "zoom": 70,
             "opacity": 70,
             "click": 0,
             "inputOp": 0,
@@ -147,8 +148,8 @@
             "height": 30
         },
         {
-            "top": 276,
-            "left": 489,
+            "top": 275,
+            "left": 490,
             "type": "xbox-round-medium",
             "zoom": 70,
             "opacity": 70,

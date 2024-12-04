@@ -885,7 +885,7 @@ class GameActivity : AppCompatActivity() {
                                     AppVirtualOperateType.APP_KEYBOARD
                                 )
                             }
-                            KeyType.KEY_SHOT -> {
+                            KeyType.KEY_SHOOT -> {
                                 dataBinding.gameController.addShotKey(
                                     keyInfo,
                                     AppVirtualOperateType.APP_KEYBOARD

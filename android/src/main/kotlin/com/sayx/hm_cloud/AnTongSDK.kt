@@ -149,6 +149,8 @@ object AnTongSDK {
         val leaveQueue = anTongVideoView?.leaveQueue() ?: true
         if (leaveQueue) {
             onDestroy()
+        } else {
+            stopGame()
         }
     }
 
@@ -177,6 +179,7 @@ object AnTongSDK {
             callback?.let {
                 val jsonObject = JSONObject(it)
                 val status = jsonObject.getInt(StatusCallbackUtil.STATUS)
+                val errorMessage = jsonObject.optString(StatusCallbackUtil.DATA, "服务器异常")
                 when (status) {
                     Constants.STATUS_FIRST_FRAME_ARRIVAL -> {
                         anTongVideoView?.setHmcpPlayerListener(null)
@@ -192,45 +195,31 @@ object AnTongSDK {
                             LogUtils.e("queue info error:$dataStr")
                         }
                     }
-//                    Constants.STATUS_APP_ID_ERROR,
-                    Constants.STATUS_NOT_FOND_GAME,
-                    Constants.STATUS_TOKEN_INVALID,
-                    Constants.STATUS_SIGN_FAILED,
-                    Constants.STATUS_STOP_PLAY,
-                    Constants.STATUS_CONN_FAILED,
-                    Constants.STATUS_FINISH_WAIT,
-                    Constants.STATUS_START_QUEUE_FAILED,
-                    300010,
-                    101001,
-                    201011 -> {
-                        uploadErrorCode(status)
-                        val errorMessage =
-                            jsonObject.optString(StatusCallbackUtil.DATA, "服务器异常")
-                        mRequestDeviceSuccess?.onRequestDeviceFailed(status, errorMessage)
-                    }
-
                     else -> {
-                        uploadErrorCode(status)
+                        uploadErrorCode(status, errorMessage)
                     }
                 }
             } ?: return
         }
+
+        override fun onPlayerError(errorCode: Int, errorMsg: String?) {
+            uploadErrorCode(errorCode, errorMsg ?: "")
+        }
     }
 
-    fun uploadErrorCode(errorCode: Int) {
-        GameManager.gameEsStat(
-            "game_error",
-            "安通报错码",
-            "show",
-            mapOf("errorCode" to "$errorCode").toString(),
-        )
-        GameManager.invokeMethod("errorInfo_at", mapOf(
-                Pair("page", "page-errorPage"),
-                Pair("action", "show"),
-                Pair("arguments", mapOf(
-                    "errorcode_at" to "$errorCode",
-                )),
+    fun uploadErrorCode(errorCode: Int, errorMsg: String) {
+        if (errorCode != Constants.STATUS_STOP_PLAY) {
+            GameManager.gameEsStat(
+                "game_error",
+                "安通报错码",
+                "show",
+                mapOf("errorCode" to "$errorCode", "errorMsg" to errorMsg).toString(),
+            )
+            GameManager.invokeMethod("errorInfo_at", mapOf(
+                "errorCode" to "$errorCode",
+                "errorMsg" to errorMsg,
             ))
+        }
     }
 }
 
@@ -984,7 +973,7 @@ open class OnKeyEventListenerImp : OnKeyEventListener {
 //                LogUtils.d("key:${keyInfo.text}, inputOp:${oneInputOpData.inputOp}, value:${oneInputOpData.value}, result:$result")
             }
             // 键盘按键，鼠标左中右键
-            KeyType.KEYBOARD_KEY, KeyType.KEYBOARD_MOUSE_LEFT, KeyType.KEYBOARD_MOUSE_RIGHT, KeyType.KEYBOARD_MOUSE_MIDDLE, KeyType.KEY_SHOT -> {
+            KeyType.KEYBOARD_KEY, KeyType.KEYBOARD_MOUSE_LEFT, KeyType.KEYBOARD_MOUSE_RIGHT, KeyType.KEYBOARD_MOUSE_MIDDLE, KeyType.KEY_SHOOT -> {
                 val inputOp = HMInputOpData()
                 val oneInputOpData = HMInputOpData.HMOneInputOPData()
                 oneInputOpData.inputState = if (press) HMInputOpData.HMOneInputOPData_InputState.HMOneInputOPData_InputState_OpStateDown else

@@ -5,6 +5,4 @@ interface RequestDeviceSuccess {
     fun onQueueStatus(time:Int, rank: Int)
 
     fun onRequestDeviceSuccess()
-
-    fun onRequestDeviceFailed(status:Int, errorMessage: String)
 }

@@ -169,16 +169,18 @@ class ContainerKeyView @JvmOverloads constructor(
         dataBinding.ivArrow.alpha = keyInfo.opacity / 100f
 
         val size = keyInfo.containerArr?.size ?: 0
+        val margin = AppSizeUtils.convertViewSize(ceil(6 * keyInfo.zoom / 100f * 2f).toInt())
         if (size > 0) {
-            layoutWidth += layoutHeight * size + AppSizeUtils.convertViewSize(ceil(6 * keyInfo.zoom / 100f * 2f).toInt()) * (size + 1)
+            layoutWidth += layoutHeight * size + margin * (size + 1)
         }
-
+        dataBinding.layoutItemsLeft.removeAllViews()
+        dataBinding.layoutItemsRight.removeAllViews()
         keyInfo.containerArr?.forEachIndexed { _, itemInfo ->
             val itemLayoutParams = LayoutParams(
                 layoutHeight,
                 layoutHeight
             )
-            val paddingHorizontal = AppSizeUtils.convertViewSize(ceil(3 * keyInfo.zoom / 100f * 2f).toInt())
+            val paddingHorizontal = margin / 2
             itemLayoutParams.marginStart = paddingHorizontal
             itemLayoutParams.marginEnd = paddingHorizontal
 
@@ -330,6 +332,14 @@ class ContainerKeyView @JvmOverloads constructor(
                     hideRight()
                 }
             }
+        }
+    }
+
+    fun hideItems() {
+        if (containerState == ContainerState.SHOW_LEFT) {
+            hideLeft()
+        } else if (containerState == ContainerState.SHOW_RIGHT) {
+            hideRight()
         }
     }
 }

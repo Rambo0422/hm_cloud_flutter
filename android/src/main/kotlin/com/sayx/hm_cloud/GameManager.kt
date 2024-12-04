@@ -220,7 +220,10 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                 }
                 channel.invokeMethod(
                     "errorInfo",
-                    mapOf(Pair("errorCode", errorCode), Pair("errorMsg", errorMsg))
+                    mapOf(
+                        Pair("errorCode", errorCode),
+                        Pair("errorMsg", errorMsg),
+                    )
                 )
             }
         }, true)
@@ -249,7 +252,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         // 判断是否是安通
         if (isAnTong()) {
             // TODO: 这里暂时先不做处理!!! 延后再处理
-            val userId = this.gameParam?.userId ?: ""
+//            val userId = this.gameParam?.userId ?: ""
 //            AnTongSDK.checkPlayingGame(userId)
 //            val map = mutableMapOf<String, Any>(
 //                Pair("isSucc", 1)
@@ -502,16 +505,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                         inQueue = false
                         AtGameActivity.startActivityForResult(activity)
                     }
-
-                    override fun onRequestDeviceFailed(status: Int, errorMessage: String) {
-                        LogUtils.d("onRequestDeviceFailed errorMessage: $errorMessage")
-                        activity.runOnUiThread {
-                            channel.invokeMethod(
-                                "errorInfo_at",
-                                mapOf(Pair("errorCode", "$status"), Pair("errorMsg", errorMessage))
-                            )
-                        }
-                    }
                 })
             return
         }
@@ -609,7 +602,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                 "errorInfo",
                 mapOf(
                     Pair("errorCode", GameError.gameConfigErrorCode),
-                    Pair("cid", HmcpManager.getInstance().cloudId),
+                    Pair("errorMsg", GameError.gameConfigErrorMsg),
                 )
             )
         }
@@ -836,7 +829,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
     private fun statusOperationStateChangeReason(data: JSONObject, status: Int) {
         // 各类游戏中断状态下，获取errorCode,errorMsg展示
         val dataStr = data.getString(StatusCallbackUtil.DATA)
-        LogUtils.d("errorInfo:$dataStr")
+//        LogUtils.d("errorInfo:$dataStr")
         var errorCode = ""
         var errorMsg = ""
         if (dataStr is String && !TextUtils.isEmpty(dataStr)) {
@@ -860,7 +853,10 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         EventBus.getDefault().post(GameErrorEvent(errorCode, errorMsg))
         channel.invokeMethod(
             "errorInfo",
-            mapOf(Pair("errorCode", errorCode), Pair("errorMsg", errorMsg))
+            mapOf(
+                Pair("errorCode", errorCode),
+                Pair("errorMsg", errorMsg)
+            )
         )
     }
 
@@ -1521,7 +1517,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                         "errorInfo",
                         mapOf(
                             Pair("errorCode", GameError.gameReleaseErrorCode),
-                            Pair("cid", cloudId)
+                            Pair("errorMsg", GameError.gameReleaseErrorMsg),
                         )
                     )
                 }
