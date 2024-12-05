@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Point
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -80,6 +81,12 @@ class ContainerKeyView @JvmOverloads constructor(
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         event?.let {
+            if (containerState == ContainerState.HIDE_LEFT || containerState == ContainerState.HIDE_RIGHT) {
+                val inside = it.x >= dataBinding.ivArrow.left && it.x <= dataBinding.ivArrow.right && it.y >= dataBinding.ivArrow.top && it.y <= dataBinding.ivArrow.bottom
+                if (!inside) {
+                    return false
+                }
+            }
             when (it.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
                     if (controllerStatus == ControllerStatus.Edit && needDrawShadow) {

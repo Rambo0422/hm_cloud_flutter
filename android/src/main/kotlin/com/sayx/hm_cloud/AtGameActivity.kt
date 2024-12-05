@@ -37,9 +37,8 @@ import com.gyf.immersionbar.BarHide
 import com.gyf.immersionbar.ktx.immersionBar
 import com.gyf.immersionbar.ktx.navigationBarHeight
 import com.haima.hmcp.beans.ResolutionInfo
-import com.haima.hmcp.beans.VideoDelayInfo
-import com.haima.hmcp.rtc.widgets.beans.RtcVideoDelayInfo
 import com.media.atkit.Constants
+import com.media.atkit.beans.VideoDelayInfo
 import com.media.atkit.listeners.AnTongPlayerListener
 import com.media.atkit.utils.StatusCallbackUtil
 import com.sayx.hm_cloud.callback.AddKeyListenerImp
@@ -64,7 +63,6 @@ import com.sayx.hm_cloud.http.bean.BaseObserver
 import com.sayx.hm_cloud.http.repository.AppRepository
 import com.sayx.hm_cloud.http.bean.HttpResponse
 import com.sayx.hm_cloud.model.ControllerConfigEvent
-import com.sayx.hm_cloud.model.ControllerEditEvent
 import com.sayx.hm_cloud.model.ControllerInfo
 import com.sayx.hm_cloud.model.GameConfig
 import com.sayx.hm_cloud.model.GameNotice
@@ -150,6 +148,7 @@ class AtGameActivity : AppCompatActivity() {
             fullScreen(true)
             hideBar(BarHide.FLAG_HIDE_BAR)
         }
+        controllerStatus = ControllerStatus.Normal
         // 设置屏幕常亮
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         // 事件监听
@@ -538,10 +537,23 @@ class AtGameActivity : AppCompatActivity() {
             }
 
             @SuppressLint("SetTextI18n")
-            override fun onDelayChange(delayInfo: VideoDelayInfo?) {
+            override fun onDelayChange(delayInfo: Any?) {
                 if (BuildConfig.DEBUG) {
-                    if (delayInfo is RtcVideoDelayInfo) {
-                        dataBinding.tvInfo.text = "Fps:${delayInfo.videoFps}"
+                    if (delayInfo is VideoDelayInfo) {
+                        if (BuildConfig.DEBUG) {
+                            dataBinding.tvInfo.text =
+                                "netDelay:${delayInfo.netDelay}\n" +
+                                        "decodeDelay: ${delayInfo.decodeDelay}\n" +
+                                        "renderDelay: ${delayInfo.renderDelay}\n" +
+                                        "videoFps: ${delayInfo.videoFps}\n" +
+                                        "bitRate: ${delayInfo.bitrate}\n" +
+                                        "decodeDelayAvg: ${delayInfo.decodeDelayAvg}\n" +
+                                        "packetsLostRate: ${delayInfo.packetsLostRate}\n" +
+                                        "freezeCount: ${delayInfo.freezeCount}\n" +
+                                        "freezeDuration: ${delayInfo.freezeDuration}\n"
+                        } else {
+                            dataBinding.tvInfo.text = "Fps:${delayInfo.videoFps}"
+                        }
                     }
                 }
             }
@@ -1123,11 +1135,11 @@ class AtGameActivity : AppCompatActivity() {
                 event.arg?.let {
                     when (it) {
                         GameConstants.gamepadConfig -> {
-                            dataBinding.gameController.setControllerData(GameManager.gamepadList[0])
+                            dataBinding.gameController.setControllerData(GameManager.gamepadList[0], true)
                             showControllerEdit(AppVirtualOperateType.APP_STICK_XBOX)
                         }
                         GameConstants.keyboardConfig -> {
-                            dataBinding.gameController.setControllerData(GameManager.keyboardList[0])
+                            dataBinding.gameController.setControllerData(GameManager.keyboardList[0], true)
                             showControllerEdit(AppVirtualOperateType.APP_KEYBOARD)
                         }
                     }
@@ -1137,7 +1149,7 @@ class AtGameActivity : AppCompatActivity() {
                 event.arg?.let {
                     if (it is ControllerInfo) {
 //                        LogUtils.d("updateKeyboard:${it.type}")
-                        dataBinding.gameController.setControllerData(it)
+                        dataBinding.gameController.setControllerData(it, true)
                         when (it.type) {
                             GameConstants.gamepadConfig -> {
                                 showControllerEdit(AppVirtualOperateType.APP_STICK_XBOX)
@@ -1202,6 +1214,8 @@ class AtGameActivity : AppCompatActivity() {
                 KeyboardListView.show(dataBinding.layoutGame)
                 if (GameManager.getGameParam()?.isVip() != true) {
                     dataBinding.gameController.restoreOriginal()
+                } else {
+                    dataBinding.gameController.onEditSuccess()
                 }
             }
         }
@@ -1259,17 +1273,12 @@ class AtGameActivity : AppCompatActivity() {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onControllerConfigEvent(event: ControllerConfigEvent) {
+        LogUtils.d("onControllerConfigEvent:${event.data}")
         dataBinding.gameController.setControllerData(event.data)
         gameSettings?.controllerType = dataBinding.gameController.controllerType
         if (event.data.use != 1) {
             GameManager.useKeyboardData(event.data)
         }
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onControllerEditEvent(event: ControllerEditEvent) {
-        dataBinding.gameController.controllerChange(event.type)
-        exitCustom()
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

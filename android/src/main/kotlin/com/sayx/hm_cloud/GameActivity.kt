@@ -70,7 +70,6 @@ import com.sayx.hm_cloud.http.bean.BaseObserver
 import com.sayx.hm_cloud.http.bean.HttpResponse
 import com.sayx.hm_cloud.http.repository.AppRepository
 import com.sayx.hm_cloud.model.ControllerConfigEvent
-import com.sayx.hm_cloud.model.ControllerEditEvent
 import com.sayx.hm_cloud.model.ControllerInfo
 import com.sayx.hm_cloud.model.ErrorConfigInfo
 import com.sayx.hm_cloud.model.ExitGameEvent
@@ -165,6 +164,7 @@ class GameActivity : AppCompatActivity() {
             fullScreen(true)
             hideBar(BarHide.FLAG_HIDE_BAR)
         }
+        controllerStatus = ControllerStatus.Normal
         // 设置屏幕常亮
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         // 事件监听
@@ -545,10 +545,20 @@ class GameActivity : AppCompatActivity() {
             }
 
             @SuppressLint("SetTextI18n")
-            override fun onDelayChange(delayInfo: VideoDelayInfo?) {
+            override fun onDelayChange(delayInfo: Any?) {
                 if (BuildConfig.DEBUG) {
                     if (delayInfo is RtcVideoDelayInfo) {
-                        dataBinding.tvInfo.text = "Fps:${delayInfo.videoFps}"
+                        if (BuildConfig.DEBUG) {
+                            dataBinding.tvInfo.text =
+                                "netDelay:${delayInfo.netDelay}\n" +
+                                        "decodeDelay: ${delayInfo.decodeDelay}\n" +
+                                        "renderDelay: ${delayInfo.renderDelay}\n" +
+                                        "videoFps: ${delayInfo.videoFps}\n" +
+                                        "bitRate: ${delayInfo.bitRate}\n" +
+                                        "packetsLostRate: ${delayInfo.packetsLostRate}\n"
+                        } else {
+                            dataBinding.tvInfo.text = "Fps:${delayInfo.videoFps}"
+                        }
                     }
                 }
             }
@@ -1086,11 +1096,11 @@ class GameActivity : AppCompatActivity() {
                 event.arg?.let {
                     when (it) {
                         GameConstants.gamepadConfig -> {
-                            dataBinding.gameController.setControllerData(GameManager.gamepadList[0])
+                            dataBinding.gameController.setControllerData(GameManager.gamepadList[0], true)
                             showControllerEdit(AppVirtualOperateType.APP_STICK_XBOX)
                         }
                         GameConstants.keyboardConfig -> {
-                            dataBinding.gameController.setControllerData(GameManager.keyboardList[0])
+                            dataBinding.gameController.setControllerData(GameManager.keyboardList[0], true)
                             showControllerEdit(AppVirtualOperateType.APP_KEYBOARD)
                         }
                     }
@@ -1100,7 +1110,7 @@ class GameActivity : AppCompatActivity() {
                 event.arg?.let {
                     if (it is ControllerInfo) {
                         LogUtils.d("updateKeyboard:${it.type}")
-                        dataBinding.gameController.setControllerData(it)
+                        dataBinding.gameController.setControllerData(it, true)
                         when (it.type) {
                             GameConstants.gamepadConfig -> {
                                 showControllerEdit(AppVirtualOperateType.APP_STICK_XBOX)
@@ -1164,8 +1174,9 @@ class GameActivity : AppCompatActivity() {
                 exitCustom()
                 KeyboardListView.show(dataBinding.layoutGame)
                 if (GameManager.getGameParam()?.isVip() != true) {
-                    // 非会员，还原到编辑之前
                     dataBinding.gameController.restoreOriginal()
+                } else {
+                    dataBinding.gameController.onEditSuccess()
                 }
             }
         }
@@ -1224,17 +1235,12 @@ class GameActivity : AppCompatActivity() {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onControllerConfigEvent(event: ControllerConfigEvent) {
+        LogUtils.d("onControllerConfigEvent:${event.data}")
         dataBinding.gameController.setControllerData(event.data)
         gameSettings?.controllerType = dataBinding.gameController.controllerType
         if (event.data.use != 1) {
             GameManager.useKeyboardData(event.data)
         }
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onControllerEditEvent(event: ControllerEditEvent) {
-        dataBinding.gameController.controllerChange(event.type)
-        exitCustom()
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

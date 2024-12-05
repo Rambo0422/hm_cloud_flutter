@@ -597,9 +597,12 @@ class GameSettings @JvmOverloads constructor(
 
     @SuppressLint("SetTextI18n")
     private fun updateNetDelay() {
+        if (gameView is ATGameView) {
+            gameSettingChangeListener?.onDelayChange((gameView as ATGameView).clockDiffVideoLatencyInfo)
+        } else if (gameView is HMGameView) {
+            gameSettingChangeListener?.onDelayChange((gameView as HMGameView).clockDiffVideoLatencyInfo)
+        }
         val delay = gameSettingChangeListener?.getNetDelay() ?: 999
-
-
         val netDelay = if (delay > 450) 450 else delay
         // 延迟在0~60，展示满信号
         if (netDelay <= 60) {

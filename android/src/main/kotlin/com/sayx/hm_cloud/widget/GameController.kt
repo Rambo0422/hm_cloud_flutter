@@ -3,7 +3,6 @@ package com.sayx.hm_cloud.widget
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -1118,22 +1117,30 @@ class GameController @JvmOverloads constructor(
     /**
      * 加载操作面板数据
      */
-    fun setControllerData(data: ControllerInfo) {
+    fun setControllerData(data: ControllerInfo, update: Boolean = false) {
         controllerInfo = data
         controllerName = data.name?: ""
 //        LogUtils.d("setKeyData:$data")
         if (data.type == GameConstants.keyboardConfig) {
             // 键鼠
 //            LogUtils.d("setKeyData-> keyboard")
-            keyboardKeys.clear()
-            keyboardKeys.addAll(data.keyboard)
-            initKeyboard(keyboardKeys)
+            if (update) {
+                initKeyboard(data.keyboard)
+            } else {
+                keyboardKeys.clear()
+                keyboardKeys.addAll(data.keyboard)
+                initKeyboard(keyboardKeys)
+            }
         } else if (data.type == GameConstants.gamepadConfig) {
             // 手柄
 //            LogUtils.d("setKeyData-> gamepad")
-            gamepadKeys.clear()
-            gamepadKeys.addAll(data.keyboard)
-            initGamepad(gamepadKeys)
+            if (update) {
+                initGamepad(data.keyboard)
+            } else {
+                gamepadKeys.clear()
+                gamepadKeys.addAll(data.keyboard)
+                initGamepad(gamepadKeys)
+            }
         }
     }
 
@@ -1369,11 +1376,25 @@ class GameController @JvmOverloads constructor(
      * 退出编辑，展示编辑前数据
      */
     fun restoreOriginal() {
+        currentKey = null
         if (controllerType == AppVirtualOperateType.APP_STICK_XBOX) {
             initGamepad(gamepadKeys)
         } else if (controllerType == AppVirtualOperateType.APP_KEYBOARD) {
             initKeyboard(keyboardKeys)
         }
+    }
+
+    fun onEditSuccess() {
+        if (controllerInfo?.use == 1) {
+            if (controllerInfo?.type == GameConstants.gamepadConfig) {
+                gamepadKeys.clear()
+                gamepadKeys.addAll(editGamepadKeys)
+            } else if (controllerInfo?.type == GameConstants.keyboardConfig) {
+                keyboardKeys.clear()
+                keyboardKeys.addAll(editKeyboardKeys)
+            }
+        }
+        restoreOriginal()
     }
 
     /**
@@ -1382,36 +1403,26 @@ class GameController @JvmOverloads constructor(
     fun saveKeyConfig() {
         if (controllerType == AppVirtualOperateType.APP_STICK_XBOX) {
             controllerInfo?.let {
+                val keyList = editGamepadKeys.map { item -> item.copy() }.toList()
                 if (it.isOfficial == true) {
-                    val info = ControllerInfo("", it.type, it.userId, it.gameId, editGamepadKeys, controllerName, 0)
+                    val info = ControllerInfo("", it.type, it.userId, it.gameId, keyList, controllerName, 0)
                     GameManager.addKeyboardConfig(info)
                 } else {
-                    val info = ControllerInfo(it.id, it.type, it.userId, it.gameId, editGamepadKeys, controllerName, it.use)
+                    val info = ControllerInfo(it.id, it.type, it.userId, it.gameId, keyList, controllerName, it.use)
                     GameManager.updateKeyboardConfig(info)
                 }
             }
         } else if (controllerType == AppVirtualOperateType.APP_KEYBOARD) {
+            val keyList = editKeyboardKeys.map { item -> item.copy() }.toList()
             controllerInfo?.let {
                 if (it.isOfficial == true) {
-                    val info = ControllerInfo("", it.type, it.userId, it.gameId, editKeyboardKeys, controllerName, 0)
+                    val info = ControllerInfo("", it.type, it.userId, it.gameId, keyList, controllerName, 0)
                     GameManager.addKeyboardConfig(info)
                 } else {
-                    val info = ControllerInfo(it.id, it.type, it.userId, it.gameId, editKeyboardKeys, controllerName, it.use)
+                    val info = ControllerInfo(it.id, it.type, it.userId, it.gameId, keyList, controllerName, it.use)
                     GameManager.updateKeyboardConfig(info)
                 }
             }
-        }
-    }
-
-    fun controllerChange(keyType: Int) {
-        if (keyType == GameConstants.gamepadConfig) {
-            gamepadKeys.clear()
-            gamepadKeys.addAll(editGamepadKeys)
-            initGamepad(gamepadKeys)
-        } else if (keyType == GameConstants.keyboardConfig) {
-            keyboardKeys.clear()
-            keyboardKeys.addAll(editKeyboardKeys)
-            initKeyboard(keyboardKeys)
         }
     }
 

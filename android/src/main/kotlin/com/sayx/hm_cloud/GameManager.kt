@@ -920,6 +920,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                             callback.onGamepadList(gamepadList)
                             getUserGamepadData(callback)
                         } else if (defaultUse || it.use == 1) {
+                            it.use = if (defaultUse) 1 else it.use
                             EventBus.getDefault().post(ControllerConfigEvent(it))
                         } else {
                             getUserGamepadData(null)
@@ -946,6 +947,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                             callback.onGamepadList(gamepadList)
                             getUserGamepadData(callback)
                         } else if (defaultUse || controllerInfo.use == 1) {
+                            controllerInfo.use = if (defaultUse) 1 else controllerInfo.use
                             EventBus.getDefault().post(ControllerConfigEvent(controllerInfo))
                         } else {
                             getUserGamepadData(null)
@@ -983,6 +985,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                             callback.onKeyboardList(keyboardList)
                             getUserKeyboardData(callback)
                         } else if (defaultUse || it.use == 1) {
+                            it.use = if (defaultUse) 1 else it.use
                             EventBus.getDefault().post(ControllerConfigEvent(it))
                         } else {
                             getUserKeyboardData(null)
@@ -1012,7 +1015,11 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                     if (callback != null) {
                         val info = it.datas.find { data -> data.use == 1 }
                         if (info != null) {
-                            gamepadList[0].use = 0
+                            if (gameParam?.isVip() == true) {
+                                gamepadList[0].use = 0
+                            } else {
+                                info.use = 0
+                            }
                         }
                         callback.onGamepadList(gamepadList)
                     } else {
@@ -1044,7 +1051,11 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                     if (callback != null) {
                         val info = it.datas.find { data -> data.use == 1 }
                         if (info != null) {
-                            keyboardList[0].use = 0
+                            if (gameParam?.isVip() == true) {
+                                keyboardList[0].use = 0
+                            } else {
+                                info.use = 0
+                            }
                         }
                         callback.onKeyboardList(keyboardList)
                     } else {

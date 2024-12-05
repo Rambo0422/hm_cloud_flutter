@@ -226,7 +226,7 @@ class RockerView @JvmOverloads constructor(
             rockerCenterPosition.set(centerPoint.x, centerPoint.y)
         }
 
-        if (showBackground || keyInfo?.type == KeyType.ROCKER_CROSS) {
+        if (showBackground || keyInfo?.type == KeyType.ROCKER_CROSS || keyInfo?.type == KeyType.ROCKER_LEFT ||keyInfo?.type == KeyType.ROCKER_RIGHT) {
             drawBackground(canvas)
         }
 

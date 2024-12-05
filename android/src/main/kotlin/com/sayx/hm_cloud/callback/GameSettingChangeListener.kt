@@ -34,7 +34,7 @@ interface GameSettingChangeListener {
 
     fun onShowPlayParty()
 
-    fun onDelayChange(delayInfo: VideoDelayInfo?)
+    fun onDelayChange(delayInfo: Any?)
 
     fun getNetDelay(): Int
 

@@ -60,9 +60,9 @@ class KeyInfo(
             this.inputOp,
             this.height,
             this.map,
-            this.composeArr,
-            this.rouArr,
-            this.containerArr,
+            this.composeArr?.map { item -> item.copy() }?.toList(),
+            this.rouArr?.map { item -> item.copy() }?.toList(),
+            this.containerArr?.map { item -> item.copy() }?.toList(),
         )
     }
 

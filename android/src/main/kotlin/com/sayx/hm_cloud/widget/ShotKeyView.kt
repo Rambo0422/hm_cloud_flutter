@@ -41,8 +41,6 @@ class ShotKeyView @JvmOverloads constructor(
 
     var onKeyTouchListener: OnKeyTouchListener? = null
 
-    private var firstTouchId = 0
-
     private val bgPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.parseColor("#3CFFFFFF")
         style = Paint.Style.FILL
@@ -73,12 +71,15 @@ class ShotKeyView @JvmOverloads constructor(
     private var clickTime = 0L
 
     @SuppressLint("ClickableViewAccessibility")
-    override fun onTouchEvent(event: MotionEvent?): Boolean {
+    override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
         event?.let {
-            if (controllerStatus == ControllerStatus.Normal) {
-                TouchEventDispatcher.dispatchTouchEvent(it)
-            }
+//            if (controllerStatus == ControllerStatus.Normal) {
+//                TouchEventDispatcher.dispatchTouchEvent(it)
+//            }
 //            LogUtils.d("onTouchEvent:$event")
+            if (controllerStatus == ControllerStatus.Normal) {
+                return false
+            }
             when (it.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
                     if (controllerStatus == ControllerStatus.Edit && needDrawShadow) {
@@ -92,11 +93,6 @@ class ShotKeyView @JvmOverloads constructor(
                         if (parent is GameController) {
                             (parent as GameController).checkAlignment(this)
                         }
-                    } else if (controllerStatus == ControllerStatus.Normal) {
-                        isPressed = true
-                        firstTouchId = it.getPointerId(it.actionIndex)
-                        AppVibrateUtils.vibrate()
-                        onKeyTouchListener?.onKeyTouch(true)
                     }
                 }
 
@@ -145,26 +141,11 @@ class ShotKeyView @JvmOverloads constructor(
                                 performClick()
                             }
                         }
-                    } else if (controllerStatus == ControllerStatus.Normal) {
-                        isPressed = false
-                        if (it.getPointerId(it.actionIndex) == firstTouchId) {
-                            onKeyTouchListener?.onKeyTouch(false)
-                        }
                     }
-                }
-
-                MotionEvent.ACTION_POINTER_UP -> {
-                    if (it.getPointerId(it.actionIndex) == firstTouchId) {
-                        onKeyTouchListener?.onKeyTouch(false)
-                    }
-                }
-
-                MotionEvent.ACTION_POINTER_DOWN -> {
-                    LogUtils.d("onTouchEventPOINTERDOWN:${it.getPointerId(it.actionIndex)}, $firstTouchId")
                 }
             }
-            return it.getPointerId(it.actionIndex) == firstTouchId
+            return super.dispatchTouchEvent(event)
         }
-        return super.onTouchEvent(event)
+        return super.dispatchTouchEvent(event)
     }
 }
