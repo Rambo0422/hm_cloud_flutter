@@ -87,7 +87,7 @@ object AnTongSDK {
             } else {
                 // 画面已经出现
                 ToastUtils.showShort(errorMsg)
-                val stopPlayEvent = StopPlayEvent()
+                val stopPlayEvent = StopPlayEvent(errorCode)
                 EventBus.getDefault().post(stopPlayEvent)
             }
         }

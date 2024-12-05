@@ -15,6 +15,7 @@ import androidx.databinding.DataBindingUtil
 import com.blankj.utilcode.util.LogUtils
 import com.gyf.immersionbar.BarHide
 import com.gyf.immersionbar.ktx.immersionBar
+import com.media.atkit.Constants
 import com.sayx.hm_cloud.callback.AvailableTimeEvent
 import com.sayx.hm_cloud.callback.NoOperateListener
 import com.sayx.hm_cloud.callback.StopPlayEvent
@@ -47,6 +48,7 @@ class GameActivity : AppCompatActivity(), GameContract.IGameView {
     private var countTime = NO_OPERATE_TIME
     private var lastDelay = 0
     private lateinit var presenter: GameContract.IGamePresenter
+    private var playTime = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -176,20 +178,28 @@ class GameActivity : AppCompatActivity(), GameContract.IGameView {
             }
         }
         lastDelay = netDelay
-        dataBinding.tvLossPacket.text =
-            "netDelay:${latencyInfo?.netDelay}\n" +
-                    "decodeDelay: ${latencyInfo?.decodeDelay}\n" +
-                    "renderDelay: ${latencyInfo?.renderDelay}\n" +
-                    "videoFps: ${latencyInfo?.videoFps}\n" +
-                    "bitRate: ${latencyInfo?.bitrate}\n" +
-                    "decodeDelayAvg: ${latencyInfo?.decodeDelayAvg}\n" +
-                    "packetsLostRate: ${latencyInfo?.packetsLostRate}\n" +
-                    "freezeCount: ${latencyInfo?.freezeCount}\n" +
-                    "freezeDuration: ${latencyInfo?.freezeDuration}\n"
+//        dataBinding.tvLossPacket.text =
+//            "netDelay:${latencyInfo?.netDelay}\n" +
+//                    "decodeDelay: ${latencyInfo?.decodeDelay}\n" +
+//                    "renderDelay: ${latencyInfo?.renderDelay}\n" +
+//                    "videoFps: ${latencyInfo?.videoFps}\n" +
+//                    "bitRate: ${latencyInfo?.bitrate}\n" +
+//                    "decodeDelayAvg: ${latencyInfo?.decodeDelayAvg}\n" +
+//                    "packetsLostRate: ${latencyInfo?.packetsLostRate}\n" +
+//                    "freezeCount: ${latencyInfo?.freezeCount}\n" +
+//                    "freezeDuration: ${latencyInfo?.freezeDuration}\n"
 
         val userId = GameManager.getGameParam()?.userId
         if (!TextUtils.isEmpty(userId)) {
             dataBinding.tvCid.text = userId
+        }
+
+        playTime++
+
+        if ((playTime % 60).toInt() == 0) {
+            // 游玩15分钟上报
+            val params = mapOf("event" to "play_fifteen_minutes")
+            GameManager.xlStat(params)
         }
     }
 
@@ -396,6 +406,12 @@ class GameActivity : AppCompatActivity(), GameContract.IGameView {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onStopPlayEvent(event: StopPlayEvent) {
+        if (event.errorCode == Constants.STATUS_INSUFFICIENT_CLOSE) {
+            // 触发了余额不足，上报
+            val params = mapOf("event" to "insufficient")
+            GameManager.xlStat(params)
+        }
+
         finish()
     }
 }

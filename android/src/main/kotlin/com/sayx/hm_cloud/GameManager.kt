@@ -228,4 +228,19 @@ object GameManager {
     fun checkOrderStatus(orderNo: String) {
         channel.invokeMethod("checkOrderStatus", orderNo)
     }
+
+    /**
+     * Dau（登录成功）、充值人数、充值金额、消耗完毕，游玩15分钟。
+     *
+     * play_fifteen_minutes     游玩十五分钟
+     * insufficient             余额不足
+     *
+     */
+    fun xlStat(params: Map<String, Any>) {
+        /**
+         * event: "pay"         "offli"
+         * price: 0.01
+         */
+        channel.invokeMethod("xl-stat", params)
+    }
 }
