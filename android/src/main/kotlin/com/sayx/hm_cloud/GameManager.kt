@@ -331,6 +331,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
 
     fun startGame(gameParam: GameParam) {
         activityPauseTime = 0
+        lastControllerType == AppVirtualOperateType.NONE
         this.gameParam = gameParam
 
         this.isPartyPlay = gameParam.isPartyGame
