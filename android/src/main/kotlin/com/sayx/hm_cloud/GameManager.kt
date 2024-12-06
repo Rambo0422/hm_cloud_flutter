@@ -225,8 +225,9 @@ object GameManager {
         channel.invokeMethod("createOrder", orderId)
     }
 
-    fun checkOrderStatus(orderNo: String) {
-        channel.invokeMethod("checkOrderStatus", orderNo)
+    fun checkOrderStatus(orderNo: String, price: Number) {
+        val arguments = mapOf("orderNo" to orderNo, "price" to price)
+        channel.invokeMethod("checkOrderStatus", arguments)
     }
 
     /**

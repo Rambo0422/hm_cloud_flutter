@@ -99,4 +99,8 @@ class PayInfoAdapter(private val dataSet: MutableList<PayInfoModel.PayInfo>) :
     fun setOnCreateOrderListener(m: CreateOrderListener) {
         this.mCreateOrderListener = m
     }
+
+    fun data(): MutableList<PayInfoModel.PayInfo> {
+        return dataSet
+    }
 }

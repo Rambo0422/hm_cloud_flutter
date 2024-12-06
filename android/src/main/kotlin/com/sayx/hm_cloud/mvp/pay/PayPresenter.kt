@@ -1,5 +1,7 @@
 package com.sayx.hm_cloud.mvp.pay
 
+import android.text.TextUtils
+import com.blankj.utilcode.util.LogUtils
 import java.util.Timer
 import java.util.TimerTask
 import java.util.concurrent.atomic.AtomicInteger
@@ -18,14 +20,20 @@ class PayPresenter(val payView: PayContract.IPayView) : PayContract.IPayPresente
         }
     }
 
-    override fun startCheckOrderStatus(orderNo: String) {
+    override fun startCheckOrderStatus() {
         stopChecking()
-
         timer = Timer()
-        val attemptCounter = AtomicInteger(0)
         timer?.scheduleAtFixedRate(object : TimerTask() {
             override fun run() {
-                payView.checkOrderIsPay(orderNo)
+                // 遍历四个条目
+                val payInfoList = payView.getPayInfoList()
+                for (payInfo in payInfoList) {
+                    val orderNo = payInfo.orderNo
+                    val price = payInfo.price
+                    if (!TextUtils.isEmpty(orderNo)) {
+                        payView.checkOrderIsPay(orderNo, price)
+                    }
+                }
             }
         }, 1000, INTERVAL)
     }

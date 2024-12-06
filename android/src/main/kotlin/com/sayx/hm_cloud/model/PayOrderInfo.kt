@@ -11,4 +11,6 @@ data class PayOrderInfo(
     val qrCode: String = "",
     @SerializedName("orderNo")
     val orderNo: String = "",
+    @SerializedName("price")
+    val price: Float = 0.0f,
 )

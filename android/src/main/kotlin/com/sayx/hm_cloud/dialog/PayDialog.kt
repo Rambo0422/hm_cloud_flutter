@@ -4,6 +4,7 @@ import android.content.DialogInterface
 import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.Gravity
 import android.view.KeyEvent
 import android.view.LayoutInflater
@@ -18,7 +19,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.blankj.utilcode.util.LogUtils
-import com.blankj.utilcode.util.ThreadUtils
 import com.sayx.hm_cloud.GameManager
 import com.sayx.hm_cloud.R
 import com.sayx.hm_cloud.adapter.PayInfoAdapter
@@ -49,7 +49,7 @@ class PayDialog : DialogFragment(), DialogInterface.OnKeyListener, PayContract.I
     private lateinit var tvPrice: TextView
     private lateinit var tvOldPrice: TextView
     private lateinit var ivAvatar: ImageView
-    private lateinit var ivQRcode: ImageView
+    private lateinit var ivQRCode: ImageView
     private lateinit var payInfoAdapter: PayInfoAdapter
     private val isProcessing = AtomicBoolean(false)
     private var lastProcessedTime = 0L
@@ -91,7 +91,7 @@ class PayDialog : DialogFragment(), DialogInterface.OnKeyListener, PayContract.I
         tvName = view.findViewById(R.id.tv_name)
         tvTime = view.findViewById(R.id.tv_time)
         ivAvatar = view.findViewById(R.id.iv_avatar)
-        ivQRcode = view.findViewById(R.id.iv_qrcode)
+        ivQRCode = view.findViewById(R.id.iv_qrcode)
         tvPrice = view.findViewById(R.id.tv_price)
         tvOldPrice = view.findViewById(R.id.tv_old_price)
 
@@ -147,13 +147,13 @@ class PayDialog : DialogFragment(), DialogInterface.OnKeyListener, PayContract.I
 
         payInfoAdapter.setOnCreateOrderListener(object : PayInfoAdapter.CreateOrderListener {
             override fun createOrder(payInfo: PayInfoModel.PayInfo) {
-                val orderInfo = orderInfoList.firstOrNull {
-                    it.orderId == payInfo.id
-                }
-                if (orderInfo == null) {
+
+                val orderNo = payInfo.orderNo
+                val codeUrl = payInfo.codeUrl
+                if (TextUtils.isEmpty(orderNo) || TextUtils.isEmpty(codeUrl)) {
                     GameManager.createOrder(payInfo.id)
                 } else {
-                    setQrCode(orderInfo)
+                    setQrCode(codeUrl)
                 }
 
                 tvOldPrice.text = "¥${payInfo.oldPrice}"
@@ -236,10 +236,7 @@ class PayDialog : DialogFragment(), DialogInterface.OnKeyListener, PayContract.I
 
         // 创建订单
         event.payInfo.firstOrNull()?.let { payInfo ->
-            val orderInfo = orderInfoList.firstOrNull {
-                it.orderId == payInfo.id
-            }
-            if (orderInfo == null) {
+            if (TextUtils.isEmpty(payInfo.codeUrl) || TextUtils.isEmpty(payInfo.orderNo)) {
                 GameManager.createOrder(payInfo.id)
             }
             tvOldPrice.text = "¥${payInfo.oldPrice}"
@@ -247,33 +244,31 @@ class PayDialog : DialogFragment(), DialogInterface.OnKeyListener, PayContract.I
         }
     }
 
-    val orderInfoList = mutableListOf<PayOrderInfo>()
-
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onPayOrderInfo(event: PayOrderInfo) {
-        val nullOrEmpty = orderInfoList.none {
-            it.orderId == event.orderId
-        }
-        if (nullOrEmpty) {
-            orderInfoList.add(event)
+        val payInfo = payInfoAdapter.data().find {
+            event.orderId == it.id
         }
 
-        setQrCode(event)
+        if (payInfo != null) {
+            payInfo.codeUrl = event.qrCode
+            payInfo.orderNo = event.orderNo
+        }
 
-        presenter.startCheckOrderStatus(event.orderNo)
+        setQrCode(event.qrCode)
+
+        presenter.startCheckOrderStatus()
     }
 
-    private fun setQrCode(payOrderInfo: PayOrderInfo) {
-        val currentBitmap = (ivQRcode.drawable as? BitmapDrawable)?.bitmap
+    private fun setQrCode(qrCode: String) {
+        val currentBitmap = (ivQRCode.drawable as? BitmapDrawable)?.bitmap
         if (currentBitmap != null && !currentBitmap.isRecycled) {
             currentBitmap.recycle()
         }
 
-        val qrCode = payOrderInfo.qrCode
-
         val generateQRCode = EncodingHandler.createQRCode(qrCode, 200)
         generateQRCode?.let { bitmap ->
-            ivQRcode.setImageBitmap(bitmap)
+            ivQRCode.setImageBitmap(bitmap)
         }
     }
 
@@ -284,15 +279,18 @@ class PayDialog : DialogFragment(), DialogInterface.OnKeyListener, PayContract.I
         return "%02d:%02d:%02d".format(hours, minutes, remainingSeconds)
     }
 
-    override fun checkOrderIsPay(orderNo: String) {
+    override fun checkOrderIsPay(orderNo: String, price: Number) {
         lifecycleScope.launch(Dispatchers.Main) {
-            LogUtils.e("main: ${ThreadUtils.isMainThread()} orderNo: $orderNo")
-            GameManager.checkOrderStatus(orderNo)
+            GameManager.checkOrderStatus(orderNo, price)
         }
     }
 
+    override fun getPayInfoList(): MutableList<PayInfoModel.PayInfo> {
+        return payInfoAdapter.data()
+    }
+
     fun setPayOderListener(payOderListener: PayOderListener) {
-        this.payOderListener = payOderListener;
+        this.payOderListener = payOderListener
     }
 
     interface PayOderListener {

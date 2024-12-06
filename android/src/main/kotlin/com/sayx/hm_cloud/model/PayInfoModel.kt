@@ -40,7 +40,13 @@ data class PayInfoModel(
         val tmpt: Int = 0,
         @SerializedName("_type")
         val type: Int = 0
-    )
+    ) {
+        // 二维码
+        var codeUrl = ""
+
+        // 订单号
+        var orderNo = ""
+    }
 
     @Keep
     data class UserInfo(
