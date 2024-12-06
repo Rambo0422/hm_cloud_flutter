@@ -141,7 +141,7 @@ class KeyView @JvmOverloads constructor(
                 if (map != null) {
                     // 展示label
                     val labelText = KeyConstants.keyControl[keyInfo.inputOp]
-                        ?: KeyConstants.keyNumber[keyInfo.inputOp]
+                        ?: KeyConstants.keyNumber[keyInfo.inputOp] ?: ""
                     dataBinding.tvLabel.text = labelText
                     dataBinding.tvLabel.visibility = VISIBLE
                     // 缩小内容，展示边框

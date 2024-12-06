@@ -1237,7 +1237,10 @@ class GameActivity : AppCompatActivity() {
     fun onControllerConfigEvent(event: ControllerConfigEvent) {
         LogUtils.d("onControllerConfigEvent:${event.data}")
         dataBinding.gameController.setControllerData(event.data)
-        gameSettings?.controllerType = dataBinding.gameController.controllerType
+        gameSettings?.controllerType = if (event.data.type == GameConstants.gamepadConfig)
+            AppVirtualOperateType.APP_STICK_XBOX
+        else
+            AppVirtualOperateType.APP_KEYBOARD
         if (event.data.use != 1) {
             GameManager.useKeyboardData(event.data)
         }

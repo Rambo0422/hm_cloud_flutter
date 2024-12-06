@@ -1180,7 +1180,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                     info?.use = 0
                     KeyboardListView.updateKeyboard(keyboardList, "useSuccess")
                 }
-                EventBus.getDefault().post(ControllerConfigEvent(keyboardInfo))
             }
         })
     }
