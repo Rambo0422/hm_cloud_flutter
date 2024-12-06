@@ -196,7 +196,7 @@ class GameActivity : AppCompatActivity(), GameContract.IGameView {
 
         playTime++
 
-        if ((playTime % 60).toInt() == 0) {
+        if (playTime.toInt() == 15 * 60) {
             // 游玩15分钟上报
             val params = mapOf("event" to "play_fifteen_minutes")
             GameManager.xlStat(params)
