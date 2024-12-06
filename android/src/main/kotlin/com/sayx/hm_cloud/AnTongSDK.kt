@@ -83,7 +83,7 @@ object AnTongSDK {
         override fun onPlayerError(errorCode: Int, errorMsg: String) {
             if (mRequestDeviceSuccess != null) {
                 // 排队阶段
-                mRequestDeviceSuccess?.onRequestDeviceFailed(errorMsg)
+                mRequestDeviceSuccess?.onRequestDeviceFailed(errorCode, errorMsg)
             } else {
                 // 画面已经出现
                 ToastUtils.showShort(errorMsg)

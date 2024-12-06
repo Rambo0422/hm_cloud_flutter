@@ -3,7 +3,7 @@ package com.sayx.hm_cloud.callback
 interface RequestDeviceSuccess {
     fun onRequestDeviceSuccess()
 
-    fun onRequestDeviceFailed(errorMessage: String)
+    fun onRequestDeviceFailed(errorCode: Int, errorMessage: String)
 
     fun onStopPlay()
 }

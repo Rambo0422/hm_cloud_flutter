@@ -89,13 +89,21 @@ object GameManager {
                     }
                 }
 
-                override fun onRequestDeviceFailed(errorMessage: String) {
+                override fun onRequestDeviceFailed(errorCode: Int, errorMessage: String) {
                     this@GameManager.gameParam = null
                     runOnUiThread {
                         channel.invokeMethod(
                             "errorInfo",
                             mapOf(Pair("errorCode", "10001"), Pair("errorMsg", errorMessage))
                         )
+
+                        val gameName = gameParam.gameName
+                        val params = mapOf(
+                            "event" to "errorCode",
+                            "errorCode" to errorCode,
+                            "gameName" to gameName,
+                        )
+                        xlStat(params)
                     }
                 }
 
@@ -238,10 +246,6 @@ object GameManager {
      *
      */
     fun xlStat(params: Map<String, Any>) {
-        /**
-         * event: "pay"         "offli"
-         * price: 0.01
-         */
         channel.invokeMethod("xl-stat", params)
     }
 }

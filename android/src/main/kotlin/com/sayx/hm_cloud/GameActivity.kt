@@ -412,6 +412,16 @@ class GameActivity : AppCompatActivity(), GameContract.IGameView {
             GameManager.xlStat(params)
         }
 
+        if (event.errorCode != 0) {
+            val gameName = GameManager.getGameParam()?.gameName ?: ""
+            val params = mapOf(
+                "event" to "errorCode",
+                "errorCode" to event.errorCode,
+                "gameName" to gameName,
+            )
+            GameManager.xlStat(params)
+        }
+
         finish()
     }
 }
