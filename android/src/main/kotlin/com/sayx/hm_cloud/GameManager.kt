@@ -364,15 +364,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             object : BaseObserver<HttpResponse<ArchiveData>>() {
                 override fun onSubscribe(d: Disposable) {
                     disposable = d
-                    channel.invokeMethod(
-                        "gameStatusStat", mapOf(
-                            Pair("type", "game_request"),
-                            Pair("page", "游戏请求"),
-                            Pair("action", "请求接口"),
-                            Pair("force", true),
-                            Pair("arguments", mapOf("uri" to "https://archives.3ayx.net/getLast", "body" to params.toString()).toString())
-                        )
-                    )
                 }
 
                 override fun onError(e: Throwable) {
@@ -390,42 +381,11 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                                 "errorMsg" to e.errorMessage
                             )
                         )
-
-                        channel.invokeMethod(
-                            "gameStatusStat", mapOf(
-                                Pair("type", "game_request"),
-                                Pair("page", "游戏请求"),
-                                Pair("force", true),
-                                Pair("action", "请求失败"),
-                                Pair(
-                                    "arguments",
-                                    mapOf("uri" to "https://archives.3ayx.net/getLast", "errorCode" to "${e.errorCode}", "errMsg" to e.errorMessage).toString()
-                                )
-                            )
-                        )
                     }
                 }
 
                 override fun onNext(response: HttpResponse<ArchiveData>) {
                     requestCount = 0
-                    channel.invokeMethod(
-                        "gameStatusStat", mapOf(
-                            Pair("type", "game_request"),
-                            Pair("page", "游戏请求"),
-                            Pair("force", true),
-                            Pair("action", "请求成功"),
-                            Pair(
-                                "arguments",
-                                mapOf(
-                                    "uri" to "https://archives.3ayx.net/getLast",
-                                    "code" to "${response.responseCode}",
-                                    "dataCode" to "${response.data?.code}",
-                                    "custodian" to "${response.data?.custodian}",
-                                    "listEmpty" to "${response.data?.list?.isEmpty() ?: true}",
-                                ).toString()
-                            )
-                        )
-                    )
                     prepareGame(response.data)
                 }
             })

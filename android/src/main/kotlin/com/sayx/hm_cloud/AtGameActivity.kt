@@ -575,7 +575,7 @@ class AtGameActivity : AppCompatActivity() {
         gameSettings?.release()
         GameManager.isPlaying = false
 
-        GameManager.releaseGame(finish = "errorCode")
+        GameManager.releaseGame(finish = "$errorCode")
         val title = "游戏结束\n[$errorCode]"
         val subtitle = when (errorCode) {
             "${Constants.STATUS_NO_INPUT}" -> {
