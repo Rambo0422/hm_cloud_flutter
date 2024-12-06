@@ -94,8 +94,8 @@ object AnTongSDK {
     }
 
     fun initSdk(context: Context, channelName: String, accessKeyId: String) {
-        Constants.IS_DEBUG = true
-        Constants.AK_DEBUG = true
+        Constants.IS_DEBUG = false
+        Constants.AK_DEBUG = false
         Constants.IS_TV = true
         ACCESS_KEY_ID = accessKeyId
         AnTongManager.getInstance().init(context, channelName, accessKeyId)
