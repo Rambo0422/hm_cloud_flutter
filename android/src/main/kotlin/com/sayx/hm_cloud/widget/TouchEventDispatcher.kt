@@ -2,6 +2,7 @@ package com.sayx.hm_cloud.widget
 
 import android.view.MotionEvent
 import android.view.View
+import com.blankj.utilcode.util.LogUtils
 
 object TouchEventDispatcher {
 
@@ -13,11 +14,19 @@ object TouchEventDispatcher {
         }
     }
 
+    fun removeView() {
+        views.clear()
+    }
+
     fun dispatchTouchEvent(event: MotionEvent) {
+        LogUtils.d("dispatchTouchEvent:${views.size}-$event")
         views.forEach {
-            val ev = MotionEvent.obtain(event)
-            it.dispatchTouchEvent(ev)
-            ev.recycle()
+            LogUtils.d("dispatchTouchEvent:$it")
+            if (it is HMGameView) {
+                it.dispatchGameEvent(event)
+            } else if (it is ATGameView) {
+                it.dispatchGameEvent(event)
+            }
         }
     }
 }
