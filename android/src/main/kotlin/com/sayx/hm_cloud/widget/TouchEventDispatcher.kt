@@ -19,9 +19,7 @@ object TouchEventDispatcher {
     }
 
     fun dispatchTouchEvent(event: MotionEvent) {
-        LogUtils.d("dispatchTouchEvent:${views.size}-$event")
         views.forEach {
-            LogUtils.d("dispatchTouchEvent:$it")
             if (it is HMGameView) {
                 it.dispatchGameEvent(event)
             } else if (it is ATGameView) {

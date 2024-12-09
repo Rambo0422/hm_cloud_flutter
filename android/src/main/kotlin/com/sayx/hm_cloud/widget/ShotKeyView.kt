@@ -76,7 +76,8 @@ class ShotKeyView @JvmOverloads constructor(
     override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
         event?.let {
             if (controllerStatus == ControllerStatus.Normal) {
-                TouchEventDispatcher.dispatchTouchEvent(it)
+//                TouchEventDispatcher.dispatchTouchEvent(it)
+                return false
             }
             when (it.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {

@@ -65,6 +65,7 @@ import com.sayx.hm_cloud.utils.GameUtils
 import com.sayx.hm_cloud.utils.TimeUtils
 import com.sayx.hm_cloud.widget.HMGameView
 import com.sayx.hm_cloud.widget.KeyboardListView
+import com.sayx.hm_cloud.widget.TouchEventDispatcher
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import io.reactivex.rxjava3.core.Observer
@@ -167,6 +168,8 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         // 键盘数据重置
         gamepadList.clear()
         keyboardList.clear()
+
+        TouchEventDispatcher.removeView()
 
         HttpManager.addHttpHeader("token", gameParam.userToken)
 
