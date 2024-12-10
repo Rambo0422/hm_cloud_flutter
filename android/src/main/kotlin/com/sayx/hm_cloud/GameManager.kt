@@ -1772,10 +1772,12 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
     }
 
     fun onHttpError(code: Int?, url: String, errorType : String?) {
-        channel.invokeMethod("http_error", mapOf(
-            "errorCode" to code,
-            "requestUrl" to url,
-            "errorType" to errorType,
-        ))
+        activity.runOnUiThread {
+            channel.invokeMethod("http_error", mapOf(
+                "errorCode" to code,
+                "requestUrl" to url,
+                "errorType" to errorType,
+            ))
+        }
     }
 }
