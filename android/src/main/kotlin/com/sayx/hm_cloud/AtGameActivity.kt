@@ -191,23 +191,12 @@ class AtGameActivity : AppCompatActivity() {
                 callback?.let {
                     val jsonObject = JSONObject(it)
                     val status = jsonObject.getInt(StatusCallbackUtil.STATUS)
-                    val errorMessage = jsonObject.optString(StatusCallbackUtil.DATA, "服务器异常")
                     when (status) {
                         // 结束游戏，finish
                         Constants.STATUS_STOP_PLAY -> {
                             runOnUiThread {
                                 finish()
                             }
-                        }
-                        Constants.STATUS_INSUFFICIENT_CLOSE, Constants.STATUS_NO_INPUT -> {
-                            runOnUiThread {
-                                AnTongSDK.uploadErrorCode(status, errorMessage)
-                                showWarningDialog("$status")
-                            }
-                        }
-
-                        else -> {
-                            AnTongSDK.uploadErrorCode(status, errorMessage)
                         }
                     }
                 }
