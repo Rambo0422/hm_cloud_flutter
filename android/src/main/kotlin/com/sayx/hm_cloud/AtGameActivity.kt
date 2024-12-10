@@ -7,6 +7,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.content.res.Resources
 import android.graphics.Color
 import android.hardware.input.InputManager
 import android.media.AudioManager
@@ -84,6 +85,7 @@ import com.sayx.hm_cloud.widget.GameNoticeView
 import com.sayx.hm_cloud.widget.GameSettings
 import com.sayx.hm_cloud.widget.KeyEditView
 import com.sayx.hm_cloud.widget.KeyboardListView
+import me.jessyan.autosize.AutoSizeCompat
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -1455,5 +1457,12 @@ class AtGameActivity : AppCompatActivity() {
         }
         dataBinding.gameController.controllerType = controllerType
         gameSettings?.controllerType = controllerType
+    }
+
+    override fun getResources(): Resources {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            AutoSizeCompat.autoConvertDensityOfGlobal(super.getResources())
+        }
+        return super.getResources()
     }
 }

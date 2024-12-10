@@ -1,6 +1,7 @@
 package com.sayx.hm_cloud.widget
 
 import android.content.Context
+import android.os.Looper
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -32,6 +33,7 @@ import com.sayx.hm_cloud.model.KeyInfo
 import com.sayx.hm_cloud.model.MessageEvent
 import com.sayx.hm_cloud.utils.AppSizeUtils
 import com.sayx.hm_cloud.utils.ViewUtils
+import me.jessyan.autosize.AutoSizeCompat
 import me.jessyan.autosize.utils.AutoSizeUtils
 import org.greenrobot.eventbus.EventBus
 import kotlin.math.abs
@@ -1465,5 +1467,12 @@ class GameController @JvmOverloads constructor(
         list.forEach {
             addKey(it)
         }
+    }
+
+    override fun generateLayoutParams(attrs: AttributeSet?): LayoutParams {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            AutoSizeCompat.autoConvertDensityOfGlobal(resources)
+        }
+        return super.generateLayoutParams(attrs)
     }
 }
