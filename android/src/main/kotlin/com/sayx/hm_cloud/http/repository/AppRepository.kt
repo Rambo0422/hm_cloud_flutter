@@ -15,14 +15,14 @@ object AppRepository {
 
     fun requestArchiveData(params: HashMap<String, Any>, observer: Observer<HttpResponse<ArchiveData>>) {
         appService.requestArchiveData(params)
-            .compose(HttpError.onError())
+            .compose(HttpError.onError("https://archives.3ayx.net/getLast"))
             .compose(RxSchedulers.schedulers())
             .subscribe(observer)
     }
 
     fun requestGameConfig(observer: Observer<HttpResponse<GameConfig>>) {
         appService.requestGameConfig()
-            .compose(HttpError.onError())
+            .compose(HttpError.onError("https://api-cgfc.3ayx.net/api/config/get?key=GAME_CONFIG"))
             .compose(RxSchedulers.schedulers())
             .subscribe(observer)
     }

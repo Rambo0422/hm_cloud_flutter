@@ -78,7 +78,7 @@ import java.io.Serializable
 @SuppressLint("StaticFieldLeak")
 object GameManager : HmcpPlayerListenerImp(), OnContronListener {
 
-    lateinit var channel: MethodChannel
+    private lateinit var channel: MethodChannel
 
     val gson: Gson by lazy {
         GsonBuilder().disableHtmlEscaping()
@@ -1769,5 +1769,13 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                 }
             }
         })
+    }
+
+    fun onHttpError(code: Int?, url: String, errorType : String?) {
+        channel.invokeMethod("http_error", mapOf(
+            "errorCode" to code,
+            "requestUrl" to url,
+            "errorType" to errorType,
+        ))
     }
 }

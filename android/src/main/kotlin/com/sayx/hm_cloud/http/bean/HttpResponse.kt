@@ -4,6 +4,8 @@ import com.google.gson.annotations.SerializedName
 
 data class HttpResponse<T>(
 
+    var exceptionName : String? = null,
+
     @SerializedName("message")
     var responseMessage: String? = null,
 
@@ -14,6 +16,6 @@ data class HttpResponse<T>(
     val data: T?,
 ) {
     override fun toString(): String {
-        return "HttpResponse(responseMessage=$responseMessage, responseCode=$responseCode, data=$data)"
+        return "HttpResponse(responseMessage=$responseMessage, responseCode=$responseCode, data=$data, exceptionName=$exceptionName)"
     }
 }
