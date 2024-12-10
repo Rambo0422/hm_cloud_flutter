@@ -1,6 +1,5 @@
 package com.sayx.hm_cloud.http.interceptor
 
-import com.blankj.utilcode.util.LogUtils
 import com.sayx.hm_cloud.utils.TimeUtils
 import okhttp3.Interceptor
 import okhttp3.Response
