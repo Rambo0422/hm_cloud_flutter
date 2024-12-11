@@ -575,7 +575,7 @@ class AtGameActivity : AppCompatActivity() {
         gameSettings?.release()
         GameManager.isPlaying = false
 
-        GameManager.releaseGame(finish = "errorCode")
+        GameManager.releaseGame(finish = "$errorCode")
         val title = "游戏结束\n[$errorCode]"
         val subtitle = when (errorCode) {
             "${Constants.STATUS_NO_INPUT}" -> {
@@ -1275,7 +1275,10 @@ class AtGameActivity : AppCompatActivity() {
     fun onControllerConfigEvent(event: ControllerConfigEvent) {
         LogUtils.d("onControllerConfigEvent:${event.data}")
         dataBinding.gameController.setControllerData(event.data)
-        gameSettings?.controllerType = dataBinding.gameController.controllerType
+        gameSettings?.controllerType = if (event.data.type == GameConstants.gamepadConfig)
+            AppVirtualOperateType.APP_STICK_XBOX
+        else
+            AppVirtualOperateType.APP_KEYBOARD
         if (event.data.use != 1) {
             GameManager.useKeyboardData(event.data)
         }

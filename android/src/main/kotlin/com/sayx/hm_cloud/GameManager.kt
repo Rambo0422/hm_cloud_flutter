@@ -65,6 +65,7 @@ import com.sayx.hm_cloud.utils.GameUtils
 import com.sayx.hm_cloud.utils.TimeUtils
 import com.sayx.hm_cloud.widget.HMGameView
 import com.sayx.hm_cloud.widget.KeyboardListView
+import com.sayx.hm_cloud.widget.TouchEventDispatcher
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import io.reactivex.rxjava3.core.Observer
@@ -77,7 +78,7 @@ import java.io.Serializable
 @SuppressLint("StaticFieldLeak")
 object GameManager : HmcpPlayerListenerImp(), OnContronListener {
 
-    lateinit var channel: MethodChannel
+    private lateinit var channel: MethodChannel
 
     val gson: Gson by lazy {
         GsonBuilder().disableHtmlEscaping()
@@ -167,6 +168,8 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         // 键盘数据重置
         gamepadList.clear()
         keyboardList.clear()
+
+        TouchEventDispatcher.removeView()
 
         HttpManager.addHttpHeader("token", gameParam.userToken)
 
@@ -364,15 +367,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             object : BaseObserver<HttpResponse<ArchiveData>>() {
                 override fun onSubscribe(d: Disposable) {
                     disposable = d
-                    channel.invokeMethod(
-                        "gameStatusStat", mapOf(
-                            Pair("type", "game_request"),
-                            Pair("page", "游戏请求"),
-                            Pair("action", "请求接口"),
-                            Pair("force", true),
-                            Pair("arguments", mapOf("uri" to "https://archives.3ayx.net/getLast", "body" to params.toString()).toString())
-                        )
-                    )
                 }
 
                 override fun onError(e: Throwable) {
@@ -390,42 +384,11 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                                 "errorMsg" to e.errorMessage
                             )
                         )
-
-                        channel.invokeMethod(
-                            "gameStatusStat", mapOf(
-                                Pair("type", "game_request"),
-                                Pair("page", "游戏请求"),
-                                Pair("force", true),
-                                Pair("action", "请求失败"),
-                                Pair(
-                                    "arguments",
-                                    mapOf("uri" to "https://archives.3ayx.net/getLast", "errorCode" to "${e.errorCode}", "errMsg" to e.errorMessage).toString()
-                                )
-                            )
-                        )
                     }
                 }
 
                 override fun onNext(response: HttpResponse<ArchiveData>) {
                     requestCount = 0
-                    channel.invokeMethod(
-                        "gameStatusStat", mapOf(
-                            Pair("type", "game_request"),
-                            Pair("page", "游戏请求"),
-                            Pair("force", true),
-                            Pair("action", "请求成功"),
-                            Pair(
-                                "arguments",
-                                mapOf(
-                                    "uri" to "https://archives.3ayx.net/getLast",
-                                    "code" to "${response.responseCode}",
-                                    "dataCode" to "${response.data?.code}",
-                                    "custodian" to "${response.data?.custodian}",
-                                    "listEmpty" to "${response.data?.list?.isEmpty() ?: true}",
-                                ).toString()
-                            )
-                        )
-                    )
                     prepareGame(response.data)
                 }
             })
@@ -610,7 +573,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
     }
 
     private fun playGame(bundle: Bundle?) {
-        LogUtils.d("playGame:$gameView")
+//        LogUtils.d("playGame:$gameView")
         channel.invokeMethod(
             "gameStatusStat", mapOf(
                 Pair("type", "game_play"),
@@ -630,7 +593,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                 it.userId = gameParam?.userId
                 it.userToken = gameParam?.userToken
             })
-            LogUtils.d("playGame:${gameParam?.accountInfo}")
+//            LogUtils.d("playGame:${gameParam?.accountInfo}")
             // 上号助手
             gameParam?.accountInfo?.let { accountInfo ->
 //            LogUtils.d("AccountInfo 1:${accountInfo.javaClass}")
@@ -652,6 +615,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                     Pair("arguments", bundle?.toString())
                 )
             )
+            invokeMethod("hm_start", mapOf())
             gameView?.play(bundle)
         }
     }
@@ -709,7 +673,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                 // 游戏准备完成，可以启动游戏
                 Constants.STATUS_PLAY_INTERNAL -> {
                     gameView?.play()
-                    channel.invokeMethod("gamePlay", null)
                 }
                 // sdk反馈需选择是否进入排队，直接进入排队
                 Constants.STATUS_WAIT_CHOOSE -> {
@@ -1180,7 +1143,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                     info?.use = 0
                     KeyboardListView.updateKeyboard(keyboardList, "useSuccess")
                 }
-                EventBus.getDefault().post(ControllerConfigEvent(keyboardInfo))
             }
         })
     }
@@ -1807,5 +1769,15 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                 }
             }
         })
+    }
+
+    fun onHttpError(code: Int?, url: String, errorType : String?) {
+        activity.runOnUiThread {
+            channel.invokeMethod("http_error", mapOf(
+                "errorCode" to code,
+                "requestUrl" to url,
+                "errorType" to errorType,
+            ))
+        }
     }
 }

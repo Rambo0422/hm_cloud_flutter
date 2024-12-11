@@ -23,6 +23,7 @@ import com.sayx.hm_cloud.model.KeyInfo
 import com.sayx.hm_cloud.callback.OnKeyEventListener
 import com.sayx.hm_cloud.callback.OnPositionChangeListener
 import com.sayx.hm_cloud.constants.ControllerStatus
+import com.sayx.hm_cloud.constants.KeyConstants
 import com.sayx.hm_cloud.constants.KeyType
 import com.sayx.hm_cloud.constants.controllerStatus
 import com.sayx.hm_cloud.model.RoulettePart
@@ -180,7 +181,9 @@ class RouletteKeyView @JvmOverloads constructor(
     }
 
     private fun drawRouletteName(canvas: Canvas, roulettePart: RoulettePart) {
-        val name: String = when (roulettePart.keyInfo.type) {
+        val keyInfo = roulettePart.keyInfo
+
+        val name: String = when (keyInfo.type) {
             KeyType.KEYBOARD_MOUSE_LEFT -> {
                 "左击"
             }
@@ -202,19 +205,32 @@ class RouletteKeyView @JvmOverloads constructor(
             }
 
             else -> {
-                roulettePart.keyInfo.text ?: ""
+                val labelText = KeyConstants.keyControl[keyInfo.inputOp]
+                    ?: KeyConstants.keyNumber[keyInfo.inputOp] ?: ""
+                if (TextUtils.isEmpty(keyInfo.text)) labelText else "${keyInfo.text}\n$labelText"
             }
         }
         val path = Path()
         path.addArc(rouletteRectF, roulettePart.startAngle, roulettePart.angle)
         val midAngle: Float = roulettePart.startAngle + roulettePart.angle / 2
-        val x = rouletteRectF.centerX() + radius * cos(Math.toRadians(midAngle.toDouble())) * 0.7f
-        val y = rouletteRectF.centerY() + radius * sin(Math.toRadians(midAngle.toDouble())) * 0.7f
+        val x = rouletteRectF.centerX() + (radius * cos(Math.toRadians(midAngle.toDouble())) * 0.64f).toFloat()
+        val y = rouletteRectF.centerY() + (radius * sin(Math.toRadians(midAngle.toDouble())) * 0.64f).toFloat()
         textPaint.color = Color.WHITE
-        val fontMetrics = textPaint.fontMetrics
-        val distance = (fontMetrics.bottom - fontMetrics.top) / 2 - fontMetrics.bottom
-        val baseline = y + distance
-        canvas.drawText(name, x.toFloat(), baseline.toFloat(), textPaint)
+        if (name.contains("\n")) {
+            val lines = name.split("\n")
+            val textHeight = (textPaint.descent() - textPaint.ascent()) * lines.size
+            var textY = y - textHeight / 2 + (textPaint.descent() - textPaint.ascent())
+
+            lines.forEach { line ->
+                canvas.drawText(line, x, textY, textPaint)
+                textY += (textPaint.descent() - textPaint.ascent())
+            }
+        } else {
+            val fontMetrics = textPaint.fontMetrics
+            val distance = (fontMetrics.bottom - fontMetrics.top) / 2 - fontMetrics.bottom
+            val textY = y + distance
+            canvas.drawText(name, x, textY, textPaint)
+        }
     }
 
     fun setKeyInfo(keyInfo: KeyInfo) {

@@ -26,7 +26,7 @@ class RequestInterceptor : Interceptor {
         HashMap()
     }
 
-    @Throws(IOException::class)
+    @Throws(Throwable::class)
     override fun intercept(chain: Interceptor.Chain): Response {
         var request = chain.request()
         when (request.method) {
@@ -115,7 +115,7 @@ class RequestInterceptor : Interceptor {
         return request
     }
 
-    @Throws(IOException::class)
+    @Throws(Throwable::class)
     private fun getRequestContent(requestBody: RequestBody): String {
         val buffer = Buffer()
         requestBody.writeTo(buffer)
