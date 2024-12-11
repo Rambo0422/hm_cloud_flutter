@@ -380,6 +380,7 @@ class RockerView @JvmOverloads constructor(
                             moveRocker(centerPoint)
                             showArrow = false
                             invalidate()
+                            handler.removeCallbacks(runnable)
                             handler.postDelayed(runnable, 5000L)
                         }
                     }
@@ -393,6 +394,7 @@ class RockerView @JvmOverloads constructor(
                         showArrow = false
                         invalidate()
                         if (controllerStatus == ControllerStatus.Normal) {
+                            handler.removeCallbacks(runnable)
                             handler.postDelayed(runnable, 5000L)
                         }
                     }
