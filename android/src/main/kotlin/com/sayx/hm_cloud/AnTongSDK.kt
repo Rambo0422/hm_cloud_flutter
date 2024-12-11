@@ -115,6 +115,7 @@ object AnTongSDK {
         }
 
         bundle.putString(AnTongVideoView.PKG_NAME, gameParam.gamePkName)
+        GameManager.invokeMethod("at_start", mapOf())
         anTongVideoView?.play(bundle)
     }
 

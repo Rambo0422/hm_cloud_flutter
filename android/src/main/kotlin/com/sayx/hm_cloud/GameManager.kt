@@ -573,7 +573,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
     }
 
     private fun playGame(bundle: Bundle?) {
-        LogUtils.d("playGame:$gameView")
+//        LogUtils.d("playGame:$gameView")
         channel.invokeMethod(
             "gameStatusStat", mapOf(
                 Pair("type", "game_play"),
@@ -593,7 +593,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                 it.userId = gameParam?.userId
                 it.userToken = gameParam?.userToken
             })
-            LogUtils.d("playGame:${gameParam?.accountInfo}")
+//            LogUtils.d("playGame:${gameParam?.accountInfo}")
             // 上号助手
             gameParam?.accountInfo?.let { accountInfo ->
 //            LogUtils.d("AccountInfo 1:${accountInfo.javaClass}")
@@ -615,6 +615,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                     Pair("arguments", bundle?.toString())
                 )
             )
+            invokeMethod("hm_start", mapOf())
             gameView?.play(bundle)
         }
     }
@@ -672,7 +673,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                 // 游戏准备完成，可以启动游戏
                 Constants.STATUS_PLAY_INTERNAL -> {
                     gameView?.play()
-                    channel.invokeMethod("gamePlay", null)
                 }
                 // sdk反馈需选择是否进入排队，直接进入排队
                 Constants.STATUS_WAIT_CHOOSE -> {
