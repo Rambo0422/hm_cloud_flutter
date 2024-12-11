@@ -2,8 +2,6 @@ package com.sayx.hm_cloud
 
 import android.app.Activity
 import android.content.Intent
-import android.content.res.Configuration
-import android.util.Log
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ScreenUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -35,11 +33,24 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
             MethodChannel(flutterPluginBinding.binaryMessenger, GameViewConstants.methodChannelName)
         channel.setMethodCallHandler(this)
 
-        AutoSizeConfig.getInstance().screenWidth = ScreenUtils.getScreenWidth()
-        AutoSizeConfig.getInstance().screenHeight = ScreenUtils.getScreenHeight()
-        AutoSizeConfig.getInstance().designWidthInDp = 812
-        AutoSizeConfig.getInstance().designHeightInDp = 375
-        AutoSizeConfig.getInstance().isExcludeFontScale = true
+
+        AutoSizeConfig.getInstance()
+            .setScreenWidth(ScreenUtils.getScreenWidth())
+            .setScreenHeight(ScreenUtils.getScreenHeight())
+            .setDesignWidthInDp(812)
+            .setDesignHeightInDp(375)
+            .setLog(false)
+            .setExcludeFontScale(true)
+            .setOnAdaptListener(object : onAdaptListener {
+                override fun onAdaptBefore(target: Any?, activity: Activity?) {
+                    AutoSizeConfig.getInstance().setScreenWidth(ScreenUtils.getScreenWidth())
+                    AutoSizeConfig.getInstance().setScreenHeight(ScreenUtils.getScreenHeight())
+
+                }
+
+                override fun onAdaptAfter(target: Any?, activity: Activity?) {
+                }
+            })
     }
 
     override fun onMethodCall(call: MethodCall, callback: MethodChannel.Result) {
