@@ -147,12 +147,7 @@ object AnTongSDK {
     }
 
     fun leaveQueue() {
-        val leaveQueue = anTongVideoView?.leaveQueue() ?: true
-        if (leaveQueue) {
-            onDestroy()
-        } else {
-            stopGame()
-        }
+        anTongVideoView?.leaveQueue()
     }
 
     fun onDestroy() {
