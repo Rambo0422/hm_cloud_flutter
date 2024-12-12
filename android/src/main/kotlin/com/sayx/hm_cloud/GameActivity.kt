@@ -6,6 +6,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.content.res.Resources
 import android.graphics.Color
 import android.hardware.input.InputManager
 import android.media.AudioManager
@@ -103,6 +104,7 @@ import com.sayx.hm_cloud.widget.PlayPartyUserAvatarView
 import com.sayx.hm_cloud.widget.PlayPartyWantPlayView
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import me.jessyan.autosize.AutoSizeCompat
 import me.jessyan.autosize.utils.AutoSizeUtils
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -1689,5 +1691,12 @@ class GameActivity : AppCompatActivity() {
         }
         dataBinding.gameController.controllerType = controllerType
         gameSettings?.controllerType = controllerType
+    }
+
+    override fun getResources(): Resources {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            AutoSizeCompat.autoConvertDensityOfGlobal(super.getResources())
+        }
+        return super.getResources()
     }
 }

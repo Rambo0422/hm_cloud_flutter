@@ -180,7 +180,6 @@ object AnTongSDK {
             callback?.let {
                 val jsonObject = JSONObject(it)
                 val status = jsonObject.getInt(StatusCallbackUtil.STATUS)
-                val errorMessage = jsonObject.optString(StatusCallbackUtil.DATA, "服务器异常")
                 when (status) {
                     Constants.STATUS_FIRST_FRAME_ARRIVAL -> {
                         anTongVideoView?.setHmcpPlayerListener(null)
@@ -197,7 +196,7 @@ object AnTongSDK {
                         }
                     }
                     else -> {
-                        uploadErrorCode(status, errorMessage)
+                        // 忽略错误码
                     }
                 }
             } ?: return
