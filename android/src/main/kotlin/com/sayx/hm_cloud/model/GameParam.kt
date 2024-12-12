@@ -103,7 +103,7 @@ data class GameParam(
                 getTimeValue(arguments["buyout"]),
                 arguments["isPartyGame"] as Boolean? ?: false,
                 arguments["gameType"] as String? ?: "",
-                (arguments["defaultOperation"] as Number?)?.toInt() ?: 2,
+                (arguments["defaultOperation"] as Number?)?.toInt() ?: 1,
                 (arguments["supportOperation"] as Number?)?.toInt() ?: 3,
                 arguments["pinCode"] as String? ?: "",
                 (arguments["roomIndex"] as Number?)?.toInt() ?: -1,
