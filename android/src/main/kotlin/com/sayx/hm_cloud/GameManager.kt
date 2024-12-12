@@ -1772,6 +1772,9 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
     }
 
     fun onHttpError(code: Int?, url: String, errorType : String?) {
+        if (code == -1) {
+            return
+        }
         activity.runOnUiThread {
             channel.invokeMethod("http_error", mapOf(
                 "errorCode" to code,

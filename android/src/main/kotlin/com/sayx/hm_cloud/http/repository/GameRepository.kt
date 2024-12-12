@@ -22,7 +22,7 @@ object GameRepository {
     fun requestDefaultGamepad(gameId: String?, observer: Observer<HttpResponse<ControllerInfo>>) {
         if (!TextUtils.isEmpty(gameId)) {
             gameService.requestDefaultKeyboard("1", gameId!!)
-                .compose(HttpError.onError("https://api-cgfc.3ayx.net/api/cloudgame/v2/keyboard/getdefault&type=1&game_id=$gameId"))
+                .compose(HttpError.onError("/api/cloudgame/v2/keyboard/getdefault"))
                 .compose(RxSchedulers.schedulers())
                 .subscribe(observer)
         } else {
@@ -33,7 +33,7 @@ object GameRepository {
     fun requestDefaultKeyboard(gameId: String?, observer: Observer<HttpResponse<ControllerInfo>>) {
         if (!TextUtils.isEmpty(gameId)) {
             gameService.requestDefaultKeyboard("2", gameId!!)
-                .compose(HttpError.onError("https://api-cgfc.3ayx.net/api/cloudgame/v2/keyboard/getdefault&type=2&game_id=$gameId"))
+                .compose(HttpError.onError("/api/cloudgame/v2/keyboard/getdefault"))
                 .compose(RxSchedulers.schedulers())
                 .subscribe(observer)
         } else {
@@ -44,7 +44,7 @@ object GameRepository {
     fun requestUserGamepadData(gameId: String?, observer: Observer<HttpResponse<KeyboardList>>) {
         if (!TextUtils.isEmpty(gameId)) {
             gameService.requestUserKeyboardData("1", 1, 3, gameId!!)
-                .compose(HttpError.onError("https://api-cgfc.3ayx.net/api/cloudgame/v2/keyboard/get&type=1&page=1&size=3&game_id=$gameId"))
+                .compose(HttpError.onError("/api/cloudgame/v2/keyboard/get"))
                 .compose(RxSchedulers.schedulers())
                 .subscribe(observer)
         } else {
@@ -55,7 +55,7 @@ object GameRepository {
     fun requestUserKeyboardData(gameId: String?, observer: Observer<HttpResponse<KeyboardList>>) {
         if (!TextUtils.isEmpty(gameId)) {
             gameService.requestUserKeyboardData("2", 1, 3, gameId!!)
-                .compose(HttpError.onError("https://api-cgfc.3ayx.net/api/cloudgame/v2/keyboard/get&type=2&page=1&size=3&game_id=$gameId"))
+                .compose(HttpError.onError("/api/cloudgame/v2/keyboard/get"))
                 .compose(RxSchedulers.schedulers())
                 .subscribe(observer)
         } else {
@@ -71,14 +71,14 @@ object GameRepository {
             "keyboard" to keyboardInfo.keyboard.map { keyInfo -> keyInfo.toMap() }.toList()
         )
         gameService.requestAddKeyboard(params)
-            .compose(HttpError.onError("https://api-cgfc.3ayx.net/api/cloudgame/v2/keyboard/create"))
+            .compose(HttpError.onError("/api/cloudgame/v2/keyboard/create"))
             .compose(RxSchedulers.schedulers())
             .subscribe(observer)
     }
 
     fun requestDeleteKeyboard(keyboardId: String, observer: Observer<HttpResponse<Any>>) {
         gameService.requestDeleteKeyboard(hashMapOf("id" to keyboardId))
-            .compose(HttpError.onError("https://api-cgfc.3ayx.net/api/cloudgame/v2/keyboard/del"))
+            .compose(HttpError.onError("/api/cloudgame/v2/keyboard/del"))
             .compose(RxSchedulers.schedulers())
             .subscribe(observer)
     }
@@ -93,7 +93,7 @@ object GameRepository {
             params["name"] = keyboardInfo.name ?: ""
         }
         gameService.requestUpdateKeyboard(params)
-            .compose(HttpError.onError("https://api-cgfc.3ayx.net/api/cloudgame/v2/keyboard/update"))
+            .compose(HttpError.onError("/api/cloudgame/v2/keyboard/update"))
             .compose(RxSchedulers.schedulers())
             .subscribe(observer)
     }

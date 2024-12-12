@@ -22,7 +22,7 @@ object AppRepository {
 
     fun requestGameConfig(observer: Observer<HttpResponse<GameConfig>>) {
         appService.requestGameConfig()
-            .compose(HttpError.onError("https://api-cgfc.3ayx.net/api/config/get?key=GAME_CONFIG"))
+            .compose(HttpError.onError("/api/config/get?key=GAME_CONFIG"))
             .compose(RxSchedulers.schedulers())
             .subscribe(observer)
     }

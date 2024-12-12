@@ -14,7 +14,7 @@ object UserRepository {
 
     fun getUserTimeInfo(observer: Observer<HttpResponse<AccountTimeInfo>>) {
         userService.getUserTimeInfo()
-            .compose(HttpError.onError("https://api-cgfc.3ayx.net/api/user/getvvip"))
+            .compose(HttpError.onError("/api/user/getvvip"))
             .compose(RxSchedulers.schedulers())
             .subscribe(observer)
     }
