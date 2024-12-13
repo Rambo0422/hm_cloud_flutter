@@ -1,5 +1,6 @@
 package com.sayx.hm_cloud.utils
 
+import com.blankj.utilcode.util.LogUtils
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -58,9 +59,10 @@ object TimeUtils {
     }
 
     fun isPeakTime(): Boolean {
-        val calendar = Calendar.getInstance()
+        val calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Shanghai"))
         calendar.time = Date(currentTime())
         val hour = calendar.get(Calendar.HOUR_OF_DAY)
-        return hour > 18
+        LogUtils.d("isPeakTime:$hour")
+        return hour > 17
     }
 }
