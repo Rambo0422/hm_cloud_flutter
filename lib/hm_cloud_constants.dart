@@ -58,4 +58,7 @@ class HMCloudConstants {
 
   // 获取订单状态
   static const checkOrderStatus = "checkOrderStatus";
+
+  // 显示异常弹窗
+  static const showErrorDialog = "showErrorDialog";
 }

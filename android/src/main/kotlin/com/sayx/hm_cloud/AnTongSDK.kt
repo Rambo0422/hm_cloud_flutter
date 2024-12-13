@@ -41,21 +41,9 @@ object AnTongSDK {
                         anTongVideoView?.setVideoFps(60)
                     }
 
-//                    Constants.STATUS_PEER_REJECT,
-//                    Constants.STATUS_TOKEN_INVALID,
                     Constants.STATUS_STOP_PLAY -> {
                         val stopPlayEvent = StopPlayEvent()
                         EventBus.getDefault().post(stopPlayEvent)
-                    }
-
-                    Constants.STATUS_APP_ID_ERROR,
-                    Constants.STATUS_NOT_FOND_GAME,
-                    Constants.STATUS_SIGN_FAILED,
-                    201011,
-                    Constants.STATUS_CONN_FAILED -> {
-                        val errorMessage =
-                            jsonObject.optString(StatusCallbackUtil.DATA, "连接失败")
-                        mRequestDeviceSuccess?.onRequestDeviceFailed(errorMessage)
                     }
 
                     Constants.STATUS_NO_INPUT -> {
@@ -85,9 +73,7 @@ object AnTongSDK {
                 // 排队阶段
                 mRequestDeviceSuccess?.onRequestDeviceFailed(errorCode, errorMsg)
             } else {
-                // 画面已经出现
-                ToastUtils.showShort(errorMsg)
-                val stopPlayEvent = StopPlayEvent(errorCode)
+                val stopPlayEvent = StopPlayEvent(errorCode, errorMsg)
                 EventBus.getDefault().post(stopPlayEvent)
             }
         }
@@ -175,10 +161,6 @@ object AnTongSDK {
     }
 
     fun leaveQueue() {
-        anTongVideoView?.setHmcpPlayerListener(null)
-        val leaveQueue = anTongVideoView?.leaveQueue() ?: true
-        if (leaveQueue) {
-            onDestroy()
-        }
+        anTongVideoView?.leaveQueue()
     }
 }

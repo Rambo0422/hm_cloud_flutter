@@ -10,11 +10,14 @@ import com.blankj.utilcode.util.LogUtils
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.media.atkit.AnTongManager
+import com.media.atkit.Constants
 import com.media.atkit.beans.ChannelInfo
+import com.media.atkit.enums.StopGameStatus
 import com.media.atkit.listeners.OnGameIsAliveListener
 import com.media.atkit.listeners.OnSaveGameCallBackListener
 import com.sayx.hm_cloud.callback.RequestDeviceSuccess
 import com.sayx.hm_cloud.model.GameParam
+import io.flutter.BuildConfig
 import io.flutter.plugin.common.MethodChannel
 
 @SuppressLint("StaticFieldLeak")
@@ -90,20 +93,32 @@ object GameManager {
                 }
 
                 override fun onRequestDeviceFailed(errorCode: Int, errorMessage: String) {
-                    this@GameManager.gameParam = null
-                    runOnUiThread {
-                        channel.invokeMethod(
-                            "errorInfo",
-                            mapOf(Pair("errorCode", "10001"), Pair("errorMsg", errorMessage))
-                        )
+                    if (errorCode == Constants.STATUS_STOP_ING) {
+                        AnTongManager.getInstance().setStopGameListener { stopGameStatus ->
+                            AnTongManager.getInstance().setStopGameListener(null)
+                            if (stopGameStatus == StopGameStatus.StopGameEnding) {
+                                // 切换到主线程
+                                runOnUiThread {
+                                    startGame(this@GameManager.gameParam!!)
+                                }
+                            }
+                        }
+                    } else {
+                        this@GameManager.gameParam = null
+                        runOnUiThread {
+                            channel.invokeMethod(
+                                "errorInfo",
+                                mapOf(Pair("errorCode", errorCode), Pair("errorMsg", errorMessage))
+                            )
 
-                        val gameName = gameParam.gameName
-                        val params = mapOf(
-                            "event" to "errorCode",
-                            "errorCode" to errorCode,
-                            "gameName" to gameName,
-                        )
-                        xlStat(params)
+                            val gameName = gameParam.gameName
+                            val params = mapOf(
+                                "event" to "errorCode",
+                                "errorCode" to errorCode,
+                                "gameName" to gameName,
+                            )
+                            xlStat(params)
+                        }
                     }
                 }
 
@@ -184,10 +199,18 @@ object GameManager {
                 releaseOldGameCallback = null
             }
 
-            override fun fail(msg: String?) {
-                this@GameManager.userId = ""
-                releaseOldGameCallback?.success(false)
-                releaseOldGameCallback = null
+            override fun fail(errorCode: Int, errorMsg: String) {
+                if (errorCode == Constants.STATUS_STOP_ING) {
+                    // 开始监听
+                    AnTongManager.getInstance().setStopGameListener { stopGameStatus ->
+                        AnTongManager.getInstance().setStopGameListener(null)
+                        releaseOldGame(releaseOldGameCallback, userId)
+                    }
+                } else {
+                    this@GameManager.userId = ""
+                    releaseOldGameCallback?.success(false)
+                    releaseOldGameCallback = null
+                }
             }
         })
     }
@@ -213,9 +236,9 @@ object GameManager {
     }
 
     fun leaveQueue() {
+        AnTongManager.getInstance().setStopGameListener(null)
         AnTongSDK.leaveQueue()
         stopReleaseCheckTimer()
-
         // 假设这个时候碰到了 releaseOldGame 的情况下，所以，需要释放 releaseOldGame 的channel
         releaseOldGameCallback = null
     }
@@ -247,5 +270,13 @@ object GameManager {
      */
     fun xlStat(params: Map<String, Any>) {
         channel.invokeMethod("xl-stat", params)
+    }
+
+    fun showErrorDialog(errorCode: Int, errorMsg: String) {
+        val params = hashMapOf<String, Any>(
+            "errorCode" to errorCode,
+            "errorMsg" to errorMsg
+        )
+        channel.invokeMethod("showErrorDialog", params)
     }
 }

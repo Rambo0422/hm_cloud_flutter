@@ -422,6 +422,9 @@ class GameActivity : AppCompatActivity(), GameContract.IGameView {
             GameManager.xlStat(params)
         }
 
+        // 回传错误码
+        GameManager.showErrorDialog(event.errorCode, event.errorMsg);
+
         finish()
     }
 }
