@@ -62,7 +62,6 @@ object TimeUtils {
         val calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Shanghai"))
         calendar.time = Date(currentTime())
         val hour = calendar.get(Calendar.HOUR_OF_DAY)
-        LogUtils.d("isPeakTime:$hour")
         return hour > 17
     }
 }
