@@ -46,6 +46,10 @@ android {
         enabled = true
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
