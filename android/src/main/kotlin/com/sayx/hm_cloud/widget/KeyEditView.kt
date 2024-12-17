@@ -1,5 +1,6 @@
 package com.sayx.hm_cloud.widget
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.text.Editable
 import android.util.AttributeSet
@@ -63,9 +64,13 @@ class KeyEditView @JvmOverloads constructor(
             callback?.onSaveKey(mKeyInfo, dataBinding.etKeyName.windowToken)
         }
         dataBinding.etKeyName.addTextChangedListener(object : TextWatcherImp() {
+            @SuppressLint("DefaultLocale")
             override fun afterTextChanged(s: Editable?) {
                 super.afterTextChanged(s)
                 mKeyInfo.text = s?.toString() ?: ""
+                s?.toString()?.let {
+                    dataBinding.tvCount.text = String.format("%d/4", it.length)
+                }
                 updateView()
             }
         })
@@ -133,6 +138,7 @@ class KeyEditView @JvmOverloads constructor(
         }
     }
 
+    @SuppressLint("DefaultLocale")
     fun setKeyInfo(keyInfo: KeyInfo) {
         mKeyInfo = keyInfo.copy()
         dataBinding.tvKeySize.text = String.format("%s", "${keyInfo.zoom}%")
@@ -146,6 +152,7 @@ class KeyEditView @JvmOverloads constructor(
         keyInfo.text?.let {
             dataBinding.etKeyName.setText(it)
             dataBinding.etKeyName.setSelection(it.length)
+            dataBinding.tvCount.text = String.format("%d/4", it.length)
         }
         val nameable =
             keyInfo.type == KeyType.KEYBOARD_KEY || keyInfo.type == KeyType.GAMEPAD_SQUARE ||

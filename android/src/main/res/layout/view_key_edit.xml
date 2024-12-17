@@ -220,6 +220,7 @@
                             android:layout_height="match_parent"
                             android:layout_gravity="end"
                             android:gravity="center"
+                            android:textSize="11sp"
                             android:textColor="#FF9CA3B4"
                             tools:text="2/2" />
                     </FrameLayout>
