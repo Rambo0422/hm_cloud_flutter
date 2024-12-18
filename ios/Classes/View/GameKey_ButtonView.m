@@ -259,7 +259,7 @@
             }
 
         default:
-            return @"";
+            return isHigh ? @"key_kb_round_h" : @"key_kb_round_n";
     }
 }
 
