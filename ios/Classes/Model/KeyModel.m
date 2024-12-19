@@ -32,6 +32,8 @@ static NSString *const KeyTypeEnumTypeStrings[] = {
     [KEY_kb_combination] = @"kb-combination",
     [KEY_xbox_combination] = @"xbox-combination",
     [KEY_kb_roulette] = @"kb-roulette",
+    [KEY_kb_container] = @"kb-container",
+    [KEY_kb_shoot] = @"kb-shoot",
 };
 
 KeyType KeyTypeFromString(NSString *string) {
@@ -50,6 +52,7 @@ KeyType KeyTypeFromString(NSString *string) {
     return @{
         @"composeArr": [KeyModel class],
         @"rouArr": [KeyModel class],
+        @"containerArr": [KeyModel class],
     };
 }
 
@@ -72,7 +75,6 @@ KeyType KeyTypeFromString(NSString *string) {
             @"height": @(_height),
             @"text": _text ? : @"",
             @"editIndex": @(_editIndex),
-//            @"isRou": @(_isRou),
         }.mutableCopy;
 
     if (self.rouArr) {
@@ -81,6 +83,10 @@ KeyType KeyTypeFromString(NSString *string) {
 
     if (self.composeArr) {
         [dict setObject:[self composeToJson] forKey:@"composeArr"];
+    }
+
+    if (self.containerArr) {
+        [dict setObject:[self containerToJson] forKey:@"containerArr"];
     }
 
     return dict;
@@ -94,6 +100,12 @@ KeyType KeyTypeFromString(NSString *string) {
 
 - (NSArray<NSDictionary *> *)composeToJson {
     return [self.composeArr mapUsingBlock:^id _Nullable (KeyModel *_Nonnull obj, NSUInteger idx) {
+        return [obj toJson];
+    }];
+}
+
+- (NSArray<NSDictionary *> *)containerToJson {
+    return [self.containerArr mapUsingBlock:^id _Nullable (KeyModel *_Nonnull obj, NSUInteger idx) {
         return [obj toJson];
     }];
 }

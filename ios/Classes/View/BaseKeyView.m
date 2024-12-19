@@ -23,9 +23,9 @@
         self.contentView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         [self addSubview:self.contentView];
 
-
-//        self.hidden = self.model.isRou;
-        self.frame = CGRectMake(self.model.left, self.model.top, self.model.width, self.model.height);
+        if (model.key_type != KEY_kb_container) {
+            self.frame = CGRectMake(self.model.left, self.model.top, self.model.width, self.model.height);
+        }
 
         if (self.isEdit) {
             self.contentView.userInteractionEnabled = NO;
@@ -33,17 +33,22 @@
             tap.delaysTouchesBegan = YES;
             tap.delaysTouchesEnded = YES;
             [self addGestureRecognizer:tap];
-            
-            
+
+
             self.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:0.3];
-            
         }
 
         @weakify(self);
-        [RACObserve(self.model, zoom) subscribeNext:^(id _Nullable x) {
-            @strongify(self);
-            self.bounds = CGRectMake(0, 0, self.model.width, self.model.height);
-        }];
+
+        /// 收纳键的宽度只是那个箭头的宽度， 所以大小不能写在这里
+        /// 写在GameKey_ContainerView里面
+        /// 
+        if (model.key_type != KEY_kb_container) {
+            [RACObserve(self.model, zoom) subscribeNext:^(id _Nullable x) {
+                @strongify(self);
+                self.bounds = CGRectMake(0, 0, self.model.width, self.model.height);
+            }];
+        }
 
         [RACObserve(self.model, opacity) subscribeNext:^(id _Nullable x) {
             @strongify(self);
@@ -57,7 +62,7 @@
 - (void)tap:(UITapGestureRecognizer *)tap {
     if (self.tapCallback) {
         self.backgroundColor = [kColor(0xC6EC4B) colorWithAlphaComponent:0.6];
-        self.tapCallback(self.model,self);
+        self.tapCallback(self.model, self);
     }
 }
 
