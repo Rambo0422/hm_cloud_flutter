@@ -7,6 +7,7 @@
 
 
 #import "GameKey_ButtonView.h"
+#import "GameKey_ContainerView.h"
 #import "GameKey_CrossView.h"
 #import "GameKey_JoystickArrowView.h"
 #import "GameKey_JoystickView.h"
@@ -302,12 +303,25 @@
         }
         break;
 
+        case KEY_kb_container:{
+            GameKey_ContainerView *container = [[GameKey_ContainerView alloc] initWithEidt:_isEdit model:m];
+            container.tapCallback = self.tapCallback;
+
+            if (_isEdit) {
+                [container addGestureRecognizer:panGesture];
+            }
+
+            [self addSubview:container];
+        }
+        break;
+
         case KEY_unknown:{
         }
         break;
 
         case KEY_xbox_combination:
         case KEY_kb_combination:
+        case KEY_kb_shoot:
         default:{
             [self initKey:m ges:panGesture];
         }
@@ -633,13 +647,18 @@
     draggedView.model.top = top / (kScreenH / 375.0);
     draggedView.model.left = left / (kScreenW / 667.0);
 
+    if ([draggedView isKindOfClass:[GameKey_ContainerView class]]) {
+        GameKey_ContainerView *v = (GameKey_ContainerView *)draggedView;
+        [v refreshView];
+    }
+
     [gesture setTranslation:CGPointZero inView:self];
 
     if (self.tapCallback) {
         draggedView.backgroundColor = [kColor(0xC6EC4B) colorWithAlphaComponent:0.6];
-        self.tapCallback(draggedView.model,draggedView);
+        self.tapCallback(draggedView.model, draggedView);
     }
-    
+
     // 检测是否对齐
     [self checkForAlignmentWithView:draggedView];
 

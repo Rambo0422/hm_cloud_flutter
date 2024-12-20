@@ -7,7 +7,6 @@
 
 #import <GameController/GameController.h>
 #import "CloudPreViewController.h"
-#import "CustomKeyViewController.h"
 #import "CustomSelectViewController.h"
 #import "CustomSlider.h"
 #import "GameDetailsModel.h"
@@ -129,9 +128,9 @@ typedef enum : NSUInteger {
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    
-    
-    
+
+
+
     @weakify(self);
     [[AFNetworkReachabilityManager sharedManager] setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
         // 一共有四种状态
@@ -612,9 +611,9 @@ typedef enum : NSUInteger {
             self.currentOperation = 2;
             [self getJoystickAndSet:YES];
         } else {
-            self.currentOperation = 2;
-            [self getJoystickAndSet:YES];
-            [self getKeyboardAndSet:NO];
+            self.currentOperation = 1;
+            [self getJoystickAndSet:NO];
+            [self getKeyboardAndSet:YES];
         }
     }];
 }

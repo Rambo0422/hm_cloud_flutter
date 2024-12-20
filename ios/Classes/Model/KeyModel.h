@@ -79,6 +79,14 @@ typedef enum : NSUInteger {
     /// 轮盘键
     /// "kb-roulette"
     KEY_kb_roulette,
+
+    /// 收纳键
+    /// "kb_container"
+    KEY_kb_container,
+
+    /// 射击键
+    /// "kb_shoot"
+    KEY_kb_shoot,
 } KeyType;
 
 
@@ -95,10 +103,11 @@ typedef enum : NSUInteger {
 @property (nonatomic, assign)  NSInteger inputOp;
 @property (nonatomic, strong)  NSString *text;
 @property (nonatomic, strong)  NSString *type;
-//@property (nonatomic, assign)  BOOL isRou;
 @property (nonatomic, assign)  NSInteger editIndex;
 @property (nonatomic, strong)  NSArray<KeyModel *> *composeArr;
 @property (nonatomic, strong)  NSArray<KeyModel *> *rouArr;
+@property (nonatomic, strong)  NSArray<KeyModel *> *containerArr;
+
 
 @property (nonatomic, assign)  KeyType key_type;
 
