@@ -103,7 +103,7 @@
     UIView *view = [super hitTest:point withEvent:event];
 
     if ([self pointInside:point withEvent:event]) {
-        if (view == self.arrowBtn || self.isShow) {
+        if (view == self.arrowBtn || self.isShow || self.isEdit) {
             return view;
         } else {
             return self.superview;
