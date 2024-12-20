@@ -150,9 +150,14 @@ class KeyEditView @JvmOverloads constructor(
         dataBinding.layoutKeyParam.visibility = VISIBLE
         dataBinding.rvMaps.visibility = INVISIBLE
         keyInfo.text?.let {
-            dataBinding.etKeyName.setText(it)
-            dataBinding.etKeyName.setSelection(it.length)
-            dataBinding.tvCount.text = String.format("%d/4", it.length)
+            val text = if (it.length <= 10) {
+                it
+            } else {
+                it.substring(0, 10)
+            }
+            dataBinding.etKeyName.setText(text)
+            dataBinding.etKeyName.setSelection(text.length)
+            dataBinding.tvCount.text = String.format("%d/4", text.length)
         }
         val nameable =
             keyInfo.type == KeyType.KEYBOARD_KEY || keyInfo.type == KeyType.GAMEPAD_SQUARE ||

@@ -100,17 +100,17 @@
 }
 
 - (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
-    if (self.isEdit) {
-        return [super hitTest:point withEvent:event];
-    }
-
     UIView *view = [super hitTest:point withEvent:event];
 
-    if ([view isKindOfClass:[UIButton class]]) {
+    if ([self pointInside:point withEvent:event]) {
+        if (view == self.arrowBtn || self.isShow) {
+            return view;
+        } else {
+            return self.superview;
+        }
+    } else {
         return view;
     }
-
-    return self.superview;
 }
 
 @end

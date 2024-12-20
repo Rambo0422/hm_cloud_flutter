@@ -208,6 +208,7 @@
                             android:background="@android:color/transparent"
                             android:hint="@string/key_name"
                             android:inputType="text"
+                            android:maxLength="10"
                             android:lines="1"
                             android:textColor="@android:color/white"
                             android:textColorHint="#FF9CA3B4"
@@ -222,6 +223,7 @@
                             android:gravity="center"
                             android:textSize="11sp"
                             android:textColor="#FF9CA3B4"
+                            android:textSize="11sp"
                             tools:text="2/2" />
                     </FrameLayout>
                 </LinearLayout>
