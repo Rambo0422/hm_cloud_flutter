@@ -223,7 +223,6 @@
                             android:gravity="center"
                             android:textSize="11sp"
                             android:textColor="#FF9CA3B4"
-                            android:textSize="11sp"
                             tools:text="2/2" />
                     </FrameLayout>
                 </LinearLayout>
