@@ -55,6 +55,7 @@ import com.sayx.hm_cloud.callback.GameSettingChangeListener
 import com.sayx.hm_cloud.callback.HideListener
 import com.sayx.hm_cloud.callback.KeyEditCallback
 import com.sayx.hm_cloud.callback.OnEditClickListener
+import com.sayx.hm_cloud.callback.OnPositionChangeListener
 import com.sayx.hm_cloud.constants.AppVirtualOperateType
 import com.sayx.hm_cloud.constants.ControllerStatus
 import com.sayx.hm_cloud.constants.GameConstants
@@ -215,6 +216,11 @@ class GameActivity : AppCompatActivity() {
                 checkTipsShow()
             } else {
                 showGameSetting()
+            }
+        }
+        dataBinding.btnGameSettings.positionListener = object : OnPositionChangeListener {
+            override fun onPositionChange(left: Int, top: Int, right: Int, bottom: Int) {
+
             }
         }
         dataBinding.btnVirtualKeyboard.setOnClickListener {
