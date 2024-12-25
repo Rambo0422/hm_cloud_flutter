@@ -78,7 +78,6 @@ class KeyView @JvmOverloads constructor(
             AppSizeUtils.convertViewSize(keyInfo.getKeyHeight())
         )
         this.layoutParams = layoutParams
-        this.alpha = keyInfo.opacity / 100f
         when (keyInfo.type) {
             KeyType.GAMEPAD_SQUARE, KeyType.GAMEPAD_ROUND_SMALL,
             KeyType.GAMEPAD_ROUND_MEDIUM -> {

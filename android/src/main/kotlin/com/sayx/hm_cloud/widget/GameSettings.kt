@@ -20,8 +20,6 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.SPUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.haima.hmcp.enums.TouchMode
-import com.haima.hmcp.widgets.HmcpVideoView
-import com.media.atkit.widgets.AnTongVideoView
 import com.sayx.hm_cloud.GameManager
 import com.sayx.hm_cloud.R
 import com.sayx.hm_cloud.callback.AnimatorListenerImp
@@ -76,6 +74,10 @@ class GameSettings @JvmOverloads constructor(
 
     private var mouseModeEditable = true
 
+    private var sensitivity = 0
+
+    private var opacity = 0
+
     var controllerType: AppVirtualOperateType = AppVirtualOperateType.NONE
         set(value) {
             field = value
@@ -129,6 +131,31 @@ class GameSettings @JvmOverloads constructor(
             }
             hideLayout()
             gameSettingChangeListener?.onMoreKeyboard()
+        }
+        // 透明度
+        dataBinding.btnAddKeyOpacity.setOnClickListener {
+            if (opacity < 100) {
+                // 改值
+                opacity += 10
+                // 展示
+                dataBinding.tvKeyOpacity.text = String.format("%s", "${opacity}%")
+                // 存值
+                SPUtils.getInstance().put(GameConstants.keyOpacity, opacity)
+                // 更效
+                gameSettingChangeListener?.onOpacityChange(opacity)
+            }
+        }
+        dataBinding.btnReduceKeyOpacity.setOnClickListener {
+            if (opacity > 0) {
+                // 改值
+                opacity -= 10
+                // 展示
+                dataBinding.tvKeyOpacity.text = String.format("%s", "${opacity}%")
+                // 存值
+                SPUtils.getInstance().put(GameConstants.keyOpacity, opacity)
+                // 更效
+                gameSettingChangeListener?.onOpacityChange(opacity)
+            }
         }
         // 震动开关
         dataBinding.btnVibrate.setOnClickListener {
@@ -229,6 +256,31 @@ class GameSettings @JvmOverloads constructor(
                 updateMouseMode(currentTouchMode)
             }
         }
+        // 灵敏度
+        dataBinding.btnAddSensitivity.setOnClickListener {
+            if (sensitivity < 100) {
+                // 改值
+                sensitivity += 10
+                // 展示
+                dataBinding.tvSensitivity.text = String.format("%s", "${sensitivity}%")
+                // 存值
+                SPUtils.getInstance().put(GameConstants.sensitivity, sensitivity / 100f)
+                // 更效
+                updateSensitivity()
+            }
+        }
+        dataBinding.btnReduceSensitivity.setOnClickListener {
+            if (sensitivity > 0) {
+                // 改值
+                sensitivity -= 10
+                // 展示
+                dataBinding.tvSensitivity.text = String.format("%s", "${sensitivity}%")
+                // 存值
+                SPUtils.getInstance().put(GameConstants.sensitivity, sensitivity / 100f)
+                // 更效
+                updateSensitivity()
+            }
+        }
         // 退出游戏
         dataBinding.btnExitGame.setOnClickListener {
             hideLayout()
@@ -257,6 +309,7 @@ class GameSettings @JvmOverloads constructor(
         this.peakChannel = peakChannel
         // 手游不展示控制方法
         updateControllerMethod(if (mobileGame) View.GONE else VISIBLE)
+        initOpacity()
         checkControllerSupport()
         // 配置声音/亮度
         updateVoice(maxVolume, volume)
@@ -375,7 +428,8 @@ class GameSettings @JvmOverloads constructor(
                     }
                     updateMouseMode(TouchMode.TOUCH_MODE_NONE)
                 }
-                dataBinding.sbSensitivity.isEnabled = isChecked
+                dataBinding.btnAddSensitivity.isEnabled = isChecked
+                dataBinding.btnReduceSensitivity.isEnabled = isChecked
             }
         }
         // 亮度状态变更
@@ -399,33 +453,36 @@ class GameSettings @JvmOverloads constructor(
                 SPUtils.getInstance().put(GameConstants.volumeSwitch, true)
             }
         })
-        // 鼠标灵敏度状态变更
-        dataBinding.sbSensitivity.setOnSeekBarChangeListener(object : SeekBarChangListenerImp() {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                LogUtils.d("onProgressChanged->sensitivity=$progress, fromUser=$fromUser")
-                if (fromUser) {
-                    if (gameView is HMGameView) {
-                        (gameView as HMGameView).mouseSensitivity = progress / 10f
-                    } else if (gameView is ATGameView) {
-                        (gameView as ATGameView).setMouseSensitivity(progress / 10f)
-                    }
-                    SPUtils.getInstance().put(GameConstants.mouseSensitivity, progress)
-                }
-            }
-        })
+    }
+
+    private fun initOpacity() {
+        // 取值
+        opacity = SPUtils.getInstance().getInt(GameConstants.keyOpacity, 70)
+        // 展示
+        dataBinding.tvKeyOpacity.text = String.format("%s", "${opacity}%")
+        // 更效
+        gameSettingChangeListener?.onOpacityChange(opacity)
     }
 
     private fun initSensitivity() {
+        // 取值
+        val sensitivityValue = SPUtils.getInstance().getFloat(GameConstants.sensitivity, 0.5f)
+        sensitivity = (sensitivityValue * 100).toInt()
+        // 展示
+        dataBinding.tvSensitivity.text = String.format("%s", "${sensitivity}%")
+        // 更效
         if (gameView is HMGameView) {
-            val sensitivity = SPUtils.getInstance().getInt(GameConstants.mouseSensitivity, 10)
-            dataBinding.sbSensitivity.max = 20
-            dataBinding.sbSensitivity.progress = sensitivity
-            (gameView as HmcpVideoView).mouseSensitivity = sensitivity / 10f
+            (gameView as HMGameView).mouseSensitivity = 2f * sensitivityValue
         } else if (gameView is ATGameView) {
-            val sensitivity = SPUtils.getInstance().getInt(GameConstants.mouseSensitivity, 10)
-            dataBinding.sbSensitivity.max = 60
-            dataBinding.sbSensitivity.progress = sensitivity
-            (gameView as ATGameView).setMouseSensitivity(sensitivity / 10f)
+            (gameView as ATGameView).setMouseSensitivity(6f * sensitivityValue)
+        }
+    }
+
+    private fun updateSensitivity() {
+        if (gameView is HMGameView) {
+            (gameView as HMGameView).mouseSensitivity = 2f * (sensitivity / 100f)
+        } else if (gameView is ATGameView) {
+            (gameView as ATGameView).setMouseSensitivity(6f * (sensitivity / 100f))
         }
     }
 
@@ -443,7 +500,8 @@ class GameSettings @JvmOverloads constructor(
 
     fun setPCMouseMode(enable: Boolean) {
         dataBinding.switchMouseConfig.isEnabled = enable
-        dataBinding.sbSensitivity.isEnabled = enable
+        dataBinding.btnAddSensitivity.isEnabled = enable
+        dataBinding.btnReduceSensitivity.isEnabled = enable
         mouseModeEditable = enable
     }
 
@@ -500,7 +558,8 @@ class GameSettings @JvmOverloads constructor(
                 dataBinding.btnTouchClick.isSelected = false
                 dataBinding.btnTouchAttack.isSelected = false
 
-                dataBinding.sbSensitivity.isEnabled = false
+                dataBinding.btnAddKeyOpacity.isEnabled = false
+                dataBinding.btnReduceSensitivity.isEnabled = false
                 if (dataBinding.switchMouseConfig.isChecked) {
                     dataBinding.switchMouseConfig.isChecked = false
                 }

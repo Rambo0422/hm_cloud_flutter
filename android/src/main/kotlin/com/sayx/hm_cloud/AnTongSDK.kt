@@ -172,6 +172,7 @@ object AnTongSDK {
 
     private val mAnTongPlayerListener = object : AnTongPlayerListener {
         override fun antongPlayerStatusCallback(callback: String?) {
+            LogUtils.d("PlayerStatusCallback:$callback")
             callback?.let {
                 val jsonObject = JSONObject(it)
                 val status = jsonObject.getInt(StatusCallbackUtil.STATUS)

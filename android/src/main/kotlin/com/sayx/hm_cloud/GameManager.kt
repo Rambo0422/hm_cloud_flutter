@@ -459,15 +459,20 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                     }
 
                     override fun onRequestDeviceSuccess() {
-                        LogUtils.d("onRequestDeviceSuccess")
-                        // 跳转activity
-                        activity.runOnUiThread {
-                            channel.invokeMethod(GameViewConstants.firstFrameArrival, null)
+                        if (!isVideoShowed) {
+                            isVideoShowed = true
+                            gameView?.virtualDeviceType = VirtualOperateType.NONE
+                            // 跳转activity
+                            activity.runOnUiThread {
+                                channel.invokeMethod(GameViewConstants.firstFrameArrival, null)
+                            }
                             openGame = true
+                            isPlaying = true
+                            inQueue = false
+
+                            processEvent("gamePageShow")
+                            AtGameActivity.startActivityForResult(activity)
                         }
-                        isPlaying = true
-                        inQueue = false
-                        AtGameActivity.startActivityForResult(activity)
                     }
                 })
             return
@@ -658,6 +663,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
     }
 
     override fun HmcpPlayerStatusCallback(statusData: String?) {
+        LogUtils.d("PlayerStatusCallback:$statusData")
         statusData?.let {
             val data = JSONObject(it)
             val status = data.getInt(StatusCallbackUtil.STATUS)
@@ -718,7 +724,8 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                                 Pair("cid", HmcpManager.getInstance().cloudId)
                             )
                         )
-                        processEvent("gamePageShow")
+                        inQueue = false
+                        isPlaying = true
                         openGame = true
                         // 打开新的页面展示游戏画面
 
@@ -730,6 +737,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                                 Pair("arguments", mapOf("gameParam" to gameParam?.toString(), "cid" to HmcpManager.getInstance().cloudId).toString())
                             )
                         )
+                        processEvent("gamePageShow")
                         Intent().apply {
                             setClass(activity, GameActivity::class.java)
                             activity.startActivityForResult(this, 200)
@@ -1436,6 +1444,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             )
             needReattach = false
         }
+        isVideoShowed = false
         if (TextUtils.isEmpty(cloudId)) {
             LogUtils.d("undo releaseGame, cid is empty")
             gameView?.release()
@@ -1443,7 +1452,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             gameView = null
             isPlaying = false
             inQueue = false
-            isVideoShowed = false
             if (finish == "0" && !isAnTong) {
                 // 切换队列
                 playGame(bundle)
@@ -1764,7 +1772,11 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                     val totalTime = it.totalTime
                     // 无时长
                     if (totalTime <= 0) {
-                        EventBus.getDefault().post(GameErrorEvent("15", ""))
+                        if (isAnTong()) {
+                            EventBus.getDefault().post(GameErrorEvent("2111114", ""))
+                        } else {
+                            EventBus.getDefault().post(GameErrorEvent("42", ""))
+                        }
                     }
                 }
             }

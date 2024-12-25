@@ -59,7 +59,6 @@ class ShotKeyView @JvmOverloads constructor(
             AppSizeUtils.convertViewSize(keyInfo.getKeyHeight())
         )
         this.layoutParams = layoutParams
-        this.alpha = keyInfo.opacity / 100f
     }
 
     override fun onDraw(canvas: Canvas) {

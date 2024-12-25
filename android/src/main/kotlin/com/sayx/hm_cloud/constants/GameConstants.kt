@@ -10,6 +10,9 @@ import com.sayx.hm_cloud.model.KeyInfo
 
 object GameConstants {
 
+    const val settingsLeft = "settingsLeft"
+    const val settingsTop = "settingsTop"
+
     // 是否展示游戏设置按钮引导层
     const val showGuide = "showGuide"
     // 是否开启振动
@@ -17,7 +20,9 @@ object GameConstants {
     // 是否开启声音
     const val volumeSwitch = "volumeSwitch"
     // 鼠标灵敏度
-    const val mouseSensitivity = "mouseSensitivity"
+    const val sensitivity = "sensitivity"
+    // 按键透明度
+    const val keyOpacity = "keyOpacity"
 
     // 操作键位配置类型
     const val gamepadConfig = 1

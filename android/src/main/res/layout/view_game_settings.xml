@@ -232,7 +232,7 @@
                     android:drawablePadding="5dp"
                     android:gravity="center"
                     android:text="@string/key_vibrate"
-                    android:textColor="#ADB5CD"
+                    android:textColor="#FF9EA2AD"
                     android:textSize="10sp"
                     app:drawableSize="40dp"
                     app:drawableTop="@drawable/selector_vibrate"
@@ -249,7 +249,7 @@
                     android:drawablePadding="5dp"
                     android:gravity="center"
                     android:text="@string/interaction"
-                    android:textColor="#ADB5CD"
+                    android:textColor="#FF9EA2AD"
                     android:textSize="10sp"
                     app:drawableSize="40dp"
                     app:drawableTop="@drawable/selector_interaction"
@@ -454,7 +454,6 @@
                     android:drawablePadding="5dp"
                     android:gravity="center"
                     android:text=""
-                    android:textColor="#ADB5CD"
                     android:textSize="10sp"
                     app:drawableSize="40dp"
                     app:drawableTop="@drawable/selector_empty"
@@ -627,105 +626,146 @@
                 app:layout_constraintVertical_chainStyle="packed"
                 tools:visibility="visible" />
 
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/layout_control_method"
                 android:layout_width="0dp"
-                android:layout_height="80dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:layout_marginEnd="15dp"
+                android:clipToPadding="false"
+                android:paddingHorizontal="15dp"
+                android:paddingVertical="10dp"
                 android:background="@drawable/shape_settings_function_bg"
                 android:clipChildren="false"
-                android:paddingHorizontal="10dp"
                 app:layout_constraintBottom_toTopOf="@id/mouse_config"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@id/control_method"
                 app:layout_constraintTop_toBottomOf="@id/control_method">
 
-                <FrameLayout
-                    android:layout_width="0dp"
+                <com.sayx.hm_cloud.widget.DrawableTextView
+                    android:id="@+id/btn_gamepad"
+                    android:layout_width="50dp"
                     android:layout_height="64dp"
-                    android:layout_marginTop="10dp"
-                    android:clipChildren="false"
-                    android:layout_weight="1">
+                    android:drawablePadding="5dp"
+                    android:gravity="center"
+                    android:text="@string/gamepad_control"
+                    android:textColor="#FF9EA2AD"
+                    android:textSize="10sp"
+                    app:drawableSize="40dp"
+                    app:drawableTop="@drawable/selector_gamepad"
+                    app:layout_constraintEnd_toStartOf="@id/btn_keyboard"
+                    app:layout_constraintHorizontal_chainStyle="spread_inside"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="visible" />
 
-                    <com.sayx.hm_cloud.widget.DrawableTextView
-                        android:id="@+id/btn_gamepad"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:drawablePadding="5dp"
-                        android:gravity="center"
-                        android:text="@string/gamepad_control"
-                        android:textColor="#ADB5CD"
-                        android:textSize="10sp"
-                        app:drawableSize="40dp"
-                        app:drawableTop="@drawable/selector_gamepad"
-                        tools:visibility="visible" />
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_gamepad_sign"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="-5dp"
+                    android:layout_marginEnd="-5dp"
+                    android:background="@drawable/shape_not_open_bg"
+                    android:enabled="false"
+                    android:text="@string/not_open"
+                    android:textColor="#FF959AA9"
+                    android:textSize="8sp"
+                    android:visibility="invisible"
+                    app:layout_constraintEnd_toEndOf="@id/btn_gamepad"
+                    app:layout_constraintTop_toTopOf="@id/btn_gamepad"
+                    tools:visibility="visible" />
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/tv_gamepad_sign"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="-5dp"
-                        android:layout_marginEnd="-5dp"
-                        android:background="@drawable/shape_not_open_bg"
-                        android:text="@string/not_open"
-                        tools:visibility="visible"
-                        android:visibility="invisible"
-                        android:layout_gravity="end"
-                        android:textColor="#FF959AA9"
-                        android:textSize="8sp" />
-                </FrameLayout>
-
-                <FrameLayout
-                    android:layout_width="0dp"
+                <com.sayx.hm_cloud.widget.DrawableTextView
+                    android:id="@+id/btn_keyboard"
+                    android:layout_width="50dp"
                     android:layout_height="64dp"
-                    android:layout_marginTop="10dp"
-                    android:clipChildren="false"
-                    android:layout_weight="1">
+                    android:drawablePadding="5dp"
+                    android:gravity="center"
+                    android:text="@string/keyboard_control"
+                    android:textColor="#FF9EA2AD"
+                    android:textSize="10sp"
+                    app:drawableSize="40dp"
+                    app:drawableTop="@drawable/selector_keyboard"
+                    app:layout_constraintEnd_toStartOf="@id/btn_more_keyboard"
+                    app:layout_constraintStart_toEndOf="@id/btn_gamepad"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="visible" />
 
-                    <com.sayx.hm_cloud.widget.DrawableTextView
-                        android:id="@+id/btn_keyboard"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:drawablePadding="5dp"
-                        android:gravity="center"
-                        android:text="@string/keyboard_control"
-                        android:textColor="#ADB5CD"
-                        android:textSize="10sp"
-                        app:drawableSize="40dp"
-                        app:drawableTop="@drawable/selector_keyboard"
-                        tools:visibility="visible" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/tv_keyboard_sign"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="-5dp"
-                        android:layout_marginEnd="-5dp"
-                        android:background="@drawable/shape_not_open_bg"
-                        android:text="@string/not_open"
-                        tools:visibility="visible"
-                        android:visibility="invisible"
-                        android:layout_gravity="end"
-                        android:textColor="#FF959AA9"
-                        android:textSize="8sp" />
-                </FrameLayout>
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_keyboard_sign"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="-5dp"
+                    android:layout_marginEnd="-5dp"
+                    android:background="@drawable/shape_not_open_bg"
+                    android:enabled="false"
+                    android:text="@string/not_open"
+                    android:textColor="#FF959AA9"
+                    android:textSize="8sp"
+                    android:visibility="invisible"
+                    app:layout_constraintEnd_toEndOf="@id/btn_keyboard"
+                    app:layout_constraintTop_toTopOf="@id/btn_keyboard"
+                    tools:visibility="visible" />
 
                 <com.sayx.hm_cloud.widget.DrawableTextView
                     android:id="@+id/btn_more_keyboard"
-                    android:layout_width="0dp"
+                    android:layout_width="50dp"
                     android:layout_height="64dp"
-                    android:layout_marginVertical="10dp"
-                    android:layout_weight="1"
                     android:drawablePadding="5dp"
                     android:gravity="center"
                     android:text="@string/more_keyboard"
-                    android:textColor="#ADB5CD"
+                    android:textColor="#FF9EA2AD"
                     android:textSize="10sp"
                     app:drawableSize="40dp"
                     app:drawableTop="@drawable/icon_more_keyboard"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/btn_keyboard"
+                    app:layout_constraintTop_toTopOf="parent"
                     tools:visibility="visible" />
-            </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layout_key_opacity"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="13dp"
+                    app:layout_constraintTop_toBottomOf="@id/btn_gamepad">
+
+                    <com.sayx.hm_cloud.widget.DrawableTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/key_opacity"
+                        android:textColor="#FF9EA2AD"
+                        android:textSize="10sp" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/btn_reduce_key_opacity"
+                        android:layout_width="20dp"
+                        android:layout_height="15dp"
+                        android:layout_marginStart="5dp"
+                        android:src="@drawable/img_reduce_edit" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_key_opacity"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="15dp"
+                        android:layout_marginHorizontal="2dp"
+                        android:background="@drawable/shape_key_param_bg"
+                        android:gravity="center"
+                        android:text="@string/default_percent"
+                        android:textColor="#C4D7EB"
+                        android:textSize="10sp"
+                        tools:text="100%" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/btn_add_key_opacity"
+                        android:layout_width="20dp"
+                        android:layout_height="15dp"
+                        android:src="@drawable/img_add_edit" />
+                </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/mouse_config"
@@ -757,7 +797,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/layout_mouse_config"
                 android:layout_width="0dp"
-                android:layout_height="130dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:layout_marginEnd="15dp"
                 android:background="@drawable/shape_settings_function_bg"
@@ -783,7 +823,7 @@
                         android:drawablePadding="5dp"
                         android:gravity="center"
                         android:text="@string/mouse_click"
-                        android:textColor="#ADB5CD"
+                        android:textColor="#FF9EA2AD"
                         android:textSize="10sp"
                         app:drawableSize="40dp"
                         app:drawableTop="@drawable/selector_mouse_click"
@@ -797,7 +837,7 @@
                         android:drawablePadding="5dp"
                         android:gravity="center"
                         android:text="@string/touch_click"
-                        android:textColor="#ADB5CD"
+                        android:textColor="#FF9EA2AD"
                         android:textSize="10sp"
                         app:drawableSize="40dp"
                         app:drawableTop="@drawable/selector_touch_click"
@@ -811,47 +851,55 @@
                         android:drawablePadding="5dp"
                         android:gravity="center"
                         android:text="@string/touch_attack"
-                        android:textColor="#ADB5CD"
+                        android:textColor="#FF9EA2AD"
                         android:textSize="10sp"
                         app:drawableSize="40dp"
                         app:drawableTop="@drawable/selector_touch_attack"
                         tools:visibility="visible" />
                 </LinearLayout>
 
-                <androidx.appcompat.widget.AppCompatSeekBar
-                    android:id="@+id/sb_sensitivity"
+                <LinearLayout
+                    android:id="@+id/layout_sensitivity"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
-                    android:background="@android:color/transparent"
-                    android:maxHeight="4dp"
-                    android:paddingStart="0dp"
-                    android:paddingEnd="0dp"
-                    android:progressDrawable="@drawable/shape_progress"
-                    android:thumb="@drawable/icon_sensitivity_thumb"
-                    android:thumbOffset="0dp"
-                    app:layout_constraintTop_toBottomOf="@id/layout_mouse_click" />
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="13dp"
+                    app:layout_constraintTop_toBottomOf="@id/layout_mouse_click">
 
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:text="@string/sensitivity"
-                    android:textColor="#ADB5CD"
-                    android:textSize="10sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/sb_sensitivity" />
+                    <com.sayx.hm_cloud.widget.DrawableTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/sensitivity"
+                        android:textColor="#FF9EA2AD"
+                        android:textSize="10sp" />
 
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/tv_sensitivity_value"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:textColor="#ADB5CD"
-                    android:textSize="10sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/sb_sensitivity"
-                    tools:text="100%" />
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/btn_reduce_sensitivity"
+                        android:layout_width="20dp"
+                        android:layout_height="15dp"
+                        android:layout_marginStart="5dp"
+                        android:src="@drawable/img_reduce_edit" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_sensitivity"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="15dp"
+                        android:layout_marginHorizontal="2dp"
+                        android:background="@drawable/shape_key_param_bg"
+                        android:gravity="center"
+                        android:text="@string/default_percent"
+                        android:textColor="#C4D7EB"
+                        android:textSize="10sp"
+                        tools:text="100%" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/btn_add_sensitivity"
+                        android:layout_width="20dp"
+                        android:layout_height="15dp"
+                        android:src="@drawable/img_add_edit" />
+                </LinearLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

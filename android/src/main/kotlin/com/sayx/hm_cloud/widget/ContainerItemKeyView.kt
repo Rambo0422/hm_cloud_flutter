@@ -45,7 +45,6 @@ class ContainerItemKeyView @JvmOverloads constructor(
             height,
             height
         )
-        this.alpha = keyInfo.opacity / 100f
         dataBinding.tvName.layoutParams = layoutParams
         when (keyInfo.type) {
             KeyType.GAMEPAD_SQUARE, KeyType.GAMEPAD_ROUND_SMALL,

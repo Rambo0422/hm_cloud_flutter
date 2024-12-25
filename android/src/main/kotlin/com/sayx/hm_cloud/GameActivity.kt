@@ -42,7 +42,6 @@ import com.gyf.immersionbar.ktx.immersionBar
 import com.gyf.immersionbar.ktx.navigationBarHeight
 import com.haima.hmcp.HmcpManager
 import com.haima.hmcp.beans.ResolutionInfo
-import com.haima.hmcp.beans.VideoDelayInfo
 import com.haima.hmcp.listeners.OnLivingListener
 import com.haima.hmcp.rtc.widgets.beans.RtcVideoDelayInfo
 import com.haima.hmcp.widgets.beans.VirtualOperateType
@@ -220,7 +219,16 @@ class GameActivity : AppCompatActivity() {
         }
         dataBinding.btnGameSettings.positionListener = object : OnPositionChangeListener {
             override fun onPositionChange(left: Int, top: Int, right: Int, bottom: Int) {
-
+                SPUtils.getInstance().put(GameConstants.settingsLeft, left)
+                SPUtils.getInstance().put(GameConstants.settingsTop, top)
+            }
+        }
+        val x = SPUtils.getInstance().getInt(GameConstants.settingsLeft, -1)
+        val y = SPUtils.getInstance().getInt(GameConstants.settingsTop, -1)
+        if (x > 0 && y > 0) {
+            dataBinding.btnGameSettings.post {
+                dataBinding.btnGameSettings.x = x.toFloat()
+                dataBinding.btnGameSettings.y = y.toFloat()
             }
         }
         dataBinding.btnVirtualKeyboard.setOnClickListener {
@@ -577,6 +585,10 @@ class GameActivity : AppCompatActivity() {
 
             override fun getPacketsLostRate(): String {
                 return GameManager.gameView?.clockDiffVideoLatencyInfo?.packetsLostRate ?: ""
+            }
+
+            override fun onOpacityChange(opacity: Int) {
+                dataBinding.gameController.setKeyOpacity(opacity)
             }
         }
     }
@@ -1151,12 +1163,16 @@ class GameActivity : AppCompatActivity() {
                 showKeyEditView(event.arg as KeyInfo)
             }
             "useSuccess" -> {
-                val type = if (event.arg == GameConstants.gamepadConfig) {
-                    "手柄"
-                } else if (event.arg == GameConstants.keyboardConfig) {
-                    "键鼠"
-                } else {
-                    ""
+                val type = when (event.arg) {
+                    GameConstants.gamepadConfig -> {
+                        "手柄"
+                    }
+                    GameConstants.keyboardConfig -> {
+                        "键鼠"
+                    }
+                    else -> {
+                        ""
+                    }
                 }
                 GameToastDialog.Builder(this)
                     .setTitle("使用成功")
@@ -1320,17 +1336,49 @@ class GameActivity : AppCompatActivity() {
         gameSettings?.release()
         GameManager.isPlaying = false
         GameManager.releaseGame(finish = errorCode, bundle = null)
-        val title = when (errorCode) {
+
+        AppCommonDialog.Builder(this)
+            .setTitle(getWarningDialogTitle(errorCode))
+            .setSubTitle(getWarningDialogSubtitle(errorCode), Color.parseColor("#FF555A69"))
+            .setLeftButton(getLeftButtonText(errorCode)) {
+                finish()
+            }
+            .setRightButton(getRightButtonText(errorCode)) {
+                LogUtils.d("exitGameForError:$errorCode")
+                AppCommonDialog.hideDialog(this, "warningDialog")
+                when(errorCode) {
+                    "42" -> {
+                        GameManager.invokeMethod("openRecharge")
+                    }
+                    else -> {
+                    }
+                }
+                finish()
+            }
+            .build().show("warningDialog")
+    }
+
+    private fun getWarningDialogTitle(errorCode: String): String {
+        return when (errorCode) {
             "401" -> {
                 "设备限制"
+            }
+            "42" -> {
+                "账号时长已消耗完毕"
             }
             else -> {
                 "游戏结束\n[$errorCode]"
             }
         }
-        val subtitle = when (errorCode) {
+    }
+
+    private fun getWarningDialogSubtitle(errorCode: String): String {
+        return when (errorCode) {
             "11" -> {
                 "游戏长时间无操作"
+            }
+            "42" -> {
+                "你可以通过每日签到或充值获取时长"
             }
             "401" -> {
                 "游戏已在其他设备运行"
@@ -1339,15 +1387,28 @@ class GameActivity : AppCompatActivity() {
                 "游戏结束"
             }
         }
+    }
 
-        AppCommonDialog.Builder(this)
-            .setTitle(title)
-            .setSubTitle(subtitle, Color.parseColor("#FF555A69"))
-            .setRightButton("退出游戏") {
-                LogUtils.d("exitGameForTime")
-                finish()
+    private fun getLeftButtonText(errorCode: String): String? {
+        return when(errorCode) {
+            "42" -> {
+                "退出"
             }
-            .build().show()
+            else -> {
+                null
+            }
+        }
+    }
+
+    private fun getRightButtonText(errorCode: String): String {
+        return when(errorCode) {
+            "42" -> {
+                "去充值"
+            }
+            else -> {
+                "退出游戏"
+            }
+        }
     }
 
     private fun showErrorDialog(errorCode: String, errorMsg: String? = null) {
@@ -1673,13 +1734,14 @@ class GameActivity : AppCompatActivity() {
                         }
 
                         else -> {
-//                    LogUtils.d("checkInputDevice->other:$inputDevice")
+//                            LogUtils.d("checkInputDevice->other:$inputDevice")
                         }
                     }
                 }
             }
         }
         GameManager.gameView?.setPCMouseMode(pcMouseMode)
+        gameSettings?.setPCMouseMode(!pcMouseMode)
         var controllerType = AppVirtualOperateType.NONE
         if (!pcMouseMode && GameManager.hasPremission) {
             if (GameManager.lastControllerType == AppVirtualOperateType.NONE) {

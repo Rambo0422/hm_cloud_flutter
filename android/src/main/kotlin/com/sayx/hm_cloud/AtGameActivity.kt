@@ -51,6 +51,7 @@ import com.sayx.hm_cloud.callback.GameSettingChangeListener
 import com.sayx.hm_cloud.callback.HideListener
 import com.sayx.hm_cloud.callback.KeyEditCallback
 import com.sayx.hm_cloud.callback.OnEditClickListener
+import com.sayx.hm_cloud.callback.OnPositionChangeListener
 import com.sayx.hm_cloud.constants.AppVirtualOperateType
 import com.sayx.hm_cloud.constants.ControllerStatus
 import com.sayx.hm_cloud.constants.GameConstants
@@ -66,6 +67,7 @@ import com.sayx.hm_cloud.http.bean.HttpResponse
 import com.sayx.hm_cloud.model.ControllerConfigEvent
 import com.sayx.hm_cloud.model.ControllerInfo
 import com.sayx.hm_cloud.model.GameConfig
+import com.sayx.hm_cloud.model.GameErrorEvent
 import com.sayx.hm_cloud.model.GameNotice
 import com.sayx.hm_cloud.model.GameParam
 import com.sayx.hm_cloud.model.KeyInfo
@@ -187,7 +189,7 @@ class AtGameActivity : AppCompatActivity() {
         anTongVideoView?.setAttachContext(this)
         anTongVideoView?.setHmcpPlayerListener(object : AnTongPlayerListener {
             override fun antongPlayerStatusCallback(callback: String?) {
-                LogUtils.d("antongPlayerStatusCallback:$callback")
+                LogUtils.d("PlayerStatusCallback:$callback")
                 callback?.let {
                     val jsonObject = JSONObject(it)
                     val status = jsonObject.getInt(StatusCallbackUtil.STATUS)
@@ -205,19 +207,7 @@ class AtGameActivity : AppCompatActivity() {
             override fun onPlayerError(errorCode: Int, errorMsg: String?) {
                 runOnUiThread {
                     AnTongSDK.uploadErrorCode(errorCode, errorMsg ?: "")
-                    gameSettings?.release()
-                    GameManager.isPlaying = false
-
-                    GameManager.releaseGame(finish = "errorCode")
-                    AppCommonDialog.Builder(this@AtGameActivity)
-                        .setTitle("游戏已结束\n[$errorCode]")
-                        .setSubTitle(errorMsg)
-                        .setRightButton("退出游戏") {
-                            AppCommonDialog.hideDialog(this@AtGameActivity, "gameErrorDialog")
-                            finish()
-                        }
-                        .build()
-                        .show("gameErrorDialog")
+                    showWarningDialog("$errorCode")
                 }
             }
         })
@@ -234,6 +224,20 @@ class AtGameActivity : AppCompatActivity() {
                 checkTipsShow()
             } else {
                 showGameSetting()
+            }
+        }
+        dataBinding.btnGameSettings.positionListener = object : OnPositionChangeListener {
+            override fun onPositionChange(left: Int, top: Int, right: Int, bottom: Int) {
+                SPUtils.getInstance().put(GameConstants.settingsLeft, left)
+                SPUtils.getInstance().put(GameConstants.settingsTop, top)
+            }
+        }
+        val x = SPUtils.getInstance().getInt(GameConstants.settingsLeft, -1)
+        val y = SPUtils.getInstance().getInt(GameConstants.settingsTop, -1)
+        if (x > 0 && y > 0) {
+            dataBinding.btnGameSettings.post {
+                dataBinding.btnGameSettings.x = x.toFloat()
+                dataBinding.btnGameSettings.y = y.toFloat()
             }
         }
         dataBinding.btnVirtualKeyboard.setOnClickListener {
@@ -559,34 +563,82 @@ class AtGameActivity : AppCompatActivity() {
                     AnTongSDK.anTongVideoView?.clockDiffVideoLatencyInfo?.packetsLostRate?.toString()
                 return packetsLostRate ?: ""
             }
+
+            override fun onOpacityChange(opacity: Int) {
+                dataBinding.gameController.setKeyOpacity(opacity)
+            }
         }
     }
 
     private fun showWarningDialog(errorCode: String) {
         gameSettings?.release()
         GameManager.isPlaying = false
+        GameManager.releaseGame(finish = errorCode)
+        AppCommonDialog.Builder(this)
+            .setTitle(getWarningDialogTitle(errorCode))
+            .setSubTitle(getWarningDialogSubtitle(errorCode), Color.parseColor("#FF555A69"))
+            .setLeftButton(getLeftButtonText(errorCode)) {
+                finish()
+            }
+            .setRightButton(getRightButtonText(errorCode)) {
+                AppCommonDialog.hideDialog(this, "warningDialog")
+                when(errorCode) {
+                    "2111114" -> {
+                        GameManager.invokeMethod("openRecharge")
+                    }
+                    else -> {
+                    }
+                }
+                finish()
+            }
+            .build().show("warningDialog")
+    }
 
-        GameManager.releaseGame(finish = "$errorCode")
-        val title = "游戏结束\n[$errorCode]"
-        val subtitle = when (errorCode) {
+    private fun getWarningDialogTitle(errorCode: String): String {
+        return when (errorCode) {
+            "2111114" -> {
+                "账号时长已消耗完毕"
+            }
+            else -> {
+                "游戏结束\n[$errorCode]"
+            }
+        }
+    }
+
+    private fun getWarningDialogSubtitle(errorCode: String): String {
+        return when (errorCode) {
             "${Constants.STATUS_NO_INPUT}" -> {
                 "游戏长时间无操作"
             }
-            "${Constants.STATUS_INSUFFICIENT_CLOSE}" -> {
-                "游戏结束"
+            "2111114" -> {
+                "你可以通过每日签到或充值获取时长"
             }
             else -> {
                 "游戏结束"
             }
         }
-        AppCommonDialog.Builder(this)
-            .setTitle(title)
-            .setSubTitle(subtitle, Color.parseColor("#FF555A69"))
-            .setRightButton("退出游戏") {
-                AppCommonDialog.hideDialog(this, "warningDialog")
-                finish()
+    }
+
+    private fun getLeftButtonText(errorCode: String): String? {
+        return when(errorCode) {
+            "2111114" -> {
+                "退出"
             }
-            .build().show("warningDialog")
+            else -> {
+                null
+            }
+        }
+    }
+
+    private fun getRightButtonText(errorCode: String): String {
+        return when(errorCode) {
+            "2111114" -> {
+                "去充值"
+            }
+            else -> {
+                "退出游戏"
+            }
+        }
     }
 
     private fun showExitGameDialog() {
@@ -663,12 +715,13 @@ class AtGameActivity : AppCompatActivity() {
             inputTimer = Timer()
             inputTimer?.schedule(object : TimerTask() {
                 override fun run() {
-                    AnTongSDK.anTongVideoView?.cmdToCloud(HMInputOpData().apply {
+                    val result = AnTongSDK.anTongVideoView?.cmdToCloud(HMInputOpData().apply {
                         val oneInputOpData = HMInputOpData.HMOneInputOPData()
                         oneInputOpData.inputState = HMInputOpData.HMOneInputOPData_InputState.HMOneInputOPData_InputState_OpStateUp
-                        oneInputOpData.inputOp = HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpMouseButtonMiddle
+                        oneInputOpData.inputOp = HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpKeyVkPlaceholder
                         opListArray.add(oneInputOpData)
                     })
+                    LogUtils.d("resetInputTimer:$result")
                 }
             }, 0L, 5 * 60 * 1000L)
         } catch (e: Exception) {
@@ -1173,12 +1226,16 @@ class AtGameActivity : AppCompatActivity() {
                 showKeyEditView(event.arg as KeyInfo)
             }
             "useSuccess" -> {
-                val type = if (event.arg == GameConstants.gamepadConfig) {
-                    "手柄"
-                } else if (event.arg == GameConstants.keyboardConfig) {
-                    "键鼠"
-                } else {
-                    ""
+                val type = when (event.arg) {
+                    GameConstants.gamepadConfig -> {
+                        "手柄"
+                    }
+                    GameConstants.keyboardConfig -> {
+                        "键鼠"
+                    }
+                    else -> {
+                        ""
+                    }
                 }
                 GameToastDialog.Builder(this)
                     .setTitle("使用成功")
@@ -1260,6 +1317,11 @@ class AtGameActivity : AppCompatActivity() {
 
     fun hideSoftKeyBoard(windowToken: IBinder) {
         inputMethodManager.hideSoftInputFromWindow(windowToken, 0)
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onGameError(event: GameErrorEvent) {
+        showWarningDialog(event.errorCode)
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

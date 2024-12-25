@@ -331,60 +331,6 @@
                         android:src="@drawable/img_add_edit" />
 
                 </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="0.5dp"
-                    android:background="#FF323741" />
-
-                <LinearLayout
-                    android:id="@+id/layout_key_opacity"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <com.sayx.hm_cloud.widget.DrawableTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:drawablePadding="6dp"
-                        android:text="@string/key_opacity"
-                        android:textColor="#FFBEC2CE"
-                        android:textSize="12sp"
-                        app:drawableLeft="@drawable/shape_point"
-                        app:drawableSize="4dp" />
-
-                    <View
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:layout_weight="1" />
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/btn_reduce_key_opacity"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_marginEnd="5dp"
-                        android:src="@drawable/img_reduce_edit" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/tv_key_opacity"
-                        android:layout_width="150dp"
-                        android:layout_height="20dp"
-                        android:layout_marginStart="2dp"
-                        android:background="@drawable/shape_key_param_bg"
-                        android:gravity="center"
-                        android:text="@string/default_percent"
-                        android:textColor="#C4D7EB"
-                        android:textSize="10sp"
-                        tools:text="100%" />
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/btn_add_key_opacity"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_marginStart="5dp"
-                        android:src="@drawable/img_add_edit" />
-                </LinearLayout>
             </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView

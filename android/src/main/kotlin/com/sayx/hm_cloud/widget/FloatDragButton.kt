@@ -70,13 +70,11 @@ class FloatDragButton @JvmOverloads constructor(
                         performClick()
                     }
                 }
-                val position = IntArray(4)
-                val location = AppSizeUtils.getLocationOnScreen(this, position)
                 positionListener?.onPositionChange(
-                    location[0],
-                    location[1],
-                    location[2],
-                    location[3]
+                    x.toInt(),
+                    y.toInt(),
+                    0,
+                    0
                 )
             }
         }

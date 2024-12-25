@@ -122,27 +122,12 @@ class KeyEditView @JvmOverloads constructor(
                 updateView()
             }
         }
-        dataBinding.btnAddKeyOpacity.setOnClickListener {
-            if (mKeyInfo.opacity < 100) {
-                mKeyInfo.opacity += 10
-                dataBinding.tvKeyOpacity.text = String.format("%s", "${mKeyInfo.opacity}%")
-                updateView()
-            }
-        }
-        dataBinding.btnReduceKeyOpacity.setOnClickListener {
-            if (mKeyInfo.opacity > 10) {
-                mKeyInfo.opacity -= 10
-                dataBinding.tvKeyOpacity.text = String.format("%s", "${mKeyInfo.opacity}%")
-                updateView()
-            }
-        }
     }
 
     @SuppressLint("DefaultLocale")
     fun setKeyInfo(keyInfo: KeyInfo) {
         mKeyInfo = keyInfo.copy()
         dataBinding.tvKeySize.text = String.format("%s", "${keyInfo.zoom}%")
-        dataBinding.tvKeyOpacity.text = String.format("%s", "${keyInfo.opacity}%")
         dataBinding.btnClick.isSelected = keyInfo.click == 0
         dataBinding.btnPress.isSelected = keyInfo.click != 0
         dataBinding.tabSetting.isSelected = true
