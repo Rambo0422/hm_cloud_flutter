@@ -82,20 +82,20 @@
     self.delegate = delegate;
     NSLog(@" =============== SDK_VERSION : %@", CLOUDGAME_SDK_VERSION);
 
-    if ([HmCloudTool share].playTime.integerValue < 0) {
-        [ErrorAlertView showAlertWithCid:[HMCloudPlayer sharedCloudPlayer].cloudId
-                                     uid:self.userId
-                               errorCode:[NSString stringWithFormat:@"-1(%ld)", [HmCloudTool share].playTime.integerValue]
-                                   title:@"特殊错误，请联系客服!"
-                                 content:nil
-                        dissMissCallback:^{
-            [self stopWithBack];
-            [[UIViewController topViewController] dismissViewControllerAnimated:YES
-                                                                     completion:^{
-            }];
-        }];
-        return;
-    }
+//    if ([HmCloudTool share].playTime.integerValue < 0) {
+//        [ErrorAlertView showAlertWithCid:[HMCloudPlayer sharedCloudPlayer].cloudId
+//                                     uid:self.userId
+//                               errorCode:[NSString stringWithFormat:@"-1(%ld)", [HmCloudTool share].playTime.integerValue]
+//                                   title:@"特殊错误，请联系客服!"
+//                                 content:nil
+//                        dissMissCallback:^{
+//            [self stopWithBack];
+//            [[UIViewController topViewController] dismissViewControllerAnimated:YES
+//                                                                     completion:^{
+//            }];
+//        }];
+//        return;
+//    }
 
 //    [self pushPreView];
 //    return;
