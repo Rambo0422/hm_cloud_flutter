@@ -72,7 +72,8 @@ class KeyInfo(
             // 仅序列化有 @Expose 标记的字段
             .excludeFieldsWithoutExposeAnnotation()
             .create()
-        return "${this.id}:${gson.toJson(this)}"
+        id = if (id == null) UUID.randomUUID() else id
+        return "${id}:${gson.toJson(this)}"
     }
 
     fun toMap(): Map<*, *> {

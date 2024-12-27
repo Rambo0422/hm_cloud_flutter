@@ -81,7 +81,7 @@ class GameController @JvmOverloads constructor(
 
     var controllerType: AppVirtualOperateType = AppVirtualOperateType.NONE
         set(value) {
-//            LogUtils.d("change controllerType = $value")
+            LogUtils.d("change controllerType = $value")
             if (value == field) {
                 return
             }
@@ -112,6 +112,7 @@ class GameController @JvmOverloads constructor(
             dataBinding.layoutMask.clearLine()
             for (index in 0..<childCount) {
                 val view = get(index)
+                currentKey = null
                 if (view is RouletteKeyView) {
                     view.showRoulette = value
                     view.invalidate()
@@ -141,7 +142,7 @@ class GameController @JvmOverloads constructor(
             if (gamepadKeys.isEmpty()) {
                 controllerCallback?.getGamepadData()
             } else {
-//                LogUtils.d("showGamepad:${gamepadViews.size}")
+                LogUtils.d("showGamepadView:${gamepadViews.size}")
                 // 加载Views
                 if (gamepadViews.size == 0) {
                     initGamepad(gamepadKeys)
@@ -153,14 +154,14 @@ class GameController @JvmOverloads constructor(
     }
 
     private fun showKeyboard() {
-//        LogUtils.d("showKeyboard:${keyboardKeys.size}")
+        LogUtils.d("showKeyboard:${keyboardKeys.size}")
         try {
             changViewVisibility(gamepadViews, INVISIBLE)
             changViewVisibility(keyboardViews, VISIBLE)
             if (keyboardKeys.isEmpty()) {
                 controllerCallback?.getKeyboardData()
             } else {
-//                LogUtils.d("showKeyboard:${keyboardViews.size}")
+                LogUtils.d("showKeyboardView:${keyboardViews.size}")
                 // 加载Views
                 if (keyboardViews.size == 0) {
                     initKeyboard(keyboardKeys)
@@ -172,7 +173,7 @@ class GameController @JvmOverloads constructor(
     }
 
     private fun initGamepad(keyInfoList: List<KeyInfo>) {
-//        LogUtils.d("initGamepad:${keyInfoList}")
+        LogUtils.d("initGamepad:${keyInfoList}")
         editGamepadKeys.clear()
         removeAllViews(keyboardViews)
         removeAllViews(gamepadViews)
@@ -1462,13 +1463,20 @@ class GameController @JvmOverloads constructor(
 
     private fun hideAllKey() {
         children.iterator().forEach {
-            if (it is KeyView|| it is RockerView || it is CombineKeyView || it is RouletteKeyView || it is ContainerKeyView || it is ShotKeyView) {
+            if (it is KeyView ||
+                it is RockerView ||
+                it is CombineKeyView ||
+                it is RouletteKeyView ||
+                it is ContainerKeyView ||
+                it is ShotKeyView
+                ) {
                 it.visibility = View.INVISIBLE
             }
         }
     }
 
     private fun removeAllViews(views: ArrayList<View>) {
+        LogUtils.d("removeAllViews")
         views.forEach {
             this.removeView(it)
         }

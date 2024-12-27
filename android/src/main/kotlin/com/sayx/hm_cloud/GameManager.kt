@@ -14,6 +14,7 @@ import androidx.fragment.app.FragmentActivity
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ThreadUtils
 import com.blankj.utilcode.util.ToastUtils
+import com.blankj.utilcode.util.AppUtils
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.haima.hmcp.Constants
@@ -508,7 +509,10 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                         gson,
                         gameParam?.userId,
                         gameParam?.gameId,
-                        gameParam?.priority ?: 1
+                        gameParam?.priority ?: 1,
+                        "android",
+                        "hmy",
+                        AppUtils.getAppVersionName(),
                     )
                 )
                 // 码率
@@ -1357,7 +1361,10 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                     gson,
                     gameParam?.userId,
                     gameParam?.gameId,
-                    gameParam?.priority ?: 1
+                    gameParam?.priority ?: 1,
+                    "android",
+                    "hmy",
+                    AppUtils.getAppVersionName()
                 )
             )
             putString(HmcpVideoView.C_TOKEN, gameParam?.cToken)

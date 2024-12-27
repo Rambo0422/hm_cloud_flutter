@@ -70,12 +70,15 @@ object GameUtils {
     }
 
     // 配置数据处理
-    fun getProtoData(gson: Gson, userId: String?, gameId: String?, priority: Int): String {
+    fun getProtoData(gson: Gson, userId: String?, gameId: String?, priority: Int, platform: String, supplier: String, version: String): String {
         val map = mutableMapOf<String, Any?>()
         val type = if (priority > 46) 2 else 1
         map["uid"] = userId
         map["gameId"] = gameId
         map["type"] = type
+        map["platform"] = platform
+        map["supplier"] = supplier
+        map["version"] = version
         val json = gson.toJson(map)
         val encode = Base64.encodeToString(json.toByteArray(), Base64.NO_WRAP)
         LogUtils.logD("getProtoData-->json:$json,\n$encode")
