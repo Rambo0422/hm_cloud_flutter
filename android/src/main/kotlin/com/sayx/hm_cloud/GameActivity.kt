@@ -623,9 +623,7 @@ class GameActivity : AppCompatActivity() {
             dataBinding.btnVirtualKeyboard.visibility = View.INVISIBLE
             // 展示自定义控制面板，让游戏画面无法触摸操作
             dataBinding.gameController.maskEnable = true
-            if (dataBinding.gameController.controllerType != AppVirtualOperateType.NONE) {
-                dataBinding.gameController.controllerType = type
-            }
+            dataBinding.gameController.controllerType = type
             controllerStatus = ControllerStatus.Edit
             // 进入编辑模式，防止操作过久，游戏出现无操作退出，每5分钟重置无操作时间，后台设置无操作下线时间为10分钟
             updateInputTimer()
