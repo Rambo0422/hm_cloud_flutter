@@ -87,6 +87,7 @@ import com.sayx.hm_cloud.widget.GameNoticeView
 import com.sayx.hm_cloud.widget.GameSettings
 import com.sayx.hm_cloud.widget.KeyEditView
 import com.sayx.hm_cloud.widget.KeyboardListView
+import com.sayx.hm_cloud.widget.TouchEventDispatcher
 import me.jessyan.autosize.AutoSizeCompat
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -177,6 +178,7 @@ class AtGameActivity : AppCompatActivity() {
             if (parent != null && parent is ViewGroup) {
                 parent.removeView(it)
             }
+            TouchEventDispatcher.registerView(it)
             dataBinding.gameController.addView(
                 it,
                 0,
@@ -699,7 +701,9 @@ class AtGameActivity : AppCompatActivity() {
             dataBinding.btnVirtualKeyboard.visibility = View.INVISIBLE
             // 展示自定义控制面板，让游戏画面无法触摸操作
             dataBinding.gameController.maskEnable = true
-            dataBinding.gameController.controllerType = type
+            if (dataBinding.gameController.controllerType != AppVirtualOperateType.NONE) {
+                dataBinding.gameController.controllerType = type
+            }
             controllerStatus = ControllerStatus.Edit
             // 进入编辑模式，防止操作过久，游戏出现无操作退出，每5分钟重置无操作时间，后台设置无操作下线时间为10分钟
             updateInputTimer()
@@ -1352,9 +1356,12 @@ class AtGameActivity : AppCompatActivity() {
     override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
 //        LogUtils.d("$this->dispatchTouchEvent:$event")
         event?.let {
-            if (GameUtils.isGamePadEvent(it) || GameUtils.isKeyBoardEvent(it) || GameUtils.isMouseEvent(
-                    it
-                )
+            if (controllerStatus == ControllerStatus.Edit) {
+                return super.dispatchTouchEvent(event)
+            }
+            if (GameUtils.isGamePadEvent(it) ||
+                GameUtils.isKeyBoardEvent(it) ||
+                GameUtils.isMouseEvent(it)
             ) {
 //                LogUtils.d("外设输入:$it")
                 if (dataBinding.gameController.controllerType != AppVirtualOperateType.NONE) {
@@ -1375,9 +1382,12 @@ class AtGameActivity : AppCompatActivity() {
     override fun dispatchGenericMotionEvent(event: MotionEvent?): Boolean {
 //        LogUtils.d("$this->dispatchGenericMotionEvent:$event")
         event?.let {
-            if (GameUtils.isGamePadEvent(it) || GameUtils.isKeyBoardEvent(it) || GameUtils.isMouseEvent(
-                    it
-                )
+            if (controllerStatus == ControllerStatus.Edit) {
+                return super.dispatchGenericMotionEvent(event)
+            }
+            if (GameUtils.isGamePadEvent(it) ||
+                GameUtils.isKeyBoardEvent(it) ||
+                GameUtils.isMouseEvent(it)
             ) {
 //                LogUtils.d("外设输入:$it")
                 if (dataBinding.gameController.controllerType != AppVirtualOperateType.NONE) {
@@ -1394,9 +1404,12 @@ class AtGameActivity : AppCompatActivity() {
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
         LogUtils.d("$this->dispatchKeyEvent:$event")
         event.let {
-            if (GameUtils.isGamePadEvent(it) || GameUtils.isKeyBoardEvent(it) || GameUtils.isMouseEvent(
-                    it
-                )
+            if (controllerStatus == ControllerStatus.Edit) {
+                return super.dispatchKeyEvent(event)
+            }
+            if (GameUtils.isGamePadEvent(it) ||
+                GameUtils.isKeyBoardEvent(it) ||
+                GameUtils.isMouseEvent(it)
             ) {
                 LogUtils.d("外设输入:$it")
                 if (dataBinding.gameController.controllerType != AppVirtualOperateType.NONE) {
@@ -1464,6 +1477,9 @@ class AtGameActivity : AppCompatActivity() {
     }
 
     private fun checkInputDevices() {
+        if (controllerStatus == ControllerStatus.Edit) {
+            return
+        }
         val inputDeviceIds = inputManager.inputDeviceIds
         var pcMouseMode = false
         if (inputDeviceIds.isNotEmpty()) {

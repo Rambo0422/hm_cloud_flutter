@@ -1134,7 +1134,7 @@ class GameController @JvmOverloads constructor(
 //        LogUtils.d("setKeyData:$data")
         if (data.type == GameConstants.keyboardConfig) {
             // 键鼠
-//            LogUtils.d("setKeyData-> keyboard")
+//            LogUtils.d("setKeyData:${keyboardKeys.size}")
             if (update) {
                 initKeyboard(data.keyboard)
             } else {
@@ -1144,7 +1144,7 @@ class GameController @JvmOverloads constructor(
             }
         } else if (data.type == GameConstants.gamepadConfig) {
             // 手柄
-//            LogUtils.d("setKeyData-> gamepad")
+//            LogUtils.d("setKeyData:${gamepadKeys.size}")
             if (update) {
                 initGamepad(data.keyboard)
             } else {
@@ -1303,18 +1303,17 @@ class GameController @JvmOverloads constructor(
                 currentEditKeys?.let { list ->
                     when (view) {
                         is RouletteKeyView -> {
-                            LogUtils.d("remove RouletteKeyView")
-                            it.rouArr?.forEach { info ->
-                                list.add(info)
-                            }
-                            list.remove(currentKey)
                             when (controllerType) {
                                 AppVirtualOperateType.APP_STICK_XBOX -> {
-                                    initGamepad(list.toList())
+                                    it.rouArr?.forEach { info ->
+                                        addKeyButton(info)
+                                    }
                                 }
 
                                 AppVirtualOperateType.APP_KEYBOARD -> {
-                                    initKeyboard(list.toList())
+                                    it.rouArr?.forEach { info ->
+                                        addKeyButton(info)
+                                    }
                                 }
 
                                 else -> {
@@ -1324,17 +1323,17 @@ class GameController @JvmOverloads constructor(
                         }
 
                         is ContainerKeyView -> {
-                            it.containerArr?.forEach { info ->
-                                list.add(info)
-                            }
-                            list.remove(currentKey)
                             when (controllerType) {
                                 AppVirtualOperateType.APP_STICK_XBOX -> {
-                                    initGamepad(list.toList())
+                                    it.containerArr?.forEach { info ->
+                                        addKeyButton(info)
+                                    }
                                 }
 
                                 AppVirtualOperateType.APP_KEYBOARD -> {
-                                    initKeyboard(list.toList())
+                                    it.containerArr?.forEach { info ->
+                                        addKeyButton(info)
+                                    }
                                 }
 
                                 else -> {
@@ -1344,12 +1343,11 @@ class GameController @JvmOverloads constructor(
                         }
 
                         else -> {
-                            list.remove(currentKey)
                         }
                     }
+                    list.remove(currentKey)
+                    currentKey = null
                 }
-                currentKey = null
-                LogUtils.d("deleteKey")
             } ?: LogUtils.e("deleteKey: View not found")
         }
     }
@@ -1462,7 +1460,7 @@ class GameController @JvmOverloads constructor(
     }
 
     private fun hideAllKey() {
-        children.iterator().forEach {
+        children.forEach {
             if (it is KeyView ||
                 it is RockerView ||
                 it is CombineKeyView ||
