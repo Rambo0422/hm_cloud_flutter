@@ -14,11 +14,13 @@ import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.SPUtils
 import com.sayx.hm_cloud.R
 import com.sayx.hm_cloud.model.KeyInfo
 import com.sayx.hm_cloud.callback.OnKeyTouchListener
 import com.sayx.hm_cloud.callback.OnPositionChangeListener
 import com.sayx.hm_cloud.constants.ControllerStatus
+import com.sayx.hm_cloud.constants.GameConstants
 import com.sayx.hm_cloud.constants.controllerStatus
 import com.sayx.hm_cloud.constants.maps
 import com.sayx.hm_cloud.databinding.ViewCombineKeyBinding
@@ -62,7 +64,6 @@ class CombineKeyView @JvmOverloads constructor(
             AppSizeUtils.convertViewSize(keyInfo.getKeyHeight())
         )
         this.layoutParams = layoutParams
-        this.alpha = keyInfo.opacity / 100f
         dataBinding.tvName.layoutParams = layoutParams
         val map = maps.find { item -> item.first == keyInfo.map}?.second
         if (TextUtils.isEmpty(keyInfo.map) || keyInfo.map == "map1" || map == null) {

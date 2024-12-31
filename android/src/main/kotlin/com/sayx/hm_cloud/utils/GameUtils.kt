@@ -54,28 +54,34 @@ object GameUtils {
 
     // 是否是外接手柄操作
     fun isGamePadEvent(motionEvent: InputEvent): Boolean {
-        return (motionEvent.source and InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD ||
+        return isGamePadController(motionEvent.device) ||
+                (motionEvent.source and InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD ||
                 (motionEvent.source and InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK
     }
 
     // 是否是外接键盘操作
     fun isKeyBoardEvent(motionEvent: InputEvent): Boolean {
-        return (motionEvent.source and InputDevice.SOURCE_KEYBOARD) == InputDevice.SOURCE_KEYBOARD
-                && motionEvent.source == InputDevice.KEYBOARD_TYPE_ALPHABETIC
+        return isKeyBoardController(motionEvent.device) ||
+                (motionEvent.source and InputDevice.SOURCE_KEYBOARD) == InputDevice.SOURCE_KEYBOARD &&
+                motionEvent.source == InputDevice.KEYBOARD_TYPE_ALPHABETIC
     }
 
     // 是否是外鼠标操作
-    fun isMouseEvent(event: InputEvent): Boolean {
-        return (event.source and InputDevice.SOURCE_MOUSE) == InputDevice.SOURCE_MOUSE
+    fun isMouseEvent(motionEvent: InputEvent): Boolean {
+        return isMouseController(motionEvent.device) ||
+                (motionEvent.source and InputDevice.SOURCE_MOUSE) == InputDevice.SOURCE_MOUSE
     }
 
     // 配置数据处理
-    fun getProtoData(gson: Gson, userId: String?, gameId: String?, priority: Int): String {
+    fun getProtoData(gson: Gson, userId: String?, gameId: String?, priority: Int, platform: String, supplier: String, version: String): String {
         val map = mutableMapOf<String, Any?>()
         val type = if (priority > 46) 2 else 1
         map["uid"] = userId
         map["gameId"] = gameId
         map["type"] = type
+        map["platform"] = platform
+        map["supplier"] = supplier
+        map["version"] = version
         val json = gson.toJson(map)
         val encode = Base64.encodeToString(json.toByteArray(), Base64.NO_WRAP)
         LogUtils.logD("getProtoData-->json:$json,\n$encode")

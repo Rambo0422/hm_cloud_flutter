@@ -195,7 +195,6 @@ class RockerView @JvmOverloads constructor(
 
     fun setKeyInfo(keyInfo: KeyInfo) {
         this.keyInfo = keyInfo
-        alpha = keyInfo.opacity / 100f
         val layoutParams = FrameLayout.LayoutParams(
             AppSizeUtils.convertViewSize(keyInfo.getKeyWidth()),
             AppSizeUtils.convertViewSize(keyInfo.getKeyHeight())

@@ -6,6 +6,8 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
+import com.sayx.hm_cloud.utils.AppSizeUtils
+import com.sayx.hm_cloud.callback.OnPositionChangeListener
 import kotlin.math.sqrt
 
 class FloatDragButton @JvmOverloads constructor(
@@ -23,6 +25,8 @@ class FloatDragButton @JvmOverloads constructor(
     private var parentHeight = 0
 
     private var clickTime = 0L
+
+    var positionListener: OnPositionChangeListener? = null
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
@@ -66,6 +70,12 @@ class FloatDragButton @JvmOverloads constructor(
                         performClick()
                     }
                 }
+                positionListener?.onPositionChange(
+                    x.toInt(),
+                    y.toInt(),
+                    0,
+                    0
+                )
             }
         }
         return true

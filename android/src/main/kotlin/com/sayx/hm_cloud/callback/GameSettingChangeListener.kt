@@ -39,4 +39,6 @@ interface GameSettingChangeListener {
     fun getNetDelay(): Int
 
     fun getPacketsLostRate(): String
+
+    fun onOpacityChange(opacity: Int)
 }

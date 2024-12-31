@@ -51,6 +51,7 @@ import com.sayx.hm_cloud.callback.GameSettingChangeListener
 import com.sayx.hm_cloud.callback.HideListener
 import com.sayx.hm_cloud.callback.KeyEditCallback
 import com.sayx.hm_cloud.callback.OnEditClickListener
+import com.sayx.hm_cloud.callback.OnPositionChangeListener
 import com.sayx.hm_cloud.constants.AppVirtualOperateType
 import com.sayx.hm_cloud.constants.ControllerStatus
 import com.sayx.hm_cloud.constants.GameConstants
@@ -66,6 +67,7 @@ import com.sayx.hm_cloud.http.bean.HttpResponse
 import com.sayx.hm_cloud.model.ControllerConfigEvent
 import com.sayx.hm_cloud.model.ControllerInfo
 import com.sayx.hm_cloud.model.GameConfig
+import com.sayx.hm_cloud.model.GameErrorEvent
 import com.sayx.hm_cloud.model.GameNotice
 import com.sayx.hm_cloud.model.GameParam
 import com.sayx.hm_cloud.model.KeyInfo
@@ -85,6 +87,7 @@ import com.sayx.hm_cloud.widget.GameNoticeView
 import com.sayx.hm_cloud.widget.GameSettings
 import com.sayx.hm_cloud.widget.KeyEditView
 import com.sayx.hm_cloud.widget.KeyboardListView
+import com.sayx.hm_cloud.widget.TouchEventDispatcher
 import me.jessyan.autosize.AutoSizeCompat
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -175,6 +178,7 @@ class AtGameActivity : AppCompatActivity() {
             if (parent != null && parent is ViewGroup) {
                 parent.removeView(it)
             }
+            TouchEventDispatcher.registerView(it)
             dataBinding.gameController.addView(
                 it,
                 0,
@@ -187,7 +191,7 @@ class AtGameActivity : AppCompatActivity() {
         anTongVideoView?.setAttachContext(this)
         anTongVideoView?.setHmcpPlayerListener(object : AnTongPlayerListener {
             override fun antongPlayerStatusCallback(callback: String?) {
-                LogUtils.d("antongPlayerStatusCallback:$callback")
+                LogUtils.d("PlayerStatusCallback:$callback")
                 callback?.let {
                     val jsonObject = JSONObject(it)
                     val status = jsonObject.getInt(StatusCallbackUtil.STATUS)
@@ -205,19 +209,7 @@ class AtGameActivity : AppCompatActivity() {
             override fun onPlayerError(errorCode: Int, errorMsg: String?) {
                 runOnUiThread {
                     AnTongSDK.uploadErrorCode(errorCode, errorMsg ?: "")
-                    gameSettings?.release()
-                    GameManager.isPlaying = false
-
-                    GameManager.releaseGame(finish = "errorCode")
-                    AppCommonDialog.Builder(this@AtGameActivity)
-                        .setTitle("游戏已结束\n[$errorCode]")
-                        .setSubTitle(errorMsg)
-                        .setRightButton("退出游戏") {
-                            AppCommonDialog.hideDialog(this@AtGameActivity, "gameErrorDialog")
-                            finish()
-                        }
-                        .build()
-                        .show("gameErrorDialog")
+                    showWarningDialog("$errorCode")
                 }
             }
         })
@@ -234,6 +226,20 @@ class AtGameActivity : AppCompatActivity() {
                 checkTipsShow()
             } else {
                 showGameSetting()
+            }
+        }
+        dataBinding.btnGameSettings.positionListener = object : OnPositionChangeListener {
+            override fun onPositionChange(left: Int, top: Int, right: Int, bottom: Int) {
+                SPUtils.getInstance().put(GameConstants.settingsLeft, left)
+                SPUtils.getInstance().put(GameConstants.settingsTop, top)
+            }
+        }
+        val x = SPUtils.getInstance().getInt(GameConstants.settingsLeft, -1)
+        val y = SPUtils.getInstance().getInt(GameConstants.settingsTop, -1)
+        if (x > 0 && y > 0) {
+            dataBinding.btnGameSettings.post {
+                dataBinding.btnGameSettings.x = x.toFloat()
+                dataBinding.btnGameSettings.y = y.toFloat()
             }
         }
         dataBinding.btnVirtualKeyboard.setOnClickListener {
@@ -559,34 +565,82 @@ class AtGameActivity : AppCompatActivity() {
                     AnTongSDK.anTongVideoView?.clockDiffVideoLatencyInfo?.packetsLostRate?.toString()
                 return packetsLostRate ?: ""
             }
+
+            override fun onOpacityChange(opacity: Int) {
+                dataBinding.gameController.setKeyOpacity(opacity)
+            }
         }
     }
 
     private fun showWarningDialog(errorCode: String) {
         gameSettings?.release()
         GameManager.isPlaying = false
+        GameManager.releaseGame(finish = errorCode)
+        AppCommonDialog.Builder(this)
+            .setTitle(getWarningDialogTitle(errorCode))
+            .setSubTitle(getWarningDialogSubtitle(errorCode), Color.parseColor("#FF555A69"))
+            .setLeftButton(getLeftButtonText(errorCode)) {
+                finish()
+            }
+            .setRightButton(getRightButtonText(errorCode)) {
+                AppCommonDialog.hideDialog(this, "warningDialog")
+                when(errorCode) {
+                    "2111114" -> {
+                        GameManager.invokeMethod("openRecharge")
+                    }
+                    else -> {
+                    }
+                }
+                finish()
+            }
+            .build().show("warningDialog")
+    }
 
-        GameManager.releaseGame(finish = "$errorCode")
-        val title = "游戏结束\n[$errorCode]"
-        val subtitle = when (errorCode) {
+    private fun getWarningDialogTitle(errorCode: String): String {
+        return when (errorCode) {
+            "2111114" -> {
+                "账号时长已消耗完毕"
+            }
+            else -> {
+                "游戏结束\n[$errorCode]"
+            }
+        }
+    }
+
+    private fun getWarningDialogSubtitle(errorCode: String): String {
+        return when (errorCode) {
             "${Constants.STATUS_NO_INPUT}" -> {
                 "游戏长时间无操作"
             }
-            "${Constants.STATUS_INSUFFICIENT_CLOSE}" -> {
-                "游戏结束"
+            "2111114" -> {
+                "你可以通过每日签到或充值获取时长"
             }
             else -> {
                 "游戏结束"
             }
         }
-        AppCommonDialog.Builder(this)
-            .setTitle(title)
-            .setSubTitle(subtitle, Color.parseColor("#FF555A69"))
-            .setRightButton("退出游戏") {
-                AppCommonDialog.hideDialog(this, "warningDialog")
-                finish()
+    }
+
+    private fun getLeftButtonText(errorCode: String): String? {
+        return when(errorCode) {
+            "2111114" -> {
+                "退出"
             }
-            .build().show("warningDialog")
+            else -> {
+                null
+            }
+        }
+    }
+
+    private fun getRightButtonText(errorCode: String): String {
+        return when(errorCode) {
+            "2111114" -> {
+                "去充值"
+            }
+            else -> {
+                "退出游戏"
+            }
+        }
     }
 
     private fun showExitGameDialog() {
@@ -646,9 +700,9 @@ class AtGameActivity : AppCompatActivity() {
             dataBinding.btnGameSettings.visibility = View.INVISIBLE
             dataBinding.btnVirtualKeyboard.visibility = View.INVISIBLE
             // 展示自定义控制面板，让游戏画面无法触摸操作
+            dataBinding.gameController.maskEnable = true
             dataBinding.gameController.controllerType = type
             controllerStatus = ControllerStatus.Edit
-            dataBinding.gameController.maskEnable = true
             // 进入编辑模式，防止操作过久，游戏出现无操作退出，每5分钟重置无操作时间，后台设置无操作下线时间为10分钟
             updateInputTimer()
         }
@@ -663,12 +717,13 @@ class AtGameActivity : AppCompatActivity() {
             inputTimer = Timer()
             inputTimer?.schedule(object : TimerTask() {
                 override fun run() {
-                    AnTongSDK.anTongVideoView?.cmdToCloud(HMInputOpData().apply {
+                    val result = AnTongSDK.anTongVideoView?.cmdToCloud(HMInputOpData().apply {
                         val oneInputOpData = HMInputOpData.HMOneInputOPData()
                         oneInputOpData.inputState = HMInputOpData.HMOneInputOPData_InputState.HMOneInputOPData_InputState_OpStateUp
-                        oneInputOpData.inputOp = HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpMouseButtonMiddle
+                        oneInputOpData.inputOp = HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpKeyVkPlaceholder
                         opListArray.add(oneInputOpData)
                     })
+                    LogUtils.d("resetInputTimer:$result")
                 }
             }, 0L, 5 * 60 * 1000L)
         } catch (e: Exception) {
@@ -1173,12 +1228,16 @@ class AtGameActivity : AppCompatActivity() {
                 showKeyEditView(event.arg as KeyInfo)
             }
             "useSuccess" -> {
-                val type = if (event.arg == GameConstants.gamepadConfig) {
-                    "手柄"
-                } else if (event.arg == GameConstants.keyboardConfig) {
-                    "键鼠"
-                } else {
-                    ""
+                val type = when (event.arg) {
+                    GameConstants.gamepadConfig -> {
+                        "手柄"
+                    }
+                    GameConstants.keyboardConfig -> {
+                        "键鼠"
+                    }
+                    else -> {
+                        ""
+                    }
                 }
                 GameToastDialog.Builder(this)
                     .setTitle("使用成功")
@@ -1263,6 +1322,11 @@ class AtGameActivity : AppCompatActivity() {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onGameError(event: GameErrorEvent) {
+        showWarningDialog(event.errorCode)
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
     fun onControllerConfigEvent(event: ControllerConfigEvent) {
         LogUtils.d("onControllerConfigEvent:${event.data}")
         dataBinding.gameController.setControllerData(event.data)
@@ -1290,9 +1354,12 @@ class AtGameActivity : AppCompatActivity() {
     override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
 //        LogUtils.d("$this->dispatchTouchEvent:$event")
         event?.let {
-            if (GameUtils.isGamePadEvent(it) || GameUtils.isKeyBoardEvent(it) || GameUtils.isMouseEvent(
-                    it
-                )
+            if (controllerStatus == ControllerStatus.Edit) {
+                return super.dispatchTouchEvent(event)
+            }
+            if (GameUtils.isGamePadEvent(it) ||
+                GameUtils.isKeyBoardEvent(it) ||
+                GameUtils.isMouseEvent(it)
             ) {
 //                LogUtils.d("外设输入:$it")
                 if (dataBinding.gameController.controllerType != AppVirtualOperateType.NONE) {
@@ -1313,9 +1380,12 @@ class AtGameActivity : AppCompatActivity() {
     override fun dispatchGenericMotionEvent(event: MotionEvent?): Boolean {
 //        LogUtils.d("$this->dispatchGenericMotionEvent:$event")
         event?.let {
-            if (GameUtils.isGamePadEvent(it) || GameUtils.isKeyBoardEvent(it) || GameUtils.isMouseEvent(
-                    it
-                )
+            if (controllerStatus == ControllerStatus.Edit) {
+                return super.dispatchGenericMotionEvent(event)
+            }
+            if (GameUtils.isGamePadEvent(it) ||
+                GameUtils.isKeyBoardEvent(it) ||
+                GameUtils.isMouseEvent(it)
             ) {
 //                LogUtils.d("外设输入:$it")
                 if (dataBinding.gameController.controllerType != AppVirtualOperateType.NONE) {
@@ -1330,13 +1400,16 @@ class AtGameActivity : AppCompatActivity() {
     }
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
-//        LogUtils.d("$this->dispatchKeyEvent:$event")
+        LogUtils.d("$this->dispatchKeyEvent:$event")
         event.let {
-            if (GameUtils.isGamePadEvent(it) || GameUtils.isKeyBoardEvent(it) || GameUtils.isMouseEvent(
-                    it
-                )
+            if (controllerStatus == ControllerStatus.Edit) {
+                return super.dispatchKeyEvent(event)
+            }
+            if (GameUtils.isGamePadEvent(it) ||
+                GameUtils.isKeyBoardEvent(it) ||
+                GameUtils.isMouseEvent(it)
             ) {
-                //                LogUtils.d("外设输入:$it")
+                LogUtils.d("外设输入:$it")
                 if (dataBinding.gameController.controllerType != AppVirtualOperateType.NONE) {
                     dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
                     gameSettings?.controllerType = AppVirtualOperateType.NONE
@@ -1392,7 +1465,7 @@ class AtGameActivity : AppCompatActivity() {
         }
 
         override fun onInputDeviceRemoved(deviceId: Int) {
-            LogUtils.v("检测到设备移除:$deviceId", "GameManager")
+            LogUtils.v("检测到设备移除:$deviceId")
             checkInputDevices()
         }
 
@@ -1402,6 +1475,9 @@ class AtGameActivity : AppCompatActivity() {
     }
 
     private fun checkInputDevices() {
+        if (controllerStatus == ControllerStatus.Edit) {
+            return
+        }
         val inputDeviceIds = inputManager.inputDeviceIds
         var pcMouseMode = false
         if (inputDeviceIds.isNotEmpty()) {
@@ -1410,17 +1486,17 @@ class AtGameActivity : AppCompatActivity() {
                 inputDevice?.let {
                     when {
                         GameUtils.isGamePadController(it) -> {
-                            LogUtils.v("检测到外设手柄:$deviceId, device:${inputDevice.name}", "GameManager")
+                            LogUtils.v("检测到外设手柄:$deviceId, device:${inputDevice.name}")
                             pcMouseMode = true
                         }
 
                         GameUtils.isKeyBoardController(it) -> {
-                            LogUtils.v("检测到外设键盘:$deviceId, device:${inputDevice.name}", "GameManager")
+                            LogUtils.v("检测到外设键盘:$deviceId, device:${inputDevice.name}")
                             pcMouseMode = true
                         }
 
                         GameUtils.isMouseController(it) -> {
-                            LogUtils.v("检测到外设鼠标:$deviceId, device:${inputDevice.name}", "GameManager")
+                            LogUtils.v("检测到外设鼠标:$deviceId, device:${inputDevice.name}")
                             pcMouseMode = true
                         }
 

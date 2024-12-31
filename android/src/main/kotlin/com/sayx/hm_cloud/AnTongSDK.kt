@@ -1,10 +1,12 @@
 package com.sayx.hm_cloud
 
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.ViewGroup
 import com.antong.keyboard.sa.constants.HMInputOpData
+import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.LogUtils
 import com.media.atkit.AnTongManager
 import com.media.atkit.Constants
@@ -83,7 +85,7 @@ object AnTongSDK {
 
         bundle.putString(
             AnTongVideoView.PROTO_DATA,
-            GameUtils.getProtoData(GameManager.gson, gameParam.userId, gameParam.gameId, gameParam.priority)
+            GameUtils.getProtoData(GameManager.gson, gameParam.userId, gameParam.gameId, gameParam.priority, "android", "at", AppUtils.getAppVersionName())
         )
         bundle.putBoolean(AnTongVideoView.AUTO_PLAY_AUDIO, true)
         if (gameParam.isVip()) {
@@ -172,6 +174,7 @@ object AnTongSDK {
 
     private val mAnTongPlayerListener = object : AnTongPlayerListener {
         override fun antongPlayerStatusCallback(callback: String?) {
+            LogUtils.d("PlayerStatusCallback:$callback")
             callback?.let {
                 val jsonObject = JSONObject(it)
                 val status = jsonObject.getInt(StatusCallbackUtil.STATUS)

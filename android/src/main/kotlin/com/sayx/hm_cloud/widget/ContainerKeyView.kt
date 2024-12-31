@@ -173,7 +173,6 @@ class ContainerKeyView @JvmOverloads constructor(
             layoutHeight
         )
         dataBinding.ivArrow.layoutParams = arrowLayoutParams
-        dataBinding.ivArrow.alpha = keyInfo.opacity / 100f
 
         val size = keyInfo.containerArr?.size ?: 0
         val margin = AppSizeUtils.convertViewSize(ceil(6 * keyInfo.zoom / 100f * 2f).toInt())

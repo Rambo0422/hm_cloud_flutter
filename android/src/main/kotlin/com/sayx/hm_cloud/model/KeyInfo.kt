@@ -18,6 +18,7 @@ class KeyInfo(
     @Expose(serialize = true) var text: String?,
     @Expose(serialize = true) var remark: Int?,
     @Expose(serialize = true) var type: String,
+    @Deprecated("需求变更，透明度统一调整")
     @Expose(serialize = true) var opacity: Int,
     @Expose(serialize = true) var click: Int,
     @Expose(serialize = true) val inputOp: Int,
@@ -71,7 +72,8 @@ class KeyInfo(
             // 仅序列化有 @Expose 标记的字段
             .excludeFieldsWithoutExposeAnnotation()
             .create()
-        return "${this.id}:${gson.toJson(this)}"
+        id = if (id == null) UUID.randomUUID() else id
+        return "${id}:${gson.toJson(this)}"
     }
 
     fun toMap(): Map<*, *> {

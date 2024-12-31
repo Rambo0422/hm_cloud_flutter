@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout.LayoutParams
 import androidx.appcompat.widget.AppCompatImageView
 import com.blankj.utilcode.util.LogUtils
+import com.sayx.hm_cloud.GameManager
 import com.sayx.hm_cloud.R
 import com.sayx.hm_cloud.callback.OnKeyTouchListener
 import com.sayx.hm_cloud.callback.OnPositionChangeListener
@@ -59,7 +60,6 @@ class ShotKeyView @JvmOverloads constructor(
             AppSizeUtils.convertViewSize(keyInfo.getKeyHeight())
         )
         this.layoutParams = layoutParams
-        this.alpha = keyInfo.opacity / 100f
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -75,20 +75,20 @@ class ShotKeyView @JvmOverloads constructor(
     @SuppressLint("ClickableViewAccessibility")
     override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
         event?.let {
-            if (controllerStatus == ControllerStatus.Normal) {
-//                TouchEventDispatcher.dispatchTouchEvent(it)
+            if (controllerStatus == ControllerStatus.Normal && !GameManager.isAnTong()) {
+                // 海马保持原功能
                 return false
             }
             when (it.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
+                    lastX = it.x
+                    lastY = it.y
                     if (controllerStatus == ControllerStatus.Edit && needDrawShadow) {
                         isDrag = false
                         if (parent is ViewGroup) {
                             parentWidth = (parent as ViewGroup).width
                             parentHeight = (parent as ViewGroup).height
                         }
-                        lastX = it.x
-                        lastY = it.y
                         if (parent is GameController) {
                             (parent as GameController).checkAlignment(this)
                         }
@@ -123,6 +123,12 @@ class ShotKeyView @JvmOverloads constructor(
                                 (parent as GameController).checkAlignment(this)
                             }
                         }
+                    } else if (controllerStatus == ControllerStatus.Normal) {
+                        val offsetX = it.x - lastX
+                        val offsetY = it.y - lastY
+                        lastX = it.x
+                        lastY = it.y
+                        TouchEventDispatcher.dispatchTouchOffset(offsetX.toInt(), offsetY.toInt())
                     }
                 }
 

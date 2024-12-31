@@ -42,7 +42,6 @@ import com.gyf.immersionbar.ktx.immersionBar
 import com.gyf.immersionbar.ktx.navigationBarHeight
 import com.haima.hmcp.HmcpManager
 import com.haima.hmcp.beans.ResolutionInfo
-import com.haima.hmcp.beans.VideoDelayInfo
 import com.haima.hmcp.listeners.OnLivingListener
 import com.haima.hmcp.rtc.widgets.beans.RtcVideoDelayInfo
 import com.haima.hmcp.widgets.beans.VirtualOperateType
@@ -55,6 +54,7 @@ import com.sayx.hm_cloud.callback.GameSettingChangeListener
 import com.sayx.hm_cloud.callback.HideListener
 import com.sayx.hm_cloud.callback.KeyEditCallback
 import com.sayx.hm_cloud.callback.OnEditClickListener
+import com.sayx.hm_cloud.callback.OnPositionChangeListener
 import com.sayx.hm_cloud.constants.AppVirtualOperateType
 import com.sayx.hm_cloud.constants.ControllerStatus
 import com.sayx.hm_cloud.constants.GameConstants
@@ -102,6 +102,7 @@ import com.sayx.hm_cloud.widget.PlayPartyGameView
 import com.sayx.hm_cloud.widget.PlayPartyPermissionView
 import com.sayx.hm_cloud.widget.PlayPartyUserAvatarView
 import com.sayx.hm_cloud.widget.PlayPartyWantPlayView
+import com.sayx.hm_cloud.widget.TouchEventDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.jessyan.autosize.AutoSizeCompat
@@ -189,6 +190,7 @@ class GameActivity : AppCompatActivity() {
             if (parent != null && parent is ViewGroup) {
                 parent.removeView(it)
             }
+            TouchEventDispatcher.registerView(it)
             dataBinding.gameController.addView(
                 it,
                 0,
@@ -215,6 +217,20 @@ class GameActivity : AppCompatActivity() {
                 checkTipsShow()
             } else {
                 showGameSetting()
+            }
+        }
+        dataBinding.btnGameSettings.positionListener = object : OnPositionChangeListener {
+            override fun onPositionChange(left: Int, top: Int, right: Int, bottom: Int) {
+                SPUtils.getInstance().put(GameConstants.settingsLeft, left)
+                SPUtils.getInstance().put(GameConstants.settingsTop, top)
+            }
+        }
+        val x = SPUtils.getInstance().getInt(GameConstants.settingsLeft, -1)
+        val y = SPUtils.getInstance().getInt(GameConstants.settingsTop, -1)
+        if (x > 0 && y > 0) {
+            dataBinding.btnGameSettings.post {
+                dataBinding.btnGameSettings.x = x.toFloat()
+                dataBinding.btnGameSettings.y = y.toFloat()
             }
         }
         dataBinding.btnVirtualKeyboard.setOnClickListener {
@@ -572,6 +588,10 @@ class GameActivity : AppCompatActivity() {
             override fun getPacketsLostRate(): String {
                 return GameManager.gameView?.clockDiffVideoLatencyInfo?.packetsLostRate ?: ""
             }
+
+            override fun onOpacityChange(opacity: Int) {
+                dataBinding.gameController.setKeyOpacity(opacity)
+            }
         }
     }
 
@@ -602,9 +622,9 @@ class GameActivity : AppCompatActivity() {
             dataBinding.btnGameSettings.visibility = View.INVISIBLE
             dataBinding.btnVirtualKeyboard.visibility = View.INVISIBLE
             // 展示自定义控制面板，让游戏画面无法触摸操作
+            dataBinding.gameController.maskEnable = true
             dataBinding.gameController.controllerType = type
             controllerStatus = ControllerStatus.Edit
-            dataBinding.gameController.maskEnable = true
             // 进入编辑模式，防止操作过久，游戏出现无操作退出，每5分钟重置无操作时间，后台设置无操作下线时间为10分钟
             updateInputTimer()
         }
@@ -1145,12 +1165,16 @@ class GameActivity : AppCompatActivity() {
                 showKeyEditView(event.arg as KeyInfo)
             }
             "useSuccess" -> {
-                val type = if (event.arg == GameConstants.gamepadConfig) {
-                    "手柄"
-                } else if (event.arg == GameConstants.keyboardConfig) {
-                    "键鼠"
-                } else {
-                    ""
+                val type = when (event.arg) {
+                    GameConstants.gamepadConfig -> {
+                        "手柄"
+                    }
+                    GameConstants.keyboardConfig -> {
+                        "键鼠"
+                    }
+                    else -> {
+                        ""
+                    }
                 }
                 GameToastDialog.Builder(this)
                     .setTitle("使用成功")
@@ -1314,17 +1338,49 @@ class GameActivity : AppCompatActivity() {
         gameSettings?.release()
         GameManager.isPlaying = false
         GameManager.releaseGame(finish = errorCode, bundle = null)
-        val title = when (errorCode) {
+
+        AppCommonDialog.Builder(this)
+            .setTitle(getWarningDialogTitle(errorCode))
+            .setSubTitle(getWarningDialogSubtitle(errorCode), Color.parseColor("#FF555A69"))
+            .setLeftButton(getLeftButtonText(errorCode)) {
+                finish()
+            }
+            .setRightButton(getRightButtonText(errorCode)) {
+                LogUtils.d("exitGameForError:$errorCode")
+                AppCommonDialog.hideDialog(this, "warningDialog")
+                when(errorCode) {
+                    "42" -> {
+                        GameManager.invokeMethod("openRecharge")
+                    }
+                    else -> {
+                    }
+                }
+                finish()
+            }
+            .build().show("warningDialog")
+    }
+
+    private fun getWarningDialogTitle(errorCode: String): String {
+        return when (errorCode) {
             "401" -> {
                 "设备限制"
+            }
+            "42" -> {
+                "账号时长已消耗完毕"
             }
             else -> {
                 "游戏结束\n[$errorCode]"
             }
         }
-        val subtitle = when (errorCode) {
+    }
+
+    private fun getWarningDialogSubtitle(errorCode: String): String {
+        return when (errorCode) {
             "11" -> {
                 "游戏长时间无操作"
+            }
+            "42" -> {
+                "你可以通过每日签到或充值获取时长"
             }
             "401" -> {
                 "游戏已在其他设备运行"
@@ -1333,15 +1389,28 @@ class GameActivity : AppCompatActivity() {
                 "游戏结束"
             }
         }
+    }
 
-        AppCommonDialog.Builder(this)
-            .setTitle(title)
-            .setSubTitle(subtitle, Color.parseColor("#FF555A69"))
-            .setRightButton("退出游戏") {
-                LogUtils.d("exitGameForTime")
-                finish()
+    private fun getLeftButtonText(errorCode: String): String? {
+        return when(errorCode) {
+            "42" -> {
+                "退出"
             }
-            .build().show()
+            else -> {
+                null
+            }
+        }
+    }
+
+    private fun getRightButtonText(errorCode: String): String {
+        return when(errorCode) {
+            "42" -> {
+                "去充值"
+            }
+            else -> {
+                "退出游戏"
+            }
+        }
     }
 
     private fun showErrorDialog(errorCode: String, errorMsg: String? = null) {
@@ -1395,9 +1464,12 @@ class GameActivity : AppCompatActivity() {
     override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
 //        LogUtils.d("$this->dispatchTouchEvent:$event")
         event?.let {
-            if (GameUtils.isGamePadEvent(it) || GameUtils.isKeyBoardEvent(it) || GameUtils.isMouseEvent(
-                    it
-                )
+            if (controllerStatus == ControllerStatus.Edit) {
+                return super.dispatchTouchEvent(event)
+            }
+            if (GameUtils.isGamePadEvent(it) ||
+                GameUtils.isKeyBoardEvent(it) ||
+                GameUtils.isMouseEvent(it)
             ) {
 //                LogUtils.d("外设输入:$it")
                 if (dataBinding.gameController.controllerType != AppVirtualOperateType.NONE) {
@@ -1418,9 +1490,12 @@ class GameActivity : AppCompatActivity() {
     override fun dispatchGenericMotionEvent(event: MotionEvent?): Boolean {
 //        LogUtils.d("$this->dispatchGenericMotionEvent:$event")
         event?.let {
-            if (GameUtils.isGamePadEvent(it) || GameUtils.isKeyBoardEvent(it) || GameUtils.isMouseEvent(
-                    it
-                )
+            if (controllerStatus == ControllerStatus.Edit) {
+                return super.dispatchGenericMotionEvent(event)
+            }
+            if (GameUtils.isGamePadEvent(it) ||
+                GameUtils.isKeyBoardEvent(it) ||
+                GameUtils.isMouseEvent(it)
             ) {
 //                LogUtils.d("外设输入:$it")
                 if (dataBinding.gameController.controllerType != AppVirtualOperateType.NONE) {
@@ -1437,9 +1512,12 @@ class GameActivity : AppCompatActivity() {
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
 //        LogUtils.d("$this->dispatchKeyEvent:$event")
         event.let {
-            if (GameUtils.isGamePadEvent(it) || GameUtils.isKeyBoardEvent(it) || GameUtils.isMouseEvent(
-                    it
-                )
+            if (controllerStatus == ControllerStatus.Edit) {
+                return super.dispatchKeyEvent(event)
+            }
+            if (GameUtils.isGamePadEvent(it) ||
+                GameUtils.isKeyBoardEvent(it) ||
+                GameUtils.isMouseEvent(it)
             ) {
                 //                LogUtils.d("外设输入:$it")
                 if (dataBinding.gameController.controllerType != AppVirtualOperateType.NONE) {
@@ -1634,7 +1712,7 @@ class GameActivity : AppCompatActivity() {
         }
 
         override fun onInputDeviceRemoved(deviceId: Int) {
-            LogUtils.v("检测到设备移除:$deviceId", "GameManager")
+            LogUtils.v("检测到设备移除:$deviceId")
             checkInputDevices()
         }
 
@@ -1652,28 +1730,29 @@ class GameActivity : AppCompatActivity() {
                 inputDevice?.let {
                     when {
                         GameUtils.isGamePadController(it) -> {
-//                            LogUtils.v("检测到外设手柄:$deviceId, device:${inputDevice.name}", "GameManager")
+//                            LogUtils.v("检测到外设手柄:$deviceId, device:${inputDevice.name}")
                             pcMouseMode = true
                         }
 
                         GameUtils.isKeyBoardController(it) -> {
-//                            LogUtils.v("检测到外设键盘:$deviceId, device:${inputDevice.name}", "GameManager")
+//                            LogUtils.v("检测到外设键盘:$deviceId, device:${inputDevice.name}")
                             pcMouseMode = true
                         }
 
                         GameUtils.isMouseController(it) -> {
-//                            LogUtils.v("检测到外设鼠标:$deviceId, device:${inputDevice.name}", "GameManager")
+//                            LogUtils.v("检测到外设鼠标:$deviceId, device:${inputDevice.name}")
                             pcMouseMode = true
                         }
 
                         else -> {
-//                    LogUtils.d("checkInputDevice->other:$inputDevice")
+//                            LogUtils.d("checkInputDevice->other:$inputDevice")
                         }
                     }
                 }
             }
         }
         GameManager.gameView?.setPCMouseMode(pcMouseMode)
+        gameSettings?.setPCMouseMode(!pcMouseMode)
         var controllerType = AppVirtualOperateType.NONE
         if (!pcMouseMode && GameManager.hasPremission) {
             if (GameManager.lastControllerType == AppVirtualOperateType.NONE) {
