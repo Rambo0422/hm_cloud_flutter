@@ -187,6 +187,7 @@ class AtGameActivity : AppCompatActivity() {
                     ViewGroup.LayoutParams.MATCH_PARENT
                 )
             )
+            it.externalInputBlocker(false)
         }
         anTongVideoView?.setAttachContext(this)
         anTongVideoView?.setHmcpPlayerListener(object : AnTongPlayerListener {
@@ -687,6 +688,7 @@ class AtGameActivity : AppCompatActivity() {
         if (controllerEditLayout != null) {
             dataBinding.layoutGame.removeView(controllerEditLayout)
         }
+        AnTongSDK.anTongVideoView?.externalInputBlocker(true)
         controllerEditLayout = ControllerEditLayout(this)
         controllerEditLayout?.controllerType = type
         configControllerEditCallback()
@@ -1152,7 +1154,7 @@ class AtGameActivity : AppCompatActivity() {
         controllerStatus = ControllerStatus.Normal
 
         dataBinding.gameController.maskEnable = false
-
+        AnTongSDK.anTongVideoView?.externalInputBlocker(false)
         try {
             inputTimer?.cancel()
             inputTimer?.purge()
