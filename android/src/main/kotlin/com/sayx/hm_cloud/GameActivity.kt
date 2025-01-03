@@ -1679,11 +1679,6 @@ class GameActivity : AppCompatActivity() {
      * 吐槽弹窗
      */
     private fun showFeedbackSubmissionSuccessAlert(configInfo: ErrorConfigInfo) {
-        val logMap = hashMapOf(
-            "ecode_content" to "${configInfo.title}+${configInfo.androidCode}"
-        )
-        GameManager.gameEsStat("game_error", "拦截报错弹窗", "show", logMap.toString())
-
         AppCommonDialog.Builder(this)
             .setTitle("提交成功")
             .setSubTitle(

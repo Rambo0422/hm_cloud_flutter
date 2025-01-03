@@ -158,20 +158,12 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
 
     fun initSDK(gameParam: GameParam, callback: MethodChannel.Result) {
         this.gameParam = gameParam
-        channel.invokeMethod(
-            "gameStatusStat", mapOf(
-                Pair("type", "game_init"),
-                Pair("page", "游戏初始化"),
-                Pair("action", "游戏初始化"),
-                Pair("arguments", gameParam.toString())
-            )
-        )
         // 键盘数据重置
         gamepadList.clear()
         keyboardList.clear()
-
+        // touch传递绑定清空
         TouchEventDispatcher.removeView()
-
+        // 网络请求请求头加入token数据
         HttpManager.addHttpHeader("token", gameParam.userToken)
 
         // 初始化安通 SDK
@@ -244,14 +236,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             }, 3000L)
             return
         }
-        channel.invokeMethod(
-            "gameStatusStat", mapOf(
-                Pair("type", "game_prepare"),
-                Pair("page", "游戏检查"),
-                Pair("action", "游戏检查"),
-                Pair("arguments", gameParam?.toString())
-            )
-        )
 
         // 判断是否是安通
         if (isAnTong()) {
@@ -341,15 +325,8 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         this.isPartyPlay = gameParam.isPartyGame
         this.isPartyPlayOwner = true
         hasPremission = true
-        isFirstGetControllerInfo = true 
-        channel.invokeMethod(
-            "gameStatusStat", mapOf(
-                Pair("type", "game_start"),
-                Pair("page", "游戏开始"),
-                Pair("action", "检查游戏存档数据"),
-                Pair("arguments", gameParam.toString())
-            )
-        )
+        isFirstGetControllerInfo = true
+
         getArchiveData(gameParam)
     }
 
@@ -427,17 +404,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
 //        LogUtils.d("priority:${gameParam?.priority}")
 //        AtGameActivity.startActivityForResult(activity)
 //        return
-        val code = archiveData?.code
-        val custodian = archiveData?.custodian
-        val listEmpty = archiveData?.list?.isEmpty() ?: true
-        channel.invokeMethod(
-            "gameStatusStat", mapOf(
-                Pair("type", "game_prepare"),
-                Pair("page", "游戏准备"),
-                Pair("action", "游戏准备"),
-                Pair("arguments", mapOf("gameParam" to gameParam?.toString(), "code" to code, "custodian" to custodian, "listEmpty" to listEmpty).toString())
-            )
-        )
 
         // 进入安通页面
         if (isAnTong()) {
@@ -583,14 +549,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
 
     private fun playGame(bundle: Bundle?) {
 //        LogUtils.d("playGame:$gameView")
-        channel.invokeMethod(
-            "gameStatusStat", mapOf(
-                Pair("type", "game_play"),
-                Pair("page", "游戏开始"),
-                Pair("action", "游戏开始"),
-                Pair("arguments", gameParam?.toString())
-            )
-        )
         if (gameView != null) {
             // 通常是已进入普通队列，切换高速队列，释放普通队列实例，重新进入高速队列
             if (!isPlaying) {
@@ -615,15 +573,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             gameView?.setConfigInfo("configInfo")
             // 状态监听
             gameView?.hmcpPlayerListener = this
-
-            channel.invokeMethod(
-                "gameStatusStat", mapOf(
-                    Pair("type", "game_play"),
-                    Pair("page", "游戏开始"),
-                    Pair("action", "游戏启动"),
-                    Pair("arguments", bundle?.toString())
-                )
-            )
             invokeMethod("hm_start", mapOf())
             gameView?.play(bundle)
         }
@@ -671,14 +620,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         statusData?.let {
             val data = JSONObject(it)
             val status = data.getInt(StatusCallbackUtil.STATUS)
-            channel.invokeMethod(
-                "gameStatusStat", mapOf(
-                    Pair("type", "game_sdk_status"),
-                    Pair("page", "$status"),
-                    Pair("action", data.getString(StatusCallbackUtil.DATA)),
-                    Pair("arguments", gameParam?.toString())
-                )
-            )
             when (status) {
                 // 游戏准备完成，可以启动游戏
                 Constants.STATUS_PLAY_INTERNAL -> {
@@ -732,15 +673,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                         isPlaying = true
                         openGame = true
                         // 打开新的页面展示游戏画面
-
-                        channel.invokeMethod(
-                            "gameStatusStat", mapOf(
-                                Pair("type", "game_play"),
-                                Pair("page", "游戏开始"),
-                                Pair("action", "首帧到达"),
-                                Pair("arguments", mapOf("gameParam" to gameParam?.toString(), "cid" to HmcpManager.getInstance().cloudId).toString())
-                            )
-                        )
                         processEvent("gamePageShow")
                         Intent().apply {
                             setClass(activity, GameActivity::class.java)
@@ -1305,25 +1237,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         }
     }
 
-    fun gameEsStat(
-        type: String,
-        page: String,
-        action: String,
-        arg: String?,
-    ) {
-        activity.runOnUiThread {
-            channel.invokeMethod(
-                "gameStatusStat",
-                mapOf(
-                    "type" to type,
-                    "page" to page,
-                    "action" to action,
-                    "arguments" to arg
-                )
-            )
-        }
-    }
-
     fun statGamePlay() {
         channel.invokeMethod("statGamePlay", null)
     }
@@ -1435,14 +1348,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         } else {
             HmcpManager.getInstance().cloudId
         }
-        channel.invokeMethod(
-            "gameStatusStat", mapOf(
-                Pair("type", "game_release"),
-                Pair("page", "游戏释放"),
-                Pair("action", "游戏释放:$finish, $cloudId"),
-                Pair("arguments", gameParam?.toString())
-            )
-        )
         if (finish != "0") {
             // 非切换队列调用此方法，认定为退出游戏
             channel.invokeMethod(
