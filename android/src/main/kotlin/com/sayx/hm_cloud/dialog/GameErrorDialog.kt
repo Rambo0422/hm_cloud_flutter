@@ -31,6 +31,8 @@ class GameErrorDialog : DialogFragment() {
     @SuppressLint("GestureBackNavigation")
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = Dialog(requireContext(), R.style.DialogTheme)
+        dialog.setCanceledOnTouchOutside(false)
+        dialog.setCancelable(false)
         dialog.setOnKeyListener(fun(_: DialogInterface, keyCode: Int, _: KeyEvent): Boolean {
             return when (keyCode) {
                 KeyEvent.KEYCODE_BACK -> true

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="end">
+
+            <com.sayx.hm_cloud.widget.DrawableTextView
+                android:id="@+id/tv_title"
+                android:layout_width="230dp"
+                android:layout_height="wrap_content"
+                android:background="#FF1B222C"
+                android:drawablePadding="9.5dp"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="9.5dp"
+                android:text="@string/shareToFriend"
+                android:textColor="#FF7E8795"
+                android:textSize="13sp"
+                app:drawableLeft="@drawable/shape_vertical_line"
+                app:drawableLeftHeight="15dp"
+                app:drawableLeftWidth="2dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iv_handle"
+                android:layout_width="20.5dp"
+                android:layout_height="75dp"
+                android:src="@drawable/ic_handle"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/tv_title"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <View
+                android:id="@+id/bg"
+                android:layout_width="230dp"
+                android:layout_height="0dp"
+                android:background="#FF242C39"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_title" />
+
+            <com.sayx.hm_cloud.widget.DrawableTextView
+                android:id="@+id/btn_wechat"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="23dp"
+                android:layout_marginEnd="13dp"
+                android:background="@drawable/shape_share_btn"
+                android:drawablePadding="30dp"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="15dp"
+                android:paddingVertical="7.5dp"
+                android:text="@string/wechat_share"
+                android:textColor="@android:color/white"
+                android:textSize="12sp"
+                app:drawableLeft="@drawable/img_share_wechat"
+                app:drawableSize="25dp"
+                app:layout_constraintBottom_toTopOf="@id/btn_qq"
+                app:layout_constraintEnd_toEndOf="@id/bg"
+                app:layout_constraintStart_toStartOf="@id/bg"
+                app:layout_constraintTop_toTopOf="@id/bg"
+                app:layout_constraintVertical_chainStyle="packed" />
+
+            <com.sayx.hm_cloud.widget.DrawableTextView
+                android:id="@+id/btn_qq"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="23dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="13dp"
+                android:background="@drawable/shape_share_btn"
+                android:drawablePadding="30dp"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="15dp"
+                android:paddingVertical="7.5dp"
+                android:text="@string/qq_share"
+                android:textColor="@android:color/white"
+                android:textSize="12sp"
+                app:drawableLeft="@drawable/img_share_qq"
+                app:drawableSize="25dp"
+                app:layout_constraintBottom_toTopOf="@id/btn_copy"
+                app:layout_constraintEnd_toEndOf="@id/bg"
+                app:layout_constraintStart_toStartOf="@id/bg"
+                app:layout_constraintTop_toBottomOf="@id/btn_wechat" />
+
+            <com.sayx.hm_cloud.widget.DrawableTextView
+                android:id="@+id/btn_copy"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="23dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="13dp"
+                android:background="@drawable/shape_share_btn"
+                android:drawablePadding="30dp"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="15dp"
+                android:paddingVertical="7.5dp"
+                android:text="@string/copy_share"
+                android:textColor="@android:color/white"
+                android:textSize="12sp"
+                app:drawableLeft="@drawable/img_share_copy"
+                app:drawableSize="25dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/bg"
+                app:layout_constraintStart_toStartOf="@id/bg"
+                app:layout_constraintTop_toBottomOf="@id/btn_qq" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
+</layout>

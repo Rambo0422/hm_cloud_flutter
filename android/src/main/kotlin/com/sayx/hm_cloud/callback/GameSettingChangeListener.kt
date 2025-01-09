@@ -10,6 +10,8 @@ interface GameSettingChangeListener {
 
     fun onDebugCodeClick()
 
+    fun onShareClick()
+
     fun onControlMethodChange(operateType: AppVirtualOperateType)
 
     fun onLiveInteractionChange(status: Boolean)

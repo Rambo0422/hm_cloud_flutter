@@ -67,6 +67,7 @@ import com.sayx.hm_cloud.dialog.AppCommonDialog
 import com.sayx.hm_cloud.dialog.EditControllerNameDialog
 import com.sayx.hm_cloud.dialog.GameErrorDialog
 import com.sayx.hm_cloud.dialog.GameToastDialog
+import com.sayx.hm_cloud.dialog.ShareDialog
 import com.sayx.hm_cloud.http.bean.BaseObserver
 import com.sayx.hm_cloud.http.bean.HttpResponse
 import com.sayx.hm_cloud.http.repository.AppRepository
@@ -458,6 +459,10 @@ class GameActivity : AppCompatActivity() {
                 LogUtils.d("onDebugCodeClick:$str")
                 clipboardManager.setPrimaryClip(ClipData.newPlainText(null, str))
                 ToastUtils.showShort(R.string.clip_success)
+            }
+
+            override fun onShareClick() {
+                ShareDialog.show(this@GameActivity)
             }
 
             override fun onControlMethodChange(operateType: AppVirtualOperateType) {

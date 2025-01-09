@@ -110,6 +110,11 @@ class GameSettings @JvmOverloads constructor(
         dataBinding.tvDebugCode.setOnClickListener {
             gameSettingChangeListener?.onDebugCodeClick()
         }
+        // 调试码点击，复制调试码到剪切板
+        dataBinding.tvShare.setOnClickListener {
+            hideLayout()
+            gameSettingChangeListener?.onShareClick()
+        }
         // 控制方法
         dataBinding.btnGamepad.setOnClickListener {
             if (!GameManager.hasPremission) {
