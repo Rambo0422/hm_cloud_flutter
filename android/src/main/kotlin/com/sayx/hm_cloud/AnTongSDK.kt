@@ -207,12 +207,6 @@ object AnTongSDK {
 
     fun uploadErrorCode(errorCode: Int, errorMsg: String) {
         if (errorCode != Constants.STATUS_STOP_PLAY) {
-            GameManager.gameEsStat(
-                "game_error",
-                "安通报错码",
-                "show",
-                mapOf("errorCode" to "$errorCode", "errorMsg" to errorMsg).toString(),
-            )
             GameManager.invokeMethod("errorInfo_at", mapOf(
                 "errorCode" to "$errorCode",
                 "errorMsg" to errorMsg,

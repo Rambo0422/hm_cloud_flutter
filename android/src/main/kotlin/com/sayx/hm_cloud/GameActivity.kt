@@ -1215,48 +1215,51 @@ class GameActivity : AppCompatActivity() {
 
     private fun showKeyEditView(keyInfo: KeyInfo) {
         LogUtils.d("showKeyEditView:$keyInfo")
-        if (keyEditView == null) {
-            keyEditView = KeyEditView(this)
-            val layoutParams = FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
-            keyEditView?.setKeyInfo(keyInfo)
+        if (keyEditView != null) {
+            dataBinding.layoutGame.removeView(keyEditView)
+            keyEditView = null
+        }
+        keyEditView = KeyEditView(this)
+        val layoutParams = FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+        keyEditView?.setKeyInfo(keyInfo)
+        keyEditView?.callback = object : KeyEditCallback {
+            override fun onKeyDelete() {
+                dataBinding.gameController.deleteKey()
+            }
 
-            keyEditView?.callback = object : KeyEditCallback {
-                override fun onKeyDelete() {
-                    dataBinding.gameController.deleteKey()
-                }
+            override fun onSaveKey(keyInfo: KeyInfo, windowToken: IBinder) {
+                hideSoftKeyBoard(windowToken)
+                dataBinding.gameController.updateKey(keyInfo)
+            }
 
-                override fun onSaveKey(keyInfo: KeyInfo, windowToken: IBinder) {
-                    hideSoftKeyBoard(windowToken)
-                    dataBinding.gameController.updateKey(keyInfo)
-                }
-
-                override fun onCombineKeyEdit(keyInfo: KeyInfo) {
-                    controllerEditLayout?.hideLayout(object : AnimatorListenerImp() {
-                        override fun onAnimationEnd(animation: Animator) {
-                            when (keyInfo.type) {
-                                KeyType.KEY_COMBINE, KeyType.GAMEPAD_COMBINE -> {
-                                    showEditCombineKeyLayout(keyInfo)
-                                }
-                                KeyType.KEY_ROULETTE, KeyType.GAMEPAD_ROULETTE -> {
-                                    showEditRouletteKeyLayout(keyInfo)
-                                }
-                                KeyType.KEY_CONTAINER -> {
-                                    showEditContainerKeyLayout(keyInfo)
-                                }
+            override fun onCombineKeyEdit(keyInfo: KeyInfo) {
+                controllerEditLayout?.hideLayout(object : AnimatorListenerImp() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        when (keyInfo.type) {
+                            KeyType.KEY_COMBINE, KeyType.GAMEPAD_COMBINE -> {
+                                showEditCombineKeyLayout(keyInfo)
+                            }
+                            KeyType.KEY_ROULETTE, KeyType.GAMEPAD_ROULETTE -> {
+                                showEditRouletteKeyLayout(keyInfo)
+                            }
+                            KeyType.KEY_CONTAINER -> {
+                                showEditContainerKeyLayout(keyInfo)
                             }
                         }
-                    })
-                }
+                    }
+                })
             }
-            dataBinding.layoutGame.post {
-                dataBinding.layoutGame.addView(keyEditView, layoutParams)
+
+            override fun onViewHide() {
+                dataBinding.layoutGame.removeView(keyEditView)
+                keyEditView = null
             }
-        } else {
-            keyEditView?.setKeyInfo(keyInfo)
-            keyEditView?.visibility = View.VISIBLE
+        }
+        dataBinding.layoutGame.post {
+            dataBinding.layoutGame.addView(keyEditView, layoutParams)
         }
     }
 
@@ -1681,11 +1684,6 @@ class GameActivity : AppCompatActivity() {
      * 吐槽弹窗
      */
     private fun showFeedbackSubmissionSuccessAlert(configInfo: ErrorConfigInfo) {
-        val logMap = hashMapOf(
-            "ecode_content" to "${configInfo.title}+${configInfo.androidCode}"
-        )
-        GameManager.gameEsStat("game_error", "拦截报错弹窗", "show", logMap.toString())
-
         AppCommonDialog.Builder(this)
             .setTitle("提交成功")
             .setSubTitle(

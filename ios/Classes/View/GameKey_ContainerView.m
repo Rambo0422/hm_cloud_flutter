@@ -27,7 +27,7 @@
         @weakify(self);
         [RACObserve(self.model, zoom) subscribeNext:^(id _Nullable x) {
             @strongify(self);
-            CGFloat w = self.model.containerArr.count * (self.model.height + 10) + self.model.width;
+            CGFloat w = self.model.containerArr.count * (self.model.height + 5) + self.model.width;
 
             self.frame = CGRectMake(self.model.left, self.model.top, w, self.model.height);
             [self refreshView];
@@ -38,7 +38,7 @@
 }
 
 - (void)refreshView {
-    CGFloat w = self.model.containerArr.count * (self.model.height + 10) + self.model.width;
+    CGFloat w = self.model.containerArr.count * (self.model.height + 5) + self.model.width;
 
     // 获取屏幕的中心点
     CGPoint center = CGPointMake([UIScreen mainScreen].bounds.size.width / 2, [UIScreen mainScreen].bounds.size.height / 2);
@@ -60,7 +60,7 @@
             btn.hidden = !self.isShow;
         }
 
-        btn.frame = CGRectMake(a * (self.model.height + 10) + (isLeft ? (self.model.width + 10) : 0), 0, self.model.height, self.model.height);
+        btn.frame = CGRectMake(a * (self.model.height + 5) + (isLeft ? (self.model.width + 5) : 0), 0, self.model.height, self.model.height);
 
         btn.upCallback = ^(NSArray<NSDictionary *> *keyList) {
             [[HmCloudTool share] sendCustomKey:keyList];
@@ -103,7 +103,7 @@
     UIView *view = [super hitTest:point withEvent:event];
 
     if ([self pointInside:point withEvent:event]) {
-        if (view == self.arrowBtn || self.isShow) {
+        if (view == self.arrowBtn || self.isShow || self.isEdit) {
             return view;
         } else {
             return self.superview;

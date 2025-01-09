@@ -10,4 +10,6 @@ interface KeyEditCallback {
     fun onSaveKey(keyInfo: KeyInfo, windowToken: IBinder)
 
     fun onCombineKeyEdit(keyInfo: KeyInfo)
+
+    fun onViewHide()
 }
