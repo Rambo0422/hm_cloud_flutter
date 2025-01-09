@@ -153,35 +153,7 @@ object AnTongSDK : OnContronListener {
         userInfo.flag = gameParam.priority
         anTongVideoView?.setUserInfo(userInfo)
 
-        val bundle = Bundle()
-        bundle.putInt(AnTongVideoView.PLAY_TIME, 99999)
-        bundle.putInt(AnTongVideoView.VIEW_RESOLUTION_WIDTH, 1920)
-        bundle.putInt(AnTongVideoView.VIEW_RESOLUTION_HEIGHT, 1080)
-        bundle.putBoolean(AnTongVideoView.IS_ARCHIVE, true)
-
-        bundle.putString(
-            AnTongVideoView.PROTO_DATA,
-            GameUtils.getProtoData(
-                GameManager.gson,
-                gameParam.userId,
-                gameParam.gameId,
-                gameParam.priority,
-                "android",
-                "at",
-                AppUtils.getAppVersionName()
-            )
-        )
-        bundle.putBoolean(AnTongVideoView.AUTO_PLAY_AUDIO, true)
-        bundle.putString(AnTongVideoView.EXTRA_ID, "")
-        bundle.putString(AnTongVideoView.PIN_CODE, pinCode)
-        bundle.putString(AnTongVideoView.PLAY_TOKEN, cid)
-        bundle.putString(AnTongVideoView.APP_CHANNEL, APP_CHANNEL)
-        bundle.putBoolean(AnTongVideoView.IS_PORTRAIT, false)
-        bundle.putString(AnTongVideoView.BUSINESS_GAME_ID, gameParam.gameId)
-        bundle.putString(AnTongVideoView.SIGN, gameParam.cToken)
-        bundle.putInt(AnTongVideoView.NO_INPUT_TIMEOUT, 10 * 60)
-        bundle.putString(AnTongVideoView.PKG_NAME, gameParam.gamePkName)
-        anTongVideoView?.play(bundle)
+        anTongVideoView?.contronPlay(cid, pinCode)
     }
 
     private fun richDataBundle(gameId: String, archiveData: ArchiveInfo?): Bundle {
