@@ -1,19 +1,21 @@
 package com.sayx.hm_cloud
 
 import android.content.Context
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.ViewGroup
 import com.antong.keyboard.sa.constants.HMInputOpData
 import com.blankj.utilcode.util.AppUtils
+import com.blankj.utilcode.util.GsonUtils
 import com.blankj.utilcode.util.LogUtils
 import com.media.atkit.AnTongManager
 import com.media.atkit.Constants
 import com.media.atkit.beans.ChannelInfo
+import com.media.atkit.beans.ControlInfo
 import com.media.atkit.beans.IntentExtraData
 import com.media.atkit.beans.UserInfo
 import com.media.atkit.listeners.AnTongPlayerListener
+import com.media.atkit.listeners.OnContronListener
 import com.media.atkit.listeners.OnGameIsAliveListener
 import com.media.atkit.utils.StatusCallbackUtil
 import com.media.atkit.widgets.AnTongVideoView
@@ -33,9 +35,10 @@ import com.sayx.hm_cloud.model.GameParam
 import com.sayx.hm_cloud.model.KeyInfo
 import com.sayx.hm_cloud.utils.GameUtils
 import com.sayx.hm_cloud.widget.ATGameView
+import org.json.JSONArray
 import org.json.JSONObject
 
-object AnTongSDK {
+object AnTongSDK : OnContronListener {
 
     const val TYPE = "at_pc"
     const val CHANNEL_TYPE = "at"
@@ -85,7 +88,15 @@ object AnTongSDK {
 
         bundle.putString(
             AnTongVideoView.PROTO_DATA,
-            GameUtils.getProtoData(GameManager.gson, gameParam.userId, gameParam.gameId, gameParam.priority, "android", "at", AppUtils.getAppVersionName())
+            GameUtils.getProtoData(
+                GameManager.gson,
+                gameParam.userId,
+                gameParam.gameId,
+                gameParam.priority,
+                "android",
+                "at",
+                AppUtils.getAppVersionName()
+            )
         )
         bundle.putBoolean(AnTongVideoView.AUTO_PLAY_AUDIO, true)
         if (gameParam.isVip()) {
@@ -103,7 +114,10 @@ object AnTongSDK {
         bundle.putInt(AnTongVideoView.NO_INPUT_TIMEOUT, 10 * 60)
         gameParam.accountInfo?.let { accountInfo ->
 //            LogUtils.d("AccountInfo 1:${accountInfo.javaClass}")
-            val result = GameManager.gson.fromJson(GameManager.gson.toJson(accountInfo), AccountInfo::class.java)
+            val result = GameManager.gson.fromJson(
+                GameManager.gson.toJson(accountInfo),
+                AccountInfo::class.java
+            )
 //            LogUtils.d("AccountInfo 2:${result.json}")
             anTongVideoView?.setExtraData(IntentExtraData().also {
                 it.setStringExtra(GameUtils.getStringData(result))
@@ -118,6 +132,55 @@ object AnTongSDK {
 
         bundle.putString(AnTongVideoView.PKG_NAME, gameParam.gamePkName)
         GameManager.invokeMethod("at_start", mapOf())
+        anTongVideoView?.play(bundle)
+    }
+
+
+    fun controlPlay(
+        context: Context,
+        gameParam: GameParam,
+        cid: String,
+        pinCode: String,
+    ) {
+        if (anTongVideoView == null) {
+            anTongVideoView = ATGameView(context)
+        }
+        anTongVideoView?.setHmcpPlayerListener(mAnTongPlayerListener)
+
+        val userInfo = UserInfo()
+        userInfo.userId = gameParam.userId
+        userInfo.userToken = gameParam.userToken
+        userInfo.flag = gameParam.priority
+        anTongVideoView?.setUserInfo(userInfo)
+
+        val bundle = Bundle()
+        bundle.putInt(AnTongVideoView.PLAY_TIME, 99999)
+        bundle.putInt(AnTongVideoView.VIEW_RESOLUTION_WIDTH, 1920)
+        bundle.putInt(AnTongVideoView.VIEW_RESOLUTION_HEIGHT, 1080)
+        bundle.putBoolean(AnTongVideoView.IS_ARCHIVE, true)
+
+        bundle.putString(
+            AnTongVideoView.PROTO_DATA,
+            GameUtils.getProtoData(
+                GameManager.gson,
+                gameParam.userId,
+                gameParam.gameId,
+                gameParam.priority,
+                "android",
+                "at",
+                AppUtils.getAppVersionName()
+            )
+        )
+        bundle.putBoolean(AnTongVideoView.AUTO_PLAY_AUDIO, true)
+        bundle.putString(AnTongVideoView.EXTRA_ID, "")
+        bundle.putString(AnTongVideoView.PIN_CODE, pinCode)
+        bundle.putString(AnTongVideoView.PLAY_TOKEN, cid)
+        bundle.putString(AnTongVideoView.APP_CHANNEL, APP_CHANNEL)
+        bundle.putBoolean(AnTongVideoView.IS_PORTRAIT, false)
+        bundle.putString(AnTongVideoView.BUSINESS_GAME_ID, gameParam.gameId)
+        bundle.putString(AnTongVideoView.SIGN, gameParam.cToken)
+        bundle.putInt(AnTongVideoView.NO_INPUT_TIMEOUT, 10 * 60)
+        bundle.putString(AnTongVideoView.PKG_NAME, gameParam.gamePkName)
         anTongVideoView?.play(bundle)
     }
 
@@ -183,16 +246,23 @@ object AnTongSDK {
                         anTongVideoView?.setHmcpPlayerListener(null)
                         // 跳转远程页面
                         mRequestDeviceSuccess?.onRequestDeviceSuccess()
+
+                        GameManager.anTongFirstFrameArrival()
                     }
+
                     Constants.STATUS_OPERATION_INTERVAL_TIME -> {
                         val dataStr = jsonObject.getString(StatusCallbackUtil.DATA)
                         if (dataStr is String && !TextUtils.isEmpty(dataStr)) {
                             val resultData = GameManager.gson.fromJson(dataStr, Map::class.java)
-                            mRequestDeviceSuccess?.onQueueStatus((resultData["avg_time"] as Number?)?.toInt() ?: 300, (resultData["ranking"] as Number?)?.toInt() ?: 1)
+                            mRequestDeviceSuccess?.onQueueStatus(
+                                (resultData["avg_time"] as Number?)?.toInt() ?: 300,
+                                (resultData["ranking"] as Number?)?.toInt() ?: 1
+                            )
                         } else {
                             LogUtils.e("queue info error:$dataStr")
                         }
                     }
+
                     else -> {
                         // 忽略错误码
                     }
@@ -213,12 +283,83 @@ object AnTongSDK {
                 "show",
                 mapOf("errorCode" to "$errorCode", "errorMsg" to errorMsg).toString(),
             )
-            GameManager.invokeMethod("errorInfo_at", mapOf(
-                "errorCode" to "$errorCode",
-                "errorMsg" to errorMsg,
-            ))
+            GameManager.invokeMethod(
+                "errorInfo_at", mapOf(
+                    "errorCode" to "$errorCode",
+                    "errorMsg" to errorMsg,
+                )
+            )
         }
     }
+
+    fun queryControlUsers() {
+        anTongVideoView?.queryControlUsers(this)
+    }
+
+    override fun pinCodeResult(success: Boolean, cid: String, pinCode: String, msg: String?) {
+        if (success && !TextUtils.isEmpty(pinCode) && !TextUtils.isEmpty(cid)) {
+            GameManager.invokePinCodeResult(pinCode, cid)
+        }
+    }
+
+    override fun contronResult(success: Boolean, msg: String?) {
+    }
+
+    override fun contronLost() {
+    }
+
+    override fun controlDistribute(
+        success: Boolean,
+        controlInfos: MutableList<ControlInfo>?
+    ) {
+        if (controlInfos != null) {
+            val toJson = GsonUtils.toJson(controlInfos)
+            GameManager.invokeControlDistribute(toJson)
+        }
+    }
+
+    override fun controlQuery(
+        success: Boolean,
+        controlInfos: MutableList<ControlInfo>?,
+        msg: String?
+    ) {
+        if (success) {
+            val jsonArray = JSONArray()
+            controlInfos?.forEach { controlInfo ->
+                val jsonObject = JSONObject()
+                jsonObject.put("position", controlInfo.position)
+                jsonObject.put("cid", controlInfo.playerToken.toString())
+                jsonArray.put(jsonObject)
+            }
+            LogUtils.d("controlQuery: $jsonArray")
+            GameManager.invokeControlQuery(jsonArray.toString())
+        }
+    }
+
+    fun distributeControlPermit(arguments: JSONArray) {
+        val list = arrayListOf<ControlInfo>()
+        for (i in 0 until arguments.length()) {
+            val jsonObject = arguments.getJSONObject(i)
+            val controlInfo = ControlInfo().apply {
+                playerToken = jsonObject.getString("cid")
+                position = jsonObject.getInt("position")
+            }
+            list.add(controlInfo)
+        }
+
+        if (list.isNotEmpty()) {
+            anTongVideoView?.distributeControlPermit(list, this)
+        }
+    }
+
+    fun getPinCode() {
+        anTongVideoView?.getPinCode(this)
+    }
+
+    fun queryControlPermitUsers() {
+        anTongVideoView?.queryControlUsers(this)
+    }
+
 }
 
 open class OnRockerOperationListenerImp : OnRockerOperationListener {

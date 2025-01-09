@@ -11,10 +11,10 @@ import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
 import androidx.fragment.app.FragmentActivity
+import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ThreadUtils
 import com.blankj.utilcode.util.ToastUtils
-import com.blankj.utilcode.util.AppUtils
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.haima.hmcp.Constants
@@ -35,17 +35,18 @@ import com.haima.hmcp.listeners.OnUpdataGameUIDListener
 import com.haima.hmcp.utils.StatusCallbackUtil
 import com.haima.hmcp.widgets.HmcpVideoView
 import com.haima.hmcp.widgets.beans.VirtualOperateType
-import com.sayx.hm_cloud.BuildConfig.*
+import com.media.atkit.AnTongManager
+import com.sayx.hm_cloud.BuildConfig.DEBUG
 import com.sayx.hm_cloud.callback.KeyboardListCallback
 import com.sayx.hm_cloud.callback.RequestDeviceSuccess
 import com.sayx.hm_cloud.constants.AppVirtualOperateType
 import com.sayx.hm_cloud.constants.GameConstants
 import com.sayx.hm_cloud.dialog.AppCommonDialog
 import com.sayx.hm_cloud.http.HttpManager
-import com.sayx.hm_cloud.http.repository.AppRepository
 import com.sayx.hm_cloud.http.bean.AppHttpException
 import com.sayx.hm_cloud.http.bean.BaseObserver
 import com.sayx.hm_cloud.http.bean.HttpResponse
+import com.sayx.hm_cloud.http.repository.AppRepository
 import com.sayx.hm_cloud.http.repository.GameRepository
 import com.sayx.hm_cloud.http.repository.UserRepository
 import com.sayx.hm_cloud.imp.HmcpPlayerListenerImp
@@ -341,7 +342,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         this.isPartyPlay = gameParam.isPartyGame
         this.isPartyPlayOwner = true
         hasPremission = true
-        isFirstGetControllerInfo = true 
+        isFirstGetControllerInfo = true
         channel.invokeMethod(
             "gameStatusStat", mapOf(
                 Pair("type", "game_start"),
@@ -1572,14 +1573,22 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
      * 获取授权码
      */
     fun getPinCode() {
-        gameView?.getPinCode(this)
+        if (isAnTong()) {
+            AnTongSDK.getPinCode()
+        } else {
+            gameView?.getPinCode(this)
+        }
     }
 
     /**
      * 查询当前房间内的⽤户
      */
     fun queryControlUsers() {
-        gameView?.queryControlPermitUsers(this)
+        if (isAnTong()) {
+            AnTongSDK.queryControlUsers()
+        } else {
+            gameView?.queryControlPermitUsers(this)
+        }
     }
 
     /**
@@ -1598,6 +1607,18 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         val pinCode = gameParam.pinCode
         val userId = gameParam.userId
         val userToken = gameParam.userToken
+
+        HttpManager.addHttpHeader("token", gameParam.userToken)
+
+        if (isAnTong()) {
+            if (!initState) {
+                AnTongSDK.initSdk(activity, gameParam)
+            }
+            initState = true
+
+            AnTongSDK.controlPlay(activity, gameParam, cid, pinCode)
+            return
+        }
 
         if (initState) {
             controlPlay(cid, pinCode, accessKeyId, userId, userToken)
@@ -1653,8 +1674,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         gameView?.virtualDeviceType = VirtualOperateType.NONE
     }
 
-    fun sendCurrentCid() {
-        val cloudId = HmcpManager.getInstance().cloudId
+    fun sendCurrentCid(cloudId: String) {
         val cidArr = JSONObject().apply {
             put("index", gameParam?.roomIndex ?: -1)
             put("uid", gameParam?.userId)
@@ -1667,18 +1687,23 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
      * 设置派对吧每个用户的操作权限
      */
     fun distributeControlPermit(arguments: JSONArray) {
-        val list = arrayListOf<ControlInfo>()
-        for (i in 0 until arguments.length()) {
-            val jsonObject = arguments.getJSONObject(i)
-            val controlInfo = ControlInfo().apply {
-                cid = jsonObject.getString("cid").toLong()
-                position = jsonObject.getInt("position")
+        // 判断是否是安通还是海马
+        if (isAnTong()) {
+            AnTongSDK.distributeControlPermit(arguments)
+        } else {
+            val list = arrayListOf<ControlInfo>()
+            for (i in 0 until arguments.length()) {
+                val jsonObject = arguments.getJSONObject(i)
+                val controlInfo = ControlInfo().apply {
+                    cid = jsonObject.getString("cid").toLong()
+                    position = jsonObject.getInt("position")
+                }
+                list.add(controlInfo)
             }
-            list.add(controlInfo)
-        }
 
-        if (list.isNotEmpty()) {
-            gameView?.distributeControlPermit(list, this)
+            if (list.isNotEmpty()) {
+                gameView?.distributeControlPermit(list, this)
+            }
         }
     }
 
@@ -1767,7 +1792,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         }
         val peakChannel = gameParam?.isPeakChannel ?: false
         val isPeakTime = TimeUtils.isPeakTime()
-        if (!isPeakTime  && !peakChannel) {
+        if (!isPeakTime && !peakChannel) {
             // 非高峰通道，且非高峰时段
             return
         }
@@ -1790,16 +1815,58 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         })
     }
 
-    fun onHttpError(code: Int?, url: String, errorType : String?) {
+    fun onHttpError(code: Int?, url: String, errorType: String?) {
         if (code == -1) {
             return
         }
         activity.runOnUiThread {
-            channel.invokeMethod("http_error", mapOf(
-                "errorCode" to code,
-                "requestUrl" to url,
-                "errorType" to errorType,
-            ))
+            channel.invokeMethod(
+                "http_error", mapOf(
+                    "errorCode" to code,
+                    "requestUrl" to url,
+                    "errorType" to errorType,
+                )
+            )
+        }
+    }
+
+    /**
+     * 向 flutter 端发送 pinCode 事件
+     */
+    fun invokePinCodeResult(pinCode: String, cid: String) {
+        val map = hashMapOf<String, String>()
+        map["pinCode"] = pinCode
+        map["cid"] = cid
+        activity.runOnUiThread {
+            channel.invokeMethod("pinCodeResult", map)
+        }
+    }
+
+    fun invokeControlDistribute(controlInfos: String) {
+        activity.runOnUiThread {
+            channel.invokeMethod("controlDistribute", controlInfos)
+        }
+    }
+
+    fun invokeControlQuery(controlInfos: String) {
+        activity.runOnUiThread {
+            channel.invokeMethod("controlInfos", controlInfos)
+        }
+    }
+
+    fun anTongFirstFrameArrival() {
+        if (!isVideoShowed) {
+            isVideoShowed = true
+            val playToken = AnTongManager.getInstance().playToken ?: ""
+            channel.invokeMethod(
+                GameViewConstants.firstFrameArrival, mapOf(
+                    Pair("cid", playToken)
+                )
+            )
+            inQueue = false
+            isPlaying = true
+            openGame = true
+            AtGameActivity.startActivityForResult(activity)
         }
     }
 }

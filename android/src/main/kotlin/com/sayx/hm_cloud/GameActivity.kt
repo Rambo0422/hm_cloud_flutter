@@ -282,7 +282,8 @@ class GameActivity : AppCompatActivity() {
                 GameManager.queryControlUsers()
                 GameManager.getPinCode()
             }
-            GameManager.sendCurrentCid()
+            val cloudId = HmcpManager.getInstance().cloudId
+            GameManager.sendCurrentCid(cloudId)
             initPlayPartyView()
         }
     }
