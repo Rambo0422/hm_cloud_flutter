@@ -2,6 +2,7 @@ package com.sayx.hm_cloud.constants
 
 import com.haima.hmcp.beans.HMInputOpData
 import com.sayx.hm_cloud.R
+import com.sayx.hm_cloud.model.KeyInfo
 
 var controllerStatus: ControllerStatus = ControllerStatus.Normal
 
@@ -85,7 +86,7 @@ object KeyType {
     const val KEY_SHOOT = "kb-shoot"
 }
 
-val maps : List<Pair<String, Int>> by lazy {
+val maps: List<Pair<String, Int>> by lazy {
     listOf(
         "map1" to R.drawable.map1,
         "map2" to R.drawable.map2,
@@ -186,6 +187,21 @@ val maps : List<Pair<String, Int>> by lazy {
 }
 
 object KeyConstants {
+    fun getLabelText(keyInfo: KeyInfo): CharSequence {
+        var result: CharSequence = keyControl[keyInfo.inputOp] ?: keyNumber[keyInfo.inputOp] ?: ""
+        if (keyInfo.autoShift == 1) {
+            result = getShiftResult(result)
+        }
+        return result
+    }
+
+    private fun getShiftResult(result: CharSequence): CharSequence {
+        return when(result) {
+            "`" -> "~"
+            else -> ""
+        }
+    }
+
     val keyControl: HashMap<Int, String> = hashMapOf(
         HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpKeyVkBack.value to "Back",
         HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpKeyVkTab.value to "Tab",
@@ -314,7 +330,6 @@ val stickKeyMaps: HashMap<Int, Boolean> by lazy {
         it[GameConstants.gamepadButtonRBValue] = false
     }
 }
-
 
 
 fun resetDirectionMap(value: Int) {

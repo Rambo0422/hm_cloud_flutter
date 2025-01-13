@@ -117,15 +117,17 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
 
     var lastControllerType = AppVirtualOperateType.NONE
 
+    // 游戏是否启动
     var isPlaying = false
 
+    // 游戏页面是否已经打开
     var isVideoShowed = false
 
+    // 是否需要打开游戏页面
     var openGame = false
 
+    // App是否在前台
     private var resume = false
-
-    var inQueue = false
 
     private var needReattach = false
 
@@ -402,9 +404,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
      */
     private fun prepareGame(archiveData: ArchiveData?) {
 //        LogUtils.d("priority:${gameParam?.priority}")
-//        AtGameActivity.startActivityForResult(activity)
-//        return
-
         // 进入安通页面
         if (isAnTong()) {
             AnTongSDK.play(
@@ -413,7 +412,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                 archiveData,
                 object : RequestDeviceSuccess {
                     override fun onQueueStatus(time: Int, rank: Int) {
-                        inQueue = true
                         activity.runOnUiThread {
                             channel.invokeMethod(
                                 "queueInfo",
@@ -428,17 +426,11 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                     override fun onRequestDeviceSuccess() {
                         if (!isVideoShowed) {
                             isVideoShowed = true
-                            gameView?.virtualDeviceType = VirtualOperateType.NONE
                             // 跳转activity
                             activity.runOnUiThread {
                                 channel.invokeMethod(GameViewConstants.firstFrameArrival, null)
                             }
-                            openGame = true
                             isPlaying = true
-                            inQueue = false
-
-                            processEvent("gamePageShow")
-                            AtGameActivity.startActivityForResult(activity)
                         }
                     }
                 })
@@ -547,6 +539,20 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         }
     }
 
+    fun openGamePage() {
+        openGame = true
+
+        processEvent("gamePageShow")
+        if (isAnTong()) {
+            AtGameActivity.startActivityForResult(activity)
+        } else {
+            Intent().apply {
+                setClass(activity, GameActivity::class.java)
+                activity.startActivityForResult(this, 200)
+            }
+        }
+    }
+
     private fun playGame(bundle: Bundle?) {
 //        LogUtils.d("playGame:$gameView")
         if (gameView != null) {
@@ -637,7 +643,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
 
                 Constants.STATUS_START_PLAY -> {
                     isPlaying = true
-                    inQueue = false
                 }
                 // 网络切换，尝试重连
                 Constants.STATUS_TIPS_CHANGE_WIFI_TO_4G -> {
@@ -645,7 +650,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                 }
                 // 实例进入排队，sdk反馈排队时间
                 Constants.STATUS_OPERATION_INTERVAL_TIME -> {
-                    inQueue = true
                     val dataStr = data.getString(StatusCallbackUtil.DATA)
                     if (dataStr is String && !TextUtils.isEmpty(dataStr)) {
                         val resultData = gson.fromJson(dataStr, Map::class.java)
@@ -663,21 +667,14 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                 Constants.STATUS_FIRST_FRAME_ARRIVAL -> {
                     if (!isVideoShowed) {
                         isVideoShowed = true
+                        gameView?.setAudioMute(true)
                         gameView?.virtualDeviceType = VirtualOperateType.NONE
                         channel.invokeMethod(
                             GameViewConstants.firstFrameArrival, mapOf(
                                 Pair("cid", HmcpManager.getInstance().cloudId)
                             )
                         )
-                        inQueue = false
                         isPlaying = true
-                        openGame = true
-                        // 打开新的页面展示游戏画面
-                        processEvent("gamePageShow")
-                        Intent().apply {
-                            setClass(activity, GameActivity::class.java)
-                            activity.startActivityForResult(this, 200)
-                        }
                     } else {
                         LogUtils.e("The game feeds back the first frame again.")
                     }
@@ -1124,7 +1121,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             when (sceneId) {
                 "play" -> {
                     isPlaying = true
-                    inQueue = false
                 }
             }
         }
@@ -1298,6 +1294,8 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
     }
 
     fun exitQueue() {
+        isVideoShowed = false
+        openGame = false
         if (isAnTong()) {
             AnTongSDK.leaveQueue()
         } else {
@@ -1305,7 +1303,16 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         }
     }
 
+    fun cancelGame() {
+        if (isAnTong()) {
+            AnTongSDK.stopGame()
+        }
+        releaseGame(finish = "1")
+    }
+
     fun exitGame() {
+        isVideoShowed = false
+        openGame = false
         channel.invokeMethod("exitGame", mapOf(Pair("action", "0")))
     }
 
@@ -1363,7 +1370,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             gameView?.onDestroy()
             gameView = null
             isPlaying = false
-            inQueue = false
             if (finish == "0" && !isAnTong) {
                 // 切换队列
                 playGame(bundle)
@@ -1390,7 +1396,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                     gameView?.onDestroy()
                     gameView = null
                     isPlaying = false
-                    inQueue = false
                     isVideoShowed = false
                     if (finish == "0") {
                         // 切换队列
@@ -1405,7 +1410,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                     gameView?.onDestroy()
                     gameView = null
                     isPlaying = false
-                    inQueue = false
                     isVideoShowed = false
                     channel.invokeMethod(
                         "errorInfo",
@@ -1424,7 +1428,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         gameView?.onDestroy()
         gameView = null
         isPlaying = false
-        inQueue = false
         isVideoShowed = false
     }
 

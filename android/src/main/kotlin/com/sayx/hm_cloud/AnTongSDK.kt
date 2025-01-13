@@ -181,6 +181,7 @@ object AnTongSDK {
                 when (status) {
                     Constants.STATUS_FIRST_FRAME_ARRIVAL -> {
                         anTongVideoView?.setHmcpPlayerListener(null)
+                        anTongVideoView?.setAudioMute(true)
                         // 跳转远程页面
                         mRequestDeviceSuccess?.onRequestDeviceSuccess()
                     }
@@ -966,6 +967,16 @@ open class OnKeyEventListenerImp : OnKeyEventListener {
             }
             // 键盘按键，鼠标左中右键
             KeyType.KEYBOARD_KEY, KeyType.KEYBOARD_MOUSE_LEFT, KeyType.KEYBOARD_MOUSE_RIGHT, KeyType.KEYBOARD_MOUSE_MIDDLE, KeyType.KEY_SHOOT -> {
+                if (keyInfo.autoShift == 1) {
+                    val inputOp = HMInputOpData()
+                    val oneInputOpData = HMInputOpData.HMOneInputOPData()
+                    oneInputOpData.inputState = if (press) HMInputOpData.HMOneInputOPData_InputState.HMOneInputOPData_InputState_OpStateDown else
+                        HMInputOpData.HMOneInputOPData_InputState.HMOneInputOPData_InputState_OpStateUp
+                    oneInputOpData.inputOp = HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpKeyVkShift
+                    inputOp.opListArray.add(oneInputOpData)
+                    val result = AnTongSDK.anTongVideoView?.cmdToCloud(inputOp)
+                    LogUtils.d("key:${keyInfo.text}, inputOp:${oneInputOpData.inputOp}, value:${oneInputOpData.inputState}, result:$result")
+                }
                 val inputOp = HMInputOpData()
                 val oneInputOpData = HMInputOpData.HMOneInputOPData()
                 oneInputOpData.inputState = if (press) HMInputOpData.HMOneInputOPData_InputState.HMOneInputOPData_InputState_OpStateDown else

@@ -2,6 +2,9 @@ package com.sayx.hm_cloud.dialog
 
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.DialogInterface
 import android.os.Build
 import android.os.Bundle
@@ -17,12 +20,22 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.ToastUtils
+import com.sayx.hm_cloud.GameManager
 import com.sayx.hm_cloud.R
+import com.sayx.hm_cloud.callback.DialogDismissListener
 import com.sayx.hm_cloud.databinding.DialogShareBinding
 
 class ShareDialog : DialogFragment() {
 
     private lateinit var dataBinding: DialogShareBinding
+
+    // 剪切板
+    private val clipboardManager: ClipboardManager? by lazy {
+        context?.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
+    }
+
+    var listener : DialogDismissListener? = null
 
     @SuppressLint("GestureBackNavigation")
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -64,12 +77,16 @@ class ShareDialog : DialogFragment() {
             insetsController.hide(WindowInsetsCompat.Type.navigationBars())
         }
         dataBinding.btnWechat.setOnClickListener {
+            GameManager.invokeMethod("shareToWx")
             dismiss()
         }
         dataBinding.btnQq.setOnClickListener {
+            GameManager.invokeMethod("shareToQq")
             dismiss()
         }
         dataBinding.btnCopy.setOnClickListener {
+            clipboardManager?.setPrimaryClip(ClipData.newPlainText(null, "https://play.3ayx.net/"))
+            ToastUtils.showShort(R.string.clip_success)
             dismiss()
         }
         dataBinding.ivHandle.setOnClickListener {
@@ -98,8 +115,13 @@ class ShareDialog : DialogFragment() {
                 )
     }
 
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        listener?.onDialogDismiss()
+    }
+
     companion object {
-        fun show(activity: FragmentActivity, tag: String? = ShareDialog::class.java.simpleName) {
+        fun show(activity: FragmentActivity, listener: DialogDismissListener?, tag: String? = ShareDialog::class.java.simpleName) {
             val fragmentManager = activity.supportFragmentManager
             if (!fragmentManager.isDestroyed) {
                 val fragmentTransaction = fragmentManager.beginTransaction()
@@ -108,6 +130,7 @@ class ShareDialog : DialogFragment() {
                     fragmentTransaction.show(fragment)
                 } else {
                     val dialog = ShareDialog()
+                    dialog.listener = listener
                     fragmentTransaction.add(dialog, tag).commitAllowingStateLoss()
                 }
             } else {

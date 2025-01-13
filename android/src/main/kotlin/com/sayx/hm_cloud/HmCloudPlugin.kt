@@ -10,6 +10,7 @@ import com.sayx.hm_cloud.model.ControlInfo
 import com.sayx.hm_cloud.model.ErrorDialogConfig
 import com.sayx.hm_cloud.model.ExitGameEvent
 import com.sayx.hm_cloud.model.GameParam
+import com.sayx.hm_cloud.model.MessageEvent
 import com.sayx.hm_cloud.model.PartyPlayWantPlay
 import com.sayx.hm_cloud.model.PlayPartyRoomInfo
 import com.sayx.hm_cloud.model.PlayPartyRoomInfoEvent
@@ -76,6 +77,9 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
                     val gameParam = GameParam.formGson(arguments)
                     GameManager.startGame(gameParam)
                 }
+            }
+            "openGamePage" -> {
+                GameManager.openGamePage()
             }
             // 释放游戏
             "releaseGame" -> {
@@ -164,6 +168,14 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
 
             "exitQueue" -> {
                 GameManager.exitQueue()
+            }
+
+            "cancelGame" -> {
+                GameManager.cancelGame()
+            }
+
+            "shareFail" -> {
+                EventBus.getDefault().post(MessageEvent("shareFail", arguments as String))
             }
 
             "exitGame" -> {

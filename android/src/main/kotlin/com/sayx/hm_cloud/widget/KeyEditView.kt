@@ -252,8 +252,7 @@ class KeyEditView @JvmOverloads constructor(
             }
 
             else -> {
-                KeyConstants.keyControl[info.inputOp]
-                    ?: KeyConstants.keyNumber[info.inputOp] ?: ""
+                KeyConstants.getLabelText(info).toString()
             }
         }
     }

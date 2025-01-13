@@ -39,6 +39,7 @@
     <string name="home" translatable="false">Home</string>
     <string name="end" translatable="false">End</string>
     <string name="back_quote" translatable="false">`</string>
+    <string name="tilde" translatable="false">～</string>
     <string name="num_1" translatable="false">1</string>
     <string name="num_2" translatable="false">2</string>
     <string name="num_3" translatable="false">3</string>

@@ -255,6 +255,17 @@
                 android:layout_height="25dp"
                 android:layout_marginTop="4dp"
                 android:text="@string/back_quote"
+                app:layout_constraintEnd_toEndOf="@id/btn_key_f1"
+                app:layout_constraintStart_toStartOf="@id/btn_key_f1"
+                app:layout_constraintTop_toBottomOf="@id/btn_key_esc" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/btn_key_tilde"
+                style="@style/EditKeyStyle"
+                android:layout_width="38dp"
+                android:layout_height="25dp"
+                android:layout_marginTop="4dp"
+                android:text="@string/tilde"
                 app:layout_constraintEnd_toEndOf="@id/btn_key_esc"
                 app:layout_constraintStart_toStartOf="@id/btn_key_esc"
                 app:layout_constraintTop_toBottomOf="@id/btn_key_esc" />
@@ -266,8 +277,8 @@
                 android:layout_height="25dp"
                 android:layout_marginTop="4dp"
                 android:text="@string/num_1"
-                app:layout_constraintEnd_toEndOf="@id/btn_key_f1"
-                app:layout_constraintStart_toStartOf="@id/btn_key_f1"
+                app:layout_constraintEnd_toEndOf="@id/btn_key_f2"
+                app:layout_constraintStart_toStartOf="@id/btn_key_f2"
                 app:layout_constraintTop_toBottomOf="@id/btn_key_esc" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -277,8 +288,8 @@
                 android:layout_height="25dp"
                 android:layout_marginTop="4dp"
                 android:text="@string/num_2"
-                app:layout_constraintEnd_toEndOf="@id/btn_key_f2"
-                app:layout_constraintStart_toStartOf="@id/btn_key_f2"
+                app:layout_constraintEnd_toEndOf="@id/btn_key_f3"
+                app:layout_constraintStart_toStartOf="@id/btn_key_f3"
                 app:layout_constraintTop_toBottomOf="@id/btn_key_esc" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -288,8 +299,8 @@
                 android:layout_height="25dp"
                 android:layout_marginTop="4dp"
                 android:text="@string/num_3"
-                app:layout_constraintEnd_toEndOf="@id/btn_key_f3"
-                app:layout_constraintStart_toStartOf="@id/btn_key_f3"
+                app:layout_constraintEnd_toEndOf="@id/btn_key_f4"
+                app:layout_constraintStart_toStartOf="@id/btn_key_f4"
                 app:layout_constraintTop_toBottomOf="@id/btn_key_esc" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -299,8 +310,8 @@
                 android:layout_height="25dp"
                 android:layout_marginTop="4dp"
                 android:text="@string/num_4"
-                app:layout_constraintEnd_toEndOf="@id/btn_key_f4"
-                app:layout_constraintStart_toStartOf="@id/btn_key_f4"
+                app:layout_constraintEnd_toEndOf="@id/btn_key_f5"
+                app:layout_constraintStart_toStartOf="@id/btn_key_f5"
                 app:layout_constraintTop_toBottomOf="@id/btn_key_esc" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -310,8 +321,8 @@
                 android:layout_height="25dp"
                 android:layout_marginTop="4dp"
                 android:text="@string/num_5"
-                app:layout_constraintEnd_toEndOf="@id/btn_key_f5"
-                app:layout_constraintStart_toStartOf="@id/btn_key_f5"
+                app:layout_constraintEnd_toEndOf="@id/btn_key_f6"
+                app:layout_constraintStart_toStartOf="@id/btn_key_f6"
                 app:layout_constraintTop_toBottomOf="@id/btn_key_esc" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -321,8 +332,8 @@
                 android:layout_height="25dp"
                 android:layout_marginTop="4dp"
                 android:text="@string/num_6"
-                app:layout_constraintEnd_toEndOf="@id/btn_key_f6"
-                app:layout_constraintStart_toStartOf="@id/btn_key_f6"
+                app:layout_constraintEnd_toEndOf="@id/btn_key_f7"
+                app:layout_constraintStart_toStartOf="@id/btn_key_f7"
                 app:layout_constraintTop_toBottomOf="@id/btn_key_esc" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -332,8 +343,8 @@
                 android:layout_height="25dp"
                 android:layout_marginTop="4dp"
                 android:text="@string/num_7"
-                app:layout_constraintEnd_toEndOf="@id/btn_key_f7"
-                app:layout_constraintStart_toStartOf="@id/btn_key_f7"
+                app:layout_constraintEnd_toEndOf="@id/btn_key_f8"
+                app:layout_constraintStart_toStartOf="@id/btn_key_f8"
                 app:layout_constraintTop_toBottomOf="@id/btn_key_esc" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -343,8 +354,8 @@
                 android:layout_height="25dp"
                 android:layout_marginTop="4dp"
                 android:text="@string/num_8"
-                app:layout_constraintEnd_toEndOf="@id/btn_key_f8"
-                app:layout_constraintStart_toStartOf="@id/btn_key_f8"
+                app:layout_constraintEnd_toEndOf="@id/btn_key_f9"
+                app:layout_constraintStart_toStartOf="@id/btn_key_f9"
                 app:layout_constraintTop_toBottomOf="@id/btn_key_esc" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -354,8 +365,8 @@
                 android:layout_height="25dp"
                 android:layout_marginTop="4dp"
                 android:text="@string/num_9"
-                app:layout_constraintEnd_toEndOf="@id/btn_key_f9"
-                app:layout_constraintStart_toStartOf="@id/btn_key_f9"
+                app:layout_constraintEnd_toEndOf="@id/btn_key_f10"
+                app:layout_constraintStart_toStartOf="@id/btn_key_f10"
                 app:layout_constraintTop_toBottomOf="@id/btn_key_esc" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -365,8 +376,8 @@
                 android:layout_height="25dp"
                 android:layout_marginTop="4dp"
                 android:text="@string/num_0"
-                app:layout_constraintEnd_toEndOf="@id/btn_key_f10"
-                app:layout_constraintStart_toStartOf="@id/btn_key_f10"
+                app:layout_constraintEnd_toEndOf="@id/btn_key_f11"
+                app:layout_constraintStart_toStartOf="@id/btn_key_f11"
                 app:layout_constraintTop_toBottomOf="@id/btn_key_esc" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -376,8 +387,8 @@
                 android:layout_height="25dp"
                 android:layout_marginTop="4dp"
                 android:text="@string/symbol_reduce"
-                app:layout_constraintEnd_toEndOf="@id/btn_key_f11"
-                app:layout_constraintStart_toStartOf="@id/btn_key_f11"
+                app:layout_constraintEnd_toEndOf="@id/btn_key_f12"
+                app:layout_constraintStart_toStartOf="@id/btn_key_f12"
                 app:layout_constraintTop_toBottomOf="@id/btn_key_esc" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -387,19 +398,19 @@
                 android:layout_height="25dp"
                 android:layout_marginTop="4dp"
                 android:text="@string/symbol_equal"
-                app:layout_constraintEnd_toEndOf="@id/btn_key_f12"
-                app:layout_constraintStart_toStartOf="@id/btn_key_f12"
+                app:layout_constraintEnd_toEndOf="@id/btn_key_ins"
+                app:layout_constraintStart_toStartOf="@id/btn_key_ins"
                 app:layout_constraintTop_toBottomOf="@id/btn_key_esc" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/btn_key_back"
                 style="@style/EditKeyStyle"
-                android:layout_width="0dp"
+                android:layout_width="38dp"
                 android:layout_height="25dp"
                 android:layout_marginTop="4dp"
                 android:text="@string/key_back"
                 app:layout_constraintEnd_toEndOf="@id/btn_key_del"
-                app:layout_constraintStart_toStartOf="@id/btn_key_ins"
+                app:layout_constraintStart_toStartOf="@id/btn_key_del"
                 app:layout_constraintTop_toBottomOf="@id/btn_key_esc" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -454,9 +465,9 @@
                 android:layout_height="25dp"
                 android:layout_marginTop="4dp"
                 android:text="@string/tab"
-                app:layout_constraintEnd_toEndOf="@id/btn_key_1"
-                app:layout_constraintStart_toStartOf="@id/btn_key_back_quote"
-                app:layout_constraintTop_toBottomOf="@id/btn_key_back_quote" />
+                app:layout_constraintEnd_toEndOf="@id/btn_key_back_quote"
+                app:layout_constraintStart_toStartOf="@id/btn_key_tilde"
+                app:layout_constraintTop_toBottomOf="@id/btn_key_tilde" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/btn_key_q"
@@ -467,7 +478,7 @@
                 android:text="@string/q"
                 app:layout_constraintEnd_toEndOf="@id/btn_key_f2"
                 app:layout_constraintStart_toStartOf="@id/btn_key_f2"
-                app:layout_constraintTop_toBottomOf="@id/btn_key_back_quote" />
+                app:layout_constraintTop_toBottomOf="@id/btn_key_tilde" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/btn_key_w"
@@ -478,7 +489,7 @@
                 android:text="@string/w"
                 app:layout_constraintEnd_toEndOf="@id/btn_key_f3"
                 app:layout_constraintStart_toStartOf="@id/btn_key_f3"
-                app:layout_constraintTop_toBottomOf="@id/btn_key_back_quote" />
+                app:layout_constraintTop_toBottomOf="@id/btn_key_tilde" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/btn_key_e"
@@ -489,7 +500,7 @@
                 android:text="@string/e"
                 app:layout_constraintEnd_toEndOf="@id/btn_key_f4"
                 app:layout_constraintStart_toStartOf="@id/btn_key_f4"
-                app:layout_constraintTop_toBottomOf="@id/btn_key_back_quote" />
+                app:layout_constraintTop_toBottomOf="@id/btn_key_tilde" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/btn_key_r"
@@ -500,7 +511,7 @@
                 android:text="@string/r"
                 app:layout_constraintEnd_toEndOf="@id/btn_key_f5"
                 app:layout_constraintStart_toStartOf="@id/btn_key_f5"
-                app:layout_constraintTop_toBottomOf="@id/btn_key_back_quote" />
+                app:layout_constraintTop_toBottomOf="@id/btn_key_tilde" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/btn_key_t"
@@ -511,7 +522,7 @@
                 android:text="@string/t"
                 app:layout_constraintEnd_toEndOf="@id/btn_key_f6"
                 app:layout_constraintStart_toStartOf="@id/btn_key_f6"
-                app:layout_constraintTop_toBottomOf="@id/btn_key_back_quote" />
+                app:layout_constraintTop_toBottomOf="@id/btn_key_tilde" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/btn_key_y"
@@ -522,7 +533,7 @@
                 android:text="@string/y"
                 app:layout_constraintEnd_toEndOf="@id/btn_key_f7"
                 app:layout_constraintStart_toStartOf="@id/btn_key_f7"
-                app:layout_constraintTop_toBottomOf="@id/btn_key_back_quote" />
+                app:layout_constraintTop_toBottomOf="@id/btn_key_tilde" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/btn_key_u"
@@ -533,7 +544,7 @@
                 android:text="@string/u"
                 app:layout_constraintEnd_toEndOf="@id/btn_key_f8"
                 app:layout_constraintStart_toStartOf="@id/btn_key_f8"
-                app:layout_constraintTop_toBottomOf="@id/btn_key_back_quote" />
+                app:layout_constraintTop_toBottomOf="@id/btn_key_tilde" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/btn_key_i"
@@ -544,7 +555,7 @@
                 android:text="@string/i"
                 app:layout_constraintEnd_toEndOf="@id/btn_key_f9"
                 app:layout_constraintStart_toStartOf="@id/btn_key_f9"
-                app:layout_constraintTop_toBottomOf="@id/btn_key_back_quote" />
+                app:layout_constraintTop_toBottomOf="@id/btn_key_tilde" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/btn_key_o"
@@ -555,7 +566,7 @@
                 android:text="@string/o"
                 app:layout_constraintEnd_toEndOf="@id/btn_key_f10"
                 app:layout_constraintStart_toStartOf="@id/btn_key_f10"
-                app:layout_constraintTop_toBottomOf="@id/btn_key_back_quote" />
+                app:layout_constraintTop_toBottomOf="@id/btn_key_tilde" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/btn_key_p"
@@ -566,7 +577,7 @@
                 android:text="@string/p"
                 app:layout_constraintEnd_toEndOf="@id/btn_key_f11"
                 app:layout_constraintStart_toStartOf="@id/btn_key_f11"
-                app:layout_constraintTop_toBottomOf="@id/btn_key_back_quote" />
+                app:layout_constraintTop_toBottomOf="@id/btn_key_tilde" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/btn_key_bracket_left"
@@ -577,7 +588,7 @@
                 android:text="@string/symbol_bracket_left"
                 app:layout_constraintEnd_toEndOf="@id/btn_key_f12"
                 app:layout_constraintStart_toStartOf="@id/btn_key_f12"
-                app:layout_constraintTop_toBottomOf="@id/btn_key_back_quote" />
+                app:layout_constraintTop_toBottomOf="@id/btn_key_tilde" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/btn_key_bracket_right"
@@ -588,7 +599,7 @@
                 android:text="@string/symbol_bracket_right"
                 app:layout_constraintEnd_toEndOf="@id/btn_key_ins"
                 app:layout_constraintStart_toStartOf="@id/btn_key_ins"
-                app:layout_constraintTop_toBottomOf="@id/btn_key_back_quote" />
+                app:layout_constraintTop_toBottomOf="@id/btn_key_tilde" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/btn_key_bias_reverse"
@@ -599,7 +610,7 @@
                 android:text="@string/symbol_bias_re"
                 app:layout_constraintEnd_toEndOf="@id/btn_key_del"
                 app:layout_constraintStart_toStartOf="@id/btn_key_del"
-                app:layout_constraintTop_toBottomOf="@id/btn_key_back_quote" />
+                app:layout_constraintTop_toBottomOf="@id/btn_key_tilde" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/btn_key_1_re"
@@ -610,7 +621,7 @@
                 android:text="@string/num_1"
                 app:layout_constraintEnd_toEndOf="@id/btn_key_pg_up"
                 app:layout_constraintStart_toStartOf="@id/btn_key_pg_up"
-                app:layout_constraintTop_toBottomOf="@id/btn_key_back_quote" />
+                app:layout_constraintTop_toBottomOf="@id/btn_key_tilde" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/btn_key_2_re"
@@ -621,7 +632,7 @@
                 android:text="@string/num_2"
                 app:layout_constraintEnd_toEndOf="@id/btn_key_pg_dn"
                 app:layout_constraintStart_toStartOf="@id/btn_key_pg_dn"
-                app:layout_constraintTop_toBottomOf="@id/btn_key_back_quote" />
+                app:layout_constraintTop_toBottomOf="@id/btn_key_tilde" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/btn_key_3_re"
@@ -632,7 +643,7 @@
                 android:text="@string/num_3"
                 app:layout_constraintEnd_toEndOf="@id/btn_key_home"
                 app:layout_constraintStart_toStartOf="@id/btn_key_home"
-                app:layout_constraintTop_toBottomOf="@id/btn_key_back_quote" />
+                app:layout_constraintTop_toBottomOf="@id/btn_key_tilde" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/btn_key_capital"
@@ -641,8 +652,8 @@
                 android:layout_height="25dp"
                 android:layout_marginTop="4dp"
                 android:text="@string/key_capital"
-                app:layout_constraintEnd_toEndOf="@id/btn_key_1"
-                app:layout_constraintStart_toStartOf="@id/btn_key_back_quote"
+                app:layout_constraintEnd_toEndOf="@id/btn_key_back_quote"
+                app:layout_constraintStart_toStartOf="@id/btn_key_tilde"
                 app:layout_constraintTop_toBottomOf="@id/btn_key_tab" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -829,8 +840,8 @@
                 android:layout_height="25dp"
                 android:layout_marginTop="4dp"
                 android:text="@string/key_shift"
-                app:layout_constraintEnd_toEndOf="@id/btn_key_1"
-                app:layout_constraintStart_toStartOf="@id/btn_key_back_quote"
+                app:layout_constraintEnd_toEndOf="@id/btn_key_back_quote"
+                app:layout_constraintStart_toStartOf="@id/btn_key_tilde"
                 app:layout_constraintTop_toBottomOf="@id/btn_key_capital" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -1006,8 +1017,8 @@
                 android:layout_height="25dp"
                 android:layout_marginTop="4dp"
                 android:text="@string/key_ctrl"
-                app:layout_constraintEnd_toEndOf="@id/btn_key_1"
-                app:layout_constraintStart_toStartOf="@id/btn_key_back_quote"
+                app:layout_constraintEnd_toEndOf="@id/btn_key_back_quote"
+                app:layout_constraintStart_toStartOf="@id/btn_key_tilde"
                 app:layout_constraintTop_toBottomOf="@id/btn_key_shift" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -1119,7 +1130,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/btn_hide"
-            tools:visibility="visible">
+            tools:visibility="gone">
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/btn_edit_mouse_left"

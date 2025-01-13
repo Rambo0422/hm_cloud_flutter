@@ -205,8 +205,7 @@ class RouletteKeyView @JvmOverloads constructor(
             }
 
             else -> {
-                val labelText = KeyConstants.keyControl[keyInfo.inputOp]
-                    ?: KeyConstants.keyNumber[keyInfo.inputOp] ?: ""
+                val labelText = KeyConstants.getLabelText(keyInfo).toString()
                 if (TextUtils.isEmpty(keyInfo.text)) labelText else "${keyInfo.text}\n$labelText"
             }
         }

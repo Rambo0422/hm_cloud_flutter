@@ -101,6 +101,7 @@ class AddKeyboardKey @JvmOverloads constructor(
         dataBinding.btnKeyHome.setOnClickListener(this)
         dataBinding.btnKeyEnd.setOnClickListener(this)
         dataBinding.btnKeyBackQuote.setOnClickListener(this)
+        dataBinding.btnKeyTilde.setOnClickListener(this)
         dataBinding.btnKey1.setOnClickListener(this)
         dataBinding.btnKey1Re.setOnClickListener(this)
         dataBinding.btnKey2.setOnClickListener(this)
@@ -238,6 +239,7 @@ class AddKeyboardKey @JvmOverloads constructor(
         var inputOp = 0
         var height = 48
         var remark = 0
+        var autoShift = 0
         when (v?.id) {
             R.id.btn_key_0,
 
@@ -404,6 +406,12 @@ class AddKeyboardKey @JvmOverloads constructor(
                 type = KeyType.KEYBOARD_KEY
             }
 
+            R.id.btn_key_tilde -> {
+                inputOp = getKey(KeyConstants.keyControl, "`")
+                type = KeyType.KEYBOARD_KEY
+                autoShift = 1
+            }
+
             R.id.btn_key_0_re,
 
             R.id.btn_key_1_re,
@@ -514,7 +522,8 @@ class AddKeyboardKey @JvmOverloads constructor(
                 optical,
                 0,
                 inputOp,
-                height
+                height,
+                autoShift
             )
         )
     }

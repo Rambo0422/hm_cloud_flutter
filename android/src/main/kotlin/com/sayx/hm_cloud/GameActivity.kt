@@ -49,6 +49,7 @@ import com.sayx.hm_cloud.callback.AddKeyListenerImp
 import com.sayx.hm_cloud.callback.AnimatorListenerImp
 import com.sayx.hm_cloud.callback.ConfigNameCallback
 import com.sayx.hm_cloud.callback.ControllerEventCallback
+import com.sayx.hm_cloud.callback.DialogDismissListener
 import com.sayx.hm_cloud.callback.EditCallback
 import com.sayx.hm_cloud.callback.GameSettingChangeListener
 import com.sayx.hm_cloud.callback.HideListener
@@ -462,7 +463,11 @@ class GameActivity : AppCompatActivity() {
             }
 
             override fun onShareClick() {
-                ShareDialog.show(this@GameActivity)
+                ShareDialog.show(this@GameActivity, object : DialogDismissListener {
+                    override fun onDialogDismiss() {
+                        showGameSetting()
+                    }
+                })
             }
 
             override fun onControlMethodChange(operateType: AppVirtualOperateType) {
@@ -1208,6 +1213,17 @@ class GameActivity : AppCompatActivity() {
                     dataBinding.gameController.restoreOriginal()
                 } else {
                     dataBinding.gameController.onEditSuccess()
+                }
+            }
+            "shareFail" -> {
+                if (event.arg is String) {
+                    AppCommonDialog.Builder(this)
+                        .setTitle(event.arg)
+                        .setRightButton("知道了") {
+                            AppCommonDialog.hideDialog(this)
+                        }
+                        .build()
+                        .show()
                 }
             }
         }
