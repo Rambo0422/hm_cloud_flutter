@@ -27,8 +27,11 @@ import android.view.animation.LinearInterpolator
 import android.view.animation.ScaleAnimation
 import android.view.inputmethod.InputMethodManager
 import android.widget.FrameLayout
+import android.widget.LinearLayout.LayoutParams
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.databinding.DataBindingUtil
 import com.antong.keyboard.sa.constants.HMInputOpData
 import com.blankj.utilcode.util.LogUtils
@@ -38,6 +41,7 @@ import com.gyf.immersionbar.BarHide
 import com.gyf.immersionbar.ktx.immersionBar
 import com.gyf.immersionbar.ktx.navigationBarHeight
 import com.haima.hmcp.beans.ResolutionInfo
+import com.media.atkit.AnTongManager
 import com.media.atkit.Constants
 import com.media.atkit.beans.VideoDelayInfo
 import com.media.atkit.listeners.AnTongPlayerListener
@@ -64,16 +68,20 @@ import com.sayx.hm_cloud.dialog.EditControllerNameDialog
 import com.sayx.hm_cloud.dialog.GameToastDialog
 import com.sayx.hm_cloud.dialog.ShareDialog
 import com.sayx.hm_cloud.http.bean.BaseObserver
-import com.sayx.hm_cloud.http.repository.AppRepository
 import com.sayx.hm_cloud.http.bean.HttpResponse
+import com.sayx.hm_cloud.http.repository.AppRepository
 import com.sayx.hm_cloud.model.ControllerConfigEvent
 import com.sayx.hm_cloud.model.ControllerInfo
+import com.sayx.hm_cloud.model.ExitGameEvent
 import com.sayx.hm_cloud.model.GameConfig
 import com.sayx.hm_cloud.model.GameErrorEvent
 import com.sayx.hm_cloud.model.GameNotice
 import com.sayx.hm_cloud.model.GameParam
 import com.sayx.hm_cloud.model.KeyInfo
 import com.sayx.hm_cloud.model.MessageEvent
+import com.sayx.hm_cloud.model.PartyPlayWantPlay
+import com.sayx.hm_cloud.model.PlayPartyRoomInfoEvent
+import com.sayx.hm_cloud.model.PlayPartyRoomSoundAndMicrophoneStateEvent
 import com.sayx.hm_cloud.model.TimeUpdateEvent
 import com.sayx.hm_cloud.model.UserRechargeStatusEvent
 import com.sayx.hm_cloud.utils.AppSizeUtils
@@ -89,8 +97,13 @@ import com.sayx.hm_cloud.widget.GameNoticeView
 import com.sayx.hm_cloud.widget.GameSettings
 import com.sayx.hm_cloud.widget.KeyEditView
 import com.sayx.hm_cloud.widget.KeyboardListView
+import com.sayx.hm_cloud.widget.PlayPartyGameView
+import com.sayx.hm_cloud.widget.PlayPartyPermissionView
+import com.sayx.hm_cloud.widget.PlayPartyUserAvatarView
+import com.sayx.hm_cloud.widget.PlayPartyWantPlayView
 import com.sayx.hm_cloud.widget.TouchEventDispatcher
 import me.jessyan.autosize.AutoSizeCompat
+import me.jessyan.autosize.utils.AutoSizeUtils
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -288,6 +301,16 @@ class AtGameActivity : AppCompatActivity() {
 
         // 初始化设置面板
         initGameSettings()
+
+        if (GameManager.isPartyPlay) {
+            if (GameManager.isPartyPlayOwner) {
+                GameManager.queryControlUsers()
+                GameManager.getPinCode()
+            }
+            val playToken = AnTongManager.getInstance().playToken
+            GameManager.sendCurrentCid(playToken)
+            initPlayPartyView()
+        }
     }
 
     private fun checkGuideShow() {
@@ -541,7 +564,7 @@ class AtGameActivity : AppCompatActivity() {
             }
 
             override fun onShowPlayParty() {
-
+                playPartyGameView?.show()
             }
 
             @SuppressLint("SetTextI18n")
@@ -1557,5 +1580,110 @@ class AtGameActivity : AppCompatActivity() {
             AutoSizeCompat.autoConvertDensityOfGlobal(super.getResources())
         }
         return super.getResources()
+    }
+
+
+    private var playPartyGameView: PlayPartyGameView? = null
+    private var playPartyUser: PlayPartyUserAvatarView? = null
+
+    private fun initPlayPartyView() {
+        playPartyGameView = PlayPartyGameView(this)
+        playPartyGameView?.visibility = View.GONE
+
+        val layoutParams = FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+        dataBinding.layoutGame.addView(playPartyGameView, layoutParams)
+
+        // 右上角派对吧用户头像
+        playPartyUser = PlayPartyUserAvatarView(this)
+        // 将设置面板控件加入主面板
+        playPartyUser?.layoutParams = FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        ).apply {
+            gravity = Gravity.END or Gravity.TOP
+            marginEnd = AutoSizeUtils.dp2px(this@AtGameActivity, 56f)
+            topMargin = AutoSizeUtils.dp2px(this@AtGameActivity, 6f)
+        }
+        dataBinding.layoutGame.addView(playPartyUser)
+    }
+
+    private val wantPlayViewId = View.generateViewId()
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onPlayPartyRoomInfoEvent(event: PlayPartyRoomInfoEvent) {
+        val roomInfo = event.roomInfo
+        val controlInfos = event.controlInfos
+        playPartyGameView?.onPlayPartyRoomInfoEvent(roomInfo, controlInfos)
+
+        // 判断我自己是否有权限，如果没权限，就显示，有权限就隐藏
+        val position = controlInfos.find {
+            it.uid == GameManager.getGameParam()?.userId
+        }?.position ?: 0
+        if (position == 0) {
+            GameManager.hasPremission = false
+            dataBinding.gameController.controllerType = AppVirtualOperateType.NONE
+            gameSettings?.controllerType = AppVirtualOperateType.NONE
+            initWantPlayView()
+        } else {
+            GameManager.hasPremission = true
+            checkInputDevices()
+            // 如果有权限，则需要removeView
+            dataBinding.gameController.findViewById<View>(wantPlayViewId)?.let {
+                dataBinding.gameController.removeView(it)
+            }
+        }
+
+        playPartyUser?.setUserInfo(roomInfo, controlInfos)
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onPartyPlayWantPlay(partyPlayWantPlay: PartyPlayWantPlay) {
+        showPlayPartyPermissionView(partyPlayWantPlay)
+        // 同时派对吧游戏页面去申请权限
+        playPartyGameView?.onPartyPlayWantPlay(partyPlayWantPlay)
+    }
+
+    private fun showPlayPartyPermissionView(partyPlayWantPlay: PartyPlayWantPlay) {
+        val permissionView = PlayPartyPermissionView(partyPlayWantPlay, this).apply {
+            layoutParams = ConstraintLayout.LayoutParams(
+                LayoutParams.WRAP_CONTENT,
+                LayoutParams.WRAP_CONTENT
+            ).apply {
+                endToEnd = ConstraintSet.PARENT_ID
+                topToTop = ConstraintSet.PARENT_ID
+                startToStart = ConstraintSet.PARENT_ID
+            }
+        }
+
+        dataBinding.gameController.addView(permissionView)
+        permissionView.show()
+    }
+
+    private fun initWantPlayView() {
+        // 校验是否已经拥有
+        val view = dataBinding.gameController.findViewById<View>(wantPlayViewId)
+        if (view != null) {
+            return
+        }
+
+        val partyWantPlayView = PlayPartyWantPlayView(this)
+        partyWantPlayView.id = wantPlayViewId
+        // 将 textView 添加到 ConstraintLayout
+        dataBinding.gameController.addView(partyWantPlayView)
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onPlayPartyRoomSoundAndMicrophoneStateEvent(event: PlayPartyRoomSoundAndMicrophoneStateEvent) {
+        playPartyGameView?.setSoundAndMicrophoneState(event.soundState, event.microphoneState)
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onPlayPartyExitGame(event: ExitGameEvent) {
+        GameManager.releasePlayPartyGame()
+        gameSettings?.release()
+        finish()
     }
 }
