@@ -92,6 +92,7 @@ class ShareDialog : DialogFragment() {
         dataBinding.ivHandle.setOnClickListener {
             dismiss()
         }
+        GameManager.invokeMethod("sharePageShow")
     }
 
     override fun onStart() {

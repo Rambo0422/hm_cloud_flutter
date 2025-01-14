@@ -836,6 +836,8 @@ class GameSettings @JvmOverloads constructor(
                 super.onAnimationEnd(animation)
                 dataBinding.layoutSettings.isClickable = true
                 animated = false
+
+                GameManager.invokeMethod("shareBtnShow")
             }
         })
         animatorSet.start()

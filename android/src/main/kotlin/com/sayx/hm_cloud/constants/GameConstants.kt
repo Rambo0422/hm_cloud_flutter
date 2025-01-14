@@ -920,7 +920,7 @@ abstract class OnKeyEventListenerImp : OnKeyEventListener {
             // 组合键(手柄)
             KeyType.GAMEPAD_COMBINE -> {
                 val inputOp = HMInputOpData()
-                val text = StringBuilder()
+//                val text = StringBuilder()
                 keyInfo.composeArr?.let {
                     it.forEachIndexed { index, keyInfo ->
                         val inputOpData = HMInputOpData.HMOneInputOPData()
@@ -947,10 +947,10 @@ abstract class OnKeyEventListenerImp : OnKeyEventListener {
                             inputOpData.value = calStickValue()
                         }
                         inputOp.opListArray.add(inputOpData)
-                        text.append("$keyInfo")
-                        if (index != it.size - 1) {
-                            text.append(", ")
-                        }
+//                        text.append("$keyInfo")
+//                        if (index != it.size - 1) {
+//                            text.append(", ")
+//                        }
                     }
                 }
                 GameManager.gameView?.sendCustomKeycode(inputOp)
