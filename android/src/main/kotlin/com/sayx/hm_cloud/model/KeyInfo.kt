@@ -23,6 +23,7 @@ class KeyInfo(
     @Expose(serialize = true) var click: Int,
     @Expose(serialize = true) val inputOp: Int,
     @Expose(serialize = true) val height: Int,
+    @Expose(serialize = true) var autoShift: Int?,
     @Expose(serialize = true) var map: String? = "",
     @Expose(serialize = true) var composeArr: List<KeyInfo>? = null,
     @Expose(serialize = true) var rouArr: List<KeyInfo>? = null,
@@ -60,6 +61,7 @@ class KeyInfo(
             this.click,
             this.inputOp,
             this.height,
+            this.autoShift,
             this.map,
             this.composeArr?.map { item -> item.copy() }?.toList(),
             this.rouArr?.map { item -> item.copy() }?.toList(),
@@ -90,6 +92,7 @@ class KeyInfo(
             "text" to text,
             "remark" to remark,
             "map" to map,
+            "autoShift" to autoShift,
         )
         composeArr?.let {
             map["composeArr"] = it.map { keyInfo -> keyInfo.toMap() }.toList()

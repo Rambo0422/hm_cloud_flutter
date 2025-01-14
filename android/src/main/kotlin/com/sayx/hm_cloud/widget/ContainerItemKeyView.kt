@@ -73,8 +73,7 @@ class ContainerItemKeyView @JvmOverloads constructor(
 
     private fun showKeyboardKey(keyInfo: KeyInfo) {
         dataBinding.tvName.text = keyInfo.text
-        val labelText = KeyConstants.keyControl[keyInfo.inputOp]
-            ?: KeyConstants.keyNumber[keyInfo.inputOp]
+        val labelText = KeyConstants.getLabelText(keyInfo)
         dataBinding.tvLabel.text = labelText
         dataBinding.tvLabel.visibility = VISIBLE
         dataBinding.ivIcon.visibility = INVISIBLE
@@ -88,8 +87,7 @@ class ContainerItemKeyView @JvmOverloads constructor(
                 val map = maps.find { item -> item.first == keyInfo.map}?.second
                 if (map != null) {
                     // 展示label
-                    val labelText = KeyConstants.keyControl[keyInfo.inputOp]
-                        ?: KeyConstants.keyNumber[keyInfo.inputOp]
+                    val labelText = KeyConstants.getLabelText(keyInfo)
                     dataBinding.tvLabel.text = labelText
                     dataBinding.tvLabel.visibility = VISIBLE
                     // 缩小内容，展示边框

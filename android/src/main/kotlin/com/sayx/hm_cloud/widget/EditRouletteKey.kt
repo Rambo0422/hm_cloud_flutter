@@ -280,6 +280,7 @@ class EditRouletteKey @JvmOverloads constructor(
                     0,
                     0,
                     144,
+                    0,
                     rouArr = newData
                 )
             )

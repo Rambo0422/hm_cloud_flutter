@@ -121,4 +121,16 @@ class HmCloudController {
   void updateUserRechargeStatus(Map status) {
     methodChannel.invokeMethod("updateUserRechargeStatus", status);
   }
+
+  void openGamePage() {
+    methodChannel.invokeMethod("openGamePage");
+  }
+
+  void cancelGame() {
+    methodChannel.invokeMethod("cancelGame");
+  }
+
+  void shareFail(String msg) {
+    methodChannel.invokeMethod("shareFail", msg);
+  }
 }

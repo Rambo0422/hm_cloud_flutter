@@ -39,6 +39,7 @@
     <string name="home" translatable="false">Home</string>
     <string name="end" translatable="false">End</string>
     <string name="back_quote" translatable="false">`</string>
+    <string name="tilde" translatable="false">～</string>
     <string name="num_1" translatable="false">1</string>
     <string name="num_2" translatable="false">2</string>
     <string name="num_3" translatable="false">3</string>
@@ -148,6 +149,7 @@
     <string name="exit_game">退出游戏</string>
     <string name="exit">退出</string>
     <string name="debug_code">调试码</string>
+    <string name="share">分享</string>
     <string name="control_method">操作方式</string>
     <string name="more_keyboard">更多按键</string>
     <string name="gamepad_control">手柄</string>
@@ -192,4 +194,8 @@
     <string name="edit_roulette_key_tips">选择下方按键进行添加，至少4个</string>
     <string name="save_container_key">保存按键包</string>
     <string name="shot_key">射击键(左键)</string>
+    <string name="shareToFriend">分享给好友</string>
+    <string name="wechat_share">微信好友</string>
+    <string name="qq_share">QQ好友</string>
+    <string name="copy_share">"复制链接"</string>
 </resources>

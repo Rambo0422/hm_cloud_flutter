@@ -50,6 +50,7 @@ import com.sayx.hm_cloud.callback.AddKeyListenerImp
 import com.sayx.hm_cloud.callback.AnimatorListenerImp
 import com.sayx.hm_cloud.callback.ConfigNameCallback
 import com.sayx.hm_cloud.callback.ControllerEventCallback
+import com.sayx.hm_cloud.callback.DialogDismissListener
 import com.sayx.hm_cloud.callback.EditCallback
 import com.sayx.hm_cloud.callback.GameSettingChangeListener
 import com.sayx.hm_cloud.callback.HideListener
@@ -65,6 +66,7 @@ import com.sayx.hm_cloud.databinding.ActivityGameBinding
 import com.sayx.hm_cloud.dialog.AppCommonDialog
 import com.sayx.hm_cloud.dialog.EditControllerNameDialog
 import com.sayx.hm_cloud.dialog.GameToastDialog
+import com.sayx.hm_cloud.dialog.ShareDialog
 import com.sayx.hm_cloud.http.bean.BaseObserver
 import com.sayx.hm_cloud.http.bean.HttpResponse
 import com.sayx.hm_cloud.http.repository.AppRepository
@@ -200,6 +202,7 @@ class AtGameActivity : AppCompatActivity() {
                     ViewGroup.LayoutParams.MATCH_PARENT
                 )
             )
+            it.externalInputBlocker(false)
         }
         anTongVideoView?.setAttachContext(this)
         anTongVideoView?.setHmcpPlayerListener(object : AnTongPlayerListener {
@@ -480,6 +483,14 @@ class AtGameActivity : AppCompatActivity() {
                 ToastUtils.showShort(R.string.clip_success)
             }
 
+            override fun onShareClick() {
+                ShareDialog.show(this@AtGameActivity, object : DialogDismissListener {
+                    override fun onDialogDismiss() {
+                        showGameSetting()
+                    }
+                })
+            }
+
             override fun onControlMethodChange(operateType: AppVirtualOperateType) {
                 LogUtils.d("onControlMethodChange:$operateType")
                 when (operateType) {
@@ -710,6 +721,7 @@ class AtGameActivity : AppCompatActivity() {
         if (controllerEditLayout != null) {
             dataBinding.layoutGame.removeView(controllerEditLayout)
         }
+        AnTongSDK.anTongVideoView?.externalInputBlocker(true)
         controllerEditLayout = ControllerEditLayout(this)
         controllerEditLayout?.controllerType = type
         configControllerEditCallback()
@@ -1175,7 +1187,7 @@ class AtGameActivity : AppCompatActivity() {
         controllerStatus = ControllerStatus.Normal
 
         dataBinding.gameController.maskEnable = false
-
+        AnTongSDK.anTongVideoView?.externalInputBlocker(false)
         try {
             inputTimer?.cancel()
             inputTimer?.purge()
@@ -1291,52 +1303,65 @@ class AtGameActivity : AppCompatActivity() {
                     dataBinding.gameController.onEditSuccess()
                 }
             }
+            "shareFail" -> {
+                if (event.arg is String) {
+                    AppCommonDialog.Builder(this)
+                        .setTitle(event.arg)
+                        .setRightButton("知道了")
+                        .build()
+                        .show()
+                }
+            }
         }
     }
 
     private fun showKeyEditView(keyInfo: KeyInfo) {
         LogUtils.d("showKeyEditView:$keyInfo")
-        if (keyEditView == null) {
-            keyEditView = KeyEditView(this)
-            val layoutParams = FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
-            keyEditView?.setKeyInfo(keyInfo)
-            keyEditView?.callback = object : KeyEditCallback {
-                override fun onKeyDelete() {
-                    dataBinding.gameController.deleteKey()
-                }
+        if (keyEditView != null) {
+            dataBinding.layoutGame.removeView(keyEditView)
+            keyEditView = null
+        }
+        keyEditView = KeyEditView(this)
+        val layoutParams = FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+        keyEditView?.setKeyInfo(keyInfo)
+        keyEditView?.callback = object : KeyEditCallback {
+            override fun onKeyDelete() {
+                dataBinding.gameController.deleteKey()
+            }
 
-                override fun onSaveKey(keyInfo: KeyInfo, windowToken: IBinder) {
-                    hideSoftKeyBoard(windowToken)
-                    dataBinding.gameController.updateKey(keyInfo)
-                }
+            override fun onSaveKey(keyInfo: KeyInfo, windowToken: IBinder) {
+                hideSoftKeyBoard(windowToken)
+                dataBinding.gameController.updateKey(keyInfo)
+            }
 
-                override fun onCombineKeyEdit(keyInfo: KeyInfo) {
-                    controllerEditLayout?.hideLayout(object : AnimatorListenerImp() {
-                        override fun onAnimationEnd(animation: Animator) {
-                            when (keyInfo.type) {
-                                KeyType.KEY_COMBINE, KeyType.GAMEPAD_COMBINE -> {
-                                    showEditCombineKeyLayout(keyInfo)
-                                }
-                                KeyType.KEY_ROULETTE, KeyType.GAMEPAD_ROULETTE -> {
-                                    showEditRouletteKeyLayout(keyInfo)
-                                }
-                                KeyType.KEY_CONTAINER -> {
-                                    showEditContainerKeyLayout(keyInfo)
-                                }
+            override fun onCombineKeyEdit(keyInfo: KeyInfo) {
+                controllerEditLayout?.hideLayout(object : AnimatorListenerImp() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        when (keyInfo.type) {
+                            KeyType.KEY_COMBINE, KeyType.GAMEPAD_COMBINE -> {
+                                showEditCombineKeyLayout(keyInfo)
+                            }
+                            KeyType.KEY_ROULETTE, KeyType.GAMEPAD_ROULETTE -> {
+                                showEditRouletteKeyLayout(keyInfo)
+                            }
+                            KeyType.KEY_CONTAINER -> {
+                                showEditContainerKeyLayout(keyInfo)
                             }
                         }
-                    })
-                }
+                    }
+                })
             }
-            dataBinding.layoutGame.post {
-                dataBinding.layoutGame.addView(keyEditView, layoutParams)
+
+            override fun onViewHide() {
+                dataBinding.layoutGame.removeView(keyEditView)
+                keyEditView = null
             }
-        } else {
-            keyEditView?.setKeyInfo(keyInfo)
-            keyEditView?.visibility = View.VISIBLE
+        }
+        dataBinding.layoutGame.post {
+            dataBinding.layoutGame.addView(keyEditView, layoutParams)
         }
     }
 

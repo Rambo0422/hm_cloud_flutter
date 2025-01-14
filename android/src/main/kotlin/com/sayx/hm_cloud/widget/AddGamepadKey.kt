@@ -274,7 +274,8 @@ class AddGamepadKey @JvmOverloads constructor(
                 optical,
                 0,
                 inputOp,
-                height
+                height,
+                0
             )
         )
     }

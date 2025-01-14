@@ -47,11 +47,11 @@ class KeyEditView @JvmOverloads constructor(
 
     private fun initView() {
         dataBinding.btnExitEdit.setOnClickListener {
-            visibility = GONE
+            callback?.onViewHide()
         }
         dataBinding.btnDeleteKey.setOnClickListener {
-            visibility = GONE
             callback?.onKeyDelete()
+            callback?.onViewHide()
         }
         dataBinding.btnSaveEdit.setOnClickListener {
             val text = dataBinding.etKeyName.text ?: ""
@@ -60,8 +60,8 @@ class KeyEditView @JvmOverloads constructor(
                 return@setOnClickListener
             }
             mKeyInfo.text = text.toString()
-            visibility = GONE
             callback?.onSaveKey(mKeyInfo, dataBinding.etKeyName.windowToken)
+            callback?.onViewHide()
         }
         dataBinding.etKeyName.addTextChangedListener(object : TextWatcherImp() {
             @SuppressLint("DefaultLocale")
@@ -75,8 +75,8 @@ class KeyEditView @JvmOverloads constructor(
             }
         })
         dataBinding.btnEdit.setOnClickListener {
-            visibility = GONE
             callback?.onCombineKeyEdit(mKeyInfo)
+            callback?.onViewHide()
         }
         dataBinding.tabSetting.setOnClickListener {
             if (!it.isSelected) {
@@ -252,8 +252,7 @@ class KeyEditView @JvmOverloads constructor(
             }
 
             else -> {
-                KeyConstants.keyControl[info.inputOp]
-                    ?: KeyConstants.keyNumber[info.inputOp] ?: ""
+                KeyConstants.getLabelText(info).toString()
             }
         }
     }

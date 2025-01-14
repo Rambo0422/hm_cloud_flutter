@@ -857,6 +857,16 @@ abstract class OnKeyEventListenerImp : OnKeyEventListener {
             }
             // 键盘按键，鼠标左中右键
             KeyType.KEYBOARD_KEY, KeyType.KEYBOARD_MOUSE_LEFT, KeyType.KEYBOARD_MOUSE_RIGHT, KeyType.KEYBOARD_MOUSE_MIDDLE, KeyType.KEY_SHOOT -> {
+                if (keyInfo.autoShift == 1) {
+                    val inputOp = HMInputOpData()
+                    val oneInputOpData = HMInputOpData.HMOneInputOPData()
+                    oneInputOpData.inputState = if (press) HMInputOpData.HMOneInputOPData_InputState.HMOneInputOPData_InputState_OpStateDown else
+                        HMInputOpData.HMOneInputOPData_InputState.HMOneInputOPData_InputState_OpStateUp
+                    oneInputOpData.inputOp = HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpKeyVkShift
+                    inputOp.opListArray.add(oneInputOpData)
+                    val result = GameManager.gameView?.sendCustomKeycode(inputOp)
+                    LogUtils.d("key:${keyInfo.text}, inputOp:${oneInputOpData.inputOp}, value:${oneInputOpData.inputState}, result:$result")
+                }
                 val inputOp = HMInputOpData()
                 val oneInputOpData = HMInputOpData.HMOneInputOPData()
                 oneInputOpData.inputState = if (press) HMInputOpData.HMOneInputOPData_InputState.HMOneInputOPData_InputState_OpStateDown else
@@ -889,7 +899,7 @@ abstract class OnKeyEventListenerImp : OnKeyEventListener {
             // 组合键(键鼠)
             KeyType.KEY_COMBINE -> {
                 val inputOp = HMInputOpData()
-                val text = StringBuilder()
+//                val text = StringBuilder()
                 keyInfo.composeArr?.let {
                     it.forEachIndexed { index, keyInfo ->
                         val inputOpData = HMInputOpData.HMOneInputOPData()
@@ -897,10 +907,10 @@ abstract class OnKeyEventListenerImp : OnKeyEventListener {
                             HMInputOpData.HMOneInputOPData_InputState.HMOneInputOPData_InputState_OpStateUp
                         inputOpData.inputOp = getInputOp(keyInfo.inputOp)
                         inputOp.opListArray.add(inputOpData)
-                        text.append("$keyInfo")
-                        if (index != it.size - 1) {
-                            text.append(", ")
-                        }
+//                        text.append("$keyInfo")
+//                        if (index != it.size - 1) {
+//                            text.append(", ")
+//                        }
                     }
                 }
                 GameManager.gameView?.sendCustomKeycode(inputOp)
@@ -910,7 +920,7 @@ abstract class OnKeyEventListenerImp : OnKeyEventListener {
             // 组合键(手柄)
             KeyType.GAMEPAD_COMBINE -> {
                 val inputOp = HMInputOpData()
-                val text = StringBuilder()
+//                val text = StringBuilder()
                 keyInfo.composeArr?.let {
                     it.forEachIndexed { index, keyInfo ->
                         val inputOpData = HMInputOpData.HMOneInputOPData()
@@ -937,10 +947,10 @@ abstract class OnKeyEventListenerImp : OnKeyEventListener {
                             inputOpData.value = calStickValue()
                         }
                         inputOp.opListArray.add(inputOpData)
-                        text.append("$keyInfo")
-                        if (index != it.size - 1) {
-                            text.append(", ")
-                        }
+//                        text.append("$keyInfo")
+//                        if (index != it.size - 1) {
+//                            text.append(", ")
+//                        }
                     }
                 }
                 GameManager.gameView?.sendCustomKeycode(inputOp)

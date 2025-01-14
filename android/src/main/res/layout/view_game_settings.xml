@@ -554,6 +554,24 @@
             tools:visibility="visible">
 
             <com.sayx.hm_cloud.widget.DrawableTextView
+                android:id="@+id/tv_share"
+                android:layout_width="wrap_content"
+                android:layout_height="20dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="15dp"
+                android:background="@drawable/shape_debug_code_bg"
+                android:drawablePadding="2dp"
+                android:gravity="center"
+                android:text="@string/share"
+                android:textColor="#6A6F7D"
+                android:textSize="10sp"
+                app:drawableLeft="@drawable/ic_share"
+                app:drawableSize="13dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="SmallSp" />
+
+            <com.sayx.hm_cloud.widget.DrawableTextView
                 android:id="@+id/tv_debug_code"
                 android:layout_width="wrap_content"
                 android:layout_height="20dp"
@@ -567,7 +585,7 @@
                 android:textSize="10sp"
                 app:drawableLeft="@drawable/img_copy"
                 app:drawableSize="13dp"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/tv_share"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:ignore="SmallSp" />
 

@@ -238,6 +238,7 @@ class EditCombineKey @JvmOverloads constructor(
                     0,
                     0,
                     64,
+                    0,
                     composeArr = keyInfoList
                 )
             )
