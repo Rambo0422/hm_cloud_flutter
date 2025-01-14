@@ -1770,7 +1770,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                     Pair("cid", playToken)
                 )
             )
-            inQueue = false
             isPlaying = true
             openGame = true
             AtGameActivity.startActivityForResult(activity)
