@@ -51,6 +51,15 @@
     if ([call.method isEqualToString:MethodClosePage]) {
         [[HmCloudTool share] restart];
     }
+    
+    if ([call.method isEqualToString:MethodOpenGamePage]) {
+        [[HmCloudTool share] openGamePage];
+    }
+    
+    if ([call.method isEqualToString:MethodCancelGame]) {
+        [[HmCloudTool share] cancelGame];
+    }
+    
 
     // 收到更新时间action的时候，通知flutter端计算用户的游玩时长，并更新插件
     if ([call.method isEqualToString:MethodBuySuccess]) {

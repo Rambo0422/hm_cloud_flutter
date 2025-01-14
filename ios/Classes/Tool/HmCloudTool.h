@@ -19,6 +19,8 @@ static NSString *MethodUpdatePlayInfo = @"updatePlayInfo";
 static NSString *MethodGetUnReleaseGame = @"getUnReleaseGame";
 static NSString *MethodGetArchiveProgress = @"getArchiveProgress";
 static NSString *MethodReleaseGame = @"releaseGame";
+static NSString *MethodOpenGamePage = @"openGamePage";
+static NSString *MethodCancelGame = @"cancelGame";
 
 /// MARK: action name
 static NSString *ActionExitGame = @"exitGame";
@@ -129,6 +131,10 @@ typedef void (^BoolBlock)(BOOL isSucc);
 
 /// 推出flutter 页面后，回到游戏页面的方法
 - (void)restart;
+
+- (void)openGamePage;
+
+- (void)cancelGame;
 
 - (void)startLiving;
 - (void)stopLiving;
