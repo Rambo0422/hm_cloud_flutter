@@ -131,6 +131,20 @@
     }
 }
 
+- (void)openGamePage {
+    if (!self.isVip && !self.liveRoomId.length) {
+        [self startLiving];
+    }
+
+    [[HMCloudPlayer sharedCloudPlayer] setAudioMute:NO];
+    
+    [self pushPreView];
+}
+
+- (void)cancelGame {
+    [self stopWithBack];
+}
+
 - (void)updatePlayInfo:(NSDictionary *)playInfo {
     [self configWithParams:playInfo];
 
@@ -443,14 +457,8 @@
 
     if ([state isEqualToString:@"videoVisible"]) {
         [[HMCloudPlayer sharedCloudPlayer] cloudSetTouchModel:self.touchMode];
-
+        [[HMCloudPlayer sharedCloudPlayer] setAudioMute:YES];
         [self.delegate sendToFlutter:ActionFirstFrameArrival params:nil];
-
-        if (!self.isVip && !self.liveRoomId.length) {
-            [self startLiving];
-        }
-
-        [self pushPreView];
     }
 
     if ([state isEqualToString:@"stopped"]) {
