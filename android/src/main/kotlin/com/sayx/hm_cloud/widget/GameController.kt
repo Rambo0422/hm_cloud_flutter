@@ -86,6 +86,7 @@ class GameController @JvmOverloads constructor(
                 return
             }
             field = value
+            hideAllKey()
             when (value) {
                 AppVirtualOperateType.APP_STICK_XBOX -> {
                     GameManager.lastControllerType = value
@@ -98,7 +99,6 @@ class GameController @JvmOverloads constructor(
                 }
 
                 else -> {
-                    hideAllKey()
                 }
             }
         }
@@ -175,8 +175,7 @@ class GameController @JvmOverloads constructor(
     private fun initGamepad(keyInfoList: List<KeyInfo>) {
         LogUtils.d("initGamepad:${keyInfoList}")
         editGamepadKeys.clear()
-        removeAllViews(keyboardViews)
-        removeAllViews(gamepadViews)
+        removeAllKeyView()
         for (item in keyInfoList) {
             val keyInfo = item.copy()
             editGamepadKeys.add(keyInfo)
@@ -213,8 +212,7 @@ class GameController @JvmOverloads constructor(
     private fun initKeyboard(keyInfoList: List<KeyInfo>) {
         LogUtils.d("initKeyboard:${keyInfoList}")
         editKeyboardKeys.clear()
-        removeAllViews(keyboardViews)
-        removeAllViews(gamepadViews)
+        removeAllKeyView()
         for (item in keyInfoList) {
             val keyInfo = item.copy()
             editKeyboardKeys.add(keyInfo)
@@ -1474,8 +1472,22 @@ class GameController @JvmOverloads constructor(
         }
     }
 
-    private fun removeAllViews(views: ArrayList<View>) {
-        LogUtils.d("removeAllViews")
+    private fun removeAllKeyView() {
+//        LogUtils.d("removeAllViews")
+        keyboardViews.clear()
+        gamepadViews.clear()
+        val views = mutableListOf<View>()
+        children.forEach {
+            if (it is KeyView ||
+                it is RockerView ||
+                it is CombineKeyView ||
+                it is RouletteKeyView ||
+                it is ContainerKeyView ||
+                it is ShotKeyView
+            ) {
+                views.add(it)
+            }
+        }
         views.forEach {
             this.removeView(it)
         }
