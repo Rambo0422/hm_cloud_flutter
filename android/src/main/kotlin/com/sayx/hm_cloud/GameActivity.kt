@@ -54,6 +54,7 @@ import com.sayx.hm_cloud.callback.EditCallback
 import com.sayx.hm_cloud.callback.GameSettingChangeListener
 import com.sayx.hm_cloud.callback.HideListener
 import com.sayx.hm_cloud.callback.KeyEditCallback
+import com.blankj.utilcode.util.ScreenUtils
 import com.sayx.hm_cloud.callback.OnEditClickListener
 import com.sayx.hm_cloud.callback.OnPositionChangeListener
 import com.sayx.hm_cloud.constants.AppVirtualOperateType
@@ -152,12 +153,12 @@ class GameActivity : AppCompatActivity() {
     }
 
     // 设备连接监听
-    private val inputManager : InputManager by lazy {
+    private val inputManager: InputManager by lazy {
         getSystemService(Context.INPUT_SERVICE) as InputManager
     }
 
     // 隐藏软键盘
-    private val inputMethodManager : InputMethodManager by lazy {
+    private val inputMethodManager: InputMethodManager by lazy {
         getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     }
 
@@ -227,10 +228,18 @@ class GameActivity : AppCompatActivity() {
                 SPUtils.getInstance().put(GameConstants.settingsTop, top)
             }
         }
-        val x = SPUtils.getInstance().getInt(GameConstants.settingsLeft, -1)
-        val y = SPUtils.getInstance().getInt(GameConstants.settingsTop, -1)
+        var x = SPUtils.getInstance().getInt(GameConstants.settingsLeft, -1)
+        var y = SPUtils.getInstance().getInt(GameConstants.settingsTop, -1)
         if (x > 0 && y > 0) {
             dataBinding.btnGameSettings.post {
+                val btnWidth = dataBinding.btnGameSettings.width
+                val btnHeight = dataBinding.btnGameSettings.height
+                val screenWidth = ScreenUtils.getScreenWidth()
+                val screenHeight = ScreenUtils.getScreenHeight()
+                val maxX = screenWidth - btnWidth;
+                val maxY = screenHeight - btnHeight;
+                x = if (x > maxX) maxX else x
+                y = if (y > maxY) maxY else y
                 dataBinding.btnGameSettings.x = x.toFloat()
                 dataBinding.btnGameSettings.y = y.toFloat()
             }
@@ -928,6 +937,7 @@ class GameActivity : AppCompatActivity() {
                                     AppVirtualOperateType.APP_KEYBOARD
                                 )
                             }
+
                             KeyType.KEY_SHOOT -> {
                                 dataBinding.gameController.addShotKey(
                                     keyInfo,
@@ -1121,10 +1131,11 @@ class GameActivity : AppCompatActivity() {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onMessageEvent(event: MessageEvent) {
-        when(event.msg) {
+        when (event.msg) {
             "showVIP" -> {
                 showJoinVipDialog()
             }
+
             "addKeyboard" -> {
                 event.arg?.let {
                     when (it) {
@@ -1132,6 +1143,7 @@ class GameActivity : AppCompatActivity() {
                             dataBinding.gameController.setControllerData(GameManager.gamepadList[0], true)
                             showControllerEdit(AppVirtualOperateType.APP_STICK_XBOX)
                         }
+
                         GameConstants.keyboardConfig -> {
                             dataBinding.gameController.setControllerData(GameManager.keyboardList[0], true)
                             showControllerEdit(AppVirtualOperateType.APP_KEYBOARD)
@@ -1139,6 +1151,7 @@ class GameActivity : AppCompatActivity() {
                     }
                 }
             }
+
             "updateKeyboard" -> {
                 event.arg?.let {
                     if (it is ControllerInfo) {
@@ -1148,6 +1161,7 @@ class GameActivity : AppCompatActivity() {
                             GameConstants.gamepadConfig -> {
                                 showControllerEdit(AppVirtualOperateType.APP_STICK_XBOX)
                             }
+
                             GameConstants.keyboardConfig -> {
                                 showControllerEdit(AppVirtualOperateType.APP_KEYBOARD)
                             }
@@ -1155,6 +1169,7 @@ class GameActivity : AppCompatActivity() {
                     }
                 }
             }
+
             "deleteKeyboard" -> {
                 AppCommonDialog.Builder(this)
                     .setTitle("确认删除吗?")
@@ -1172,17 +1187,21 @@ class GameActivity : AppCompatActivity() {
                     .build()
                     .show(tag = "deleteKeyboard")
             }
+
             "editKey" -> {
                 showKeyEditView(event.arg as KeyInfo)
             }
+
             "useSuccess" -> {
                 val type = when (event.arg) {
                     GameConstants.gamepadConfig -> {
                         "手柄"
                     }
+
                     GameConstants.keyboardConfig -> {
                         "键鼠"
                     }
+
                     else -> {
                         ""
                     }
@@ -1194,6 +1213,7 @@ class GameActivity : AppCompatActivity() {
                     .build()
                     .show()
             }
+
             "restoreSuccess" -> {
                 if (event.arg is KeyInfo) {
                     keyEditView?.setKeyInfo(event.arg)
@@ -1207,6 +1227,7 @@ class GameActivity : AppCompatActivity() {
                     .build()
                     .show()
             }
+
             "addSuccess", "updateSuccess" -> {
                 exitCustom()
                 KeyboardListView.show(dataBinding.layoutGame)
@@ -1216,6 +1237,7 @@ class GameActivity : AppCompatActivity() {
                     dataBinding.gameController.onEditSuccess()
                 }
             }
+
             "shareFail" -> {
                 if (event.arg is String) {
                     AppCommonDialog.Builder(this)
@@ -1259,9 +1281,11 @@ class GameActivity : AppCompatActivity() {
                             KeyType.KEY_COMBINE, KeyType.GAMEPAD_COMBINE -> {
                                 showEditCombineKeyLayout(keyInfo)
                             }
+
                             KeyType.KEY_ROULETTE, KeyType.GAMEPAD_ROULETTE -> {
                                 showEditRouletteKeyLayout(keyInfo)
                             }
+
                             KeyType.KEY_CONTAINER -> {
                                 showEditContainerKeyLayout(keyInfo)
                             }
@@ -1373,10 +1397,11 @@ class GameActivity : AppCompatActivity() {
             .setRightButton(getRightButtonText(errorCode)) {
                 LogUtils.d("exitGameForError:$errorCode")
                 AppCommonDialog.hideDialog(this, "warningDialog")
-                when(errorCode) {
+                when (errorCode) {
                     "42" -> {
                         GameManager.invokeMethod("openRecharge")
                     }
+
                     else -> {
                     }
                 }
@@ -1390,9 +1415,11 @@ class GameActivity : AppCompatActivity() {
             "401" -> {
                 "设备限制"
             }
+
             "42" -> {
                 "账号时长已消耗完毕"
             }
+
             else -> {
                 "游戏结束\n[$errorCode]"
             }
@@ -1404,12 +1431,15 @@ class GameActivity : AppCompatActivity() {
             "11" -> {
                 "游戏长时间无操作"
             }
+
             "42" -> {
                 "你可以通过每日签到或充值获取时长"
             }
+
             "401" -> {
                 "游戏已在其他设备运行"
             }
+
             else -> {
                 "游戏结束"
             }
@@ -1417,10 +1447,11 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun getLeftButtonText(errorCode: String): String? {
-        return when(errorCode) {
+        return when (errorCode) {
             "42" -> {
                 "退出"
             }
+
             else -> {
                 null
             }
@@ -1428,10 +1459,11 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun getRightButtonText(errorCode: String): String {
-        return when(errorCode) {
+        return when (errorCode) {
             "42" -> {
                 "去充值"
             }
+
             else -> {
                 "退出游戏"
             }
@@ -1776,10 +1808,11 @@ class GameActivity : AppCompatActivity() {
         var controllerType = AppVirtualOperateType.NONE
         if (!pcMouseMode && GameManager.hasPremission) {
             if (GameManager.lastControllerType == AppVirtualOperateType.NONE) {
-                when(GameManager.getGameParam()?.defaultOperation ?: GameConstants.keyboardControl) {
+                when (GameManager.getGameParam()?.defaultOperation ?: GameConstants.keyboardControl) {
                     GameConstants.keyboardControl -> {
                         controllerType = AppVirtualOperateType.APP_KEYBOARD
                     }
+
                     GameConstants.gamepadControl -> {
                         controllerType = AppVirtualOperateType.APP_STICK_XBOX
                     }

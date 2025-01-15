@@ -1130,6 +1130,7 @@ class GameController @JvmOverloads constructor(
      */
     fun setControllerData(data: ControllerInfo, update: Boolean = false) {
         controllerInfo = data
+        ViewUtils.translateViewSize(controllerInfo)
         controllerName = data.name?: ""
 //        LogUtils.d("setKeyData:$data")
         if (data.type == GameConstants.keyboardConfig) {
@@ -1440,8 +1441,8 @@ class GameController @JvmOverloads constructor(
                 }
             }
         } else if (controllerType == AppVirtualOperateType.APP_KEYBOARD) {
-            val keyList = editKeyboardKeys.map { item -> item.copy() }.toList()
             controllerInfo?.let {
+                val keyList = editKeyboardKeys.map { item -> item.copy() }.toList()
                 if (it.isOfficial == true) {
                     val info = ControllerInfo("", it.type, it.userId, it.gameId, keyList, controllerName, 0)
                     GameManager.addKeyboardConfig(info)

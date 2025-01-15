@@ -36,6 +36,7 @@ import androidx.databinding.DataBindingUtil
 import com.antong.keyboard.sa.constants.HMInputOpData
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.SPUtils
+import com.blankj.utilcode.util.ScreenUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.gyf.immersionbar.BarHide
 import com.gyf.immersionbar.ktx.immersionBar
@@ -250,10 +251,18 @@ class AtGameActivity : AppCompatActivity() {
                 SPUtils.getInstance().put(GameConstants.settingsTop, top)
             }
         }
-        val x = SPUtils.getInstance().getInt(GameConstants.settingsLeft, -1)
-        val y = SPUtils.getInstance().getInt(GameConstants.settingsTop, -1)
+        var x = SPUtils.getInstance().getInt(GameConstants.settingsLeft, -1)
+        var y = SPUtils.getInstance().getInt(GameConstants.settingsTop, -1)
         if (x > 0 && y > 0) {
             dataBinding.btnGameSettings.post {
+                val btnWidth = dataBinding.btnGameSettings.width
+                val btnHeight = dataBinding.btnGameSettings.height
+                val screenWidth = ScreenUtils.getScreenWidth()
+                val screenHeight = ScreenUtils.getScreenHeight()
+                val maxX = screenWidth - btnWidth;
+                val maxY = screenHeight - btnHeight;
+                x = if (x > maxX) maxX else x
+                y = if (y > maxY) maxY else y
                 dataBinding.btnGameSettings.x = x.toFloat()
                 dataBinding.btnGameSettings.y = y.toFloat()
             }
