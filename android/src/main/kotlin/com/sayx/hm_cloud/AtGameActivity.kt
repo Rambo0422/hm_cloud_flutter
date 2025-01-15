@@ -1566,7 +1566,7 @@ class AtGameActivity : AppCompatActivity() {
         }
 
         var controllerType = AppVirtualOperateType.NONE
-        if (!pcMouseMode) {
+        if (!pcMouseMode && GameManager.hasPremission) {
             if (GameManager.lastControllerType == AppVirtualOperateType.NONE) {
                 when(GameManager.getGameParam()?.defaultOperation ?: GameConstants.keyboardControl) {
                     GameConstants.keyboardControl -> {

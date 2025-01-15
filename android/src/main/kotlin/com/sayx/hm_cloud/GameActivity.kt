@@ -1774,6 +1774,9 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun checkInputDevices() {
+        if (controllerStatus == ControllerStatus.Edit) {
+            return
+        }
         val inputDeviceIds = inputManager.inputDeviceIds
         var pcMouseMode = false
         if (inputDeviceIds.isNotEmpty()) {
