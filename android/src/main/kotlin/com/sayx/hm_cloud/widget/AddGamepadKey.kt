@@ -125,7 +125,6 @@ class AddGamepadKey @JvmOverloads constructor(
         val left = AppSizeUtils.DESIGN_WIDTH / 2
         val top = AppSizeUtils.DESIGN_HEIGHT / 2
         var width = 0
-        var zoom = 0
         var text: String? = null
         var type = ""
         val optical = 70
@@ -135,7 +134,6 @@ class AddGamepadKey @JvmOverloads constructor(
             R.id.btn_key_edit_ls -> {
                 width = 40
                 height = 40
-                zoom = 50
                 text = "LS"
                 type = KeyType.GAMEPAD_ROUND_SMALL
                 inputOp = GameConstants.gamepadButtonLSValue
@@ -144,7 +142,6 @@ class AddGamepadKey @JvmOverloads constructor(
             R.id.btn_key_edit_rs -> {
                 width = 40
                 height = 40
-                zoom = 50
                 text = "RS"
                 type = KeyType.GAMEPAD_ROUND_SMALL
                 inputOp = GameConstants.gamepadButtonRSValue
@@ -153,7 +150,6 @@ class AddGamepadKey @JvmOverloads constructor(
             R.id.btn_key_edit_lb -> {
                 width = 80
                 height = 60
-                zoom = 50
                 text = "LB"
                 type = KeyType.GAMEPAD_SQUARE
                 inputOp = GameConstants.gamepadButtonLBValue
@@ -162,7 +158,6 @@ class AddGamepadKey @JvmOverloads constructor(
             R.id.btn_key_edit_rb -> {
                 width = 80
                 height = 60
-                zoom = 50
                 text = "RB"
                 type = KeyType.GAMEPAD_SQUARE
                 inputOp = GameConstants.gamepadButtonRBValue
@@ -171,7 +166,6 @@ class AddGamepadKey @JvmOverloads constructor(
             R.id.btn_key_edit_lt -> {
                 width = 80
                 height = 60
-                zoom = 50
                 text = "LT"
                 type = KeyType.GAMEPAD_SQUARE
                 inputOp =
@@ -181,7 +175,6 @@ class AddGamepadKey @JvmOverloads constructor(
             R.id.btn_key_edit_rt -> {
                 width = 80
                 height = 60
-                zoom = 50
                 text = "RT"
                 type = KeyType.GAMEPAD_SQUARE
                 inputOp =
@@ -191,21 +184,18 @@ class AddGamepadKey @JvmOverloads constructor(
             R.id.btn_edit_rocker_l -> {
                 width = 144
                 height = 144
-                zoom = 50
                 type = KeyType.ROCKER_LEFT
             }
 
             R.id.btn_edit_rocker_r -> {
                 width = 144
                 height = 144
-                zoom = 50
                 type = KeyType.ROCKER_RIGHT
             }
 
             R.id.btn_key_setting -> {
                 width = 64
                 height = 40
-                zoom = 50
                 type = KeyType.GAMEPAD_ELLIPTIC
                 inputOp = GameConstants.gamepadSettingValue
             }
@@ -213,7 +203,6 @@ class AddGamepadKey @JvmOverloads constructor(
             R.id.btn_key_menu -> {
                 width = 64
                 height = 40
-                zoom = 50
                 type = KeyType.GAMEPAD_ELLIPTIC
                 inputOp = GameConstants.gamepadMenuValue
             }
@@ -221,14 +210,12 @@ class AddGamepadKey @JvmOverloads constructor(
             R.id.btn_edit_d_pad -> {
                 width = 128
                 height = 128
-                zoom = 50
                 type = KeyType.ROCKER_CROSS
             }
 
             R.id.btn_key_edit_a -> {
                 width = 48
                 height = 48
-                zoom = 50
                 text = "A"
                 type = KeyType.GAMEPAD_ROUND_MEDIUM
                 inputOp = GameConstants.gamepadButtonAValue
@@ -237,7 +224,6 @@ class AddGamepadKey @JvmOverloads constructor(
             R.id.btn_key_edit_b -> {
                 width = 48
                 height = 48
-                zoom = 50
                 text = "B"
                 type = KeyType.GAMEPAD_ROUND_MEDIUM
                 inputOp = GameConstants.gamepadButtonBValue
@@ -246,7 +232,6 @@ class AddGamepadKey @JvmOverloads constructor(
             R.id.btn_key_edit_x -> {
                 width = 48
                 height = 48
-                zoom = 50
                 text = "X"
                 type = KeyType.GAMEPAD_ROUND_MEDIUM
                 inputOp = GameConstants.gamepadButtonXValue
@@ -255,7 +240,6 @@ class AddGamepadKey @JvmOverloads constructor(
             R.id.btn_key_edit_y -> {
                 width = 48
                 height = 48
-                zoom = 50
                 text = "Y"
                 type = KeyType.GAMEPAD_ROUND_MEDIUM
                 inputOp = GameConstants.gamepadButtonYValue
@@ -267,7 +251,7 @@ class AddGamepadKey @JvmOverloads constructor(
                 left - width / 2,
                 top - height / 2,
                 width,
-                zoom,
+                50,
                 text,
                 0,
                 type,
