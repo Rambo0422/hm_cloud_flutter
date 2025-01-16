@@ -19,6 +19,8 @@
 
 @property (nonatomic, strong) BoolBlock initBlock;
 
+@property (nonatomic, assign) BOOL isFirst;
+
 @end
 
 @implementation HmCloudTool
@@ -121,7 +123,8 @@
 
     self.vc = nil;
     self.gameVC = nil;
-
+    self.isFirst = NO;
+    
     [[HMCloudPlayer sharedCloudPlayer] stop:10 withReason:HMCloudAppStopReasonNormal];
 }
 
@@ -456,9 +459,14 @@
     }
 
     if ([state isEqualToString:@"videoVisible"]) {
-        [[HMCloudPlayer sharedCloudPlayer] cloudSetTouchModel:self.touchMode];
-        [[HMCloudPlayer sharedCloudPlayer] setAudioMute:YES];
-        [self.delegate sendToFlutter:ActionFirstFrameArrival params:nil];
+        
+        if (!self.isFirst) {
+            self.isFirst = YES;
+            [[HMCloudPlayer sharedCloudPlayer] cloudSetTouchModel:self.touchMode];
+            [[HMCloudPlayer sharedCloudPlayer] setAudioMute:YES];
+            [self.delegate sendToFlutter:ActionFirstFrameArrival params:nil];
+        }
+        
     }
 
     if ([state isEqualToString:@"stopped"]) {
