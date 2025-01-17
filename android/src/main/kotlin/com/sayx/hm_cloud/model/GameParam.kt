@@ -40,8 +40,9 @@ data class GameParam(
     var defaultOperation: Int,
     // 支持按键类型 1:键盘，2:手柄，3:两者
     var supportOperation: Int,
+    var needShowShare: Boolean,
     var pinCode: String,
-    var roomIndex: Int
+    var roomIndex: Int,
 ) {
     fun isVip(): Boolean {
         return vipExpiredTime > TimeUtils.currentTime()
@@ -74,6 +75,7 @@ data class GameParam(
                 "gameType=$gameType," +
                 "defaultOperation=$defaultOperation," +
                 "supportOperation=$supportOperation," +
+                "needShowShare=$needShowShare," +
                 ")"
     }
 
@@ -105,6 +107,7 @@ data class GameParam(
                 arguments["gameType"] as String? ?: "",
                 (arguments["defaultOperation"] as Number?)?.toInt() ?: 1,
                 (arguments["supportOperation"] as Number?)?.toInt() ?: 3,
+                arguments["needShowShare"] as Boolean? ?: false,
                 arguments["pinCode"] as String? ?: "",
                 (arguments["roomIndex"] as Number?)?.toInt() ?: -1,
             )

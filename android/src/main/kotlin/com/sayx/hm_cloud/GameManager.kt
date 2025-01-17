@@ -132,8 +132,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
 
     private var needReattach = false
 
-    private var activityPauseTime = 0L
-
     var initState = false
 
     // 是否是派对吧
@@ -596,29 +594,10 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                 }
             }
         }
-        if ((activity is GameActivity || activity is AtGameActivity) &&
-            (activityPauseTime != 0L && System.currentTimeMillis() - activityPauseTime > 2000L)
-        ) {
-            activityPauseTime = 0
-            AppCommonDialog.Builder(activity as FragmentActivity)
-                .setTitle("温馨提示")
-                .setSubTitle(
-                    "游戏过程中请勿切换应用或刷新页面，会导致无法运行游戏",
-                    Color.parseColor("#FF555A69")
-                )
-                .setRightButton("知道了") {
-                    AppCommonDialog.hideDialog(activity)
-                }
-                .build()
-                .show()
-        }
     }
 
     fun onActivityPaused(activity: Activity) {
         resume = false
-        if (activity is GameActivity || activity is AtGameActivity) {
-            activityPauseTime = System.currentTimeMillis()
-        }
     }
 
     override fun HmcpPlayerStatusCallback(statusData: String?) {
@@ -1647,8 +1626,8 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
     }
 
     fun isAnTong(): Boolean {
-        val channel = gameParam?.channel
-        if (channel?.isEmpty() != false) {
+        val channel = gameParam?.channel ?: ""
+        if (channel.isEmpty()) {
             // 未配置channel，根据游戏类型判断
             return gameParam?.gameType == AnTongSDK.TYPE
         } else {

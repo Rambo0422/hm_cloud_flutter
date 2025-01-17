@@ -312,8 +312,9 @@ class GameSettings @JvmOverloads constructor(
         this.gameView = gameView
         // 是否高峰通道
         this.peakChannel = peakChannel
+        dataBinding.tvShare.visibility = if (GameManager.getGameParam()?.needShowShare == true) VISIBLE else GONE
         // 手游不展示控制方法
-        updateControllerMethod(if (mobileGame) View.GONE else VISIBLE)
+        updateControllerMethod(if (mobileGame) GONE else VISIBLE)
         initOpacity()
         checkControllerSupport()
         // 配置声音/亮度
