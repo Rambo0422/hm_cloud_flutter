@@ -316,7 +316,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
     var requestCount = 0
 
     fun startGame(gameParam: GameParam) {
-        activityPauseTime = 0
         lastControllerType == AppVirtualOperateType.NONE
         this.gameParam = gameParam
 
