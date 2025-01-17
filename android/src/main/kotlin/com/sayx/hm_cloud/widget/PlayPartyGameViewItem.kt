@@ -165,7 +165,11 @@ class PlayPartyGameViewItem @JvmOverloads constructor(
 
             if (isPartyPlayOwner) {
                 if (hasPermission) {
-                    setStatus(PlayPartyPlayStatus.HAVE_PERMISSION)
+                     setStatus(PlayPartyPlayStatus.HAVE_PERMISSION)
+                    // 判断当前房间人数，如果只有房主一个人的情况下，则不显示 “不让玩” 按钮，也就是房主无法禁用自己的权限（主要是为了兼容安通）
+                    if (controlInfos.size == 1){
+                        btn_play_status.visibility = View.GONE
+                    }
                 } else {
                     if (itemIsMy) {
                         setStatus(PlayPartyPlayStatus.NO_PERMISSION)
