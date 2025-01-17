@@ -101,9 +101,6 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
     var flutterActivity: AppFlutterActivity? = null
         set(value) {
             field = value
-            if (value != null) {
-                activityPauseTime = 0
-            }
         }
 
     val gamepadList: MutableList<ControllerInfo> by lazy {
