@@ -53,23 +53,40 @@ object GameUtils {
     }
 
     // 是否是外接手柄操作
-    fun isGamePadEvent(motionEvent: InputEvent): Boolean {
-        return isGamePadController(motionEvent.device) ||
-                (motionEvent.source and InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD ||
-                (motionEvent.source and InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK
+    fun isGamePadEvent(motionEvent: InputEvent?): Boolean {
+        val inputDevice = motionEvent?.device
+        return if (inputDevice != null) {
+            isGamePadController(inputDevice) ||
+                    (motionEvent.source and InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD ||
+                    (motionEvent.source and InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK
+        } else {
+            (motionEvent?.source?.and(InputDevice.SOURCE_GAMEPAD)) == InputDevice.SOURCE_GAMEPAD ||
+                    (motionEvent?.source?.and(InputDevice.SOURCE_JOYSTICK)) == InputDevice.SOURCE_JOYSTICK
+        }
     }
 
     // 是否是外接键盘操作
-    fun isKeyBoardEvent(motionEvent: InputEvent): Boolean {
-        return isKeyBoardController(motionEvent.device) ||
-                (motionEvent.source and InputDevice.SOURCE_KEYBOARD) == InputDevice.SOURCE_KEYBOARD &&
-                motionEvent.source == InputDevice.KEYBOARD_TYPE_ALPHABETIC
+    fun isKeyBoardEvent(motionEvent: InputEvent?): Boolean {
+        val inputDevice = motionEvent?.device
+        return if (inputDevice != null) {
+            isKeyBoardController(inputDevice) ||
+                    (motionEvent.source and InputDevice.SOURCE_KEYBOARD) == InputDevice.SOURCE_KEYBOARD &&
+                    motionEvent.source == InputDevice.KEYBOARD_TYPE_ALPHABETIC
+        } else {
+            (motionEvent?.source?.and(InputDevice.SOURCE_KEYBOARD)) == InputDevice.SOURCE_KEYBOARD &&
+                    motionEvent.source == InputDevice.KEYBOARD_TYPE_ALPHABETIC
+        }
     }
 
     // 是否是外鼠标操作
-    fun isMouseEvent(motionEvent: InputEvent): Boolean {
-        return isMouseController(motionEvent.device) ||
-                (motionEvent.source and InputDevice.SOURCE_MOUSE) == InputDevice.SOURCE_MOUSE
+    fun isMouseEvent(motionEvent: InputEvent?): Boolean {
+        val inputDevice = motionEvent?.device
+        return if (inputDevice != null) {
+            isMouseController(inputDevice) ||
+                    (motionEvent.source and InputDevice.SOURCE_MOUSE) == InputDevice.SOURCE_MOUSE
+        } else {
+            (motionEvent?.source?.and(InputDevice.SOURCE_MOUSE)) == InputDevice.SOURCE_MOUSE
+        }
     }
 
     // 配置数据处理

@@ -627,6 +627,7 @@ class GameActivity : AppCompatActivity() {
 
     private fun showControllerEdit(type: AppVirtualOperateType) {
         if (controllerEditLayout != null) {
+            (controllerEditLayout!!.parent as ViewGroup).removeView(controllerEditLayout)
             dataBinding.layoutGame.removeView(controllerEditLayout)
         }
         controllerEditLayout = ControllerEditLayout(this)

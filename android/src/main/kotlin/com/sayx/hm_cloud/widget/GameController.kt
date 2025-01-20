@@ -409,8 +409,8 @@ class GameController @JvmOverloads constructor(
         rockerView.setKeyInfo(keyInfo)
         addView(rockerView)
         rockerView.post {
-            rockerView.x = AppSizeUtils.convertWidthSize(keyInfo.left).toFloat()
-            rockerView.y = AppSizeUtils.convertHeightSize(keyInfo.top).toFloat()
+            rockerView.x = correctX(keyInfo.left, rockerView.width)
+            rockerView.y = correctY(keyInfo.top, rockerView.height)
         }
         return rockerView
     }
@@ -592,8 +592,8 @@ class GameController @JvmOverloads constructor(
         rockerView.setKeyInfo(keyInfo)
         addView(rockerView)
         rockerView.post {
-            rockerView.x = AppSizeUtils.convertWidthSize(keyInfo.left).toFloat()
-            rockerView.y = AppSizeUtils.convertHeightSize(keyInfo.top).toFloat()
+            rockerView.x = correctX(keyInfo.left, rockerView.width)
+            rockerView.y = correctY(keyInfo.top, rockerView.height)
         }
         return rockerView
     }
@@ -671,8 +671,8 @@ class GameController @JvmOverloads constructor(
         }
         addView(keyView)
         keyView.post {
-            keyView.x = AppSizeUtils.convertWidthSize(keyInfo.left).toFloat()
-            keyView.y = AppSizeUtils.convertHeightSize(keyInfo.top).toFloat()
+            keyView.x = correctX(keyInfo.left, keyView.width)
+            keyView.y = correctY(keyInfo.top, keyView.height)
         }
         return keyView
     }
@@ -736,8 +736,8 @@ class GameController @JvmOverloads constructor(
         }
         addView(keyView)
         keyView.post {
-            keyView.x = AppSizeUtils.convertWidthSize(keyInfo.left).toFloat()
-            keyView.y = AppSizeUtils.convertHeightSize(keyInfo.top).toFloat()
+            keyView.x = correctX(keyInfo.left, keyView.width)
+            keyView.y = correctY(keyInfo.top, keyView.height)
         }
         return keyView
     }
@@ -796,8 +796,8 @@ class GameController @JvmOverloads constructor(
         }
         addView(keyView)
         keyView.post {
-            keyView.x = AppSizeUtils.convertWidthSize(keyInfo.left).toFloat()
-            keyView.y = AppSizeUtils.convertHeightSize(keyInfo.top).toFloat()
+            keyView.x = correctX(keyInfo.left, keyView.width)
+            keyView.y = correctY(keyInfo.top, keyView.height)
         }
         return keyView
     }
@@ -852,8 +852,8 @@ class GameController @JvmOverloads constructor(
         }
         addView(keyView)
         keyView.post {
-            keyView.x = AppSizeUtils.convertWidthSize(keyInfo.left).toFloat()
-            keyView.y = AppSizeUtils.convertHeightSize(keyInfo.top).toFloat()
+            keyView.x = correctX(keyInfo.left, keyView.width)
+            keyView.y = correctY(keyInfo.top, keyView.height)
         }
         return keyView
     }
@@ -907,8 +907,8 @@ class GameController @JvmOverloads constructor(
         keyboardViews.add(keyView)
         addView(keyView)
         keyView.post {
-            keyView.x = AppSizeUtils.convertWidthSize(keyInfo.left).toFloat()
-            keyView.y = AppSizeUtils.convertHeightSize(keyInfo.top).toFloat()
+            keyView.x = correctX(keyInfo.left, keyView.width)
+            keyView.y = correctY(keyInfo.top, keyView.height)
         }
         return keyView
     }
@@ -1128,7 +1128,7 @@ class GameController @JvmOverloads constructor(
      */
     fun setControllerData(data: ControllerInfo, update: Boolean = false) {
         controllerInfo = data
-        ViewUtils.translateViewSize(controllerInfo)
+//        ViewUtils.translateViewSize(controllerInfo)
         controllerName = data.name?: ""
 //        LogUtils.d("setKeyData:$data")
         if (data.type == GameConstants.keyboardConfig) {
@@ -1538,6 +1538,26 @@ class GameController @JvmOverloads constructor(
             AppVirtualOperateType.NONE -> {
 
             }
+        }
+    }
+
+    private fun correctX(left: Int, width: Int): Float {
+        val distanceX = AppSizeUtils.convertWidthSize(left)
+        val controllerWidth = this.width
+        return if (distanceX + width > controllerWidth) {
+            (controllerWidth - width).toFloat()
+        } else {
+            distanceX.toFloat()
+        }
+    }
+
+    private fun correctY(top: Int, height: Int): Float {
+        val distanceY = AppSizeUtils.convertHeightSize(top)
+        val controllerHeight = this.height
+        return if (distanceY + height > controllerHeight) {
+            (controllerHeight - height).toFloat()
+        } else {
+            distanceY.toFloat()
         }
     }
 }

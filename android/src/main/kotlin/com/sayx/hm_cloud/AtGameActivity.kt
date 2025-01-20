@@ -728,6 +728,7 @@ class AtGameActivity : AppCompatActivity() {
 
     private fun showControllerEdit(type: AppVirtualOperateType) {
         if (controllerEditLayout != null) {
+            (controllerEditLayout!!.parent as ViewGroup).removeView(controllerEditLayout)
             dataBinding.layoutGame.removeView(controllerEditLayout)
         }
         AnTongSDK.anTongVideoView?.externalInputBlocker(true)
