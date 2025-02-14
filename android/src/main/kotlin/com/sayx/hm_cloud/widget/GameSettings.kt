@@ -640,7 +640,7 @@ class GameSettings @JvmOverloads constructor(
                     GameManager.statGameTime(if (gamePlayTime > 3600 * 24) 3600 * 24 else gamePlayTime)
                 }
                 if (gamePlayTime % 60 == 0L) {
-                    GameManager.statGamePlay()
+                    GameManager.statGamePlay((gamePlayTime / 60).toInt())
                     GameManager.updateGameTime()
                 }
                 gamePlayTime += 1L

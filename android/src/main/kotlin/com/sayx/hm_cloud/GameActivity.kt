@@ -185,6 +185,7 @@ class GameActivity : AppCompatActivity() {
         })
         AppSizeUtils.navigationBarHeight = navigationBarHeight
         initView()
+        GameManager.invokeMethod("gamePageShow")
     }
 
     private fun initView() {
@@ -220,6 +221,8 @@ class GameActivity : AppCompatActivity() {
                 checkTipsShow()
             } else {
                 showGameSetting()
+
+                GameManager.invokeMethod("gameSettingShow")
             }
         }
         dataBinding.btnGameSettings.positionListener = object : OnPositionChangeListener {
@@ -1517,6 +1520,8 @@ class GameActivity : AppCompatActivity() {
                 finish()
             }
             .build().show()
+
+        GameManager.invokeMethod("gameExitShow")
     }
 
     override fun dispatchTouchEvent(event: MotionEvent?): Boolean {

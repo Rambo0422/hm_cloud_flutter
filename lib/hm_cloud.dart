@@ -126,8 +126,8 @@ class HmCloudController {
     methodChannel.invokeMethod("openGamePage");
   }
 
-  void cancelGame() {
-    methodChannel.invokeMethod("cancelGame");
+  void cancelGame(int value) {
+    methodChannel.invokeMethod("cancelGame", value);
   }
 
   void shareFail(String msg) {

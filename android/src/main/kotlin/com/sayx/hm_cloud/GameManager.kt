@@ -4,13 +4,11 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
-import androidx.fragment.app.FragmentActivity
 import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ThreadUtils
@@ -41,7 +39,6 @@ import com.sayx.hm_cloud.callback.KeyboardListCallback
 import com.sayx.hm_cloud.callback.RequestDeviceSuccess
 import com.sayx.hm_cloud.constants.AppVirtualOperateType
 import com.sayx.hm_cloud.constants.GameConstants
-import com.sayx.hm_cloud.dialog.AppCommonDialog
 import com.sayx.hm_cloud.http.HttpManager
 import com.sayx.hm_cloud.http.bean.AppHttpException
 import com.sayx.hm_cloud.http.bean.BaseObserver
@@ -363,7 +360,13 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
 
                 override fun onNext(response: HttpResponse<ArchiveData>) {
                     requestCount = 0
-                    prepareGame(response.data)
+                    val archiveData = response.data
+                    val code = archiveData?.code
+                    if (code == 200) {
+                        prepareGame(archiveData)
+                    } else {
+
+                    }
                 }
             })
     }
@@ -1208,8 +1211,10 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         }
     }
 
-    fun statGamePlay() {
-        channel.invokeMethod("statGamePlay", null)
+    fun statGamePlay(time: Int) {
+        if (time > 0) {
+            channel.invokeMethod("statGamePlay", mapOf(Pair("time", time)))
+        }
     }
 
     fun openFlutterPage(route: String?, arguments: Map<String, Any>?) {
@@ -1278,11 +1283,11 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         }
     }
 
-    fun cancelGame() {
+    fun cancelGame(type : Int) {
         if (isAnTong()) {
             AnTongSDK.stopGame()
         }
-        releaseGame(finish = "1")
+        releaseGame(finish = "$type")
     }
 
     fun exitGame() {

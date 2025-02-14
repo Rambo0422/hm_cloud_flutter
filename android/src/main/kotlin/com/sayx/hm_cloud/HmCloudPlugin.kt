@@ -171,7 +171,7 @@ class HmCloudPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAw
             }
 
             "cancelGame" -> {
-                GameManager.cancelGame()
+                GameManager.cancelGame(arguments as Int)
             }
 
             "shareFail" -> {

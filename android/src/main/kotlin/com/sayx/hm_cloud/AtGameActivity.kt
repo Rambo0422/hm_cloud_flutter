@@ -185,6 +185,8 @@ class AtGameActivity : AppCompatActivity() {
         AppSizeUtils.navigationBarHeight = navigationBarHeight
 
         initView()
+
+        GameManager.invokeMethod("gamePageShow")
     }
 
     private fun initView() {
@@ -243,6 +245,8 @@ class AtGameActivity : AppCompatActivity() {
                 checkTipsShow()
             } else {
                 showGameSetting()
+
+                GameManager.invokeMethod("gameSettingShow")
             }
         }
         dataBinding.btnGameSettings.positionListener = object : OnPositionChangeListener {
@@ -707,6 +711,8 @@ class AtGameActivity : AppCompatActivity() {
                 gameSettings?.release()
             }
             .build().show("hideExitGameDialog")
+
+        GameManager.invokeMethod("gameExitShow")
     }
 
     private fun showJoinVipDialog() {
