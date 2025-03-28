@@ -1,6 +1,6 @@
 package com.sayx.hm_cloud.constants
 
-import com.haima.hmcp.beans.HMInputOpData
+import com.antong.keyboard.sa.constants.HMInputOpData
 import com.sayx.hm_cloud.R
 import com.sayx.hm_cloud.model.KeyInfo
 

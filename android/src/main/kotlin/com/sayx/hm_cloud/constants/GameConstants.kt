@@ -1,7 +1,7 @@
 package com.sayx.hm_cloud.constants
 
+import com.antong.keyboard.sa.constants.HMInputOpData
 import com.blankj.utilcode.util.LogUtils
-import com.haima.hmcp.beans.HMInputOpData
 import com.sayx.hm_cloud.GameManager
 import com.sayx.hm_cloud.callback.OnKeyEventListener
 import com.sayx.hm_cloud.callback.OnRockerOperationListener
@@ -128,7 +128,7 @@ abstract class OnRockerOperationListenerImp : OnRockerOperationListener {
             inputOp.opListArray.add(secondInputOpData)
 //            LogUtils.d("key:${keyInfo.type}, inputOp:${secondInputOpData.inputOp}, value:${secondInputOpData.value}")
         }
-        GameManager.gameView?.sendCustomKeycode(inputOp)
+//        GameManager.gameView?.sendCustomKeycode(inputOp)
 //        val result = GameManager.gameView?.sendCustomKeycode(inputOp)
 //        LogUtils.d("key:${keyInfo.type}, result:$result")
     }
@@ -808,7 +808,7 @@ abstract class OnRockerOperationListenerImp : OnRockerOperationListener {
 
             else -> {}
         }
-        GameManager.gameView?.sendCustomKeycode(inputOp)
+//        GameManager.gameView?.sendCustomKeycode(inputOp)
 //        val result = GameManager.gameView?.sendCustomKeycode(inputOp)
 //        LogUtils.d("key:${keyInfo.type}, result:$result")
     }
@@ -826,8 +826,8 @@ abstract class OnKeyEventListenerImp : OnKeyEventListener {
                 stickKeyMaps[keyInfo.inputOp] = press
                 oneInputOpData.value = calStickValue()
                 inputOp.opListArray.add(oneInputOpData)
-                val result = GameManager.gameView?.sendCustomKeycode(inputOp)
-                LogUtils.d("key:${keyInfo.text}, inputOp:${oneInputOpData.inputOp}, value:${oneInputOpData.value}, result:$result")
+//                val result = GameManager.gameView?.sendCustomKeycode(inputOp)
+//                LogUtils.d("key:${keyInfo.text}, inputOp:${oneInputOpData.inputOp}, value:${oneInputOpData.value}, result:$result")
             }
             // LT/RT, LB/RB
             KeyType.GAMEPAD_SQUARE -> {
@@ -852,8 +852,8 @@ abstract class OnKeyEventListenerImp : OnKeyEventListener {
                     }
 
                 inputOp.opListArray.add(oneInputOpData)
-                val result = GameManager.gameView?.sendCustomKeycode(inputOp)
-                LogUtils.d("key:${keyInfo.text}, inputOp:${oneInputOpData.inputOp}, value:${oneInputOpData.value}, result:$result")
+//                val result = GameManager.gameView?.sendCustomKeycode(inputOp)
+//                LogUtils.d("key:${keyInfo.text}, inputOp:${oneInputOpData.inputOp}, value:${oneInputOpData.value}, result:$result")
             }
             // 键盘按键，鼠标左中右键
             KeyType.KEYBOARD_KEY, KeyType.KEYBOARD_MOUSE_LEFT, KeyType.KEYBOARD_MOUSE_RIGHT, KeyType.KEYBOARD_MOUSE_MIDDLE, KeyType.KEY_SHOOT -> {
@@ -864,8 +864,8 @@ abstract class OnKeyEventListenerImp : OnKeyEventListener {
                         HMInputOpData.HMOneInputOPData_InputState.HMOneInputOPData_InputState_OpStateUp
                     oneInputOpData.inputOp = HMInputOpData.HMOneInputOPData_InputOP.HMOneInputOPData_InputOP_OpKeyVkShift
                     inputOp.opListArray.add(oneInputOpData)
-                    val result = GameManager.gameView?.sendCustomKeycode(inputOp)
-                    LogUtils.d("key:${keyInfo.text}, inputOp:${oneInputOpData.inputOp}, value:${oneInputOpData.inputState}, result:$result")
+//                    val result = GameManager.gameView?.sendCustomKeycode(inputOp)
+//                    LogUtils.d("key:${keyInfo.text}, inputOp:${oneInputOpData.inputOp}, value:${oneInputOpData.inputState}, result:$result")
                 }
                 val inputOp = HMInputOpData()
                 val oneInputOpData = HMInputOpData.HMOneInputOPData()
@@ -873,8 +873,8 @@ abstract class OnKeyEventListenerImp : OnKeyEventListener {
                     HMInputOpData.HMOneInputOPData_InputState.HMOneInputOPData_InputState_OpStateUp
                 oneInputOpData.inputOp = getInputOp(keyInfo.inputOp)
                 inputOp.opListArray.add(oneInputOpData)
-                val result = GameManager.gameView?.sendCustomKeycode(inputOp)
-                LogUtils.d("key:${keyInfo.text}, inputOp:${oneInputOpData.inputOp}, value:${oneInputOpData.inputState}, result:$result")
+//                val result = GameManager.gameView?.sendCustomKeycode(inputOp)
+//                LogUtils.d("key:${keyInfo.text}, inputOp:${oneInputOpData.inputOp}, value:${oneInputOpData.inputState}, result:$result")
             }
             // 鼠标滑轮向上短触发
             KeyType.KEYBOARD_MOUSE_UP -> {
@@ -883,8 +883,8 @@ abstract class OnKeyEventListenerImp : OnKeyEventListener {
                 oneInputOpData.inputOp = getInputOp(keyInfo.inputOp)
                 oneInputOpData.value = if (press) GameConstants.mouseUp else GameConstants.mouseDefault
                 inputOp.opListArray.add(oneInputOpData)
-                val result = GameManager.gameView?.sendCustomKeycode(inputOp)
-                LogUtils.d("key:${keyInfo.text}, inputOp:${oneInputOpData.inputOp}, value:${oneInputOpData.value}, result:$result")
+//                val result = GameManager.gameView?.sendCustomKeycode(inputOp)
+//                LogUtils.d("key:${keyInfo.text}, inputOp:${oneInputOpData.inputOp}, value:${oneInputOpData.value}, result:$result")
             }
             // 鼠标滑轮向下
             KeyType.KEYBOARD_MOUSE_DOWN -> {
@@ -893,8 +893,8 @@ abstract class OnKeyEventListenerImp : OnKeyEventListener {
                 oneInputOpData.inputOp = getInputOp(keyInfo.inputOp)
                 oneInputOpData.value = if (press) GameConstants.mouseDown else GameConstants.mouseDefault
                 inputOp.opListArray.add(oneInputOpData)
-                val result = GameManager.gameView?.sendCustomKeycode(inputOp)
-                LogUtils.d("key:${keyInfo.text}, inputOp:${oneInputOpData.inputOp}, value:${oneInputOpData.value}, result:$result")
+//                val result = GameManager.gameView?.sendCustomKeycode(inputOp)
+//                LogUtils.d("key:${keyInfo.text}, inputOp:${oneInputOpData.inputOp}, value:${oneInputOpData.value}, result:$result")
             }
             // 组合键(键鼠)
             KeyType.KEY_COMBINE -> {
@@ -913,7 +913,7 @@ abstract class OnKeyEventListenerImp : OnKeyEventListener {
 //                        }
                     }
                 }
-                GameManager.gameView?.sendCustomKeycode(inputOp)
+//                GameManager.gameView?.sendCustomKeycode(inputOp)
 //                val result = GameManager.gameView?.sendCustomKeycode(inputOp)
 //                LogUtils.d("key:${keyInfo.text.json}, inputOpList:[$text.json], result:$result")
             }
@@ -953,7 +953,7 @@ abstract class OnKeyEventListenerImp : OnKeyEventListener {
 //                        }
                     }
                 }
-                GameManager.gameView?.sendCustomKeycode(inputOp)
+//                GameManager.gameView?.sendCustomKeycode(inputOp)
 //                val result = GameManager.gameView?.sendCustomKeycode(inputOp)
 //                LogUtils.d("key:${keyInfo.text.json}, inputOpList:[$text.json], result:$result")
             }

@@ -9,7 +9,7 @@ import android.view.View
 import android.view.animation.AccelerateInterpolator
 import android.widget.LinearLayout
 import androidx.databinding.DataBindingUtil
-import com.haima.hmcp.beans.HMInputOpData
+import com.antong.keyboard.sa.constants.HMInputOpData
 import com.sayx.hm_cloud.R
 import com.sayx.hm_cloud.model.KeyInfo
 import com.sayx.hm_cloud.callback.AddKeyListener

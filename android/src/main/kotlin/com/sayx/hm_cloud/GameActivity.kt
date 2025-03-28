@@ -40,11 +40,6 @@ import com.blankj.utilcode.util.ToastUtils
 import com.gyf.immersionbar.BarHide
 import com.gyf.immersionbar.ktx.immersionBar
 import com.gyf.immersionbar.ktx.navigationBarHeight
-import com.haima.hmcp.HmcpManager
-import com.haima.hmcp.beans.ResolutionInfo
-import com.haima.hmcp.listeners.OnLivingListener
-import com.haima.hmcp.rtc.widgets.beans.RtcVideoDelayInfo
-import com.haima.hmcp.widgets.beans.VirtualOperateType
 import com.sayx.hm_cloud.callback.AddKeyListenerImp
 import com.sayx.hm_cloud.callback.AnimatorListenerImp
 import com.sayx.hm_cloud.callback.ConfigNameCallback
@@ -55,6 +50,7 @@ import com.sayx.hm_cloud.callback.GameSettingChangeListener
 import com.sayx.hm_cloud.callback.HideListener
 import com.sayx.hm_cloud.callback.KeyEditCallback
 import com.blankj.utilcode.util.ScreenUtils
+import com.media.atkit.beans.ResolutionInfo
 import com.sayx.hm_cloud.callback.OnEditClickListener
 import com.sayx.hm_cloud.callback.OnPositionChangeListener
 import com.sayx.hm_cloud.constants.AppVirtualOperateType
@@ -205,10 +201,10 @@ class GameActivity : AppCompatActivity() {
             )
         }
         if (BuildConfig.DEBUG) {
-            dataBinding.tvCloudId.text = HmcpManager.getInstance().cloudId
+//            dataBinding.tvCloudId.text = HmcpManager.getInstance().cloudId
         }
-        GameManager.gameView?.setAttachContext(this)
-        GameManager.gameView?.virtualDeviceType = VirtualOperateType.NONE
+//        GameManager.gameView?.setAttachContext(this)
+//        GameManager.gameView?.virtualDeviceType = VirtualOperateType.NONE
         // 游戏设置
         dataBinding.btnGameSettings.setOnClickListener {
             val showGuide = SPUtils.getInstance().getBoolean(GameConstants.showGuide)
@@ -250,7 +246,7 @@ class GameActivity : AppCompatActivity() {
         dataBinding.btnVirtualKeyboard.setOnClickListener {
             LogUtils.d("显示游戏输入法键盘")
             try {
-                GameManager.gameView?.switchKeyboard(true)
+//                GameManager.gameView?.switchKeyboard(true)
             } catch (e: Exception) {
                 LogUtils.e(e.message)
             }
@@ -296,9 +292,9 @@ class GameActivity : AppCompatActivity() {
                 GameManager.queryControlUsers()
                 GameManager.getPinCode()
             }
-            val cloudId = HmcpManager.getInstance().cloudId
-            GameManager.sendCurrentCid(cloudId)
-            initPlayPartyView()
+//            val cloudId = HmcpManager.getInstance().cloudId
+//            GameManager.sendCurrentCid(cloudId)
+//            initPlayPartyView()
         }
     }
 
@@ -468,11 +464,11 @@ class GameActivity : AppCompatActivity() {
             }
 
             override fun onDebugCodeClick() {
-                val str =
-                    "cid:${HmcpManager.getInstance().cloudId},uid:${GameManager.getGameParam()?.userId}"
-                LogUtils.d("onDebugCodeClick:$str")
-                clipboardManager.setPrimaryClip(ClipData.newPlainText(null, str))
-                ToastUtils.showShort(R.string.clip_success)
+//                val str =
+//                    "cid:${HmcpManager.getInstance().cloudId},uid:${GameManager.getGameParam()?.userId}"
+//                LogUtils.d("onDebugCodeClick:$str")
+//                clipboardManager.setPrimaryClip(ClipData.newPlainText(null, str))
+//                ToastUtils.showShort(R.string.clip_success)
             }
 
             override fun onShareClick() {
@@ -504,36 +500,36 @@ class GameActivity : AppCompatActivity() {
 
             override fun onLiveInteractionChange(status: Boolean) {
                 LogUtils.d("onLiveInteractionChange:$status")
-                val cloudId = HmcpManager.getInstance().cloudId
-                if (status) {
-                    if (live) {
-                        GameManager.openInteraction(cloudId, true)
-                    } else {
-                        // 开启直播
-                        val liveUrl = "rtmp://push-cg.3ayx.net/live/$cloudId"
-                        GameManager.gameView
-                            ?.startLiving(cloudId, liveUrl, object : OnLivingListener {
-                                override fun start(success: Boolean, msg: String?) {
-                                    LogUtils.d("startLiving:$success, $msg, url:$liveUrl")
-                                    live = true
-                                    GameManager.openInteraction(cloudId, true)
-                                }
-
-                                override fun stop(success: Boolean, msg: String?) {
-                                    live = false
-                                    LogUtils.d("startLiving:$success, $msg")
-                                }
-                            })
-                    }
-                } else {
-                    // 停止直播
-                    GameManager.openInteraction(cloudId, false)
-                }
+//                val cloudId = HmcpManager.getInstance().cloudId
+//                if (status) {
+//                    if (live) {
+//                        GameManager.openInteraction(cloudId, true)
+//                    } else {
+//                        // 开启直播
+//                        val liveUrl = "rtmp://push-cg.3ayx.net/live/$cloudId"
+//                        GameManager.gameView
+//                            ?.startLiving(cloudId, liveUrl, object : OnLivingListener {
+//                                override fun start(success: Boolean, msg: String?) {
+//                                    LogUtils.d("startLiving:$success, $msg, url:$liveUrl")
+//                                    live = true
+//                                    GameManager.openInteraction(cloudId, true)
+//                                }
+//
+//                                override fun stop(success: Boolean, msg: String?) {
+//                                    live = false
+//                                    LogUtils.d("startLiving:$success, $msg")
+//                                }
+//                            })
+//                    }
+//                } else {
+//                    // 停止直播
+//                    GameManager.openInteraction(cloudId, false)
+//                }
             }
 
             override fun onImageQualityChange(resolution: ResolutionInfo) {
-                LogUtils.d("onImageQualityChange:$resolution")
-                GameManager.gameView?.onSwitchResolution(0, resolution, 0)
+//                LogUtils.d("onImageQualityChange:$resolution")
+//                GameManager.gameView?.onSwitchResolution(0, resolution, 0)
             }
 
             override fun onLightChange(light: Int) {
@@ -587,29 +583,29 @@ class GameActivity : AppCompatActivity() {
 
             @SuppressLint("SetTextI18n")
             override fun onDelayChange(delayInfo: Any?) {
-                if (BuildConfig.DEBUG) {
-                    if (delayInfo is RtcVideoDelayInfo) {
-                        if (BuildConfig.DEBUG) {
-                            dataBinding.tvInfo.text =
-                                "netDelay:${delayInfo.netDelay}\n" +
-                                        "decodeDelay: ${delayInfo.decodeDelay}\n" +
-                                        "renderDelay: ${delayInfo.renderDelay}\n" +
-                                        "videoFps: ${delayInfo.videoFps}\n" +
-                                        "bitRate: ${delayInfo.bitRate}\n" +
-                                        "packetsLostRate: ${delayInfo.packetsLostRate}\n"
-                        } else {
-                            dataBinding.tvInfo.text = "Fps:${delayInfo.videoFps}"
-                        }
-                    }
-                }
+//                if (BuildConfig.DEBUG) {
+//                    if (delayInfo is RtcVideoDelayInfo) {
+//                        if (BuildConfig.DEBUG) {
+//                            dataBinding.tvInfo.text =
+//                                "netDelay:${delayInfo.netDelay}\n" +
+//                                        "decodeDelay: ${delayInfo.decodeDelay}\n" +
+//                                        "renderDelay: ${delayInfo.renderDelay}\n" +
+//                                        "videoFps: ${delayInfo.videoFps}\n" +
+//                                        "bitRate: ${delayInfo.bitRate}\n" +
+//                                        "packetsLostRate: ${delayInfo.packetsLostRate}\n"
+//                        } else {
+//                            dataBinding.tvInfo.text = "Fps:${delayInfo.videoFps}"
+//                        }
+//                    }
+//                }
             }
 
             override fun getNetDelay(): Int {
-                return GameManager.gameView?.clockDiffVideoLatencyInfo?.netDelay ?: 999
+                return  999
             }
 
             override fun getPacketsLostRate(): String {
-                return GameManager.gameView?.clockDiffVideoLatencyInfo?.packetsLostRate ?: ""
+                return  ""
             }
 
             override fun onOpacityChange(opacity: Int) {
@@ -663,8 +659,8 @@ class GameActivity : AppCompatActivity() {
             inputTimer = Timer()
             inputTimer?.schedule(object : TimerTask() {
                 override fun run() {
-                    val result = GameManager.gameView?.resetInputTimer()
-                    LogUtils.d("resetInputTimer:$result")
+//                    val result = GameManager.gameView?.resetInputTimer()
+//                    LogUtils.d("resetInputTimer:$result")
                 }
             }, 0L, 5 * 60 * 1000L)
         } catch (e: Exception) {
@@ -1348,24 +1344,24 @@ class GameActivity : AppCompatActivity() {
         val errorDialogConfig = GameManager.getErrorDialogConfig()
         val enable = errorDialogConfig?.enable ?: false
 
-        val str =
-            "cid:${HmcpManager.getInstance().cloudId},uid:${GameManager.getGameParam()?.userId}"
-        LogUtils.d("exitGame:$str")
-        if (!enable) {
-            handleExitGameWithoutDialog(errorCode, errorMsg)
-            return
-        }
-
-        // 判断对应的 errorCode 是否能够找到对应的弹窗配置
-        val configInfo = errorDialogConfig?.list?.find { it.androidCode == errorCode }
-
-        if (configInfo == null) {
-            handleExitGameWithoutDialog(errorCode, errorMsg)
-            return
-        }
-
-        // 找到了对应的配置，显示弹窗
-        showConfiguredDialog(configInfo)
+//        val str =
+//            "cid:${HmcpManager.getInstance().cloudId},uid:${GameManager.getGameParam()?.userId}"
+//        LogUtils.d("exitGame:$str")
+//        if (!enable) {
+//            handleExitGameWithoutDialog(errorCode, errorMsg)
+//            return
+//        }
+//
+//        // 判断对应的 errorCode 是否能够找到对应的弹窗配置
+//        val configInfo = errorDialogConfig?.list?.find { it.androidCode == errorCode }
+//
+//        if (configInfo == null) {
+//            handleExitGameWithoutDialog(errorCode, errorMsg)
+//            return
+//        }
+//
+//        // 找到了对应的配置，显示弹窗
+//        showConfiguredDialog(configInfo)
     }
 
     /**
@@ -1489,21 +1485,21 @@ class GameActivity : AppCompatActivity() {
                 title.append("\n").append("[$errorCode]")
             }
 
-            val content = StringBuilder()
-                .append("游戏名称:")
-                .append(GameManager.getGameParam()?.gameName).append("\n")
-                .append("CID:")
-                .append(HmcpManager.getInstance().cloudId).append("\n")
-                .append("UID:")
-                .append(GameManager.getGameParam()?.userId).append("\n")
-            GameErrorDialog.Builder(this)
-                .setTitle(title.toString())
-                .setSubTitle(content.toString())
-                .setLeftButtonClickListener {
-                    LogUtils.d("exitGameForError")
-                    finish()
-                }
-                .build().show()
+//            val content = StringBuilder()
+//                .append("游戏名称:")
+//                .append(GameManager.getGameParam()?.gameName).append("\n")
+//                .append("CID:")
+//                .append(HmcpManager.getInstance().cloudId).append("\n")
+//                .append("UID:")
+//                .append(GameManager.getGameParam()?.userId).append("\n")
+//            GameErrorDialog.Builder(this)
+//                .setTitle(title.toString())
+//                .setSubTitle(content.toString())
+//                .setLeftButtonClickListener {
+//                    LogUtils.d("exitGameForError")
+//                    finish()
+//                }
+//                .build().show()
         } catch (e: Exception) {
             LogUtils.e("showErrorDialog:${e.message}")
         }
@@ -1812,7 +1808,7 @@ class GameActivity : AppCompatActivity() {
                 }
             }
         }
-        GameManager.gameView?.setPCMouseMode(pcMouseMode)
+//        GameManager.gameView?.setPCMouseMode(pcMouseMode)
         gameSettings?.setPCMouseMode(!pcMouseMode)
         var controllerType = AppVirtualOperateType.NONE
         if (!pcMouseMode && GameManager.hasPremission) {

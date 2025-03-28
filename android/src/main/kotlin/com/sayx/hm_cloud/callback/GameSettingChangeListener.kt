@@ -1,7 +1,6 @@
 package com.sayx.hm_cloud.callback
 
-import com.haima.hmcp.beans.ResolutionInfo
-import com.haima.hmcp.beans.VideoDelayInfo
+import com.media.atkit.beans.ResolutionInfo
 import com.sayx.hm_cloud.constants.AppVirtualOperateType
 
 interface GameSettingChangeListener {

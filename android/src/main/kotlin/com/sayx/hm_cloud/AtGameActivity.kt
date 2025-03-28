@@ -41,9 +41,9 @@ import com.blankj.utilcode.util.ToastUtils
 import com.gyf.immersionbar.BarHide
 import com.gyf.immersionbar.ktx.immersionBar
 import com.gyf.immersionbar.ktx.navigationBarHeight
-import com.haima.hmcp.beans.ResolutionInfo
 import com.media.atkit.AnTongManager
 import com.media.atkit.Constants
+import com.media.atkit.beans.ResolutionInfo
 import com.media.atkit.beans.VideoDelayInfo
 import com.media.atkit.listeners.AnTongPlayerListener
 import com.media.atkit.utils.StatusCallbackUtil

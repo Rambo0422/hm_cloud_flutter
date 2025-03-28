@@ -9,32 +9,12 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
-import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ThreadUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import com.haima.hmcp.Constants
-import com.haima.hmcp.HmcpManager
-import com.haima.hmcp.beans.CheckCloudServiceResult
-import com.haima.hmcp.beans.Control
-import com.haima.hmcp.beans.ControlInfo
-import com.haima.hmcp.beans.IntentExtraData
-import com.haima.hmcp.beans.SerializableMap
-import com.haima.hmcp.beans.UserInfo
-import com.haima.hmcp.beans.UserInfo2
-import com.haima.hmcp.enums.ScreenOrientation
-import com.haima.hmcp.listeners.OnContronListener
-import com.haima.hmcp.listeners.OnGameIsAliveListener
-import com.haima.hmcp.listeners.OnInitCallBackListener
-import com.haima.hmcp.listeners.OnSaveGameCallBackListener
-import com.haima.hmcp.listeners.OnUpdataGameUIDListener
-import com.haima.hmcp.utils.StatusCallbackUtil
-import com.haima.hmcp.widgets.HmcpVideoView
-import com.haima.hmcp.widgets.beans.VirtualOperateType
 import com.media.atkit.AnTongManager
-import com.sayx.hm_cloud.BuildConfig.DEBUG
 import com.sayx.hm_cloud.callback.KeyboardListCallback
 import com.sayx.hm_cloud.callback.RequestDeviceSuccess
 import com.sayx.hm_cloud.constants.AppVirtualOperateType
@@ -46,21 +26,15 @@ import com.sayx.hm_cloud.http.bean.HttpResponse
 import com.sayx.hm_cloud.http.repository.AppRepository
 import com.sayx.hm_cloud.http.repository.GameRepository
 import com.sayx.hm_cloud.http.repository.UserRepository
-import com.sayx.hm_cloud.imp.HmcpPlayerListenerImp
-import com.sayx.hm_cloud.model.AccountInfo
 import com.sayx.hm_cloud.model.AccountTimeInfo
 import com.sayx.hm_cloud.model.ArchiveData
 import com.sayx.hm_cloud.model.ControllerConfigEvent
 import com.sayx.hm_cloud.model.ControllerInfo
 import com.sayx.hm_cloud.model.ErrorDialogConfig
-import com.sayx.hm_cloud.model.GameError
 import com.sayx.hm_cloud.model.GameErrorEvent
 import com.sayx.hm_cloud.model.GameParam
 import com.sayx.hm_cloud.model.KeyboardList
-import com.sayx.hm_cloud.model.SpecificArchive
-import com.sayx.hm_cloud.model.TimeUpdateEvent
 import com.sayx.hm_cloud.model.UserRechargeStatusEvent
-import com.sayx.hm_cloud.utils.GameUtils
 import com.sayx.hm_cloud.utils.TimeUtils
 import com.sayx.hm_cloud.widget.HMGameView
 import com.sayx.hm_cloud.widget.KeyboardListView
@@ -72,10 +46,9 @@ import io.reactivex.rxjava3.disposables.Disposable
 import org.greenrobot.eventbus.EventBus
 import org.json.JSONArray
 import org.json.JSONObject
-import java.io.Serializable
 
 @SuppressLint("StaticFieldLeak")
-object GameManager : HmcpPlayerListenerImp(), OnContronListener {
+object GameManager  {
 
     private lateinit var channel: MethodChannel
 
@@ -146,7 +119,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         this.channel = channel
         this.activity = context
         LogUtils.getConfig().also {
-            it.isLogSwitch = DEBUG
+            it.isLogSwitch = false
             it.globalTag = "GameManager"
         }
     }
@@ -169,55 +142,55 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             return
         }
 
-        val config: Bundle = Bundle().also {
-            it.putString(HmcpManager.ACCESS_KEY_ID, gameParam.accessKeyId)
-            it.putString(HmcpManager.CHANNEL_ID, gameParam.channelName)
-        }
-        Constants.IS_DEBUG = false
-        Constants.IS_ERROR = false
-        Constants.IS_INFO = false
+//        val config: Bundle = Bundle().also {
+//            it.putString(HmcpManager.ACCESS_KEY_ID, gameParam.accessKeyId)
+//            it.putString(HmcpManager.CHANNEL_ID, gameParam.channelName)
+//        }
+//        Constants.IS_DEBUG = false
+//        Constants.IS_ERROR = false
+//        Constants.IS_INFO = false
 
-        HmcpManager.getInstance().releaseRequestManager()
+//        HmcpManager.getInstance().releaseRequestManager()
 
-        HmcpManager.getInstance().init(config, activity, object : OnInitCallBackListener {
-            override fun success() {
-                LogUtils.d("haiMaSDK success:${HmcpManager.getInstance().sdkVersion}")
-                initState = true
-                callback.success(true)
-            }
-
-            override fun fail(msg: String?) {
-                LogUtils.e("haiMaSDK fail:$msg")
-                callback.success(false)
-                var errorCode = GameError.gameInitErrorCode
-                var errorMsg = GameError.gameInitErrorMsg
-                if (msg is String && !TextUtils.isEmpty(msg)) {
-                    val resultData = gson.fromJson(msg, Map::class.java)
-                    var errorCodeWithoutCid = ""
-                    try {
-                        errorCodeWithoutCid =
-                            if (resultData["errorCodeWithoutCid"].toString() == "null") GameError.gameInitErrorCode else resultData["errorCodeWithoutCid"].toString()
-                    } catch (e: Exception) {
-                        LogUtils.e("${e.message}")
-                    }
-                    errorCode =
-                        if (TextUtils.isEmpty(errorCodeWithoutCid)) GameError.gameInitErrorCode else errorCodeWithoutCid
-                    try {
-                        errorMsg =
-                            if (resultData["errorMessage"].toString() == "null") resultData["errorMsg"].toString() else resultData["errorMessage"].toString()
-                    } catch (e: Exception) {
-                        LogUtils.e("${e.message}")
-                    }
-                }
-                channel.invokeMethod(
-                    "errorInfo",
-                    mapOf(
-                        Pair("errorCode", errorCode),
-                        Pair("errorMsg", errorMsg),
-                    )
-                )
-            }
-        }, true)
+//        HmcpManager.getInstance().init(config, activity, object : OnInitCallBackListener {
+//            override fun success() {
+//                LogUtils.d("haiMaSDK success:${HmcpManager.getInstance().sdkVersion}")
+//                initState = true
+//                callback.success(true)
+//            }
+//
+//            override fun fail(msg: String?) {
+//                LogUtils.e("haiMaSDK fail:$msg")
+//                callback.success(false)
+//                var errorCode = GameError.gameInitErrorCode
+//                var errorMsg = GameError.gameInitErrorMsg
+//                if (msg is String && !TextUtils.isEmpty(msg)) {
+//                    val resultData = gson.fromJson(msg, Map::class.java)
+//                    var errorCodeWithoutCid = ""
+//                    try {
+//                        errorCodeWithoutCid =
+//                            if (resultData["errorCodeWithoutCid"].toString() == "null") GameError.gameInitErrorCode else resultData["errorCodeWithoutCid"].toString()
+//                    } catch (e: Exception) {
+//                        LogUtils.e("${e.message}")
+//                    }
+//                    errorCode =
+//                        if (TextUtils.isEmpty(errorCodeWithoutCid)) GameError.gameInitErrorCode else errorCodeWithoutCid
+//                    try {
+//                        errorMsg =
+//                            if (resultData["errorMessage"].toString() == "null") resultData["errorMsg"].toString() else resultData["errorMessage"].toString()
+//                    } catch (e: Exception) {
+//                        LogUtils.e("${e.message}")
+//                    }
+//                }
+//                channel.invokeMethod(
+//                    "errorInfo",
+//                    mapOf(
+//                        Pair("errorCode", errorCode),
+//                        Pair("errorMsg", errorMsg),
+//                    )
+//                )
+//            }
+//        }, true)
     }
 
     private val handler: Handler by lazy {
@@ -250,39 +223,39 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             return
         }
 
-        HmcpManager.getInstance().checkPlayingGame(UserInfo().also {
-            it.userId = gameParam?.userId
-            it.userToken = gameParam?.userToken
-        }, gameParam?.accessKeyId, object : OnGameIsAliveListener {
-            override fun success(list: MutableList<CheckCloudServiceResult.ChannelInfo>?) {
-                LogUtils.d("checkPlayingGame:$list")
-                val map = mutableMapOf<String, Any>(
-                    Pair("isSucc", 1)
-                )
-                if (!list.isNullOrEmpty()) {
-                    // 有未释放的游戏实例
-                    val channelInfo = list[0]
-                    LogUtils.d("checkPlayingGame->cid:${channelInfo.cid}, pkgName:${channelInfo.pkgName}, appChannel:${channelInfo.appChannel}")
-                    map["data"] = arrayOf(
-                        mapOf(
-                            Pair("cid", channelInfo.cid),
-                            Pair("pkgName", channelInfo.pkgName),
-                            Pair("appChannel", channelInfo.appChannel),
-                            Pair("gameName", "")
-                        )
-                    )
-                    callback?.success(gson.fromJson(gson.toJson(map), Map::class.java))
-                } else {
-                    map["data"] = emptyList<Map<String, Any>>()
-                    callback?.success(map)
-                }
-            }
-
-            override fun fail(msg: String?) {
-                LogUtils.d("checkPlayingGameFail->Msg:$msg")
-                callback?.success(mapOf(Pair("isSucc", 0)))
-            }
-        })
+//        HmcpManager.getInstance().checkPlayingGame(UserInfo().also {
+//            it.userId = gameParam?.userId
+//            it.userToken = gameParam?.userToken
+//        }, gameParam?.accessKeyId, object : OnGameIsAliveListener {
+//            override fun success(list: MutableList<CheckCloudServiceResult.ChannelInfo>?) {
+//                LogUtils.d("checkPlayingGame:$list")
+//                val map = mutableMapOf<String, Any>(
+//                    Pair("isSucc", 1)
+//                )
+//                if (!list.isNullOrEmpty()) {
+//                    // 有未释放的游戏实例
+//                    val channelInfo = list[0]
+//                    LogUtils.d("checkPlayingGame->cid:${channelInfo.cid}, pkgName:${channelInfo.pkgName}, appChannel:${channelInfo.appChannel}")
+//                    map["data"] = arrayOf(
+//                        mapOf(
+//                            Pair("cid", channelInfo.cid),
+//                            Pair("pkgName", channelInfo.pkgName),
+//                            Pair("appChannel", channelInfo.appChannel),
+//                            Pair("gameName", "")
+//                        )
+//                    )
+//                    callback?.success(gson.fromJson(gson.toJson(map), Map::class.java))
+//                } else {
+//                    map["data"] = emptyList<Map<String, Any>>()
+//                    callback?.success(map)
+//                }
+//            }
+//
+//            override fun fail(msg: String?) {
+//                LogUtils.d("checkPlayingGameFail->Msg:$msg")
+//                callback?.success(mapOf(Pair("isSucc", 0)))
+//            }
+//        })
     }
 
     fun getArchiveProgress(callback: MethodChannel.Result) {
@@ -293,21 +266,21 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             return
         }
 
-        HmcpManager.getInstance()
-            .getGameArchiveStatus(gameParam?.gamePkName, UserInfo().apply {
-                userId = gameParam?.userId
-                userToken = gameParam?.userToken
-            }, gameParam?.accessKeyId, gameParam?.channelName, object : OnSaveGameCallBackListener {
-                override fun success(result: Boolean) {
-                    LogUtils.d("getArchiveProgress->success:$result")
-                    callback.success(result)
-                }
-
-                override fun fail(msg: String?) {
-                    LogUtils.d("getArchiveProgress->fail:$msg")
-                    callback.success(false)
-                }
-            })
+//        HmcpManager.getInstance()
+//            .getGameArchiveStatus(gameParam?.gamePkName, UserInfo().apply {
+//                userId = gameParam?.userId
+//                userToken = gameParam?.userToken
+//            }, gameParam?.accessKeyId, gameParam?.channelName, object : OnSaveGameCallBackListener {
+//                override fun success(result: Boolean) {
+//                    LogUtils.d("getArchiveProgress->success:$result")
+//                    callback.success(result)
+//                }
+//
+//                override fun fail(msg: String?) {
+//                    LogUtils.d("getArchiveProgress->fail:$msg")
+//                    callback.success(false)
+//                }
+//            })
     }
 
     var requestCount = 0
@@ -434,106 +407,106 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             return
         }
 
-        try {
-            val bundle = Bundle().also {
-                // 横屏
-                it.putSerializable(HmcpVideoView.ORIENTATION, ScreenOrientation.LANDSCAPE)
-                // 可玩时间
-//                val playTime: Long = gameParam?.playTime ?: 0L
-//                val playTime: Long = 20 * 1000L
-                it.putInt(HmcpVideoView.PLAY_TIME, 99999999)
-                // 排队优先级
-                it.putInt(HmcpVideoView.PRIORITY, gameParam?.priority ?: 0)
-                // 游戏名称
-                it.putString(HmcpVideoView.APP_NAME, gameParam?.gamePkName)
-                // 渠道
-                it.putString(HmcpVideoView.APP_CHANNEL, gameParam?.channelName)
-                // token
-                it.putString(HmcpVideoView.C_TOKEN, gameParam?.cToken)
-//                it.putString(HmcpVideoView.EXTRA_ID, AppConstants.extraId)
-                // 是否使用存档
-                it.putBoolean(HmcpVideoView.ARCHIVED, true)
-                // cid
-                if (gameParam?.cid?.isNotEmpty() == true) {
-                    it.putString(HmcpVideoView.C_ID, gameParam?.cid)
-                }
-                // 业务参数
-                it.putString(
-                    HmcpVideoView.PAY_PROTO_DATA,
-                    GameUtils.getProtoData(
-                        gson,
-                        gameParam?.userId,
-                        gameParam?.gameId,
-                        gameParam?.priority ?: 1,
-                        "android",
-                        "hmy",
-                        AppUtils.getAppVersionName(),
-                    )
-                )
-                // 码率
-//                it.putInt(HmcpVideoView.INTERNET_SPEED, 300)
-                // 清晰度挡位，会员默认超清，非会员默认流畅
-                if (gameParam?.isVip() == false) {
-                    it.putInt(HmcpVideoView.RESOLUTION_ID, 4)
-                } else {
-                    it.putInt(HmcpVideoView.RESOLUTION_ID, 1)
-                }
-                // 显示剩余时间
-//                it.putBoolean(HmcpVideoView.IS_SHOW_TIME, true)
-                // 背景色
-//                it.putInt(HmcpVideoView.VERTICAL_BACKGROUND, Color.BLACK)
-                // 分辨率宽高
-//                it.putInt(HmcpVideoView.VIEW_RESOLUTION_WIDTH, 1920)
-//                it.putInt(HmcpVideoView.VIEW_RESOLUTION_HEIGHT, 1080)
-                // 流类型 0：表示RTMP 1：表示WEBRTC, 默认0
-                // 建议使用rtc：1
-                // 建议使用rtc：1
-                // 建议使用rtc：1
-                it.putInt(HmcpVideoView.STREAM_TYPE, 1)
-                // rtmp解码类型 0：软解码 1：硬解码, 默认1
-//                it.putInt(HmcpVideoView.DECODE_TYPE, 1)
-                // 输入法类型 0：表示云端键盘 1：表示本地键盘
-//                it.putInt(HmcpVideoView.IME_TYPE, 1)
-                // 存档上传
-                if (archiveData?.custodian == "3a") {
-                    val specificArchive = SpecificArchive()
-                    specificArchive.uploadArchive = true
-                    specificArchive.gameId = gameParam?.gameId ?: ""
-                    if (!archiveData.list.isNullOrEmpty()) {
-                        val archiveInfo = archiveData.list.first()
-                        specificArchive.isThirdParty = true
-                        specificArchive.downloadUrl = archiveInfo.downLoadUrl
-                        specificArchive.md5 = archiveInfo.fileMD5
-                        // 注意这里的cid，是 long 类型
-                        specificArchive.cid = archiveInfo.cid.toLong()
-                    } else {
-                        specificArchive.isThirdParty = false
-                    }
-                    val hashMap = HashMap<String, Serializable>()
-                    hashMap["specificArchive"] = specificArchive
-                    val data = SerializableMap(hashMap)
-                    it.putSerializable(HmcpVideoView.TRANSMISSION_DATA_TO_SAAS, data)
-                }
-            }
-            LogUtils.d("prepareGame->bundle:$bundle")
-            if (initState) {
-                playGame(bundle)
-            } else {
-                handler.postDelayed({
-                    playGame(bundle)
-                }, 3000L)
-            }
-        } catch (e: Exception) {
-            LogUtils.e("game error:${e.message}")
-            // 数据错误，退出游戏
-            channel.invokeMethod(
-                "errorInfo",
-                mapOf(
-                    Pair("errorCode", GameError.gameConfigErrorCode),
-                    Pair("errorMsg", GameError.gameConfigErrorMsg),
-                )
-            )
-        }
+//        try {
+//            val bundle = Bundle().also {
+//                // 横屏
+//                it.putSerializable(HmcpVideoView.ORIENTATION, ScreenOrientation.LANDSCAPE)
+//                // 可玩时间
+////                val playTime: Long = gameParam?.playTime ?: 0L
+////                val playTime: Long = 20 * 1000L
+//                it.putInt(HmcpVideoView.PLAY_TIME, 99999999)
+//                // 排队优先级
+//                it.putInt(HmcpVideoView.PRIORITY, gameParam?.priority ?: 0)
+//                // 游戏名称
+//                it.putString(HmcpVideoView.APP_NAME, gameParam?.gamePkName)
+//                // 渠道
+//                it.putString(HmcpVideoView.APP_CHANNEL, gameParam?.channelName)
+//                // token
+//                it.putString(HmcpVideoView.C_TOKEN, gameParam?.cToken)
+////                it.putString(HmcpVideoView.EXTRA_ID, AppConstants.extraId)
+//                // 是否使用存档
+//                it.putBoolean(HmcpVideoView.ARCHIVED, true)
+//                // cid
+//                if (gameParam?.cid?.isNotEmpty() == true) {
+//                    it.putString(HmcpVideoView.C_ID, gameParam?.cid)
+//                }
+//                // 业务参数
+//                it.putString(
+//                    HmcpVideoView.PAY_PROTO_DATA,
+//                    GameUtils.getProtoData(
+//                        gson,
+//                        gameParam?.userId,
+//                        gameParam?.gameId,
+//                        gameParam?.priority ?: 1,
+//                        "android",
+//                        "hmy",
+//                        AppUtils.getAppVersionName(),
+//                    )
+//                )
+//                // 码率
+////                it.putInt(HmcpVideoView.INTERNET_SPEED, 300)
+//                // 清晰度挡位，会员默认超清，非会员默认流畅
+//                if (gameParam?.isVip() == false) {
+//                    it.putInt(HmcpVideoView.RESOLUTION_ID, 4)
+//                } else {
+//                    it.putInt(HmcpVideoView.RESOLUTION_ID, 1)
+//                }
+//                // 显示剩余时间
+////                it.putBoolean(HmcpVideoView.IS_SHOW_TIME, true)
+//                // 背景色
+////                it.putInt(HmcpVideoView.VERTICAL_BACKGROUND, Color.BLACK)
+//                // 分辨率宽高
+////                it.putInt(HmcpVideoView.VIEW_RESOLUTION_WIDTH, 1920)
+////                it.putInt(HmcpVideoView.VIEW_RESOLUTION_HEIGHT, 1080)
+//                // 流类型 0：表示RTMP 1：表示WEBRTC, 默认0
+//                // 建议使用rtc：1
+//                // 建议使用rtc：1
+//                // 建议使用rtc：1
+//                it.putInt(HmcpVideoView.STREAM_TYPE, 1)
+//                // rtmp解码类型 0：软解码 1：硬解码, 默认1
+////                it.putInt(HmcpVideoView.DECODE_TYPE, 1)
+//                // 输入法类型 0：表示云端键盘 1：表示本地键盘
+////                it.putInt(HmcpVideoView.IME_TYPE, 1)
+//                // 存档上传
+//                if (archiveData?.custodian == "3a") {
+//                    val specificArchive = SpecificArchive()
+//                    specificArchive.uploadArchive = true
+//                    specificArchive.gameId = gameParam?.gameId ?: ""
+//                    if (!archiveData.list.isNullOrEmpty()) {
+//                        val archiveInfo = archiveData.list.first()
+//                        specificArchive.isThirdParty = true
+//                        specificArchive.downloadUrl = archiveInfo.downLoadUrl
+//                        specificArchive.md5 = archiveInfo.fileMD5
+//                        // 注意这里的cid，是 long 类型
+//                        specificArchive.cid = archiveInfo.cid.toLong()
+//                    } else {
+//                        specificArchive.isThirdParty = false
+//                    }
+//                    val hashMap = HashMap<String, Serializable>()
+//                    hashMap["specificArchive"] = specificArchive
+//                    val data = SerializableMap(hashMap)
+//                    it.putSerializable(HmcpVideoView.TRANSMISSION_DATA_TO_SAAS, data)
+//                }
+//            }
+//            LogUtils.d("prepareGame->bundle:$bundle")
+//            if (initState) {
+//                playGame(bundle)
+//            } else {
+//                handler.postDelayed({
+//                    playGame(bundle)
+//                }, 3000L)
+//            }
+//        } catch (e: Exception) {
+//            LogUtils.e("game error:${e.message}")
+//            // 数据错误，退出游戏
+//            channel.invokeMethod(
+//                "errorInfo",
+//                mapOf(
+//                    Pair("errorCode", GameError.gameConfigErrorCode),
+//                    Pair("errorMsg", GameError.gameConfigErrorMsg),
+//                )
+//            )
+//        }
     }
 
     fun openGamePage() {
@@ -558,26 +531,26 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
                 releaseGame(finish = "0", bundle)
             }
         } else {
-            gameView = HMGameView(activity)
-            gameView?.setUserInfo(UserInfo().also {
-                it.userId = gameParam?.userId
-                it.userToken = gameParam?.userToken
-            })
+//            gameView = HMGameView(activity)
+//            gameView?.setUserInfo(UserInfo().also {
+//                it.userId = gameParam?.userId
+//                it.userToken = gameParam?.userToken
+//            })
 //            LogUtils.d("playGame:${gameParam?.accountInfo}")
             // 上号助手
-            gameParam?.accountInfo?.let { accountInfo ->
-//            LogUtils.d("AccountInfo 1:${accountInfo.javaClass}")
-                val result = gson.fromJson(gson.toJson(accountInfo), AccountInfo::class.java)
-//            LogUtils.d("AccountInfo 2:${result.json}")
-                gameView?.setExtraData(IntentExtraData().also {
-                    it.setStringExtra(GameUtils.getStringData(result))
-                })
-            }
-            gameView?.setConfigInfo("configInfo")
-            // 状态监听
-            gameView?.hmcpPlayerListener = this
-            invokeMethod("hm_start", mapOf())
-            gameView?.play(bundle)
+//            gameParam?.accountInfo?.let { accountInfo ->
+////            LogUtils.d("AccountInfo 1:${accountInfo.javaClass}")
+//                val result = gson.fromJson(gson.toJson(accountInfo), AccountInfo::class.java)
+////            LogUtils.d("AccountInfo 2:${result.json}")
+//                gameView?.setExtraData(IntentExtraData().also {
+//                    it.setStringExtra(GameUtils.getStringData(result))
+//                })
+//            }
+//            gameView?.setConfigInfo("configInfo")
+//            // 状态监听
+//            gameView?.hmcpPlayerListener = this
+//            invokeMethod("hm_start", mapOf())
+//            gameView?.play(bundle)
         }
     }
 
@@ -599,119 +572,119 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         resume = false
     }
 
-    override fun HmcpPlayerStatusCallback(statusData: String?) {
-        LogUtils.d("PlayerStatusCallback:$statusData")
-        statusData?.let {
-            val data = JSONObject(it)
-            val status = data.getInt(StatusCallbackUtil.STATUS)
-            when (status) {
-                // 游戏准备完成，可以启动游戏
-                Constants.STATUS_PLAY_INTERNAL -> {
-                    gameView?.play()
-                }
-                // sdk反馈需选择是否进入排队，直接进入排队
-                Constants.STATUS_WAIT_CHOOSE -> {
-                    if (resume) {
-                        gameView?.entryQueue()
-                        processEvent("开始排队")
-                    } else {
-
-                    }
-                }
-
-                Constants.STATUS_START_PLAY -> {
-                    isPlaying = true
-                }
-                // 网络切换，尝试重连
-                Constants.STATUS_TIPS_CHANGE_WIFI_TO_4G -> {
-                    gameView?.reconnection()
-                }
-                // 实例进入排队，sdk反馈排队时间
-                Constants.STATUS_OPERATION_INTERVAL_TIME -> {
-                    val dataStr = data.getString(StatusCallbackUtil.DATA)
-                    if (dataStr is String && !TextUtils.isEmpty(dataStr)) {
-                        val resultData = gson.fromJson(dataStr, Map::class.java)
-                        channel.invokeMethod(
-                            "queueInfo",
-                            mapOf(
-                                Pair("queueTime", resultData["time"])
-                            )
-                        )
-                    } else {
-                        LogUtils.e("queue info error:$dataStr")
-                    }
-                }
-                // 游戏首帧画面到达，可展示游戏画面
-                Constants.STATUS_FIRST_FRAME_ARRIVAL -> {
-                    if (!isVideoShowed) {
-                        isVideoShowed = true
-                        gameView?.setAudioMute(true)
-                        gameView?.virtualDeviceType = VirtualOperateType.NONE
-                        channel.invokeMethod(
-                            GameViewConstants.firstFrameArrival, mapOf(
-                                Pair("cid", HmcpManager.getInstance().cloudId)
-                            )
-                        )
-                        isPlaying = true
-                    } else {
-                        LogUtils.e("The game feeds back the first frame again.")
-                    }
-                }
-                // sdk回调下线提醒
-                Constants.STATUS_OPERATION_GAME_TIME_COUNT_DOWN -> {
-                    val dataStr = data.getString(StatusCallbackUtil.DATA)
-                    if (dataStr is String && !TextUtils.isEmpty(dataStr)) {
-                        val resultData = gson.fromJson(dataStr, Map::class.java)
-                        LogUtils.d("下线倒计时:${resultData["ahead"]}")
-                    } else {
-                        LogUtils.e("gameTimeCountDown error:$dataStr")
-                    }
-                }
-                // 401，异端登录
-                Constants.STATUS_INVALID_CONN_IN_MULTI_CONN -> {
-                    EventBus.getDefault().post(GameErrorEvent("$status", ""))
-                }
-                // 9,连接失败
-                Constants.STATUS_CONNECTION_ERROR,
-                    // 10,排队人数过多
-                Constants.STATUS_OPERATION_REFUSE_QUEUE,
-                    // 11,长时间无操作
-                Constants.STATUS_TOAST_NO_INPUT,
-                    // 15,游戏时间到
-                Constants.STATUS_OPERATION_GAME_OVER,
-                    // 18,服务器开始维护
-                Constants.STATUS_OPERATION_PAUSE_SAAS_SERVER,
-                    // 19,服务维护中
-                Constants.STATUS_OPERATION_PAUSED_SAAS_SERVER,
-                    // 23,获取流地址超时
-                Constants.STATUS_TIME_OUT,
-                    // 24,Token过期服务终⽌
-                Constants.STATUS_OPERATION_FORCED_OFFLINE,
-                    // 26,测速结果低于服务下限
-                Constants.STATUS_SPEED_LOWER_BITRATE,
-                    // 27,游戏多开
-                Constants.STATUS_OPERATION_OPEN_MORE_SAME_GAME,
-                    // 29,服务连接错误
-                Constants.STATUS_OPERATION_HMCP_ERROR,
-                    // 40,获取控制权失败
-                Constants.STATUS_GET_CONTRON_ERROR,
-                    // 42,接⼊⽅连接服务端结束游戏
-                Constants.STATUS_OPERATION_STATE_CHANGE_REASON -> {
-                    if (!isPartyPlay || (isPartyPlay && isPartyPlayOwner)) {
-                        statusOperationStateChangeReason(data, status)
-                    } else {
-                        LogUtils.d("这里只有一种情况，当前是派对吧，但是是游客")
-                    }
-                }
-
-                else -> {}
-            }
-        }
-    }
+//    override fun HmcpPlayerStatusCallback(statusData: String?) {
+//        LogUtils.d("PlayerStatusCallback:$statusData")
+//        statusData?.let {
+//            val data = JSONObject(it)
+//            val status = data.getInt(StatusCallbackUtil.STATUS)
+//            when (status) {
+//                // 游戏准备完成，可以启动游戏
+//                Constants.STATUS_PLAY_INTERNAL -> {
+//                    gameView?.play()
+//                }
+//                // sdk反馈需选择是否进入排队，直接进入排队
+//                Constants.STATUS_WAIT_CHOOSE -> {
+//                    if (resume) {
+//                        gameView?.entryQueue()
+//                        processEvent("开始排队")
+//                    } else {
+//
+//                    }
+//                }
+//
+//                Constants.STATUS_START_PLAY -> {
+//                    isPlaying = true
+//                }
+//                // 网络切换，尝试重连
+//                Constants.STATUS_TIPS_CHANGE_WIFI_TO_4G -> {
+//                    gameView?.reconnection()
+//                }
+//                // 实例进入排队，sdk反馈排队时间
+//                Constants.STATUS_OPERATION_INTERVAL_TIME -> {
+//                    val dataStr = data.getString(StatusCallbackUtil.DATA)
+//                    if (dataStr is String && !TextUtils.isEmpty(dataStr)) {
+//                        val resultData = gson.fromJson(dataStr, Map::class.java)
+//                        channel.invokeMethod(
+//                            "queueInfo",
+//                            mapOf(
+//                                Pair("queueTime", resultData["time"])
+//                            )
+//                        )
+//                    } else {
+//                        LogUtils.e("queue info error:$dataStr")
+//                    }
+//                }
+//                // 游戏首帧画面到达，可展示游戏画面
+//                Constants.STATUS_FIRST_FRAME_ARRIVAL -> {
+//                    if (!isVideoShowed) {
+//                        isVideoShowed = true
+//                        gameView?.setAudioMute(true)
+//                        gameView?.virtualDeviceType = VirtualOperateType.NONE
+//                        channel.invokeMethod(
+//                            GameViewConstants.firstFrameArrival, mapOf(
+//                                Pair("cid", HmcpManager.getInstance().cloudId)
+//                            )
+//                        )
+//                        isPlaying = true
+//                    } else {
+//                        LogUtils.e("The game feeds back the first frame again.")
+//                    }
+//                }
+//                // sdk回调下线提醒
+//                Constants.STATUS_OPERATION_GAME_TIME_COUNT_DOWN -> {
+//                    val dataStr = data.getString(StatusCallbackUtil.DATA)
+//                    if (dataStr is String && !TextUtils.isEmpty(dataStr)) {
+//                        val resultData = gson.fromJson(dataStr, Map::class.java)
+//                        LogUtils.d("下线倒计时:${resultData["ahead"]}")
+//                    } else {
+//                        LogUtils.e("gameTimeCountDown error:$dataStr")
+//                    }
+//                }
+//                // 401，异端登录
+//                Constants.STATUS_INVALID_CONN_IN_MULTI_CONN -> {
+//                    EventBus.getDefault().post(GameErrorEvent("$status", ""))
+//                }
+//                // 9,连接失败
+//                Constants.STATUS_CONNECTION_ERROR,
+//                    // 10,排队人数过多
+//                Constants.STATUS_OPERATION_REFUSE_QUEUE,
+//                    // 11,长时间无操作
+//                Constants.STATUS_TOAST_NO_INPUT,
+//                    // 15,游戏时间到
+//                Constants.STATUS_OPERATION_GAME_OVER,
+//                    // 18,服务器开始维护
+//                Constants.STATUS_OPERATION_PAUSE_SAAS_SERVER,
+//                    // 19,服务维护中
+//                Constants.STATUS_OPERATION_PAUSED_SAAS_SERVER,
+//                    // 23,获取流地址超时
+//                Constants.STATUS_TIME_OUT,
+//                    // 24,Token过期服务终⽌
+//                Constants.STATUS_OPERATION_FORCED_OFFLINE,
+//                    // 26,测速结果低于服务下限
+//                Constants.STATUS_SPEED_LOWER_BITRATE,
+//                    // 27,游戏多开
+//                Constants.STATUS_OPERATION_OPEN_MORE_SAME_GAME,
+//                    // 29,服务连接错误
+//                Constants.STATUS_OPERATION_HMCP_ERROR,
+//                    // 40,获取控制权失败
+//                Constants.STATUS_GET_CONTRON_ERROR,
+//                    // 42,接⼊⽅连接服务端结束游戏
+//                Constants.STATUS_OPERATION_STATE_CHANGE_REASON -> {
+//                    if (!isPartyPlay || (isPartyPlay && isPartyPlayOwner)) {
+//                        statusOperationStateChangeReason(data, status)
+//                    } else {
+//                        LogUtils.d("这里只有一种情况，当前是派对吧，但是是游客")
+//                    }
+//                }
+//
+//                else -> {}
+//            }
+//        }
+//    }
 
     private fun statusOperationStateChangeReason(data: JSONObject, status: Int) {
         // 各类游戏中断状态下，获取errorCode,errorMsg展示
-        val dataStr = data.getString(StatusCallbackUtil.DATA)
+        val dataStr = data.getString("data")
 //        LogUtils.d("errorInfo:$dataStr")
         var errorCode = ""
         var errorMsg = ""
@@ -1092,43 +1065,43 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         GameRepository.requestUpdateKeyboard(keyboardInfo, observer)
     }
 
-    override fun onSceneChanged(sceneMessage: String?) {
-        sceneMessage?.let {
-            val data = gson.fromJson(it, Map::class.java)
-            val sceneId = data["sceneId"]
-            when (sceneId) {
-                "play" -> {
-                    isPlaying = true
-                }
-            }
-        }
-    }
+//    override fun onSceneChanged(sceneMessage: String?) {
+//        sceneMessage?.let {
+//            val data = gson.fromJson(it, Map::class.java)
+//            val sceneId = data["sceneId"]
+//            when (sceneId) {
+//                "play" -> {
+//                    isPlaying = true
+//                }
+//            }
+//        }
+//    }
 
-    override fun onPlayerError(errorCode: String?, errorMsg: String?) {
-        if (errorMsg != "网络请求超时") {
-            channel.invokeMethod(
-                "errorInfo",
-                mapOf(
-                    Pair("errorCode", errorCode),
-                    Pair("errorMsg", errorMsg),
-                )
-            )
-        } else {
-            channel.invokeMethod(
-                "errorInfo",
-                mapOf(
-                    Pair(
-                        "errorCode", errorCode?.replace("[", "")
-                            ?.replace("]", "")
-                            ?.replace("网络请求超时", "")
-                            ?.split("-")
-                            ?.get(0)
-                    ),
-                    Pair("errorMsg", errorMsg),
-                )
-            )
-        }
-    }
+//    override fun onPlayerError(errorCode: String?, errorMsg: String?) {
+//        if (errorMsg != "网络请求超时") {
+//            channel.invokeMethod(
+//                "errorInfo",
+//                mapOf(
+//                    Pair("errorCode", errorCode),
+//                    Pair("errorMsg", errorMsg),
+//                )
+//            )
+//        } else {
+//            channel.invokeMethod(
+//                "errorInfo",
+//                mapOf(
+//                    Pair(
+//                        "errorCode", errorCode?.replace("[", "")
+//                            ?.replace("]", "")
+//                            ?.replace("网络请求超时", "")
+//                            ?.split("-")
+//                            ?.get(0)
+//                    ),
+//                    Pair("errorMsg", errorMsg),
+//                )
+//            )
+//        }
+//    }
 
     fun openBuyPeakTime() {
         Intent().apply {
@@ -1230,47 +1203,47 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
     }
 
     fun updatePlayInfo(arguments: Map<*, *>) {
-        val playTime = (arguments["playTime"] as Number?)?.toLong() ?: 0L
-        val peakTime = GameParam.getTimeValue(arguments["peakTime"])
-        val vipExpiredTime = GameParam.getTimeValue(arguments["vipExpiredTime"])
-        gameParam?.playTime = playTime
-        gameParam?.peakTime = peakTime
-        gameParam?.vipExpiredTime = vipExpiredTime
-        if (isAnTong()) {
-            EventBus.getDefault().post(TimeUpdateEvent(gameParam!!))
-            return
-        }
-        val bundle = Bundle().apply {
-            putLong(HmcpVideoView.PLAY_TIME, playTime)
-            putString(HmcpVideoView.USER_ID, gameParam?.userId)
-            putString(HmcpVideoView.TIPS_MSG, "");
-            putString(
-                HmcpVideoView.PAY_PROTO_DATA,
-                GameUtils.getProtoData(
-                    gson,
-                    gameParam?.userId,
-                    gameParam?.gameId,
-                    gameParam?.priority ?: 1,
-                    "android",
-                    "hmy",
-                    AppUtils.getAppVersionName()
-                )
-            )
-            putString(HmcpVideoView.C_TOKEN, gameParam?.cToken)
-        }
-        LogUtils.d("updatePlayTime:$bundle")
-        gameView?.updateGameUID(bundle, object : OnUpdataGameUIDListener {
-            override fun success(result: Boolean) {
-                LogUtils.d("updateGameUID->success:$result")
-                if (result) {
-                    EventBus.getDefault().post(TimeUpdateEvent(gameParam!!))
-                }
-            }
-
-            override fun fail(result: String?) {
-                LogUtils.d("updateGameUID->fail:$result")
-            }
-        })
+//        val playTime = (arguments["playTime"] as Number?)?.toLong() ?: 0L
+//        val peakTime = GameParam.getTimeValue(arguments["peakTime"])
+//        val vipExpiredTime = GameParam.getTimeValue(arguments["vipExpiredTime"])
+//        gameParam?.playTime = playTime
+//        gameParam?.peakTime = peakTime
+//        gameParam?.vipExpiredTime = vipExpiredTime
+//        if (isAnTong()) {
+//            EventBus.getDefault().post(TimeUpdateEvent(gameParam!!))
+//            return
+//        }
+//        val bundle = Bundle().apply {
+//            putLong(HmcpVideoView.PLAY_TIME, playTime)
+//            putString(HmcpVideoView.USER_ID, gameParam?.userId)
+//            putString(HmcpVideoView.TIPS_MSG, "");
+//            putString(
+//                HmcpVideoView.PAY_PROTO_DATA,
+//                GameUtils.getProtoData(
+//                    gson,
+//                    gameParam?.userId,
+//                    gameParam?.gameId,
+//                    gameParam?.priority ?: 1,
+//                    "android",
+//                    "hmy",
+//                    AppUtils.getAppVersionName()
+//                )
+//            )
+//            putString(HmcpVideoView.C_TOKEN, gameParam?.cToken)
+//        }
+//        LogUtils.d("updatePlayTime:$bundle")
+//        gameView?.updateGameUID(bundle, object : OnUpdataGameUIDListener {
+//            override fun success(result: Boolean) {
+//                LogUtils.d("updateGameUID->success:$result")
+//                if (result) {
+//                    EventBus.getDefault().post(TimeUpdateEvent(gameParam!!))
+//                }
+//            }
+//
+//            override fun fail(result: String?) {
+//                LogUtils.d("updateGameUID->fail:$result")
+//            }
+//        })
     }
 
     fun exitQueue() {
@@ -1301,27 +1274,27 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             callback.success(true)
             return
         }
-        HmcpManager.getInstance().setReleaseCid(
-            gameParam.gamePkName, gameParam.cid, gameParam.cToken, gameParam.channelName,
-            UserInfo2().also {
-                it.userId = gameParam.userId
-                it.userToken = gameParam.userToken
-            },
-            gameParam.accessKeyId,
-            object : OnSaveGameCallBackListener {
-                override fun success(result: Boolean) {
-                    // 游戏释放成功
-                    LogUtils.d("releaseGame:$result")
-                    callback.success(result)
-                }
-
-                override fun fail(error: String?) {
-                    // 游戏释放失败
-                    LogUtils.e("releaseGame:$error")
-                    callback.success(false)
-                }
-            }
-        )
+//        HmcpManager.getInstance().setReleaseCid(
+//            gameParam.gamePkName, gameParam.cid, gameParam.cToken, gameParam.channelName,
+//            UserInfo2().also {
+//                it.userId = gameParam.userId
+//                it.userToken = gameParam.userToken
+//            },
+//            gameParam.accessKeyId,
+//            object : OnSaveGameCallBackListener {
+//                override fun success(result: Boolean) {
+//                    // 游戏释放成功
+//                    LogUtils.d("releaseGame:$result")
+//                    callback.success(result)
+//                }
+//
+//                override fun fail(error: String?) {
+//                    // 游戏释放失败
+//                    LogUtils.e("releaseGame:$error")
+//                    callback.success(false)
+//                }
+//            }
+//        )
     }
 
     /// 游戏释放
@@ -1330,11 +1303,14 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         disposable?.dispose()
         val isAnTong = isAnTong()
         // 安通没有 cid，安通使用 userId
-        val cloudId = if (isAnTong) {
-            this.gameParam?.userId
-        } else {
-            HmcpManager.getInstance().cloudId
-        }
+//        val cloudId = if (isAnTong) {
+//            this.gameParam?.userId
+//        } else {
+//            HmcpManager.getInstance().cloudId
+//        }
+
+        val cloudId = this.gameParam?.userId
+
         if (finish != "0") {
             // 非切换队列调用此方法，认定为退出游戏
             channel.invokeMethod(
@@ -1346,8 +1322,8 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         isVideoShowed = false
         if (TextUtils.isEmpty(cloudId)) {
             LogUtils.d("undo releaseGame, cid is empty")
-            gameView?.release()
-            gameView?.onDestroy()
+//            gameView?.release()
+//            gameView?.onDestroy()
             gameView = null
             isPlaying = false
             if (finish == "0" && !isAnTong) {
@@ -1361,100 +1337,100 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
             return
         }
 
-        HmcpManager.getInstance().setReleaseCid(
-            gameParam?.gamePkName, cloudId, gameParam?.cToken, gameParam?.channelName,
-            UserInfo2().also {
-                it.userId = gameParam?.userId
-                it.userToken = gameParam?.userToken
-            },
-            gameParam?.accessKeyId,
-            object : OnSaveGameCallBackListener {
-                override fun success(result: Boolean) {
-                    // 游戏释放成功
-                    LogUtils.d("releaseGame:$result")
-                    gameView?.release()
-                    gameView?.onDestroy()
-                    gameView = null
-                    isPlaying = false
-                    isVideoShowed = false
-                    if (finish == "0") {
-                        // 切换队列
-                        playGame(bundle)
-                    }
-                }
-
-                override fun fail(error: String?) {
-                    // 游戏释放失败
-                    LogUtils.e("releaseGame:$error")
-                    gameView?.release()
-                    gameView?.onDestroy()
-                    gameView = null
-                    isPlaying = false
-                    isVideoShowed = false
-                    channel.invokeMethod(
-                        "errorInfo",
-                        mapOf(
-                            Pair("errorCode", GameError.gameReleaseErrorCode),
-                            Pair("errorMsg", GameError.gameReleaseErrorMsg),
-                        )
-                    )
-                }
-            }
-        )
+//        HmcpManager.getInstance().setReleaseCid(
+//            gameParam?.gamePkName, cloudId, gameParam?.cToken, gameParam?.channelName,
+//            UserInfo2().also {
+//                it.userId = gameParam?.userId
+//                it.userToken = gameParam?.userToken
+//            },
+//            gameParam?.accessKeyId,
+//            object : OnSaveGameCallBackListener {
+//                override fun success(result: Boolean) {
+//                    // 游戏释放成功
+//                    LogUtils.d("releaseGame:$result")
+//                    gameView?.release()
+//                    gameView?.onDestroy()
+//                    gameView = null
+//                    isPlaying = false
+//                    isVideoShowed = false
+//                    if (finish == "0") {
+//                        // 切换队列
+//                        playGame(bundle)
+//                    }
+//                }
+//
+//                override fun fail(error: String?) {
+//                    // 游戏释放失败
+//                    LogUtils.e("releaseGame:$error")
+//                    gameView?.release()
+//                    gameView?.onDestroy()
+//                    gameView = null
+//                    isPlaying = false
+//                    isVideoShowed = false
+//                    channel.invokeMethod(
+//                        "errorInfo",
+//                        mapOf(
+//                            Pair("errorCode", GameError.gameReleaseErrorCode),
+//                            Pair("errorMsg", GameError.gameReleaseErrorMsg),
+//                        )
+//                    )
+//                }
+//            }
+//        )
     }
 
     fun releasePlayPartyGame() {
-        gameView?.release()
-        gameView?.onDestroy()
+//        gameView?.release()
+//        gameView?.onDestroy()
         gameView = null
         isPlaying = false
         isVideoShowed = false
     }
 
-    override fun pinCodeResult(success: Boolean, cid: String?, pinCode: String?, msg: String?) {
-        if (success && !TextUtils.isEmpty(pinCode) && !TextUtils.isEmpty(cid)) {
-            val map = hashMapOf<String, String>()
-            map["pinCode"] = pinCode ?: ""
-            map["cid"] = cid ?: ""
-            channel.invokeMethod("pinCodeResult", map)
-        }
-    }
+//    override fun pinCodeResult(success: Boolean, cid: String?, pinCode: String?, msg: String?) {
+//        if (success && !TextUtils.isEmpty(pinCode) && !TextUtils.isEmpty(cid)) {
+//            val map = hashMapOf<String, String>()
+//            map["pinCode"] = pinCode ?: ""
+//            map["cid"] = cid ?: ""
+//            channel.invokeMethod("pinCodeResult", map)
+//        }
+//    }
 
-    override fun contronResult(success: Boolean, msg: String?) {
-        LogUtils.d("contronResult success: $success msg: $msg")
-//        channel.invokeMethod("contronResult", msg)
-    }
+//    override fun contronResult(success: Boolean, msg: String?) {
+//        LogUtils.d("contronResult success: $success msg: $msg")
+////        channel.invokeMethod("contronResult", msg)
+//    }
 
-    override fun contronLost() {
-//        LogUtils.d("contronLost")
-//        channel.invokeMethod("contronLost", null)
-    }
+//    override fun contronLost() {
+////        LogUtils.d("contronLost")
+////        channel.invokeMethod("contronLost", null)
+//    }
 
-    override fun controlDistribute(
-        success: Boolean,
-        controlInfo: MutableList<ControlInfo>?,
-        msg: String?
-    ) {
-        val controlInfos = controlInfo ?: emptyList()
-        channel.invokeMethod("controlDistribute", gson.toJson(controlInfos))
-    }
+//    override fun controlDistribute(
+//        success: Boolean,
+//        controlInfo: MutableList<ControlInfo>?,
+//        msg: String?
+//    ) {
+//        val controlInfos = controlInfo ?: emptyList()
+//        channel.invokeMethod("controlDistribute", gson.toJson(controlInfos))
+//    }
 
-    override fun controlQuery(
-        success: Boolean,
-        controlInfos: MutableList<ControlInfo>?,
-        msg: String?
-    ) {
-        if (success) {
-            val jsonArray = JSONArray()
-            controlInfos?.forEach { controlInfo ->
-                val jsonObject = JSONObject()
-                jsonObject.put("position", controlInfo.position)
-                jsonObject.put("cid", controlInfo.cid.toString())
-                jsonArray.put(jsonObject)
-            }
-            channel.invokeMethod("controlInfos", jsonArray.toString())
-        }
-    }
+//    override fun controlQuery(
+//        success: Boolean,
+//        controlInfos: MutableList<ControlInfo>?,
+//        msg: String?
+//    ) {
+//        if (success) {
+//            val jsonArray = JSONArray()
+//            controlInfos?.forEach { controlInfo ->
+//                val jsonObject = JSONObject()
+//                jsonObject.put("position", controlInfo.position)
+//                jsonObject.put("cid", controlInfo.cid.toString())
+//                jsonArray.put(jsonObject)
+//            }
+//            channel.invokeMethod("controlInfos", jsonArray.toString())
+//        }
+//    }
 
     /**
      * 获取授权码
@@ -1463,7 +1439,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         if (isAnTong()) {
             AnTongSDK.getPinCode()
         } else {
-            gameView?.getPinCode(this)
+            //gameView?.getPinCode(this)
         }
     }
 
@@ -1474,7 +1450,7 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         if (isAnTong()) {
             AnTongSDK.queryControlUsers()
         } else {
-            gameView?.queryControlPermitUsers(this)
+            //gameView?.queryControlPermitUsers(this)
         }
     }
 
@@ -1510,20 +1486,20 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         if (initState) {
             controlPlay(cid, pinCode, accessKeyId, userId, userToken)
         } else {
-            val config = Bundle().apply {
-                putString(HmcpManager.ACCESS_KEY_ID, accessKeyId)
-                putString(HmcpManager.CHANNEL_ID, channelName)
-            }
-            HmcpManager.getInstance().init(config, activity, object : OnInitCallBackListener {
-                override fun success() {
-                    initState = true
-                    controlPlay(cid, pinCode, accessKeyId, userId, userToken)
-                }
-
-                override fun fail(msg: String?) {
-                    initState = false
-                }
-            }, true)
+//            val config = Bundle().apply {
+//                putString(HmcpManager.ACCESS_KEY_ID, accessKeyId)
+//                putString(HmcpManager.CHANNEL_ID, channelName)
+//            }
+//            HmcpManager.getInstance().init(config, activity, object : OnInitCallBackListener {
+//                override fun success() {
+//                    initState = true
+//                    controlPlay(cid, pinCode, accessKeyId, userId, userToken)
+//                }
+//
+//                override fun fail(msg: String?) {
+//                    initState = false
+//                }
+//            }, true)
         }
     }
 
@@ -1534,32 +1510,32 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         userId: String,
         userToken: String
     ) {
-        val userInfo = UserInfo()
-        userInfo.userId = userId
-        userInfo.userToken = userToken
-        initHmcpView(userInfo)
-
-        // 选择流类型。 0：表示RTMP  1：表示WEBRTC
-        val streamType = 1
-
-        // 获取控制权参数对象
-        val control = Control()
-        control.cid = cid
-        control.pinCode = pinCode
-        control.accessKeyID = accessKeyID
-        control.isIPV6 = false
-        control.orientation = ScreenOrientation.LANDSCAPE
-
-        gameView?.contronPlay(streamType, control, this)
+//        val userInfo = UserInfo()
+//        userInfo.userId = userId
+//        userInfo.userToken = userToken
+//        initHmcpView(userInfo)
+//
+//        // 选择流类型。 0：表示RTMP  1：表示WEBRTC
+//        val streamType = 1
+//
+//        // 获取控制权参数对象
+//        val control = Control()
+//        control.cid = cid
+//        control.pinCode = pinCode
+//        control.accessKeyID = accessKeyID
+//        control.isIPV6 = false
+//        control.orientation = ScreenOrientation.LANDSCAPE
+//
+//        gameView?.contronPlay(streamType, control, this)
     }
 
-    private fun initHmcpView(userInfo: UserInfo) {
-        gameView = HMGameView(activity)
-        gameView?.setUserInfo(userInfo)
-
-        gameView?.hmcpPlayerListener = this
-        gameView?.virtualDeviceType = VirtualOperateType.NONE
-    }
+//    private fun initHmcpView(userInfo: UserInfo) {
+//        gameView = HMGameView(activity)
+//        gameView?.setUserInfo(userInfo)
+//
+//        gameView?.hmcpPlayerListener = this
+//        gameView?.virtualDeviceType = VirtualOperateType.NONE
+//    }
 
     fun sendCurrentCid(cloudId: String) {
         val cidArr = JSONObject().apply {
@@ -1578,19 +1554,19 @@ object GameManager : HmcpPlayerListenerImp(), OnContronListener {
         if (isAnTong()) {
             AnTongSDK.distributeControlPermit(arguments)
         } else {
-            val list = arrayListOf<ControlInfo>()
-            for (i in 0 until arguments.length()) {
-                val jsonObject = arguments.getJSONObject(i)
-                val controlInfo = ControlInfo().apply {
-                    cid = jsonObject.getString("cid").toLong()
-                    position = jsonObject.getInt("position")
-                }
-                list.add(controlInfo)
-            }
-
-            if (list.isNotEmpty()) {
-                gameView?.distributeControlPermit(list, this)
-            }
+//            val list = arrayListOf<ControlInfo>()
+//            for (i in 0 until arguments.length()) {
+//                val jsonObject = arguments.getJSONObject(i)
+//                val controlInfo = ControlInfo().apply {
+//                    cid = jsonObject.getString("cid").toLong()
+//                    position = jsonObject.getInt("position")
+//                }
+//                list.add(controlInfo)
+//            }
+//
+//            if (list.isNotEmpty()) {
+//                gameView?.distributeControlPermit(list, this)
+//            }
         }
     }
 

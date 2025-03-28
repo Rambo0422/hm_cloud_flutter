@@ -10,14 +10,14 @@ import android.view.animation.AccelerateInterpolator
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.DataBindingUtil
-import com.haima.hmcp.beans.HMInputOpData
+import com.antong.keyboard.sa.constants.HMInputOpData
 import com.sayx.hm_cloud.R
-import com.sayx.hm_cloud.model.KeyInfo
 import com.sayx.hm_cloud.callback.AddKeyListener
 import com.sayx.hm_cloud.callback.AnimatorListenerImp
 import com.sayx.hm_cloud.constants.KeyConstants
 import com.sayx.hm_cloud.constants.KeyType
 import com.sayx.hm_cloud.databinding.ViewAddKeyboardKeyBinding
+import com.sayx.hm_cloud.model.KeyInfo
 import com.sayx.hm_cloud.utils.AppSizeUtils
 import java.util.UUID
 
